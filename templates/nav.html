@@ -1,0 +1,42 @@
+<nav class="navbar navbar-expand-xl navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#"><img src=""> Testing Platform</a>
+        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#nav" aria-controls="navbarsExample06" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="navbar-collapse collapse" id="nav" style="">
+            <ul class="navbar-nav me-auto mb-2 mb-xl-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdown06" data-bs-toggle="dropdown"
+                       aria-expanded="false">Dropdown</a>
+                    <ul class="dropdown-menu bg-dark" aria-labelledby="dropdown06">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav d-flex ms-auto mb-2 mb-lg-0">
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><span class="nav-link">Welcome, {{ user.username }}</span></li>
+                    <li class="nav-item"><span class="nav-link">|</span></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Logout</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="#">Login</a></li>
+                {% endif %}
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-question-circle-fill"></i></a></li>
+            </ul>
+
+        </div>
+    </div>
+</nav>

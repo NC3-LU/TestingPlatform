@@ -1,0 +1,75 @@
+/* PLEASE CHANGE COLORS HERE */
+
+:root {
+    /* MAIN BACKGROUND COLOR AND TEXT COLOR */
+    --backgroundTextColor: white;
+    --secondBackgroundColor: #5C5E5B;
+    --dBoxColor: #526475;
+    --anchorColor: #BFD0DE;
+    --anchorColorHover: #F2E422;
+
+}
+
+/*  GENERAL */
+html, body {
+ height: 100%;
+}
+body{
+  background:var(--backgroundTextColor);
+  font-family: 'Roboto Mono', monospace !important;
+}
+
+#content{
+    min-height: 85%;
+    height:auto;
+}
+
+a {color: var(--anchorColor) !important;}
+a:hover {color: var(--anchorColorHover) !important;}
+
+.btn:hover{
+
+}
+
+/* NAVIGATION */
+
+nav{
+height: 5% !important;
+}
+.dropdown-item:hover{
+    background:var(--secondBackgroundColor) !important;
+}
+
+/* DASHBOARD */
+.dBox{
+    width:15%;
+    height:20vh;
+    background:var(--dBoxColor);
+    margin: 2%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    transition: 0.5s;
+}
+.dBox > a:hover{
+    color: var(--anchorColor) !important;
+}
+
+.dBox:hover{
+    background:var(--secondBackgroundColor);
+    transition: 0.5s;
+    border: 3px black solid;
+    cursor: pointer;
+
+}
+
+
+/* FOOTER */
+footer{
+    color: white;
+    height:10%;
+}
+
+
+

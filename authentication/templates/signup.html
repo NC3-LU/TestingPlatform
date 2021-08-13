@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Authentication{% endblock %}
+
+{% block content %}
+
+<main class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center">
+    <h1>Signup</h1>
+    <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      <p>
+        {{ field.label_tag }}<br>
+        {{ field }}
+        {% if field.help_text %}
+          <small style="color: grey">{{ field.help_text }}</small>
+        {% endif %}
+        {% for error in field.errors %}
+          <p style="color: red">{{ error }}</p>
+        {% endfor %}
+      </p>
+    {% endfor %}
+    <button type="submit">Sign up</button>
+  </form>
+</main>
+
+<section class="m-5">
+
+</section>
+
+
+{% endblock %}

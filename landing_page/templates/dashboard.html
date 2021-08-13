@@ -1,0 +1,24 @@
+<section class=" w-100 h-100 d-flex justify-content-center flex-wrap">
+    <div class="dBox">
+        <a>IOT Inspector</a>
+    </div>
+
+    <div class="dBox">
+        <a>Testing</a>
+    </div>
+    <div class="dBox">
+        <a> Profile</a>
+    </div>
+
+    <div class="dBox">
+        <a>Legal</a>
+    </div>
+    {% if user.is_superuser %}
+    <div class="dBox">
+        <a> Admin Dashboard</a>
+    </div>
+    {% endif %}
+    <div class="dBox">
+        <a>Logout</a>
+    </div>
+</section>

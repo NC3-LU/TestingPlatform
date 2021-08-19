@@ -1,22 +1,13 @@
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+<nav class="navbar navbar-expand-xl navbar-dark bg-dark">
     <div class="container-fluid d-flex flex-row justify-content-around">
         <a class="navbar-brand" href="#"><img src=""> Testing Platform</a>
-<<<<<<< HEAD
-        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#nav" aria-controls="navbarsExample06" aria-expanded="false"
-                aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
 
-        <div class="navbar-collapse collapse" id="nav" style="">
-            <ul class="navbar-nav me-auto mb-2 mb-xl-0">
-=======
         <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div id="navbar" class="bg-dark collapse navbar-collapse">
             <ul class="navbar-nav">
->>>>>>> 2a1861e... Fixed NAV and Footer
+
                 <li class="nav-item">
                     <a class="nav-link" href="/">Home</a>
                 </li>
@@ -36,14 +27,16 @@
 
             <ul class="navbar-nav d-flex ms-auto mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
-                    <li class="nav-item"><span class="nav-link">Welcome, {{ user.username }}</span></li>
-                    <li class="nav-item"><span class="nav-link">|</span></li>
-                    <li class="nav-item"><a class="nav-link" href="/logout/">Logout</a></li>
+                <li class="nav-item"><span class="nav-link">Welcome, {{ user.username }} | </span></li>
+                <li class="nav-item"><a class="nav-link" href="/settings/">Profile</a></li>
+                <li class="nav-item"><a class="nav-link" href="/logout/">Logout</a></li>
+
                 {% else %}
-                    <li class="nav-item"><a class="nav-link" href="/login/">Login</a></li>
+                <li class="nav-item"><a class="nav-link" href="/login/">Login</a></li>
                 {% endif %}
 
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-question-circle-fill"></i></a></li>
+                <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-question-circle-fill"></i></a></li>
+
             </ul>
         </div>
     </div>

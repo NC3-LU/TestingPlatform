@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Authentication{% endblock %}
+{% block title %}Profile{% endblock %}
 
 {% block content %}
 
 <main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
-    <h1>Signup</h1>
+    <h1>Profile</h1>
     <hr class="w-25 text-dark">
-    <form class="p-5 authForm" method="post">
+  <form class="authForm p-5" method="post" enctype="multipart/form-data">
         {% csrf_token %}
+
         {% for field in form %}
         <div class="form-floating mb-4">
             {{ field }}
@@ -18,11 +19,11 @@
             {% endif %}
             {% for error in field.errors %}
             <p style="color: red">{{ error }}</p>
-            {% endfor %}
+         {% endfor %}
         </div>
-        {% endfor %}
-        <input class="btn btn-primary" type="submit" value="Sign Up">
-
+         {% endfor %}
+        <small><a href="/change-password/">I want to change my password</a></small>
+        <input class="mt-2 btn btn-primary" type="submit" value="Update">
     </form>
 </main>
 

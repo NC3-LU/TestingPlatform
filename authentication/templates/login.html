@@ -2,55 +2,66 @@
 {% load i18n static %}
 
 {% block content %}
+
+
 {% if form.errors and not form.non_field_errors %}
-    <p class="errornote">
-        {% if form.errors.items|length == 1 %}
-            {% translate "Please correct the error below." %}
-        {% else %}
-            {% translate "Please correct the errors below." %}
-        {% endif %}
-    </p>
+<p class="errornote">
+    {% if form.errors.items|length == 1 %}
+    {% translate "Please correct the error below." %}
+    {% else %}
+    {% translate "Please correct the errors below." %}
+    {% endif %}
+</p>
 {% endif %}
 
 {% if form.non_field_errors %}
-    {% for error in form.non_field_errors %}
-        <p class="errornote">
-            {{ error }}
-        </p>
-    {% endfor %}
+{% for error in form.non_field_errors %}
+<p class="errornote">
+    {{ error }}
+</p>
+{% endfor %}
 {% endif %}
 
-<div id="content-main">
+<main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
+
 
     {% if user.is_authenticated %}
-        <p class="errornote">
-            {% blocktranslate trimmed %}
-                You are authenticated as {{ username }}, but are not authorized to
-                access this page. Would you like to login to a different account?
-            {% endblocktranslate %}
-        </p>
+    <p class="errornote">
+        {% blocktranslate trimmed %}
+        You are authenticated as {{ username }}, but are not authorized to
+        access this page. Would you like to login to a different account?
+        {% endblocktranslate %}
+    </p>
     {% endif %}
 
-    <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
-        <div class="form-row">
-            {{ form.username.errors }}
-            {{ form.username.label_tag }} {{ form.username }}
+    <h1>Login</h1>
+    <hr class="w-25 text-dark">
+    <form class="p-5 authForm" action="{{ app_path }}" method="post" id="login-form">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="form-floating mb-4">
+            {{ field }}
+            {{ field.label_tag }}
+            {% if field.help_text %}
+            <small>{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+            <p style="color: red">{{ error }}</p>
+            {% endfor %}
         </div>
-        <div class="form-row">
-            {{ form.password.errors }}
-            {{ form.password.label_tag }} {{ form.password }}
-            <input type="hidden" name="next" value="{{ next }}">
-        </div>
+        {% endfor %}
+
+        <input type="hidden" name="next" value="{{ next }}">
+
         {% url 'admin_password_reset' as password_reset_url %}
         {% if password_reset_url %}
-            <div class="password-reset-link">
-                <a href="{{ password_reset_url }}">{% translate 'Forgotten your password or username?' %}</a>
-            </div>
-        {% endif %}
-        <div class="submit-row">
-            <input type="submit" value="{% translate 'Log in' %}">
+        <div class="password-reset-link">
+            <a href="{{ password_reset_url }}">{% translate 'Forgotten your password or username?' %}</a>
         </div>
+        {% endif %}
+        <input class="btn btn-primary" type="submit" value="{% translate 'Log in' %}">
     </form>
 
-</div>
+</main>
 {% endblock %}

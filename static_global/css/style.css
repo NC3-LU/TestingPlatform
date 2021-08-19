@@ -7,13 +7,13 @@
     --dBoxColor: #526475;
     --anchorColor: #BFD0DE;
     --anchorColorHover: #F2E422;
-
 }
 
 /*  GENERAL */
 html, body {
- height: 100%;
+  height: 100%;
 }
+
 body{
   background:var(--backgroundTextColor);
   font-family: 'Roboto Mono', monospace !important;
@@ -24,7 +24,10 @@ body{
     height:auto;
 }
 
-a {color: var(--anchorColor) !important;}
+
+a {color: var(--anchorColor) !important; font-weight:bold; text-decoration:none;}
+.anchorBgLight {color: var(--anchorColor) !important;}
+
 a:hover {color: var(--anchorColorHover) !important;}
 
 .btn-primary{
@@ -40,6 +43,23 @@ a:hover {color: var(--anchorColorHover) !important;}
 }
 
 /* FORMS */
+input {
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
 .form-control{
     border: 1px var(--bs-dark) solid;
 }
@@ -54,7 +74,6 @@ a:hover {color: var(--anchorColorHover) !important;}
 nav{
     min-height: 7%;
 }
-
 
 .navbar-nav{
     padding-left: 2rem !important;
@@ -73,21 +92,23 @@ nav{
 
 /* AUTHENTICATION */
 
-#signup{
+.authForm{
     border: 1px solid;
     background: var(--bs-dark);
+    width:50%;
 }
 
-#signup{
+.authForm{
     color: white !important;
 }
-#signup > div > input{
+.authForm > div > input{
     background: var(--anchorColor);
 }
-#signup > div > label{
+.authForm > div > label{
     color:var(--bs-dark);
     font-weight: bold;
 }
+
 
 /* DASHBOARD */
 .dBox{
@@ -98,7 +119,7 @@ nav{
     display:flex;
     justify-content: center;
     align-items: center;
-    font-size: 2em;
+    font-size: 1.5em;
     transition: 0.5s;
 }
 .dBox > a:hover{
@@ -110,6 +131,14 @@ nav{
     transition: 0.5s;
     border: 3px black solid;
     cursor: pointer;
+}
+
+@media only screen and (max-width: 800px) {
+.dBox{
+    width:35%;
+    height: 15vh;
+    font-size: 1em;
+}
 
 }
 
@@ -130,9 +159,7 @@ footer{
     #subFooter > .nav-link {
        padding: 0;
        padding-top: .5rem
-
     }
-
 }
 
 

@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'landing_page',
     'authentication',
-    'bootstrap5'
+    'bootstrap5',
+    'testing'
 ]
 
 MIDDLEWARE = [

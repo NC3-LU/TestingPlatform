@@ -20,6 +20,7 @@ urlpatterns = [
     path('', include('landing_page.urls')),
     path('', include('authentication.urls')),
     path('', include('legal_section.urls')),
+    path('', include('testing.urls')),
     path('admin/', admin.site.urls),
 ]
 

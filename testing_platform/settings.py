@@ -41,8 +41,7 @@ INSTALLED_APPS = [
     'authentication',
     'bootstrap5',
     'widget_tweaks',
-    'testing'
-
+    'testing',
 ]
 
 MIDDLEWARE = [

@@ -39,7 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'landing_page',
     'authentication',
-    'bootstrap5'
+    'bootstrap5',
+    'widget_tweaks',
+    'testing'
+
 ]
 
 MIDDLEWARE = [
@@ -50,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'testing_platform.urls'

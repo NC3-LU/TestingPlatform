@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, PasswordResetForm
 from django.contrib.auth.models import User
 
 
@@ -38,6 +38,14 @@ class UserUpdateForm(forms.ModelForm):
 
 
 class ChangePasswordForm(PasswordChangeForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
+
+
+class ResetPasswordEmail(PasswordResetForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

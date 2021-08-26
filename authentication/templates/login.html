@@ -55,11 +55,11 @@
         <input type="hidden" name="next" value="{{ next }}">
 
         {% url 'admin_password_reset' as password_reset_url %}
-        {% if password_reset_url %}
-        <div class="password-reset-link">
-            <a href="{{ password_reset_url }}">{% translate 'Forgotten your password or username?' %}</a>
+
+        <div class="mb-3 password-reset-link">
+            <a href="/accounts/password-reset">I forgot my password</a>
         </div>
-        {% endif %}
+
         <input class="btn btn-primary" type="submit" value="{% translate 'Log in' %}">
     </form>
 

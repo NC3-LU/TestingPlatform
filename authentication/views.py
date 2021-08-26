@@ -70,6 +70,7 @@ def edit_profile(request):
         return render(request, 'profile.html', args)
 
 
+@login_required
 def change_password(request):
     if request.method == 'POST':
         form = ChangePasswordForm(request.user, request.POST)

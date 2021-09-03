@@ -1,11 +1,14 @@
 import platform  # For getting the operating system name
 import subprocess  # For executing a shell command
+from django.contrib.auth.decorators import login_required
 from subprocess import check_output
 from django.shortcuts import render
+
 
 # Create your views here.
 
 
+@login_required
 def ping_test(request):
     if request.method == 'POST':
         target = request.POST['ping-target']

@@ -27,3 +27,8 @@ def ping_test(request):
         return render(request, 'ping_test.html', {'result': ping_result})
     else:
         return render(request, 'ping_test.html')
+
+@login_required
+def test_landing(request):
+    # Render the HTML template signup.html
+    return render(request, 'test_landing.html')

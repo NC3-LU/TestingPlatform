@@ -8,6 +8,12 @@
         <label for="ping-target">Ping Target:</label><br>
         <input type="text" id="ping-target" name="ping-target" value="{{ form }}"><br>
         <input type="submit" value="Ping" class="btn btn-primary">
+        <button onclick="goBack()">Back</button>
+        <script>
+        function goBack() {
+          window.history.back();
+        }
+        </script>
     </form>
     {% if result %}
     <code class="w-50 mt-2 bg-dark p-3"><b>Result:</b><br><br>{{ result }}</code>

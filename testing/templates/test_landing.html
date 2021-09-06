@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+{% if user.is_authenticated %}
+    {% include 'all_tests.html' %}
+{% else %}
+    {% include 'landing_page.html' %}
+
+{% endif %}
+
+{% endblock %}

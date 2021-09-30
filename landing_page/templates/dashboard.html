@@ -1,24 +1,60 @@
-<section class=" w-100 h-100 d-flex justify-content-center flex-wrap">
-    <div class="dBox">
-        <a>IOT Inspector</a>
+<section class="w-100 h-100 d-flex justify-content-center flex-wrap">
+    <div class="dashboardBox">
+        <a href="">
+            <div class="dashboardBoxPreview">
+                IOT Inspector
+            </div>
+            <div class="dashboardBoxDescription">
+                In order to design proper security controls adapted to your specific environment, you need to know what
+                are the intrinsic vulnerabilities of the IoT’s you are using. This is where a solution such as the one
+                we are using on this platform, will provide you with a comprehensive report on the known weaknesses of
+                the IoT’s firmware’s. To do so, we have partnered with IoT Inspector
+                GmbH whose solution is particularly advanced and comprehensive, and generates detailed reports.
+            </div>
+        </a>
     </div>
-
-    <div class="dBox">
-        <a href="test/">Testing</a>
+    <div class="dashboardBox">
+        <a href="/test/c3-protocols">
+            <div class="dashboardBoxPreview">
+                C3 Protocols
+            </div>
+            <div class="dashboardBoxDescription">
+                This initiative was inspired by Start-Ups and SMB's with whom we interact daily. While trying to
+                understand why they are not engaged more systematically into Penetration Testing, the answer that came
+                back most of the time was « Cost ». Click to read further.
+            </div>
+        </a>
     </div>
-    <div class="dBox">
-        <a href="accounts/settings/"> Profile</a>
-    </div>
-
-    <div class="dBox">
-        <a>Legal</a>
+    <div class="dashboardBox">
+        <a href="">
+            <div class="dashboardBoxPreview">
+                Testing
+            </div>
+            <div class="dashboardBoxDescription">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis lacinia felis id felis rhoncus,
+                consectetur
+                sagittis dui sagittis. Nullam bibendum rhoncus luctus. Aenean eu metus ornare, ornare odio vitae,
+                vestibulum
+                neque. Suspendisse consectetur lorem risus, volutpat viverra neque efficitur eget. Nulla facilisis augue
+                vitae leo convallis, at sagittis elit pharetra.
+            </div>
+        </a>
     </div>
     {% if user.is_superuser %}
-    <div class="dBox">
-        <a> Admin Dashboard</a>
+    <div class="dashboardBox">
+        <a href="">
+            <div class="dashboardBoxPreview">
+                Admin Dashboard
+            </div>
+            <div class="dashboardBoxDescription">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis lacinia felis id felis rhoncus,
+                consectetur
+                sagittis dui sagittis. Nullam bibendum rhoncus luctus. Aenean eu metus ornare, ornare odio vitae,
+                vestibulum
+                neque. Suspendisse consectetur lorem risus, volutpat viverra neque efficitur eget. Nulla facilisis augue
+                vitae leo convallis, at sagittis elit pharetra.
+            </div>
+        </a>
     </div>
     {% endif %}
-    <div class="dBox">
-        <a href="accounts/logout/">Logout</a>
-    </div>
 </section>

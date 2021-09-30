@@ -28,7 +28,12 @@ def ping_test(request):
     else:
         return render(request, 'ping_test.html')
 
+
 @login_required
 def test_landing(request):
-    # Render the HTML template signup.html
     return render(request, 'test_landing.html')
+
+
+@login_required
+def c3_protocols(request):
+    return render(request, 'c3_protocols.html')

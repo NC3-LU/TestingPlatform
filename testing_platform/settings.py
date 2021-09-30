@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'bootstrap5',
     'widget_tweaks',
     'testing',
+    'legal_section'
 ]
 
 MIDDLEWARE = [

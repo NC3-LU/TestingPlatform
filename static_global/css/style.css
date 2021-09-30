@@ -24,7 +24,6 @@ body{
     height:auto;
 }
 
-
 a {color: var(--anchorColor) !important; font-weight:bold; text-decoration:none;}
 .anchorBgLight {color: var(--anchorColor) !important;}
 
@@ -111,37 +110,64 @@ nav{
 
 
 /* DASHBOARD */
-.dBox{
-    width:15%;
-    height:20vh;
+.dashboardBox{
+    width:80%;
+    height:auto;
     background:var(--dBoxColor);
+    border: 3px var(--dBoxColor) solid;
     margin: 2%;
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5em;
+    padding: 2%;
     transition: 0.5s;
-}
-.dBox > a:hover{
-    color: var(--anchorColor) !important;
 }
 
-.dBox:hover{
-    background:var(--secondBackgroundColor);
+.dashboardBox > a{
+    display:flex;
+    align-items: center;
     transition: 0.5s;
-    border: 3px black solid;
+    justify-content: space-around;
+    color:white;
+    flex-wrap: wrap;
+}
+
+/*.dashboardBox > a:hover{
+    color: var(--anchorColor) !important;
+}
+*/
+.dashboardBox:hover{
+    transition: 0.5s;
+    border: 3px #212529 solid;
     cursor: pointer;
+}
+.dashboardBoxPreview{
+    width:20%;
+    height: 15vh;
+    margin-right: 5%;
+    background:var(--anchorColor);
+    display:flex;
+    align-items: center;
+    justify-content: center !important;
+    color: black !important;
+    font-weight: normal !important;
+
+}
+.dashboardBoxDescription{
+    width: 75%;
+    font-size: 1em !important;
+    color: white !important;
+    font-weight: normal !important;
 }
 
 @media only screen and (max-width: 800px) {
-.dBox{
-    width:35%;
-    height: 15vh;
-    font-size: 1em;
+    .dashboardBoxPreview{
+        width: 70%;
+    }
+    .dashboardBoxDescription{
+        width: 100%;
+        margin-top: 1%;
+        font-size: 0.8em !important;
+        text-align: center;
+    }
 }
-
-}
-
 
 /* FOOTER */
 footer{

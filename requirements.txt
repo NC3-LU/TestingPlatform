@@ -1,3 +1,11 @@
 Django~=3.2.6
 django-bootstrap-v5
 django-widget-tweaks
+django-icons
+
+python-decouple
+iot-inspector-client
+dj-database-url
+requests
+certifi
+pyjwt

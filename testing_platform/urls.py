@@ -15,12 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.conf.urls.static import static
+from testing_platform import settings
 
 urlpatterns = [
     path('', include('landing_page.urls')),
     path('accounts/', include('authentication.urls')),
     path('', include('legal_section.urls')),
     path('test/', include('testing.urls')),
+    path('iot_inspector/', include('iot_inspector.urls')),
     path('admin/', admin.site.urls),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

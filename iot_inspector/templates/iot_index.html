@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block content %}
+
+<main class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
+    <h1>IoT Inspector</h1>
+    <p class="lead">To be filled with data from old Testing Platform</p>
+    <p class="lead">
+        <a href="request/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+            Request Firmware Analysis
+        </a>
+    </p>
+    <h3>My ongoing requests</h3>
+    <table id="t1" style="width: 60%">
+    {% if requests %}
+        {% for request in requests %}
+            <tr>
+                <td>{{ request }}</td>
+                <td>{{ request.filename }}</td>
+                <td>{{ request.status_field }}</td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td><p>None</p></td>
+        </tr>
+    {% endif %}
+    </table>
+</main>
+
+{% endblock %}

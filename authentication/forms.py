@@ -1,16 +1,21 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, PasswordResetForm
-from django.contrib.auth.models import User
+from .models import User
 
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False, help_text='Optional')
     last_name = forms.CharField(max_length=30, required=False, help_text='Optional')
     email = forms.EmailField(max_length=254, help_text='Contact email')
+    company_name = forms.CharField(max_length=30, required=False,
+                                   help_text='Needed for subscription, otherwise optional')
+    vat_number = forms.CharField(max_length=30, required=False,
+                                 help_text='Needed for subscription, otherwise optional')
 
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2',)
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'company_name',
+                  'vat_number')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -29,7 +34,7 @@ class LoginForm(AuthenticationForm):
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name']
+        fields = ['username', 'email', 'first_name', 'last_name', 'company_name', 'vat_number']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

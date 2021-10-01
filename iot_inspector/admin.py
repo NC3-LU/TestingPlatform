@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .helpers import iot_api_login, iot_add_user
+from django.contrib import messages
 
+from .helpers import iot_api_login, iot_add_user
 from .models import AnalysisRequest, IOTUser
 
 
@@ -12,6 +13,10 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
         queryset.update(status=True)
         for analysis_request in queryset:
             iot_user = analysis_request.iot_user
+            if iot_user.activated:
+                pass
+            else:
+                messages.error()
 
     def decline_status(self, request, queryset):
         queryset.update(status=False)
@@ -29,6 +34,7 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
 class IOTUserAdmin(admin.ModelAdmin):
     readonly_fields = ('password',)
     actions = ['activate_iot']
+    list_display = ['__str__', 'activated']
 
     def activate_iot(self, request, queryset):
         login = iot_api_login()

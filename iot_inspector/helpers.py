@@ -15,7 +15,6 @@ def iot_api_login():
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer TOKEN'
     }
     payload = json.dumps({"client_id": config('IOT_CLIENT_ID'), "nonce": f"{generate_nonce()}",
                           "email": config('EMAIL'), "password": config('PASSWORD')})
@@ -39,8 +38,9 @@ def iot_add_user(iotuser, token):
     }
     endpoint = config('IOT_API_URL') + 'add-user'
     signer = Signer()
-    payload = {'email': iotuser.user.email, 'password': signer.unsign_object(iotuser.password), 'policy': True,
-               'company_name': iotuser.user.company_name}
+    payload = json.dumps({'email': iotuser.user.email, 'password': signer.unsign_object(iotuser.password),
+                          'policy': True, 'company_name': iotuser.user.company_name})
+    print(payload)
     response = requests.post(endpoint, headers=headers, data=payload)
     return response.json()
 

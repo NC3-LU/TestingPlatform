@@ -11,22 +11,19 @@
             Request Firmware Analysis
         </a>
     </p>
-    <h3>My ongoing requests</h3>
-    <table id="t1" style="width: 60%">
-    {% if requests %}
-        {% for request in requests %}
-            <tr>
-                <td>{{ request }}</td>
-                <td>{{ request.filename }}</td>
-                <td>{{ request.status_field }}</td>
-            </tr>
-        {% endfor %}
-    {% else %}
-        <tr>
-            <td><p>None</p></td>
-        </tr>
-    {% endif %}
-    </table>
+    <section class="authForm p-5">
+        <h3>My ongoing requests</h3>
+        <div class="d-flex">
+            {% if requests %}
+                {% for request in requests %}
+                    <div class="w-25 p-1">{{ request }}</div>
+                    <div class="w-25 p-1">{{ request.status_field }}</div>
+                {% endfor %}
+            {% else %}
+                <span>None</span>
+            {% endif %}
+        </div>
+    </section>
 </main>
 
 {% endblock %}

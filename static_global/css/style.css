@@ -7,9 +7,43 @@
     --dBoxColor: #526475;
     --anchorColor: #BFD0DE;
     --anchorColorHover: #F2E422;
+    --gradeAPlus:#0C751D;
+    --gradeA:#13C230;
+    --gradeAMinus:#63F77B;
+    --gradeBPlus:#F5ED00;
+    --gradeB:#C2BD00;
+    --gradeBMinus:#757100;
 }
 
 /*  GENERAL */
+.aPlus{
+  background: var(--gradeAPlus) !important;
+}
+
+.a{
+  background: var(--gradeA) !important;
+}
+
+.aMinus{
+  background: var(--gradeAMinus) !important;
+}
+.bPlus{
+  background: var(--gradeBPlus) !important;
+}
+
+.bGrade{
+  background: var(--gradeB) !important;
+}
+
+.bi-hand-thumbs-down-fill{
+    color:red !important;
+}
+
+.bi-hand-thumbs-up-fill{
+    color:green !important;
+}
+
+
 html, body {
   height: 100%;
 }
@@ -32,17 +66,16 @@ a:hover {color: var(--anchorColorHover) !important;}
 .btn-primary{
     background:var(--dBoxColor) !important;
     border:var(--dBoxColor) solid 1px !important ;
-    transition: 0.5s;
+    transition: 1s;
 }
 
 .btn-primary:hover{
     background:var(--secondBackgroundColor) !important;
-    border:var(--anchorColorHover) solid 1px !important;
     transition: 0.5s;
 }
 
 /* FORMS */
-input {
+input[type=text], input[type=placeholder], input[type=submit] {
     display: block;
     width: 100%;
     padding: .375rem .75rem;
@@ -168,6 +201,24 @@ nav{
         text-align: center;
     }
 }
+/*
+ check-website
+*/
+
+#gradeBox{
+    width: 5%;
+    display: flex;
+    font-size: 2em !important;
+    justify-content:center;
+    margin-bottom: 1%;
+    padding:1%;
+}
+.result-content {
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+}
+
 
 /* FOOTER */
 footer{

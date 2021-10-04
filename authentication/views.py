@@ -3,8 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.http import HttpResponseRedirect
+from decouple import config
 
 from .forms import SignUpForm, LoginForm, UserUpdateForm, ChangePasswordForm
+from iot_inspector.models import IOTUser
+
+from iot_inspector_client import Client
 
 
 def signup(request):
@@ -18,8 +22,9 @@ def signup(request):
             user = authenticate(username=username,  password=raw_password)
             login(request, user)
             messages.success(request, 'Your signed up successfully!')
-
-            return redirect('index')
+            iotuser = IOTUser(user=user)
+            iotuser.save()
+            return redirect('/')
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
@@ -45,7 +50,7 @@ def login_user(request):
 
 def logout_user(request):
     logout(request)
-    return redirect('index')
+    return redirect('/')
 
 
 @login_required

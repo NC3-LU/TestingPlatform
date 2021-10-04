@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
+from decouple import config
+from dj_database_url import parse as db_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*@rttn0^-a98hin-b=%=(536a67$!kb^=0y%e+vww1flw6s!0#'
+
+SECRET_KEY = os.environ.get('SECRET_KEY', 'aey5eeCh2eij3jox8ieNohjee1iok8oojaiD2Shie9aenahtooC3ieyohkeuhuas')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = []
+allowed_hosts = os.environ.get('ALLOWED_HOSTS', 'localhost')
+ALLOWED_HOSTS = list(map(str.strip, allowed_hosts.split(',')))
 
 
 # Application definition
@@ -37,12 +41,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'landing_page',
-    'authentication',
-    'bootstrap5',
+    'django_icons',
     'widget_tweaks',
+    'bootstrap5',
+    'landing_page',
+    'legal_section',
+    'authentication',
     'testing',
-    'legal_section'
+    'iot_inspector',
 ]
 
 MIDDLEWARE = [
@@ -85,7 +91,7 @@ WSGI_APPLICATION = 'testing_platform.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, "db", "db.sqlite3"),
     }
 }
 
@@ -129,8 +135,16 @@ STATIC_URL = '/static_global/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static_global"),
 ]
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_ROOT = config('FILES')
+
+AUTH_USER_MODEL = 'authentication.User'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'

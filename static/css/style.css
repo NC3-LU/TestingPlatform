@@ -1,0 +1,166 @@
+/* PLEASE CHANGE COLORS HERE */
+
+:root {
+    /* MAIN BACKGROUND COLOR AND TEXT COLOR */
+    --backgroundTextColor: white;
+    --secondBackgroundColor: #5C5E5B;
+    --dBoxColor: #526475;
+    --anchorColor: #BFD0DE;
+    --anchorColorHover: #F2E422;
+}
+
+/*  GENERAL */
+html, body {
+  height: 100%;
+}
+
+body{
+  background:var(--backgroundTextColor);
+  font-family: 'Roboto Mono', monospace !important;
+}
+
+#content{
+    min-height: 85%;
+    height:auto;
+}
+
+
+a {color: var(--anchorColor) !important; font-weight:bold; text-decoration:none;}
+.anchorBgLight {color: var(--anchorColor) !important;}
+
+a:hover {color: var(--anchorColorHover) !important;}
+
+.btn-primary{
+    background:var(--dBoxColor) !important;
+    border:var(--dBoxColor) solid 1px !important ;
+    transition: 0.5s;
+}
+
+.btn-primary:hover{
+    background:var(--secondBackgroundColor) !important;
+    border:var(--anchorColorHover) solid 1px !important;
+    transition: 0.5s;
+}
+
+/* FORMS */
+input {
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.form-control{
+    border: 1px var(--bs-dark) solid;
+}
+
+.form-control:hover{
+    border: 1px var(--anchorColorHover) solid;
+}
+
+
+/* NAVIGATION */
+
+nav{
+    min-height: 7%;
+}
+
+.navbar-nav{
+    padding-left: 2rem !important;
+}
+
+.dropdown-item:hover{
+    background:var(--secondBackgroundColor) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .collapsing {
+        transition-property: height, visibility;
+        transition-duration: .5s;
+    }
+}
+
+/* AUTHENTICATION */
+
+.authForm{
+    border: 1px solid;
+    background: var(--bs-dark);
+    width:50%;
+}
+
+.authForm{
+    color: white !important;
+}
+.authForm > div > input{
+    background: var(--anchorColor);
+}
+.authForm > div > label{
+    color:var(--bs-dark);
+    font-weight: bold;
+}
+
+
+/* DASHBOARD */
+.dBox{
+    width:15%;
+    height:20vh;
+    background:var(--dBoxColor);
+    margin: 2%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    transition: 0.5s;
+}
+.dBox > a:hover{
+    color: var(--anchorColor) !important;
+}
+
+.dBox:hover{
+    background:var(--secondBackgroundColor);
+    transition: 0.5s;
+    border: 3px black solid;
+    cursor: pointer;
+}
+
+@media only screen and (max-width: 800px) {
+.dBox{
+    width:35%;
+    height: 15vh;
+    font-size: 1em;
+}
+
+}
+
+
+/* FOOTER */
+footer{
+    color: white;
+    height:auto;
+}
+
+
+@media only screen and (max-width: 800px) {
+  /* For mobile phones: */
+    #subFooter{
+       font-size: 0.8em;
+       justify-content: center !important;
+    }
+    #subFooter > .nav-link {
+       padding: 0;
+       padding-top: .5rem
+    }
+}
+
+
+

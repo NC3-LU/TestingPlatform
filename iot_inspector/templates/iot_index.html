@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block content %}
+
+<main class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
+    <h1>IoT Inspector</h1>
+    <p class="lead">To be filled with data from old Testing Platform</p>
+    <p class="lead">
+        <a href="request/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+            Request Firmware Analysis
+        </a>
+    </p>
+    <section class="authForm p-5">
+        <h3>My ongoing requests</h3>
+        <div class="d-flex">
+            {% if requests %}
+                {% for request in requests %}
+                    <div class="w-25 p-1">{{ request }}</div>
+                    <div class="w-25 p-1">{{ request.status_field }}</div>
+                {% endfor %}
+            {% else %}
+                <span>None</span>
+            {% endif %}
+        </div>
+    </section>
+</main>
+
+{% endblock %}

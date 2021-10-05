@@ -23,7 +23,7 @@ class IOTUser(models.Model):
     def status_prop(self):
         if self.activated is False:
             alert = "Not onboarded"
-        elif self.activated is True:
+        else:
             alert = "Activated"
         return alert
 
@@ -48,6 +48,9 @@ class AnalysisRequest(models.Model):
     product_name = models.CharField(max_length=200)
     file = models.FileField(upload_to=get_upload_path)
     status = models.BooleanField(default=None, blank=True, null=True)
+    firmware_uuid = models.UUIDField(default=None, blank=True, null=True)
+    report_uuid = models.UUIDField(default=None, blank=True, null=True)
+    report_link = models.URLField(default=None, blank=True, null=True)
 
     @property
     def filename(self):
@@ -69,16 +72,17 @@ class AnalysisRequest(models.Model):
 
     def save(self, *args, **kwargs):
         request_date = datetime.date.today()
-        try:
-            request_id = int(AnalysisRequest.objects.order_by('id').last().request_nb)
-            if request_id:
-                self.request_nb = request_id + 1
-            else:
-                pass
-        except:
-            request_id = 1
-            self.request_nb = \
-                f'{request_date.year}{request_date.month}{request_date.day}{(3-len(str(request_id)))*"0"}{request_id}'
+        if not self.request_nb:
+            try:
+                request_id = int(AnalysisRequest.objects.order_by('id').last().request_nb)
+                if request_id:
+                    self.request_nb = request_id + 1
+                else:
+                    pass
+            except:
+                request_id = 1
+                self.request_nb = f'{request_date.year}{request_date.month}{request_date.day}' \
+                                  f'{(3-len(str(request_id)))*"0"}{request_id}'
 
         self.iot_user = self.user.iotuser
 

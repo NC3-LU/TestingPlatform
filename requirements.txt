@@ -9,3 +9,4 @@ dj-database-url
 requests
 certifi
 pyjwt
+sgqlc

@@ -4,26 +4,54 @@
 {% block content %}
 
 <main class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
-    <h1>IoT Inspector</h1>
-    <p class="lead">To be filled with data from old Testing Platform</p>
-    <p class="lead">
-        <a href="request/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
-            Request Firmware Analysis
-        </a>
-    </p>
+    <section class="container">
+        <div class="mb-5 p-5">
+            <h1>IoT Inspector</h1>
+            <div class="mb-5 p-5">
+                <h3>What is an IOT?</h3>
+                <p class="lead">
+                    What is commonly known as the Internet of Things, also referred to as IoT, is made of all the
+                connected objects we are using knowingly, or often unknowingly, in our daily operations. It starts with
+                connected sensors that are being added to existing industrial machines, and goes up to the network attached
+                printer that can be remotely monitored and maintained by the maker. Medical gear, cars, building security
+                systems, all these connected devices are IoTs.
+                </p>
+            </div>
+            <p class="lead">
+                <a href="request/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+                    Request Firmware Analysis
+                </a>
+            </p>
+        </div>
+    </section>
     <section class="authForm p-5">
         <h3>My ongoing requests</h3>
         <div class="d-flex">
             {% if requests %}
+                <table class="table table-light table-bordered">
+                    <tr>
+                        <th>Request number</th>
+                        <th>Request name</th>
+                        <th>Request status</th>
+                        <th>Report</th>
+                    </tr>
                 {% for request in requests %}
-                    <div class="w-25 p-1">{{ request }}</div>
-                    <div class="w-25 p-1">{{ request.status_field }}</div>
+                    <td>{{ request }}</td>
+                    <td>{{ request.name }}</td>
+                    <td>{{ request.status_field }}</td>
+                    {% if request.report_link %}
+                        <td><a href="{{ request.report_uuid }}/download/" download>Get report</a></td>
+                    {% else %}
+                        <td>No report available</td>
+                    {% endif %}
                 {% endfor %}
+                </table>
             {% else %}
-                <span>None</span>
+                <span>No request registered</span>
             {% endif %}
         </div>
     </section>
+
 </main>
 
 {% endblock %}

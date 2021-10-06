@@ -10,3 +10,5 @@ requests
 certifi
 pyjwt
 sgqlc
+django-q
+croniter

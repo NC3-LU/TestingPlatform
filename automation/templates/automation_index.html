@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block content %}
+
+<main class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
+    <section class="container">
+        <div class="mb-5 p-5">
+            <h1>Automated Testing</h1>
+            <div class="mb-5 p-5">
+                <h3>Placeholder subtitle</h3>
+                <p class="lead">
+                    Too lazy to even generate a lorem ipsum, deal with it...
+                </p>
+            </div>
+            <p class="lead">
+                <a href="request/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+                    Setup an automated test.
+                </a>
+            </p>
+        </div>
+    </section>
+    <section class="authForm p-5">
+        <h3>My automated tests</h3>
+        <div class="d-flex">
+            {% if automated_tests %}
+                <table class="table table-light table-bordered">
+                    <tr>
+                        <th>Test</th>
+                        <th>Target</th>
+                        <th>Next run</th>
+                        <th>Result</th>
+                    </tr>
+                {% for test in automated_tests %}
+                    <tr>
+                        <td>{{ test.schedule.name }}</td>
+                        <td>{{ test.host }}</td>
+                        <td>{{ test.schedule.next_run }}</td>
+                        {% if  test.schedule.success %}
+                            {% if  test.schedule.success == True %}
+                                <td><i class="bi bi-check-circle-fill"></i></td>
+                            {% else %}
+                                <td><i class="bi bi-x-circle-fill"></i></td>
+                            {% endif %}
+                        {% else %}
+                            <td>No results</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </table>
+            {% else %}
+                <span>No request registered</span>
+            {% endif %}
+        </div>
+    </section>
+
+</main>
+
+{% endblock %}

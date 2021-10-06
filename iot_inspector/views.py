@@ -46,5 +46,5 @@ def download_report(request, uuid):
     file = req.content
     response = HttpResponse(file, headers={
         'Content-Type': 'application/pdf',
-        'Content-Disposition': f'attachment; filename="{request.user.username}_{uuid[-12:]}.pdf"'})
+        'Content-Disposition': f'attachment; filename="{request.user.company_name}_{uuid[-12:]}.pdf"'})
     return response

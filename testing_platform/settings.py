@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_icons',
+    'django_q',
     'widget_tweaks',
     'bootstrap5',
     'landing_page',
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     'authentication',
     'testing',
     'iot_inspector',
+    'automation',
 ]
 
 MIDDLEWARE = [
@@ -59,8 +61,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
 ]
+
+Q_CLUSTER = {
+    "name": "scheduler",
+    "orm": "default",
+    "timeout": 300,
+    "retry": 330
+}
 
 ROOT_URLCONF = 'testing_platform.urls'
 

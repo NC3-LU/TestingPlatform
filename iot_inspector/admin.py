@@ -16,7 +16,7 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
     def validate_status(self, request, queryset):
         for analysis_request in queryset:
             iot_user = analysis_request.iot_user
-            if iot_user.activated:
+            if iot_user.activated and analysis_request.status not in (True, False):
                 if not analysis_request.firmware_uuid:
                     client = client_login(iot_user)
                     default_product_group = get_default_product_group(client)
@@ -29,6 +29,7 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
                     status, link = None, None
                     while status != 'FINISHED':
                         (status, link) = client_get_report_link(client, report_uuid)
+                        print(status)
                     analysis_request.report_link = link
                     analysis_request.status = True
                     analysis_request.save()

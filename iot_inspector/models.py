@@ -81,8 +81,8 @@ class AnalysisRequest(models.Model):
                     pass
             except:
                 request_id = 1
-                self.request_nb = f'{request_date.year}{request_date.month}{request_date.day}' \
-                                  f'{(3-len(str(request_id)))*"0"}{request_id}'
+                self.request_nb = f'{request_date.year}{request_date.month}{(2-len(str(request_date.day)))*"0"}' \
+                                  f'{request_date.day}{(3-len(str(request_id)))*"0"}{request_id}'
 
         self.iot_user = self.user.iotuser
 

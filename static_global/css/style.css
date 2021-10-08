@@ -48,7 +48,7 @@
 }
 
 .bi-x-circle-fill{
-    color:green !important;
+    color:red !important;
 }
 
 
@@ -223,7 +223,7 @@ nav{
 }
 .result-content {
   padding: 0 18px;
-  display: none;
+  display: block;
   overflow: hidden;
 }
 

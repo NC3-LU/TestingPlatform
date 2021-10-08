@@ -27,11 +27,16 @@ class AutomatedTest(models.Model):
     class Meta:
         abstract = True
 
+    def schedule_task(self, t_type, func, args, cron):
+        return Schedule(
+            name=f'{t_type}_{self.user.username}_{args}',
+            func=func,
+            args="'" + args + "'",
+            schedule_type=Schedule.CRON,
+            cron=cron
+        )
 
-class PingAutomatedTest(AutomatedTest):
-    host = models.CharField(max_length=100, help_text='Host to be tested')
-
-    def save(self, *args, **kwargs):
+    def get_cron_exp(self, time):
         days = {
             'mo': 1,
             'tu': 2,
@@ -41,8 +46,8 @@ class PingAutomatedTest(AutomatedTest):
             'sa': 6,
             'su': 7,
         }
-        minutes = self.time.minute
-        hour = self.time.hour
+        minutes = time.minute
+        hour = time.hour
         cron = ''
         if self.frequency == 'D':
             cron = f'{minutes} {hour} * * *'
@@ -50,15 +55,36 @@ class PingAutomatedTest(AutomatedTest):
             cron = f'{minutes} {hour} * * {days[self.weekday]}'
         if self.frequency == 'M':
             cron = f'{minutes} {hour} {self.monthly_test_date} * *'
+        return cron
 
-        self.schedule = Schedule(
-            name=f'PingTest_{self.user.username}_{self.host}',
+
+class PingAutomatedTest(AutomatedTest):
+    host = models.CharField(max_length=100, help_text='Host to be tested')
+
+    def save(self, *args, **kwargs):
+        self.schedule = super().schedule_task(
+            t_type='ping',
             func='automation.tasks.ping',
-            args="'" + str(self.host) + "'",
-            schedule_type=Schedule.CRON,
-            cron=cron
+            args=self.host,
+            cron=super().get_cron_exp(self.time)
         )
+        self.schedule.save()
+        super().save()
 
+    def __str__(self):
+        return self.schedule.name
+
+
+class HttpAutomatedTest(AutomatedTest):
+    target = models.CharField(max_length=100, help_text='Host to be tested')
+
+    def save(self, *args, **kwargs):
+        self.schedule = super().schedule_task(
+            t_type='http',
+            func='automation.tasks.http',
+            args=self.target,
+            cron=super().get_cron_exp(self.time)
+        )
         self.schedule.save()
         super().save()
 

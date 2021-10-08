@@ -8,36 +8,38 @@
         <div class="mb-5 p-5">
             <h1>Automated Testing</h1>
             <div class="mb-5 p-5">
-                <h3>Placeholder subtitle</h3>
                 <p class="lead">
-                    Too lazy to even generate a lorem ipsum, deal with it...
+                    It offers a number of simple tests on web servers configuration.
+                    The goal is to ensure your organisation is using the most up-to-date security standards and
+                    limiting therefore its exposure to easy or automated exploitation.
                 </p>
             </div>
-            <p class="lead">
-                <a href="request/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
-                    Setup an automated test.
-                </a>
-            </p>
         </div>
     </section>
     <section class="authForm p-5">
-        <h3>My automated tests</h3>
+        <p class="lead">
+            <a href="ping/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+                Setup an automated ping
+            </a>
+        </p>
+        <h3>My automated pings</h3>
         <div class="d-flex">
-            {% if automated_tests %}
-                <table class="table table-light table-bordered">
+            {% if ping_list %}
+                <table class="table table-light table-bordered table-striped">
                     <tr>
                         <th>Test</th>
                         <th>Target</th>
                         <th>Next run</th>
                         <th>Result</th>
+                        <th></th>
                     </tr>
-                {% for test in automated_tests %}
+                {% for scheduled_ping, last_run in ping_list %}
                     <tr>
-                        <td>{{ test.schedule.name }}</td>
-                        <td>{{ test.host }}</td>
-                        <td>{{ test.schedule.next_run }}</td>
-                        {% if  test.schedule.success %}
-                            {% if  test.schedule.success == True %}
+                        <td>{{ scheduled_ping.name }}</td>
+                        <td>{{ scheduled_ping.args }}</td>
+                        <td>{{ scheduled_ping.next_run }}</td>
+                        {% if last_run %}
+                            {% if last_run.result == 0 %}
                                 <td><i class="bi bi-check-circle-fill"></i></td>
                             {% else %}
                                 <td><i class="bi bi-x-circle-fill"></i></td>
@@ -45,11 +47,48 @@
                         {% else %}
                             <td>No results</td>
                         {% endif %}
+                        <td>Remove</td>
                     </tr>
                 {% endfor %}
                 </table>
             {% else %}
-                <span>No request registered</span>
+                <p>No request registered</p>
+            {% endif %}
+        </div>
+    </section>
+    <section class="authForm p-5">
+        <p class="lead">
+            <a href="http/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+                Setup an automated http header test
+            </a>
+        </p>
+        <h3>My automated http tests</h3>
+        <div class="d-flex">
+            {% if http_list %}
+                <table class="table table-light table-bordered">
+                    <tr>
+                        <th>Test</th>
+                        <th>Target</th>
+                        <th>Next run</th>
+                        <th>Result</th>
+                        <th>Report</th>
+                    </tr>
+                {% for scheduled_http, last_run in http_list %}
+                    <tr>
+                        <td>{{ scheduled_http.name }}</td>
+                        <td>{{ scheduled_http.args }}</td>
+                        <td>{{ scheduled_http.next_run }}</td>
+                        {% if last_run %}
+                            <td>{{ last_run.result.scan_summary.grade }}</td>
+                            <td><a href="http/{{ last_run.group }}">View full report</a></td>
+                        {% else %}
+                            <td>No results</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </table>
+            {% else %}
+                <p>No request registered</p>
             {% endif %}
         </div>
     </section>

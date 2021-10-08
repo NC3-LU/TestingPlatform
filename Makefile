@@ -1,12 +1,16 @@
 VERSION?=latest
 IMAGE_NAME?=testing-platform:$(VERSION)
 
+PYTHON_VERSION?=3.9
+
 LOCAL_PORT?=8000
 
 .PHONY: image run
 
 image:
-	docker build -t $(IMAGE_NAME) .
+	docker build \
+	  --build-arg PYTHON_VERSION=$(PYTHON_VERSION) \
+		-t $(IMAGE_NAME) .
 
 run:
 	docker run -it --rm \

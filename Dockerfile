@@ -1,4 +1,6 @@
-FROM python:3.9
+ARG PYTHON_VERSION
+
+FROM python:${PYTHON_VERSION}
 
 ARG DEBUG
 
@@ -13,7 +15,7 @@ RUN pip3 install -r /app/requirements.txt
 
 EXPOSE 8000
 
-VOLUME [ "/app/db" ]
+VOLUME [ "/app/db", "/app/files" ]
 COPY . /app/
 
 ENTRYPOINT [ "/app/entrypoint.sh" ]

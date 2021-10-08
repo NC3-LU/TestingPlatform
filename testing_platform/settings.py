@@ -150,9 +150,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_ROOT = config('FILES')
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(BASE_DIR, "files"))
 
 AUTH_USER_MODEL = 'authentication.User'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+IOT_API_URL = 'https://smile.iot-inspector.com/api/'
+IOT_CLIENT_ID = os.environ.get('IOT_CLIENT_ID', 'IAPoqoHRe6axaYZckyH7s7Ncef4yfyLL8rCxf84AtY8')
+IOT_API_EMAIL = 'romain.kieffer@securitymadein.lu'
+IOT_API_PASSWORD = os.environ.get('IOT_API_PASSWORD')

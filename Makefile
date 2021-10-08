@@ -1,4 +1,4 @@
-VERSION?=0.1
+VERSION?=latest
 IMAGE_NAME?=testing-platform:$(VERSION)
 
 LOCAL_PORT?=8000

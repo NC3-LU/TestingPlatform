@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<section class="w-100 h-100 d-flex justify-content-center flex-wrap">
+     <div class="dashboardBox">
+        <a href="/test/check-website/">
+            <div class="dashboardBoxPreview">
+                Ping Test
+            </div>
+            <div class="dashboardBoxDescription">
+                Perform scans for your websites.
+            </div>
+        </a>
+         <a href="https://observatory.mozilla.org/"><b>Powered by Mozilla Observatory</b></a>
+    </div>
+    <div class="dashboardBox">
+        <a href="/test/pingtest/">
+            <div class="dashboardBoxPreview">
+                Ping Test
+            </div>
+            <div class="dashboardBoxDescription">
+                Simply perform a ping test and see if you can reach the entered domain/ip address.
+            </div>
+        </a>
+    </div>
+    <div class="dashboardBox">
+        <a href="">
+            <div class="dashboardBoxPreview">
+                C3 Protocols
+            </div>
+            <div class="dashboardBoxDescription">
+                This initiative was inspired by Start-Ups and SMB's with whom we interact daily. While trying to
+                understand why they are not engaged more systematically into Penetration Testing, the answer that came
+                back most of the time was « Cost ». Click to read further.
+            </div>
+        </a>
+    </div>
+</section>
+
+{% endblock %}

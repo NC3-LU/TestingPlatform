@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+
+<main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
+    <h1>Profile</h1>
+    <hr class="w-25 text-dark">
+  <form class="authForm p-5" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% for field in     form %}
+        <div class="form-floating mb-4">
+            {{ field }}
+            {{ field.label_tag }}
+            {% if field.help_text %}
+            <small>{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+            <p style="color: red">{{ error }}</p>
+         {% endfor %}
+        </div>
+         {% endfor %}
+        <small><a href="/change-password/">I want to change my password</a></small><br>
+        <input class="mt-2 btn btn-primary" type="submit" value="Update">
+    </form>
+</main>
+
+
+{% endblock %}

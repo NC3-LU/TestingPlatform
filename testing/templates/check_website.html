@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
+        <h1 class="authForm p-5 d-flex justify-content-center">Website Test:</h1>
+        <form method="post" class="authForm p-5">
+            {% csrf_token %}
+            <div></div>
+            <label>Enter your website domain:</label><br>
+            {% if error %}
+            <span class="text-danger">{{ error }}</span>
+            {% endif %}
+            <input type="text" placeholder="www.domain.com" id="target" name="target" value="{{ form }}"><br>
+            <div class="mb-2">
+                <label class="text-light">Force a rescan instead of returning cached results:</label>
+                <input type="checkbox" id="rescan" name="rescan">
+            </div>
+            <small>Loading can take up to 5 minutes.</small>
+            <input type="submit" value="Test" class="btn btn-primary">
+            <button class="btn btn-secondary mt-2" onclick="window.history.back()">Back</button>
+        </form>
+        {% if result %}
+            {% include "web_report.html" %}
+        {% endif %}
+    </main>
+{% endblock %}

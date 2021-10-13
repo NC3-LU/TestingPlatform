@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
+    <div class="authForm p-5">
+        <h2>DMARC Reporter</h2>
+
+        <table class="table table-light table-stripped table-responsive">
+            <tr>
+                <th>UID</th>
+                <th>Subject</th>
+                <th>Date</th>
+                <th>Attachment</th>
+                <th></th>
+            </tr>
+            {% for email in emails %}
+            <tr>
+                <td>{{email.uid}}</td>
+                <td>{{email.subject}}</td>
+                <td>{{email.date}}</td>
+                <td>
+                    {% for att in email.attachments %}
+                    {{att.filename}}
+                    {% endfor %}
+                </td>
+                <td><a class="btn btn-primary" href="/test/dmarc-reporter/{{email.uid}}">View report</a></td>
+
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</main>
+{% endblock %}

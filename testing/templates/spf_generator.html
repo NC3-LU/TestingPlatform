@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
+    <div class="authForm p-5">
+        <h3>SPF Generator</h3>
+        <h4>This form will assist you in creating an SPF record for your domain:</h4>
+        <br>
+
+        Please enter the domain name the record should be generated for:
+        <input type="text" id="domain" size="45"><br><br>
+        <br><br>
+        Do you send email from this server?&nbsp;&nbsp;
+        <select id="mail" name="mail">
+            <option value="a" selected>Yes</option>
+            <option value="">No</option>
+        </select>
+        <br><br>
+        Is your MX record pointing to this server? :
+        <select id="mx" name="mx">
+            <option value="mx" selected>Yes</option>
+            <option value="">No</option>
+        </select>
+        <br><br>
+        How strict should the SPF Policy be? :
+        <select id="policy" name="policy">
+            <option value="-all">strict</option>
+            <option value="?all">neutral</option>
+            <option value="~all" selected>soft fail</option>
+        </select>
+        <br><br>
+        Enter any other server hostname or domain that delivers email for your domain (please separate by comma):
+        <input type="text" id="others" size="45">
+        <br><br>
+        <input class="btn btn-primary" type="button" onclick="generate();" value="Generate SPF record">
+        <br><br>
+        <div id="result" style="display: none;">
+            Please add a TXT record to your domain with the following content:<br>
+            <div id="txt" class="bg-light p-2 text-dark"></div>
+        </div>
+    </div>
+</main>
+<script type="text/javascript">
+        function generate()
+        {
+            var domain = document.getElementById('domain').value;
+            if (!domain.match(/\S/)) {alert('Please enter a domain name'); return}
+
+            var e = document.getElementById('others');
+            if (e.value != "")
+            {
+                hosts = "a:" + e.value;
+            }
+            else
+            {
+                hosts = "";
+            }
+            var e = document.getElementById('mail');
+            mail = e.options[e.selectedIndex].value;
+            var e = document.getElementById('mx');
+            mx = e.options[e.selectedIndex].value;
+            var e = document.getElementById('policy');
+            policy = e.options[e.selectedIndex].value;
+            document.getElementById('result').style.display = "block";
+            document.getElementById('txt').innerHTML = "v=spf1 " + mail + "  " + mx + " " + hosts + " " + policy;
+        }
+
+</script>
+{% endblock %}

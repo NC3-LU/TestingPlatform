@@ -17,4 +17,5 @@ run:
 			-p 127.0.0.1:$(LOCAL_PORT):8000 \
 			-e DEBUG=True \
 			-v$(PWD)/db:/app/db \
+			-v$(PWD)/files:/app/files \
 			$(IMAGE_NAME)

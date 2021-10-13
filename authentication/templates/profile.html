@@ -7,10 +7,10 @@
 <main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
     <h1>Profile</h1>
     <hr class="w-25 text-dark">
-  <form class="authForm p-5" method="post" enctype="multipart/form-data">
+    <form class="authForm p-5 mb-5" method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        {% for field in     form %}
+        {% for field in form %}
         <div class="form-floating mb-4">
             {{ field }}
             {{ field.label_tag }}
@@ -19,12 +19,54 @@
             {% endif %}
             {% for error in field.errors %}
             <p style="color: red">{{ error }}</p>
-         {% endfor %}
+            {% endfor %}
         </div>
-         {% endfor %}
+        {% endfor %}
         <small><a href="/change-password/">I want to change my password</a></small><br>
         <input class="mt-2 btn btn-primary" type="submit" value="Update">
     </form>
+
+    <h1>Add a domain you manage</h1>
+    <hr class="w-25 text-dark">
+    <form class="authForm p-5 mb-5" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% for field in domain_form %}
+        <div class="form-floating mb-4">
+            {{ field }}
+            {{ field.label_tag }}
+            {% if field.help_text %}
+            <small>{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+            <p style="color: red">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <input class="mt-2 btn btn-primary" type="submit" value="Update">
+    </form>
+
+    <h1>Edit a domain you manage</h1>
+    <hr class="w-25 text-dark">
+    <form class="authForm p-5" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% for field in domain_form %}
+        <div class="form-floating mb-4">
+            {{ field }}
+            {{ field.label_tag }}
+            {% if field.help_text %}
+            <small>{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+            <p style="color: red">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        <input class="mt-2 btn btn-primary" type="submit" value="Update">
+    </form>
+
 </main>
 
 

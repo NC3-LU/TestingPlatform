@@ -5,7 +5,7 @@ from django.contrib.auth import login, logout, authenticate, update_session_auth
 from django.http import HttpResponseRedirect
 from decouple import config
 
-from .forms import SignUpForm, LoginForm, UserUpdateForm, ChangePasswordForm
+from .forms import SignUpForm, LoginForm, UserUpdateForm, ChangePasswordForm, UserDomainForm
 from iot_inspector.models import IOTUser
 
 from iot_inspector_client import Client
@@ -69,7 +69,8 @@ def edit_profile(request):
     else:
         form = UserUpdateForm(instance=request.user)
         profile_form = UserUpdateForm(instance=request.user)
-        args = {'form': form, 'profile_form': profile_form}
+        domain_form = UserDomainForm(instance=request.user)
+        args = {'form': form, 'profile_form': profile_form, 'domain_form': domain_form}
         # args.update(csrf(request))
         return render(request, 'profile.html', args)
 

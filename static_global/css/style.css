@@ -141,8 +141,8 @@ nav{
 .authForm{
     color: white !important;
 }
-.authForm > div > input{
-    background: var(--anchorColor);
+.authForm > div > input, select{
+    background: var(--anchorColor) !important;
 }
 .authForm > div > label{
     color:var(--bs-dark);

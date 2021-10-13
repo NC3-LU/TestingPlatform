@@ -1,6 +1,8 @@
 from django.core.files.storage import FileSystemStorage
 from django.core.signing import Signer
 
+from testing_platform import settings
+
 from decouple import config
 from iot_inspector_client import Client, FirmwareMetadata
 from pathlib import Path
@@ -19,16 +21,16 @@ def api_login(email, password):
         'Accept': 'application/json',
         'Content-Type': 'application/json',
     }
-    payload = json.dumps({"client_id": config('IOT_CLIENT_ID'), "nonce": f"{generate_nonce()}",
+    payload = json.dumps({"client_id": settings.IOT_CLIENT_ID, "nonce": f"{generate_nonce()}",
                           "email": email, "password": password})
-    endpoint = config('IOT_API_URL') + 'authorize'
+    endpoint = settings.IOT_API_URL + 'authorize'
     id_token = requests.post(endpoint, headers=headers, data=payload).json()['id_token']
     tenant_id = jwt.decode(id_token, options={"verify_signature": False},
                            audience='NeSPys5jIT_3OKn7R_ZyBqPubkDl9amI3sGOxJLXCy4')['https://www.iot-inspector.com/tenants'][0]['id']
 
-    payload = json.dumps({"client_id": config('IOT_CLIENT_ID'), "nonce": f"{generate_nonce()}",
+    payload = json.dumps({"client_id": settings.IOT_CLIENT_ID, "nonce": f"{generate_nonce()}",
                           "id_token": id_token, 'tenant_id': tenant_id})
-    endpoint = config('IOT_API_URL') + 'token'
+    endpoint = settings.IOT_API_URL + 'token'
     response = requests.post(endpoint, headers=headers, data=payload).json()
     return response
 
@@ -39,7 +41,7 @@ def api_add_user(iotuser, token):
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {token}'
     }
-    endpoint = config('IOT_API_URL') + 'add-user'
+    endpoint = settings.IOT_API_URL + 'add-user'
     signer = Signer()
     payload = json.dumps({'email': iotuser.user.email, 'password': signer.unsign_object(iotuser.password),
                           'policy': True, 'company_name': iotuser.user.company_name})
@@ -61,7 +63,7 @@ def get_product_group_id(client):
 
 
 def client_login(iot_user):
-    client = Client(api_url=config('IOT_API_URL'))
+    client = Client(api_url=settings.IOT_API_URL)
     signer = Signer()
     client.login(iot_user.user.email, signer.unsign_object(iot_user.password))
     tenant = client.get_tenant(iot_user.user.company_name)
@@ -164,7 +166,7 @@ def api_get_report(user, report_uuid):
         'Authorization': f'Bearer {token}'
     }
 
-    endpoint = config('IOT_API_URL') + f'reports/{report_uuid}/pdf'
+    endpoint = settings.IOT_API_URL + f'reports/{report_uuid}/pdf'
     req = requests.get(url=endpoint, headers=headers)
     return req
 

@@ -140,20 +140,25 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static_global/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static_global"),
-]
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static_global'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_ROOT = config('FILES')
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(BASE_DIR, "files"))
 
 AUTH_USER_MODEL = 'authentication.User'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+IOT_API_URL = 'https://smile.iot-inspector.com/api/'
+IOT_CLIENT_ID = os.environ.get('IOT_CLIENT_ID')
+IOT_API_EMAIL = os.environ.get('IOT_API_EMAIL', 'romain.kieffer@securitymadein.lu')
+IOT_API_PASSWORD = os.environ.get('IOT_API_PASSWORD')

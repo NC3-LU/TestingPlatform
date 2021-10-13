@@ -8,6 +8,8 @@ from .helpers import api_login, api_add_user, client_login, client_upload_firmwa
     client_get_report_link, client_generate_report, api_get_report
 from .models import AnalysisRequest, IOTUser
 
+from testing_platform import settings
+
 
 class AnalysisRequestAdmin(admin.ModelAdmin):
 
@@ -59,7 +61,7 @@ class IOTUserAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'activated']
 
     def activate_iot(self, request, queryset):
-        login = api_login(config('EMAIL'), config('PASSWORD'))
+        login = api_login(settings.IOT_API_EMAIL, settings.IOT_API_PASSWORD)
         for iotuser in queryset:
             token = login['tenant_token']
             response = api_add_user(iotuser, token)

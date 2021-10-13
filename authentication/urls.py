@@ -14,7 +14,7 @@ urlpatterns = [
              template_name='password_reset.html',
              subject_template_name='password_reset_subject.txt',
              email_template_name='password_reset_email.html',
-             success_url='/login/'
+             success_url='accounts/login/'
          ),
          name='password_reset'),
     path('password-reset/done/',
@@ -32,5 +32,6 @@ urlpatterns = [
              template_name='password_reset_complete.html'
          ),
          name='password_reset_complete'),
-
+    path('subscriptions/', views.subscriptions, name='subscriptions'),
+    path('subscriptions/request/', views.request_subscription, name='request_subscription')
 ]

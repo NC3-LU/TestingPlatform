@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from .forms import PingAutomatedTestForm, HttpAutomatedTestForm
 from .models import PingAutomatedTest, HttpAutomatedTest
 from .helpers import get_last_runs
+
+from authentication.models import User
 
 from django_q.models import Task, Schedule
 
@@ -24,6 +27,11 @@ def schedule_ping(request):
     if request.method == 'POST':
         form = PingAutomatedTestForm(request.POST)
         if form.is_valid():
+            count = PingAutomatedTest.objects.filter(user=request.user).count()
+            if count >= 1 and not request.user.is_business:
+                messages.error(request, 'You already have one test set. Please upgrade account to BUSINESS '
+                                        'subscription if you wish to have more than one domain tested.')
+                return render(request, 'automation_request.html', {'form': form, 'title': 'ping test'})
             data = form.cleaned_data
             automation_request = PingAutomatedTest(
                 user=request.user,

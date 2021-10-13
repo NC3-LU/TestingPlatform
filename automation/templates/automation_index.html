@@ -13,6 +13,17 @@
                     The goal is to ensure your organisation is using the most up-to-date security standards and
                     limiting therefore its exposure to easy or automated exploitation.
                 </p>
+                {% if not user.is_pro and not user.is_business %}
+                    <div class="mb-5 p-5">
+                        <p class="lead">
+                            A subscription is required to perform automated tests on your systems.
+                            Make sure you check out our subscription plans and select the one that is best suited to your needs!
+                        </p>
+                    </div>
+                    <a href="#" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+                        Check out our subscription offers
+                    </a>
+                {% else %}
             </div>
         </div>
     </section>
@@ -92,6 +103,7 @@
             {% endif %}
         </div>
     </section>
+    {% endif %}
 
 </main>
 

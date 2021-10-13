@@ -5,7 +5,8 @@ from django.contrib.auth import login, logout, authenticate, update_session_auth
 from django.http import HttpResponseRedirect
 from decouple import config
 
-from .forms import SignUpForm, LoginForm, UserUpdateForm, ChangePasswordForm
+from .forms import SignUpForm, LoginForm, UserUpdateForm, ChangePasswordForm, SubscriptionRequestForm
+from .models import SubscriptionRequest
 from iot_inspector.models import IOTUser
 
 from iot_inspector_client import Client
@@ -90,4 +91,29 @@ def change_password(request):
     return render(request, 'change_password.html', {
         'form': form
     })
+
+
+@login_required
+def subscriptions(request):
+    return render(request, 'subscriptions.html')
+
+
+@login_required
+def request_subscription(request):
+    if request.method == 'POST':
+        form = SubscriptionRequestForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            tier = data['tier_level']
+            if request.user.is_pro and tier == 'pro' or request.user.is_business and tier == 'business':
+                return messages.error(request, 'You already have this user tier')
+            request = SubscriptionRequest(
+                user=request.user,
+                tier_level=data['tier_level']
+            )
+            request.save()
+            return redirect('/')
+    else:
+        form = SubscriptionRequestForm()
+    return render(request, 'subscription_request.html', {'form': form})
 

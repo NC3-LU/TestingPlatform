@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Subscription plans{% endblock %}
+
+{% block content %}
+    <main class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
+        <section class="container">
+            <h1>Subscription plans</h1>
+            <div class="mb-5 p-5">
+                <table class="table table-light table-striped">
+                    <tr style="margin-top: 5px;">
+                        <td>&nbsp;</td>
+                        <td>BASIC<br>free of charge<br><br></td>
+                        <td>PRO<br>20€ / month<br><br></td>
+                        <td>BUSINESS<br>30€ / month<br><br></td>
+                    </tr>
+                    <tr style="margin-top: 5px;">
+                        <td>Test Mailserver<br><br></td>
+                        <td><i class="bi bi-check-circle-fill"></i><br><br></td>
+                        <td><i class="bi bi-check-circle-fill"></i><br><br></td>
+                        <td><i class="bi bi-check-circle-fill"></i><br><br></td>
+                    </tr>
+                    <tr style="margin-top: 5px;">
+                        <td>Test Webserver<br><br></td>
+                        <td><i class="bi bi-check-circle-fill"></i><br><br></td>
+                        <td><i class="bi bi-check-circle-fill"></i><br><br></td>
+                        <td><i class="bi bi-check-circle-fill"></i><br><br></td>
+                    </tr>
+                    <tr style="margin-top: 5px;">
+                        <td>DMARC Statistics<br><br></td>
+                        <td><i class="bi bi-check-circle-fill"></i><br><br></td>
+                        <td><i class="bi bi-check-circle-fill"></i><br><br></td>
+                        <td><i class="bi bi-check-circle-fill"></i><br><br></td>
+                    </tr>
+                    <tr style="margin-top: 5px;">
+                        <td>Automated testing<br><br></td>
+                        <td><br><br></td>
+                        <td><i class="bi bi-check-circle-fill"></i><br><br></td>
+                        <td><i class="bi bi-check-circle-fill"></i><br><br></td>
+                    </tr>
+                    <tr style="margin-top: 5px;">
+                        <td>Multi-Domain support<br><br></td>
+                        <td><br><br></td>
+                        <td><br><br></td>
+                        <td><i class="bi bi-check-circle-fill"></i><br><br></td>
+                    </tr>
+                </table>
+            </div>
+            <a href="request/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+                Request subscription
+            </a>
+        </section>
+    </main>
+{% endblock %}

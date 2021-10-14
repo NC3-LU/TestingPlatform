@@ -130,6 +130,7 @@ def request_subscription(request):
     return render(request, 'subscription_request.html', {'form': form})
 
 
+@login_required
 def add_domain(request):
     user = request.user
     domains = user.userdomain_set.all()
@@ -159,6 +160,7 @@ def add_domain(request):
             return render(request, 'add_domain.html', {'form': form})
 
 
+@login_required
 def remove_domain(request, domain):
     user_domain = UserDomain.objects.get(domain=domain)
     user_domain.delete()

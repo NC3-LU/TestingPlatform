@@ -35,6 +35,21 @@
             </div>
         </a>
     </div>
+    {% if user.tier_level %}
+        <div class="dashboardBox">
+            <a href="/automated_testing/">
+                <div class="dashboardBoxPreview">
+                    Automated testing
+                </div>
+                <div class="dashboardBoxDescription">
+                    These tests are made to provide you with light monitoring capabilities over your systems.
+                    After registering your owned domains in your profile, you can setup a number of automated tests,
+                    like ping checks to monitor availability and reachability, http headers tests to grade your website
+                    / check if it is compromised, and more.
+                </div>
+            </a>
+    </div>
+    {% endif %}
     <div class="dashboardBox">
         <a href="/accounts/settings/subscriptions/">
             <div class="dashboardBoxPreview">

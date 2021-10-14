@@ -43,7 +43,7 @@ def c3_protocols(request):
 
 
 @login_required
-def check_website(request):
+def http_test(request):
     if request.method == 'POST':
         context = get_observatory_report(request.POST['target'])
         return render(request, 'check_website.html', context=context)
@@ -72,6 +72,7 @@ def dmarc_reporter(request):
     return render(request, 'dmarc_reporter.html', {'emails': emails})
 
 
+@login_required
 def dmarc_shower(request, uid):
     mailbox = connect_dmarc_mail()
     email = [msg for msg in mailbox.fetch(AND(uid=uid))]

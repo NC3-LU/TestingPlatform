@@ -26,46 +26,71 @@
         <input class="mt-2 btn btn-primary" type="submit" value="Update">
     </form>
 
-    <h1>Add a domain you manage</h1>
+    <h1>My subscription</h1>
     <hr class="w-25 text-dark">
-    <form class="authForm p-5 mb-5" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        {% for field in domain_form %}
-        <div class="form-floating mb-4">
-            {{ field }}
-            {{ field.label_tag }}
-            {% if field.help_text %}
-            <small>{{ field.help_text }}</small>
+    <section class="authForm p-5 mb-5">
+        <p class="lead mb-5">
+            {% if request.user.subscriptionrequest_set.all %}
+                {% if subscription %}
+                    Upgrade request pending
+                {% else %}
+                    Request pending
+                {% endif %}
+            {% else %}
+                <a href="subscriptions/request/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+                    {% if subscription %}
+                        Request subscription update
+                    {% else %}
+                        Request subscription
+                    {% endif %}
+                </a>
             {% endif %}
-            {% for error in field.errors %}
-            <p style="color: red">{{ error }}</p>
-            {% endfor %}
+        </p>
+        <div class="d-flex">
+            {% if subscription %}
+                <table class="table table-light table-bordered table-striped">
+                    <tr>
+                        <th>Tier</th>
+                        <th>Activation Date</th>
+                    </tr>
+                    <tr>
+                        <td>{{ subscription.get_tier_level }}</td>
+                        <td>{{ subscription.date_activated }}</td>
+                    </tr>
+                </table>
+            {% endif %}
         </div>
-        {% endfor %}
-        <input class="mt-2 btn btn-primary" type="submit" value="Update">
-    </form>
+    </section>
 
-    <h1>Edit a domain you manage</h1>
+    <h1>My company domains</h1>
     <hr class="w-25 text-dark">
-    <form class="authForm p-5" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        {% for field in domain_form %}
-        <div class="form-floating mb-4">
-            {{ field }}
-            {{ field.label_tag }}
-            {% if field.help_text %}
-            <small>{{ field.help_text }}</small>
+    <section class="authForm p-5">
+        <p class="lead mb-5">
+            <a href="domains/add" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+                Add a company domain
+            </a>
+        </p>
+        <div class="d-flex">
+            {% if domain_list %}
+                <table class="table table-light table-bordered table-striped">
+                    <tr>
+                        <th>Domain</th>
+                        <th>IP Address</th>
+                        <th></th>
+                    </tr>
+                {% for domain in domain_list %}
+                    <tr>
+                        <td>{{ domain.domain }}</td>
+                        <td>{{ domain.ip_address }}</td>
+                        <td><a href="domains/{{ domain.domain }}/remove">Remove</a></td>
+                    </tr>
+                {% endfor %}
+                </table>
+            {% else %}
+                <p>No domain registered</p>
             {% endif %}
-            {% for error in field.errors %}
-            <p style="color: red">{{ error }}</p>
-            {% endfor %}
         </div>
-        {% endfor %}
-
-        <input class="mt-2 btn btn-primary" type="submit" value="Update">
-    </form>
+    </section>
 
 </main>
 

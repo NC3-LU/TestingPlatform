@@ -42,20 +42,26 @@ def c3_protocols(request):
     return render(request, 'c3_protocols.html')
 
 
+@login_required
 def check_website(request):
     if request.method == 'POST':
         context = get_observatory_report(request.POST['target'])
         return render(request, 'check_website.html', context=context)
+    else:
+        return render(request, 'check_website.html')
 
 
+@login_required
 def spf_generator(request):
     return render(request, 'spf_generator.html')
 
 
+@login_required
 def dmarc_generator(request):
     return render(request, 'dmarc_generator.html')
 
 
+@login_required
 def dmarc_reporter(request):
     mailbox = connect_dmarc_mail()
 

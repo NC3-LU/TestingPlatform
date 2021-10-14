@@ -3,7 +3,7 @@ from . import views
 
 
 urlpatterns = [
-   path('', views.index, name='index'),
+   path('', views.index, name='iot_index'),
    path('request/', views.analysis_request, name='analysis_request'),
    path('<uuid>/download/', views.download_report, name='download_report')
 ]

@@ -6,9 +6,8 @@ from django.http import HttpResponseRedirect
 from decouple import config
 
 from .forms import SignUpForm, LoginForm, UserUpdateForm, ChangePasswordForm, SubscriptionRequestForm, UserDomainForm
-from .models import SubscriptionRequest
-
-from .forms import SignUpForm, LoginForm, UserUpdateForm, ChangePasswordForm
+from .models import SubscriptionRequest, Subscription
+from testing.models import UserDomain
 from iot_inspector.models import IOTUser
 
 from iot_inspector_client import Client
@@ -71,11 +70,18 @@ def edit_profile(request):
             return redirect('edit')
     else:
         form = UserUpdateForm(instance=request.user)
-        profile_form = UserUpdateForm(instance=request.user)
-        domain_form = UserDomainForm(instance=request.user)
-        args = {'form': form, 'profile_form': profile_form, 'domain_form': domain_form}
-        # args.update(csrf(request))
-        return render(request, 'profile.html', args)
+
+    user_domains = UserDomain.objects.filter(user=request.user.id)
+    try:
+        subscription = Subscription.objects.get(user=request.user.id)
+    except Subscription.DoesNotExist:
+        subscription = None
+    domain_list = []
+    for domain in user_domains:
+        domain_list.append(domain)
+
+    context = {'form': form, 'domain_list': user_domains, 'subscription': subscription}
+    return render(request, 'profile.html', context=context)
 
 
 @login_required
@@ -108,15 +114,53 @@ def request_subscription(request):
         if form.is_valid():
             data = form.cleaned_data
             tier = data['tier_level']
-            if request.user.is_pro and tier == 'pro' or request.user.is_business and tier == 'business':
-                return messages.error(request, 'You already have this user tier')
-            request = SubscriptionRequest(
+            if request.user.tier_level == tier:
+                messages.error(request, 'You already have this user tier')
+                return render(request, 'subscription_request.html', {'form': form})
+            sub_request = SubscriptionRequest(
                 user=request.user,
                 tier_level=data['tier_level']
             )
-            request.save()
-            return redirect('/')
+            sub_request.save()
+            messages.success(request, 'Your subscription request has been sent successfully, you will receive an email '
+                                      'with your pricing offer in the next few days')
+            return redirect('edit')
     else:
         form = SubscriptionRequestForm()
     return render(request, 'subscription_request.html', {'form': form})
 
+
+def add_domain(request):
+    user = request.user
+    domains = user.userdomain_set.all()
+    tier = user.tier_level
+    if user.tier_level == 0:
+        messages.error(request, 'You must have at least a PRO tier subscription if you wish to register a domain')
+        return redirect('edit')
+    elif user.tier_level == 1 and len(domains) == 1:
+        messages.error(request, 'You must have at least a BUSINESS tier subscription if you wish to register more '
+                                'domains')
+        return redirect('edit')
+    else:
+        if request.method == 'POST':
+            form = UserDomainForm(request.POST)
+            if form.is_valid():
+                data = form.cleaned_data
+                domain = UserDomain(
+                    user=user,
+                    domain=data['domain'],
+                    ip_address=data['ip_address']
+                )
+                domain.save()
+                messages.success(request, 'Domain added')
+                return redirect('edit')
+        else:
+            form = UserDomainForm()
+            return render(request, 'add_domain.html', {'form': form})
+
+
+def remove_domain(request, domain):
+    user_domain = UserDomain.objects.get(domain=domain)
+    user_domain.delete()
+    messages.success(request, f'Successfully removed {domain} from your managed domains')
+    return redirect('edit')

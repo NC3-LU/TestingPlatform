@@ -20,5 +20,8 @@ class PingTest(models.Model):
 
 class UserDomain(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    ip_address = models.GenericIPAddressField()
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
     domain = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.domain

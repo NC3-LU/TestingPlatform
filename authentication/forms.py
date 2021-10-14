@@ -36,7 +36,7 @@ class LoginForm(AuthenticationForm):
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'company_name', 'vat_number']
+        fields = ['username', 'email', 'company_name', 'address', 'post_code', 'city', 'vat_number']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -80,7 +80,7 @@ class UserDomainForm(forms.ModelForm):
 
     class Meta:
         model = UserDomain
-        fields = ['ip_address', 'domain']
+        fields = ['domain', 'ip_address']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

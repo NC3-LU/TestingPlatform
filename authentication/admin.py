@@ -1,14 +1,18 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, SubscriptionRequest
+from .models import User, Subscription, SubscriptionRequest
 
 
 class UserAdmin(BaseUserAdmin):
     readonly_fields = ('vat_number', 'username')
     fieldsets = (*BaseUserAdmin.fieldsets, ('Company Data', {'fields': ('company_name', 'address', 'post_code',
                                                                         'city', 'vat_number')}),
-                 ('Subscriptions', {'fields': ('is_pro', 'is_business')}))
-    list_display = ('username', 'email', 'company_name', 'is_pro', 'is_business')
+                 ('Subscriptions', {'fields': ('tier_level', )}))
+    list_display = ('username', 'email', 'company_name', 'tier_level')
+
+
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'tier_level', 'date_activated']
 
 
 class SubscriptionRequestAdmin(admin.ModelAdmin):
@@ -18,14 +22,18 @@ class SubscriptionRequestAdmin(admin.ModelAdmin):
     def validate_status(self, request, queryset):
         for sub_request in queryset:
             user = sub_request.user
-            if sub_request.tier_level == 'pro':
-                user.is_pro = True
-                user.is_business = False
-            if sub_request.tier_level == 'business':
-                user.is_business = True
-                user.is_pro = False
+            user.tier_level = sub_request.tier_level
+            try:
+                sub = Subscription.objects.get(user=user)
+                sub.tier_level = sub_request.tier_level
+            except Subscription.DoesNotExist:
+                sub = Subscription(
+                    user=user,
+                    tier_level=user.tier_level
+                )
             user.save()
-        queryset.update(status=True)
+            sub.save()
+            sub_request.delete()
 
     def decline_status(self, request, queryset):
         queryset.update(status=False)
@@ -42,3 +50,4 @@ class SubscriptionRequestAdmin(admin.ModelAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(SubscriptionRequest, SubscriptionRequestAdmin)
+admin.site.register(Subscription, SubscriptionAdmin)

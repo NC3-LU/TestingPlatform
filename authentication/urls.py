@@ -32,6 +32,10 @@ urlpatterns = [
              template_name='password_reset_complete.html'
          ),
          name='password_reset_complete'),
-    path('subscriptions/', views.subscriptions, name='subscriptions'),
-    path('subscriptions/request/', views.request_subscription, name='request_subscription')
+
+    path('settings/subscriptions/', views.subscriptions, name='subscriptions'),
+    path('settings/subscriptions/request/', views.request_subscription, name='request_subscription'),
+
+    path('settings/domains/add/', views.add_domain, name='add_domain'),
+    path('settings/domains/<domain>/remove/', views.remove_domain, name='remove_domain')
 ]

@@ -28,7 +28,6 @@
         <div id="scan-summary" class="d-flex flex-column">
             <div id="gradeBox" class="bg-light text-dark">
                 <span>{{ scan_summary.grade }}</span>
-                >>>>>>> Stashed changes
             </div>
             <small>Loading can take up to 5 minutes.</small>
             <input type="submit" value="Test" class="btn btn-primary">
@@ -37,5 +36,8 @@
             {% if result %}
             {% include "web_report.html" %}
             {% endif %}
+        </div>
+    </section>
+    {% endif %}
 </main>
 {% endblock %}

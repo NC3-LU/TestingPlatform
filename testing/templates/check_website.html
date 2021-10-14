@@ -20,10 +20,8 @@
         <input type="submit" value="Test" class="btn btn-primary">
         <button class="btn btn-secondary mt-2" onclick="window.history.back()">Back</button>
     </form>
-
-            {% if result %}
-            {% include "web_report.html" %}
-            {% endif %}
-
+    {% if result %}
+        {% include "web_report.html" %}
+    {% endif %}
 </main>
 {% endblock %}

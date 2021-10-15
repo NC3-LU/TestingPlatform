@@ -11,9 +11,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/">Home</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="dropdown07" data-bs-toggle="dropdown"
                        aria-expanded="false">Testing</a>
@@ -37,12 +34,15 @@
 
             <ul class="navbar-nav d-flex ms-auto mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
-                <li class="nav-item"><span class="nav-link">Welcome, {{ user.username }} | </span></li>
-                <li class="nav-item"><a class="nav-link" href="/accounts/settings/">Profile</a></li>
-                <li class="nav-item"><a class="nav-link" href="/accounts/logout/">Logout</a></li>
+                    <li class="nav-item"><span class="nav-link">Welcome, {{ user.username }} | </span></li>
+                    {% if user.is_superuser %}
+                        <li class="nav-item"><a class="nav-link" href="/admin/">Admin</a></li>
+                    {% endif %}
+                    <li class="nav-item"><a class="nav-link" href="/accounts/settings/">Profile</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/accounts/logout/">Logout</a></li>
 
                 {% else %}
-                <li class="nav-item"><a class="nav-link" href="/accounts/login/">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/accounts/login/">Login</a></li>
                 {% endif %}
 
                 <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-question-circle-fill"></i></a></li>

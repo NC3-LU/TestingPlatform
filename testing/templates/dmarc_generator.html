@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
+    <div class="authForm p-5">
+        <h3>DMARC configuration</h3>
+        <h4>This form will assist you in creating a DMARC record for your domain:</h4>
+        <p>
+            The DMARC DNS record is a TXT record that needs to be added to your Domain's DNS zone. It helps foreign
+            Nameservers to follow your policies in handling your email.</p>
+        <div class="mb-3">
+            Please enter the domain name the record should be generated for:
+            <input id="domain" class="form-control" type="text" size="45">
+        </div>
+
+        <div class="mb-3">
+            How should the mail be treated?
+            <select id="policy" class="form-control" name="policy">
+                <option value="p=none; " selected>Do nothing, just inform me (recommended)</option>
+                <option value="p=quarantine; ">Quarantine the mail</option>
+                <option value="p=reject; ">Reject the mail</option>
+            </select>
+        </div>
+
+        <p>Please choose how the Identifier Alignment should be handled (this specifies how strictly DKIM and SPF
+            policies
+            are evaluated):</p>
+        <div class="mb-3">
+            SPF:
+            <select class="form-control" id="spf_alignment">
+                <option value="" selected>Relaxed (default)</option>
+                <option value="aspf=s; ">Strict</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            DKIM:
+            <select class="form-control" id="dkim_alignment">
+                <option value="" selected>Relaxed (default)</option>
+                <option value="adkim=s; ">Strict</option>
+            </select>
+        </div>
+
+        <input class="btn btn-primary" type="button" onclick="generate();" value="Generate DMARC record">
+        <br><br>
+        <div id="result" style="display: none;">
+            Please add a TXT record to your domain with the following target / location / host:<br>
+            <div class="bg-light p-2 text-dark mb-2" id="txt"></div>
+
+            This is your DMARC record:<br>
+            <div id="record"
+                 class="bg-light p-2 text-dark"></div>
+        </div>
+    </div>
+</main>
+
+<script type="text/javascript">
+        function generate()
+        {
+            var domain = document.getElementById('domain').value;
+            if (!domain.match(/\S/)) {alert('Please enter a domain name'); return}
+
+
+            var record = "v=DMARC1; ";
+            var e = document.getElementById('policy');
+            record = record + e.options[e.selectedIndex].value;
+
+            record = record + "rua=mailto:contact.testing@c3.lu; ";
+            var e = document.getElementById('spf_alignment');
+            record = record + e.options[e.selectedIndex].value;
+            var e = document.getElementById('dkim_alignment');
+            record = record + e.options[e.selectedIndex].value;
+            document.getElementById('result').style.display = "block";
+            document.getElementById('record').innerHTML = record;
+
+            //remove www. from domain for _dmarc txt
+            let cleanDomain = domain.replace("www.", "");
+
+            document.getElementById('txt').innerHTML = "_dmarc." + cleanDomain;
+        }
+</script>
+{% endblock %}

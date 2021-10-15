@@ -31,30 +31,33 @@
                 Testing
             </div>
             <div class="dashboardBoxDescription">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis lacinia felis id felis rhoncus,
-                consectetur
-                sagittis dui sagittis. Nullam bibendum rhoncus luctus. Aenean eu metus ornare, ornare odio vitae,
-                vestibulum
-                neque. Suspendisse consectetur lorem risus, volutpat viverra neque efficitur eget. Nulla facilisis augue
-                vitae leo convallis, at sagittis elit pharetra.
+                Here you can find all of our testing tools, free to use anytime.
             </div>
         </a>
     </div>
-    {% if user.is_superuser %}
-    <div class="dashboardBox">
-        <a href="">
-            <div class="dashboardBoxPreview">
-                Admin Dashboard
-            </div>
-            <div class="dashboardBoxDescription">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis lacinia felis id felis rhoncus,
-                consectetur
-                sagittis dui sagittis. Nullam bibendum rhoncus luctus. Aenean eu metus ornare, ornare odio vitae,
-                vestibulum
-                neque. Suspendisse consectetur lorem risus, volutpat viverra neque efficitur eget. Nulla facilisis augue
-                vitae leo convallis, at sagittis elit pharetra.
-            </div>
-        </a>
+    {% if user.tier_level %}
+        <div class="dashboardBox">
+            <a href="/automated_testing/">
+                <div class="dashboardBoxPreview">
+                    Automated testing
+                </div>
+                <div class="dashboardBoxDescription">
+                    These tests are made to provide you with light monitoring capabilities over your systems.
+                    After registering your owned domains in your profile, you can setup a number of automated tests,
+                    like ping checks to monitor availability and reachability, http headers tests to grade your website
+                    / check if it is compromised, and more.
+                </div>
+            </a>
     </div>
     {% endif %}
+    <div class="dashboardBox">
+        <a href="/accounts/settings/subscriptions/">
+            <div class="dashboardBoxPreview">
+                Subscriptions
+            </div>
+            <div class="dashboardBoxDescription">
+                Learn more about our different subscription plans!
+            </div>
+        </a>
+    </div>
 </section>

@@ -65,7 +65,6 @@ class IOTUserAdmin(admin.ModelAdmin):
         for iotuser in queryset:
             token = login['tenant_token']
             response = api_add_user(iotuser, token)
-            print(response)
             if response.status_code not in (200, 204):
                 messages.error(request, f'{response.json()["errors"][0]["detail"]}')
             else:

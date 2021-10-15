@@ -34,7 +34,7 @@ def analysis_request(request):
                 file=data['file'],
             )
             a_request.save()
-            return redirect('index')
+            return redirect('/')
     else:
         form = AnalysisRequestForm()
     return render(request, 'iot_request.html', {'form': form})

@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'testing',
     'iot_inspector',
     'automation',
-    'contact'
+    'contact',
+    'testing.templatetags'
 ]
 
 MIDDLEWARE = [

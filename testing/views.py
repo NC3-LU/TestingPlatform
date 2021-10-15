@@ -2,13 +2,10 @@ import xmltodict
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from imap_tools import MailBox, AND
-
 from subprocess import check_output
+import gzip
 
 from .helpers import get_observatory_report, connect_dmarc_mail
-
-
-# Create your views here.
 
 
 @login_required
@@ -77,21 +74,27 @@ def dmarc_shower(request, uid):
     mailbox = connect_dmarc_mail()
     email = [msg for msg in mailbox.fetch(AND(uid=uid))]
     xml_content = "None"
-    type = "None"
     record = "None"
+    content_type = "None"
 
     for msg in email:
         for att in msg.attachments:
-            if att.content_type.find('gzip') != -1:
-                xml_content = None
-
-            else:
+            content_type = att.content_type
+            if "gzip" not in content_type:
                 xml_content = xmltodict.parse(att.payload)
+            else:
+                # TODO unzip and continue
+                xml_content = att.payload
 
-    # record = xml_content['feedback']['record']
+    if "gzip" not in content_type:
+        record = xml_content['feedback']['record']
+    else:
+        xml_content = gzip.decompress(xml_content)
+        xml_content = xmltodict.parse(xml_content)
+        record = xml_content['feedback']['record']
 
-    # if not isinstance(record, list):
-    # record = [record]
+    if not isinstance(record, list):
+        record = [record]
 
     return render(request, 'dmarc_shower.html',
                   {'content': email, 'report': xml_content, 'record': record})

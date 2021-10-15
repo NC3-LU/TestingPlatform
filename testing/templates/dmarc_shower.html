@@ -8,7 +8,6 @@
         <h2>DMARC report for <b>{{email.subject}}</b> sent <b>{{email.date}}</b></h2>
         {% endfor %}
 
-        <br>
         <div class="p-2 bg-light text-dark">
             <table class="table">
                 <thead class="table-dark">
@@ -60,7 +59,7 @@
                 <tr>
                     <th></th>
                     <th>domain</th>
-                    <td>{{ report.feedback.policy_published.domain }}<br> {{ report.feedback.policy_published.domain|get_ip }}</td>
+                    <td>{{ report.feedback.policy_published.domain }}<br>{{ report.feedback.policy_published.domain|get_ip }}</td>
                     <td></td>
                 </tr>
                 <tr>
@@ -129,8 +128,8 @@
                 <tr>
                     <th></th>
                     <th>Source IP</th>
-                    <td>{{ k.row.source_ip }}<br> {{ k.row.source_ip|get_host }}</td>
-                    <td>{{ k.row.source_ip|get_asn }}</td>
+                    <td>{{ k.row.source_ip }}<br> {{ k.row.source_ip|get_host }}<br>{{ k.row.source_ip|get_asn }} </td>
+                    <td></td>
                 </tr>
                 <tr>
                     <th></th>

@@ -1,3 +1,4 @@
+import ipaddress
 import socket
 import html
 
@@ -24,8 +25,7 @@ def get_host(address):
 def get_ip(domain):
     if domain is not None:
         try:
-            # return socket.gethostbyname(domain)
-            return None
+            return socket.gethostbyname(domain)
         except socket.gaierror:
             return "Can't fetch IP from host"
     else:
@@ -34,15 +34,15 @@ def get_ip(domain):
 
 @register.filter('get_asn')
 def get_asn(address):
-    if address is not None:
+    if ipaddress.ip_address(address):
         obj = IPWhois(address)
         d = obj.lookup_rdap(depth=1)
         result = f"""
-                ASN:{d["asn"]}<br>
-                ASN Description: {d["asn_description"]}<br>
-                ASN Registry: {d["asn_registry"]}<br>
-                Entities: {d["entities"]}
-                """
+              ASN:{d["asn"]}<br>
+              ASN Description: {d["asn_description"]}<br>
+              ASN Registry: {d["asn_registry"]}<br>
+              Entities: {d["entities"]}
+              """
     else:
         result = "No IP for ASN"
-        return mark_safe(result)
+    return mark_safe(result)

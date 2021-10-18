@@ -14,7 +14,7 @@
             {% endfor %}
         </select>
         <br>
-        Do you send email from this server?&nbsp;&nbsp;
+        Do you send email from this server?
         <select class="form-control" id="mail" name="mail">
             <option value="a" selected>Yes</option>
             <option value="">No</option>
@@ -38,7 +38,7 @@
         <br>
         <input class="btn btn-primary" type="button" onclick="generate();" value="Generate SPF record">
         <br>
-        <div id="result" style="display: none;">
+        <div id="result" class="mt-2" style="display: none;">
             Please add a TXT record to your domain with the following content:<br>
             <div id="txt" class="bg-light p-2 text-dark"></div>
         </div>

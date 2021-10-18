@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.admin.decorators import display
 
 # Register your models here.
-from testing.models import UserDomain, MailDomain, DMARCRecord, DMARCReport
+from testing.models import UserDomain, MailDomain, DMARCRecord, DMARCReport, TlsScanHistory
 
 
 class DomainAdmin(admin.ModelAdmin):
@@ -21,3 +21,4 @@ admin.site.register(UserDomain, DomainAdmin)
 admin.site.register(MailDomain, DomainAdmin)
 admin.site.register(DMARCRecord)
 admin.site.register(DMARCReport)
+admin.site.register(TlsScanHistory)

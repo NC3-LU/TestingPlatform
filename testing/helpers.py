@@ -1,5 +1,7 @@
 import requests
 import json
+
+from testing.models import TlsScanHistory
 from testing_platform import settings
 from imap_tools import MailBox
 
@@ -8,7 +10,11 @@ def get_observatory_report(target):
     ################################
     # HTTP SCAN Mozilla Observatory
     ################################
+    response = ""
+    scan_summary = ""
+    scan_history = ""
     rescan = True
+
     if rescan is True:
         do_scan = requests.post(
             'https://http-observatory.security.mozilla.org/api/v1/analyze?host=' + target + '&rescan=true'
@@ -53,22 +59,32 @@ def get_observatory_report(target):
         if use:
             headers = {k.replace('-', '_'): v for k, v in json_object['response_headers'].items()}
 
-        ################################
-        # TLS SCAN Mozilla Observatory
-        ################################
-        tls_target = target.replace('www.', '')
-
-        if rescan is True:
-            do_tls_scan = json.loads(requests.post(
-                'https://tls-observatory.services.mozilla.com/api/v1/scan?target=' + tls_target + '&rescan=true').text)
-        else:
-            do_tls_scan = json.loads(requests.post(
-                'https://http-observatory.security.mozilla.org/api/v1/analyze?host=' + tls_target).text)
+    ################################
+    # TLS SCAN Mozilla Observatory
+    ################################
+    tls_target = target.replace('www.', '')
+    tls_scan_id = ""
+    try:
+        do_tls_scan = json.loads(requests.post(
+            'https://tls-observatory.services.mozilla.com/api/v1/scan?target=' + tls_target + '&rescan=true').text)
         tls_scan_id = do_tls_scan['scan_id']
-        # TODO Finish TLS Observatory Data fetching
+        TlsScanHistory.objects.update_or_create(domain=tls_target, defaults={'scan_id': tls_scan_id})
+    except ValueError:
+        tls_scan_history = TlsScanHistory.objects.get(domain=tls_target)
+        tls_scan_id = tls_scan_history.scan_id
 
-        return {'result': response, 'domain_name': target, 'scan_summary': scan_summary, 'headers': headers,
-                'scan_history': scan_history, 'tls_results': do_tls_scan}
+    fetch_tls = json.loads(
+        requests.get('https://tls-observatory.services.mozilla.com/api/v1/results?id=' + str(tls_scan_id)).text)
+
+    while fetch_tls["completion_perc"] != 100:
+        fetch_tls = json.loads(requests.get(
+            'https://tls-observatory.services.mozilla.com/api/v1/results?id=' + str(tls_scan_id)).text)
+        completion_perc = fetch_tls["completion_perc"]
+        if completion_perc == 100:
+            break
+
+    return {'result': response, 'domain_name': target, 'scan_summary': scan_summary, 'headers': headers,
+            'scan_history': scan_history, 'tls_results': fetch_tls}
 
 
 def dmarc_view_checker():

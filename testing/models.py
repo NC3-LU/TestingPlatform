@@ -1,8 +1,5 @@
 import socket
-
 from django.db import models
-
-# Create your models here.
 from authentication.models import User
 
 
@@ -27,6 +24,11 @@ class UserDomain(Domain):
 
 class MailDomain(Domain):
     pass
+
+
+class TlsScanHistory(models.Model):
+    scan_id = models.IntegerField()
+    domain = models.CharField(max_length=255, unique=True)
 
 
 class DMARCRecord(models.Model):

@@ -15,7 +15,9 @@ class PingTest(models.Model):
     ip_ping_target = models.CharField(max_length=45)
 
 
-# class TlsCheck(models.Model):
+class TlsScanHistory(models.Model):
+    scan_id = models.IntegerField()
+    domain = models.CharField(max_length=255, unique=True)
 
 
 class UserDomain(models.Model):

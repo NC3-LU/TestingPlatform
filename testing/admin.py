@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.admin.decorators import display
 
 # Register your models here.
-from testing.models import UserDomain
+from testing.models import UserDomain, TlsScanHistory
 
 
 class UserDomainAdmin(admin.ModelAdmin):
@@ -18,3 +18,4 @@ class UserDomainAdmin(admin.ModelAdmin):
 
 
 admin.site.register(UserDomain, UserDomainAdmin)
+admin.site.register(TlsScanHistory)

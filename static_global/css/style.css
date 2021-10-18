@@ -213,8 +213,8 @@ nav{
  check-website
 */
 
-#gradeBox{
-    width: 5%;
+.gradeBox{
+    width: 5% !important;
     display: flex;
     font-size: 2em !important;
     justify-content:center;

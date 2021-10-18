@@ -4,19 +4,17 @@
 {% load tags %}
 <main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
     <div class="w-100 authForm p-5">
-        {% for email in content %}
-        <h2>DMARC report for <b>{{email.subject}}</b> sent <b>{{email.date}}</b></h2>
-        {% endfor %}
+        <h2>DMARC report for <b>{{ domain }}</b> sent by <b>{{ mailfrom }}</b>, <b>{{ timestamp|timestamp_to_time|date:"Y-m-d h:m:s" }}</b></h2>
 
         <div class="p-2 bg-light text-dark">
             <table class="table">
                 <thead class="table-dark">
-                <tr>
-                    <th>Report Metadata</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                </tr>
+                    <tr>
+                        <th>Report Metadata</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tr>
                     <th></th>
@@ -100,7 +98,7 @@
                     <td></td>
                 </tr>
                 </thead>
-                {% for k in record %}
+                {% for record in records %}
                 <thead class="table-dark">
                 <tr>
                     <th></th>
@@ -117,24 +115,16 @@
                     <td></td>
                 </tr>
                 </thead>
-                <thead class="table-dark">
-                <tr>
-                    <th></th>
-                    <th></th>
-                    <td></td>
-                    <td></td>
-                </tr>
-                </thead>
                 <tr>
                     <th></th>
                     <th>Source IP</th>
-                    <td>{{ k.row.source_ip }}<br> {{ k.row.source_ip|get_host }}<br>{{ k.row.source_ip|get_asn }} </td>
+                    <td>{{ record.row.source_ip }}<br> {{ record.row.source_ip|get_host }}<br>{{ record.row.source_ip|get_asn }} </td>
                     <td></td>
                 </tr>
                 <tr>
                     <th></th>
                     <th>Count</th>
-                    <td>{{ k.row.count }}</td>
+                    <td>{{ record.row.count }}</td>
                     <td></td>
                 </tr>
                 <tr>
@@ -147,17 +137,17 @@
                     <th></th>
                     <th></th>
                     <th>disposition</th>
-                    <td>{{ k.row.policy_evaluated.disposition }}</td>
+                    <td>{{ record.row.policy_evaluated.disposition }}</td>
                 </tr>
                 <tr>
                     <th></th>
                     <th></th>
                     <th>dkim</th>
                     <td>
-                        {% if k.row.policy_evaluated.dkim == "pass" %}
-                        <span class="badge bg-success">{{ k.row.policy_evaluated.dkim }}</span>
+                        {% if record.row.policy_evaluated.dkim == "pass" %}
+                        <span class="badge bg-success">{{ record.row.policy_evaluated.dkim }}</span>
                         {% else %}
-                        <span class="badge bg-danger">{{ k.row.policy_evaluated.dkim }}</span>
+                        <span class="badge bg-danger">{{ record.row.policy_evaluated.dkim }}</span>
                         {% endif %}
                     </td>
                 </tr>
@@ -166,10 +156,10 @@
                     <th></th>
                     <th>spf</th>
                     <td>
-                        {% if k.row.policy_evaluated.spf == "pass" %}
-                        <span class="badge bg-success">{{ k.row.policy_evaluated.spf }}</span>
+                        {% if record.row.policy_evaluated.spf == "pass" %}
+                        <span class="badge bg-success">{{ record.row.policy_evaluated.spf }}</span>
                         {% else %}
-                        <span class="badge bg-danger">{{ k.row.policy_evaluated.spf }}</span>
+                        <span class="badge bg-danger">{{ record.row.policy_evaluated.spf }}</span>
                         {% endif %}
                     </td>
                 </tr>
@@ -177,11 +167,11 @@
                     <th></th>
                     <th></th>
                     <th>reason</th>
-                    <td>type:{% if k.row.policy_evaluated.reason.type %} {{ k.row.policy_evaluated.reason.type }}
+                    <td>type:{% if record.row.policy_evaluated.reason.type %} {{ record.row.policy_evaluated.reason.type }}
                         {% else %} null {% endif %}
 
-                        <br>comment:{% if k.row.policy_evaluated.reason.comment %}
-                        {{ k.row.policy_evaluated.reason.comment }} {% else %} null {% endif %}
+                        <br>comment:{% if record.row.policy_evaluated.reason.comment %}
+                        {{ record.row.policy_evaluated.reason.comment }} {% else %} null {% endif %}
                     </td>
                 </tr>
                 <thead class="table-dark">
@@ -195,7 +185,7 @@
                 <tr>
                     <th></th>
                     <th>header_from</th>
-                    <td>{{ k.identifiers.header_from }}<br>{{ k.identifiers.header_from|get_ip }}</td>
+                    <td>{{ record.identifiers.header_from }}<br>{{ record.identifiers.header_from|get_ip }}</td>
                     <td></td>
                 </tr>
                 <thead class="table-dark">
@@ -206,6 +196,7 @@
                     <td></td>
                 </tr>
                 </thead>
+                {% if record.auth_results.dkim %}
                 <tr>
                     <th></th>
                     <th>dkim</th>
@@ -216,7 +207,7 @@
                     <th></th>
                     <th></th>
                     <th>domain</th>
-                    <td>{{ k.auth_results.dkim.domain }}<br>{{ k.auth_results.dkim.domain|get_ip }}
+                    <td>{{ record.auth_results.dkim.domain }}<br>{{ record.auth_results.dkim.domain|get_ip }}
                     </td>
                 </tr>
                 <tr>
@@ -224,10 +215,10 @@
                     <th></th>
                     <th>result</th>
                     <td>
-                        {% if k.auth_results.dkim.result == "pass" %}
-                        <span class="badge bg-success">{{ k.auth_results.dkim.result }}</span>
+                        {% if record.auth_results.dkim.result == "pass" %}
+                        <span class="badge bg-success">{{ record.auth_results.dkim.result }}</span>
                         {% else %}
-                        <span class="badge bg-danger">{{ k.auth_results.dkim.result }}</span>
+                        <span class="badge bg-danger">{{ record.auth_results.dkim.result }}</span>
                         {% endif %}
                     </td>
                 </tr>
@@ -235,8 +226,10 @@
                     <th></th>
                     <th></th>
                     <th>selector</th>
-                    <td>{{ k.auth_results.dkim.selector }}</td>
+                    <td>{{ record.auth_results.dkim.selector }}</td>
                 </tr>
+                {% endif %}
+                {% if record.auth_results.spf %}
                 <tr>
                     <th></th>
                     <th>spf</th>
@@ -247,7 +240,7 @@
                     <th></th>
                     <th></th>
                     <th>domain</th>
-                    <td>{{ k.auth_results.spf.domain }}<br>{{ k.auth_results.spf.domain|get_ip }}
+                    <td>{{ record.auth_results.spf.domain }}<br>{{ record.auth_results.spf.domain|get_ip }}
                     </td>
                 </tr>
                 <tr>
@@ -255,14 +248,15 @@
                     <th></th>
                     <th>result</th>
                     <td>
-                        {% if k.auth_results.spf.result == "pass" %}
-                        <span class="badge bg-success">{{ k.auth_results.spf.result }}</span>
+                        {% if record.auth_results.spf.result == "pass" %}
+                        <span class="badge bg-success">{{ record.auth_results.spf.result }}</span>
                         {% else %}
-                        <span class="badge bg-danger">{{ k.auth_results.spf.result }}</span>
+                        <span class="badge bg-danger">{{ record.auth_results.spf.result }}</span>
                         {% endif %}
                     </td>
                 </tr>
-                {% endfor %}
+                {% endif %}
+            {% endfor %}
             </table>
         </div>
     </div>

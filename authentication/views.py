@@ -5,9 +5,10 @@ from django.contrib.auth import login, logout, authenticate, update_session_auth
 from django.http import HttpResponseRedirect
 from decouple import config
 
-from .forms import SignUpForm, LoginForm, UserUpdateForm, ChangePasswordForm, SubscriptionRequestForm, UserDomainForm
+from .forms import SignUpForm, LoginForm, UserUpdateForm, ChangePasswordForm, SubscriptionRequestForm, UserDomainForm, \
+    MailDomainForm
 from .models import SubscriptionRequest, Subscription
-from testing.models import UserDomain
+from testing.models import UserDomain, MailDomain
 from iot_inspector.models import IOTUser
 
 from iot_inspector_client import Client
@@ -72,15 +73,19 @@ def edit_profile(request):
         form = UserUpdateForm(instance=request.user)
 
     user_domains = UserDomain.objects.filter(user=request.user.id)
+    mail_domains = MailDomain.objects.filter(user=request.user.id)
     try:
         subscription = Subscription.objects.get(user=request.user.id)
     except Subscription.DoesNotExist:
         subscription = None
-    domain_list = []
+    domain_list, mail_domain_list = [], []
     for domain in user_domains:
         domain_list.append(domain)
+    for domain in mail_domains:
+        mail_domain_list.append(domain)
 
-    context = {'form': form, 'domain_list': user_domains, 'subscription': subscription}
+    context = {'form': form, 'domain_list': user_domains, 'mail_domain_list': mail_domain_list,
+               'subscription': subscription}
     return render(request, 'profile.html', context=context)
 
 
@@ -134,7 +139,6 @@ def request_subscription(request):
 def add_domain(request):
     user = request.user
     domains = user.userdomain_set.all()
-    tier = user.tier_level
     if user.tier_level == 0:
         messages.error(request, 'You must have at least a PRO tier subscription if you wish to register a domain')
         return redirect('edit')
@@ -149,8 +153,7 @@ def add_domain(request):
                 data = form.cleaned_data
                 domain = UserDomain(
                     user=user,
-                    domain=data['domain'],
-                    ip_address=data['ip_address']
+                    domain=data['domain']
                 )
                 domain.save()
                 messages.success(request, 'Domain added')
@@ -165,4 +168,32 @@ def remove_domain(request, domain):
     user_domain = UserDomain.objects.get(domain=domain)
     user_domain.delete()
     messages.success(request, f'Successfully removed {domain} from your managed domains')
+    return redirect('edit')
+
+
+@login_required
+def add_mail_domain(request):
+    user = request.user
+    domains = user.maildomain_set.all()
+    if request.method == 'POST':
+        form = MailDomainForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            domain = MailDomain(
+                user=user,
+                domain=data['domain']
+            )
+            domain.save()
+            messages.success(request, 'Domain added')
+            return redirect('edit')
+    else:
+        form = MailDomainForm()
+        return render(request, 'add_domain.html', {'form': form})
+
+
+@login_required
+def remove_mail_domain(request, domain):
+    mail_domain = MailDomain.objects.get(domain=domain)
+    mail_domain.delete()
+    messages.success(request, f'Successfully removed {domain} from your managed mail domains')
     return redirect('edit')

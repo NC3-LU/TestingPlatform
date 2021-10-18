@@ -1,34 +1,45 @@
 {% extends "base.html" %}
 {% block content %}
-
+{% load timestamp_to_time %}
 
 <main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
-    <div class="w-100 authForm p-5">
-        <h2>DMARC Reporter</h2>
-
-        <table class="table table-light table-stripped table-responsive">
-            <tr>
-                <th>UID</th>
-                <th>Subject</th>
-                <th>Date</th>
-                <th>Attachment</th>
-                <th></th>
-            </tr>
-            {% for email in emails %}
-            <tr>
-                <td>{{email.uid}}</td>
-                <td>{{email.subject}}</td>
-                <td>{{email.date}}</td>
-                <td>
-                    {% for att in email.attachments %}
-                    {{att.filename}}
-                    {% endfor %}
-                </td>
-                <td><a class="btn btn-primary" href="/test/dmarc-reporter/{{email.uid}}">View report</a></td>
-
-            </tr>
-            {% endfor %}
-        </table>
+    <div class="authForm p-5">
+        <h1>DMARC Reporter</h1>
     </div>
+    {% if not domain_reports %}
+        <div class="authForm p-5">
+            No mail domain registered. Please add a domain to your list of managed mail domains by clicking <b>
+            <a href="/accounts/settings/#company-mail">here</a></b>.
+        </div>
+    {% endif %}
+    {% for domain, report in domain_reports %}
+        <div class="authForm p-5">
+            <h3>Reports for {{ domain.domain }}<br></h3>
+            <hr>
+            {% if not report.reports %}
+                No report available yet
+            {% else %}
+                <table class="table table-light table-stripped table-responsive">
+                    {% for mailfrom, reps in report.reports.items %}
+                        <tr>
+                            <th>{{ mailfrom }}</th>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            {% for timestamp in reps %}
+                                <th></th>
+                                <td>{{ timestamp|timestamp_to_time|date:"Y-m-d h:m:s" }}</td>
+                                <td><a class="btn btn-primary"
+                                       href="/test/dmarc-reporter/{{ report.domain }}/{{ mailfrom }}/{{ timestamp }}">
+                                    View report
+                                </a></td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        </div>
+    {% endfor %}
 </main>
 {% endblock %}

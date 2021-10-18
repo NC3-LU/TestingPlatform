@@ -31,6 +31,13 @@ DEBUG = os.environ.get('DEBUG', '') != 'False'
 allowed_hosts = os.environ.get('ALLOWED_HOSTS', 'localhost')
 ALLOWED_HOSTS = list(map(str.strip, allowed_hosts.split(',')))
 
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '0') == '1'
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '25'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'webmaster@localhost')
 
 # Application definition
 
@@ -160,6 +167,9 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 IOT_API_URL = 'https://smile.iot-inspector.com/api/'
-IOT_CLIENT_ID = os.environ.get('IOT_CLIENT_ID')
+IOT_CLIENT_ID = os.environ.get('IOT_CLIENT_ID', 'KFSRs6CqqErKbnwuxIog_tBdPMskLVaOzJVb39AKBQ8')
 IOT_API_EMAIL = os.environ.get('IOT_API_EMAIL', 'romain.kieffer@securitymadein.lu')
-IOT_API_PASSWORD = os.environ.get('IOT_API_PASSWORD')
+IOT_API_PASSWORD = os.environ.get('IOT_API_PASSWORD', 'WmgLs9yGpf3Vn8KtERVRrtb69Aa2aec-h1EA2Xu5w_c')
+
+# TO BE REMOVED!!
+DMARC_API_KEY = 'bnG0rbVIOwvibhYnRrV3JOhE0Ms3bQuTHdNtXZk01jw'

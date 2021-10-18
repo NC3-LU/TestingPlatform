@@ -2,10 +2,10 @@ from django.contrib import admin
 from django.contrib.admin.decorators import display
 
 # Register your models here.
-from testing.models import UserDomain
+from testing.models import UserDomain, MailDomain, DMARCRecord, DMARCReport
 
 
-class UserDomainAdmin(admin.ModelAdmin):
+class DomainAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'get_company_name', 'get_username']
 
     @display(description='Company')
@@ -17,4 +17,7 @@ class UserDomainAdmin(admin.ModelAdmin):
         return obj.user.username
 
 
-admin.site.register(UserDomain, UserDomainAdmin)
+admin.site.register(UserDomain, DomainAdmin)
+admin.site.register(MailDomain, DomainAdmin)
+admin.site.register(DMARCRecord)
+admin.site.register(DMARCReport)

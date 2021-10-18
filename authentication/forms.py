@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, PasswordResetForm
 
 from .models import User, SubscriptionRequest
-from testing.models import UserDomain
+from testing.models import UserDomain, MailDomain
 
 
 class SignUpForm(UserCreationForm):
@@ -72,15 +72,22 @@ class SubscriptionRequestForm(forms.ModelForm):
 
 
 class UserDomainForm(forms.ModelForm):
-    ip_address = forms.GenericIPAddressField(required=False,
-                                             help_text='Entering the domains IP Address is optional')
-    domain = forms.CharField(max_length=255, required=False,
-                             help_text='Please enter the domain you want perform tests with. In following format: '
-                                       'domain.com')
 
     class Meta:
         model = UserDomain
-        fields = ['domain', 'ip_address']
+        fields = ['domain']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
+
+
+class MailDomainForm(forms.ModelForm):
+
+    class Meta:
+        model = MailDomain
+        fields = ['domain']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

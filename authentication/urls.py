@@ -37,5 +37,8 @@ urlpatterns = [
     path('settings/subscriptions/request/', views.request_subscription, name='request_subscription'),
 
     path('settings/domains/add/', views.add_domain, name='add_domain'),
-    path('settings/domains/<domain>/remove/', views.remove_domain, name='remove_domain')
+    path('settings/domains/<domain>/remove/', views.remove_domain, name='remove_domain'),
+
+    path('settings/mail-domains/add', views.add_mail_domain, name='add_mail_domain'),
+    path('settings/mail-domains/<domain>/remove/', views.remove_mail_domain, name='remove_mail_domain')
 ]

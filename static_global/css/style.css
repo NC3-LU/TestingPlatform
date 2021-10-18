@@ -151,6 +151,19 @@ nav{
 
 
 /* DASHBOARD */
+.dashboardSectionBox{
+    width:80%;
+    height:auto;
+    background:var(--dBoxColor);
+    border: 3px var(--dBoxColor) solid;
+    margin: 2%;
+    padding: 1%;
+    transition: 0.5s;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
 .dashboardBox{
     width:80%;
     height:auto;

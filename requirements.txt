@@ -16,4 +16,3 @@ imap_tools
 xmltodict
 checkdmarc
 ipwhois
-http.client

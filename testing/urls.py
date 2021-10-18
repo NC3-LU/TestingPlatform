@@ -9,5 +9,6 @@ urlpatterns = [
     path('spf-generator/', views.spf_generator, name='spf-generator'),
     path('dmarc-generator/', views.dmarc_generator, name='dmarc-generator'),
     path('dmarc-reporter/', views.dmarc_reporter, name='dmarc-reporter'),
-    path('dmarc-reporter/<str:uid>', views.dmarc_shower, name='dmarc-shower'),
+    path('dmarc-reporter/<str:domain>/<mailfrom>/<timestamp>', views.dmarc_shower, name='dmarc-shower'),
+    path('dmarc-reporter/upload/', views.dmarc_upload, name='dmarc-uploader')
 ]

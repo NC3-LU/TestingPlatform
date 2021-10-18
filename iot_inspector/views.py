@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from .forms import AnalysisRequestForm
 from .models import AnalysisRequest
 from .helpers import api_get_report
 
-from decouple import config
 from iot_inspector_client import FirmwareMetadata
 from datetime import date
 import mimetypes
@@ -34,7 +34,9 @@ def analysis_request(request):
                 file=data['file'],
             )
             a_request.save()
-            return redirect('/')
+            messages.success(request, 'Your analysis request was successfully saved, you will receive a pricing offer'
+                                      'in the next few days.')
+            return redirect('iot_index')
     else:
         form = AnalysisRequestForm()
     return render(request, 'iot_request.html', {'form': form})
@@ -46,5 +48,6 @@ def download_report(request, uuid):
     file = req.content
     response = HttpResponse(file, headers={
         'Content-Type': 'application/pdf',
-        'Content-Disposition': f'attachment; filename="{request.user.company_name}_{uuid[-12:]}.pdf"'})
+        'Content-Disposition': f'attachment; filename="{request.user.company_name}_{uuid[-12:]}.pdf"'
+    })
     return response

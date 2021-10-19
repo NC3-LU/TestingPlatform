@@ -6,7 +6,7 @@ services:
 stages:
   - build
   - push
-#  - deploy
+  - deploy
 
 variables:
   PYTHON_VERSION: "3.9"
@@ -44,16 +44,16 @@ push tags:
   - docker tag $DOCKER_IMAGE:$CI_COMMIT_SHA $DOCKER_IMAGE:$CI_COMMIT_REF_NAME
   - docker push $DOCKER_IMAGE:$CI_COMMIT_REF_NAME
 
-#trigger-preview-deploy:
-#  stage: deploy
-#  only:
-#  - master
-#  variables:
-#    ANSIBLE_JOB: deploy-testing-platform-preview
-#  trigger:
-#    project: sysadmin/cfgmgt/ansible
-#    branch: master
-#
+trigger-preview-deploy:
+  stage: deploy
+  only:
+  - master
+  variables:
+    ANSIBLE_JOB: deploy-testing-platform-preview
+  trigger:
+    project: sysadmin/cfgmgt/ansible
+    branch: master
+
 #trigger-production-deploy:
 #  stage: deploy
 #  only:

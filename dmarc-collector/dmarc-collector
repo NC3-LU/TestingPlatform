@@ -1,0 +1,61 @@
+#!/usr/bin/python3.8
+
+import os
+import sys
+import email.utils
+import email.parser
+import syslog
+import uuid
+import zipfile
+import io
+import fnmatch
+import gzip
+import requests
+
+API_URL = 'https://testing-platform.srv.office.secin.lu/test/dmarc-reporter/upload/'
+API_KEY = 'bnG0rbVIOwvibhYnRrV3JOhE0Ms3bQuTHdNtXZk01jw'
+print(API_KEY)
+UUID = str(uuid.uuid4())
+syslog.openlog("dmarc-collector[{}]".format(UUID), 0, syslog.LOG_MAIL)
+
+input_mail = sys.stdin
+postfix_from = input_mail.readline().strip().split(' ')[1]
+
+message = email.parser.Parser().parse(input_mail)
+
+from_address = email.utils.parseaddr(message['From'])[1]
+to_addresses = [a[1] for a in email.utils.getaddresses(message.get_all('To', []))]
+syslog.syslog("got message from {}".format(from_address))
+
+for part in message.walk():
+    dmarc_xml_report = None
+    cd = part.get("Content-Disposition")
+    if cd and cd.strip().lower().startswith("attachment"):
+        if "application/zip" in part.get("Content-Type"):
+            payload = part.get_payload(decode=True)
+            dmarc_ar = io.BytesIO(payload)
+            zf = zipfile.ZipFile(dmarc_ar, 'r')
+            for name in zf.namelist():
+                if fnmatch.fnmatch(name, '*.xml'):
+                    dmarc_xml_report = zf.read(name)
+        if "application/gzip" in part.get("Content-Type"):
+            payload = part.get_payload(decode=True)
+            dmarc_ar = io.BytesIO(payload)
+            gzf = gzip.GzipFile(fileobj=dmarc_ar)
+            dmarc_xml_report = gzf.read()
+        if "text/xml" in part.get("Content-Type"):
+            dmarc_xml_report = part.get_payload(decode=True)
+
+        logfile = open("./dmarc-collector.log", "a")
+        logfile.write(UUID)
+        logfile.write("\n")
+        logfile.write(dmarc_xml_report.decode('utf-8'))
+        logfile.write("\n")
+        logfile.close()
+
+data = {'report': dmarc_xml_report}
+params = {'from': from_address, 'to': to_addresses, 'api-key': API_KEY}
+session = requests.Session()
+session.verify = False
+req = session.post(url=API_URL, params=params, data=data)
+print(req.history)

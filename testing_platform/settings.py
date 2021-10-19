@@ -167,9 +167,8 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 IOT_API_URL = 'https://smile.iot-inspector.com/api/'
-IOT_CLIENT_ID = os.environ.get('IOT_CLIENT_ID', 'KFSRs6CqqErKbnwuxIog_tBdPMskLVaOzJVb39AKBQ8')
+IOT_CLIENT_ID = os.environ.get('IOT_CLIENT_ID', '')
 IOT_API_EMAIL = os.environ.get('IOT_API_EMAIL', 'romain.kieffer@securitymadein.lu')
-IOT_API_PASSWORD = os.environ.get('IOT_API_PASSWORD', 'WmgLs9yGpf3Vn8KtERVRrtb69Aa2aec-h1EA2Xu5w_c')
+IOT_API_PASSWORD = os.environ.get('IOT_API_PASSWORD', '')
 
-# TO BE REMOVED!!
-DMARC_API_KEY = 'bnG0rbVIOwvibhYnRrV3JOhE0Ms3bQuTHdNtXZk01jw'
+DMARC_API_KEY = os.environ.get('DMARC_API_KEY', 'bnG0rbVIOwvibhYnRrV3JOhE0Ms3bQuTHdNtXZk01jw')

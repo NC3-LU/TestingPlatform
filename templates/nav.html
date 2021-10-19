@@ -11,17 +11,27 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/">Home</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="dropdown07" data-bs-toggle="dropdown"
                        aria-expanded="false">Testing</a>
                     <ul class="dropdown-menu bg-dark" aria-labelledby="dropdown07">
                         <li><a class="dropdown-item" href="/test/c3-protocols">C3 Protocols</a></li>
-                        <li><a class="dropdown-item" href="/test/pingtest">Ping Test</a></li>
+                        <li><a class="dropdown-item" href="/test/pingtest">Advanced Ping Test</a></li>
+                        <li class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/test/http-test">Web Test</a></li>
+
+                        <li class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">DMARC</h6></li>
+                        <li><a class="dropdown-item" href="/test/dmarc-reporter">DMARC Reporter</a></li>
+                        <li><a class="dropdown-item" href="/test/dmarc-generator">DMARC Generator</a></li>
+                        <li class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">SPF</h6></li>
+                        <li><a class="dropdown-item" href="/test/spf-generator">SPF Generator</a></li>
+
                     </ul>
                 </li>
+
+
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="dropdown06" data-bs-toggle="dropdown"
                        aria-expanded="false">Legal</a>
@@ -30,11 +40,17 @@
                         <li><a class="dropdown-item" href="/privacy">Privacy</a></li>
                     </ul>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">Contact Us</a>
+                </li>
             </ul>
 
             <ul class="navbar-nav d-flex ms-auto mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
                 <li class="nav-item"><span class="nav-link">Welcome, {{ user.username }} | </span></li>
+                {% if user.is_superuser %}
+                <li class="nav-item"><a class="nav-link" href="/admin/">Admin</a></li>
+                {% endif %}
                 <li class="nav-item"><a class="nav-link" href="/accounts/settings/">Profile</a></li>
                 <li class="nav-item"><a class="nav-link" href="/accounts/logout/">Logout</a></li>
 

@@ -141,8 +141,8 @@ nav{
 .authForm{
     color: white !important;
 }
-.authForm > div > input{
-    background: var(--anchorColor);
+.authForm > div > input, select{
+    background: var(--anchorColor) !important;
 }
 .authForm > div > label{
     color:var(--bs-dark);
@@ -151,6 +151,19 @@ nav{
 
 
 /* DASHBOARD */
+.dashboardSectionBox{
+    width:80%;
+    height:auto;
+    background:var(--dBoxColor);
+    border: 3px var(--dBoxColor) solid;
+    margin: 2%;
+    padding: 1%;
+    transition: 0.5s;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
 .dashboardBox{
     width:80%;
     height:auto;
@@ -213,8 +226,8 @@ nav{
  check-website
 */
 
-#gradeBox{
-    width: 5%;
+.gradeBox{
+    width: 5% !important;
     display: flex;
     font-size: 2em !important;
     justify-content:center;

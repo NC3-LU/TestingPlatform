@@ -5,7 +5,7 @@ from .models import PingAutomatedTest, HttpAutomatedTest
 class PingAutomatedTestForm(forms.ModelForm):
     class Meta:
         model = PingAutomatedTest
-        fields = ['host', 'frequency', 'time', 'weekday', 'monthly_test_date']
+        fields = ['target', 'frequency', 'time', 'weekday', 'monthly_test_date']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

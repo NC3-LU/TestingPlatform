@@ -24,20 +24,11 @@
 
 <main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
 
-
-    {% if user.is_authenticated %}
-    <p class="errornote">
-        {% blocktranslate trimmed %}
-        You are authenticated as {{ username }}, but are not authorized to
-        access this page. Would you like to login to a different account?
-        {% endblocktranslate %}
-    </p>
-    {% endif %}
-
-    <h1>Vendor check</h1>
+    <h1>Add domain</h1>
     <hr class="w-25 text-dark">
-    <form class="p-5 authForm" action="{{ app_path }}" method="post" id="test-form">
+    <form class="p-5 authForm" action="{{ app_path }}" method="post" id="login-form" enctype="multipart/form-data">
         {% csrf_token %}
+
         {% for field in form %}
         <div class="form-floating mb-4">
             {{ field }}
@@ -51,7 +42,9 @@
         </div>
         {% endfor %}
 
-        <input class="btn btn-primary" type="submit" value="{% translate 'Log in' %}">
+        <input type="hidden" name="next" value="{{ next }}">
+
+        <input class="btn btn-primary" type="submit" value="{% translate 'Submit' %}">
     </form>
 
 </main>

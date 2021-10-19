@@ -3,13 +3,17 @@
 
 {% block content %}
 <section class="w-100 h-100 d-flex justify-content-center flex-wrap">
-     <div class="dashboardBox">
-        <a href="/test/check-website/">
+    <div class="dashboardSectionBox"><h1>System checks</h1></div>
+    <div class="w-75"><p class="lead">These tools let you check the status of your systems: their availability, the quality of your
+        website configuration...</p></div>
+    <div class="dashboardBox">
+        <a href="/test/http-test/">
             <div class="dashboardBoxPreview">
-                Ping Test
+                HTTP Test
             </div>
             <div class="dashboardBoxDescription">
-                Perform scans for your websites.
+                Perform scans for your website. You will get a score depending on your website's configuration,
+                which allows you to see where you need to make changes if need be.
             </div>
         </a>
          <a href="https://observatory.mozilla.org/"><b>Powered by Mozilla Observatory</b></a>
@@ -20,12 +24,61 @@
                 Ping Test
             </div>
             <div class="dashboardBoxDescription">
-                Simply perform a ping test and see if you can reach the entered domain/ip address.
+                Simply perform a ping test on your chosen domain/ip address.
+                This is useful to check if your clients or users outside of your intranet can reach
+                your website.
+            </div>
+        </a>
+    </div>
+    <hr class="w-25 text-dark">
+    <div class="dashboardSectionBox" id="dmarc-tools"><h1>DMARC Tools</h1></div>
+    <div class="w-75"><p class="lead">These tools are built to give you an easy way of configuring DMARC for your emails.
+        DMARC (Domain-based Message Authentication, Reporting and Conformance) allows people you send mails to
+        to ascertain that you are the actual sender, thus protecting against identity usurpation.</p></div>
+    <div class="dashboardBox">
+        <a href="/test/dmarc-generator/">
+            <div class="dashboardBoxPreview">
+                DMARC Record Generator
+            </div>
+            <div class="dashboardBoxDescription">
+                This tool will take one of your registered mail domains and generate a DMARC
+                entry that you can add in your DNS configuration.
+                Then DMARC reports will be generated and sent to your personal report directory, right below this menu.
             </div>
         </a>
     </div>
     <div class="dashboardBox">
-        <a href="">
+        <a href="/test/dmarc-reporter/">
+            <div class="dashboardBoxPreview">
+                List DMARC Records
+            </div>
+            <div class="dashboardBoxDescription">
+                This tool will take one of your registered mail domains and generate a DMARC
+                entry that you can add in your DNS configuration.
+                Then DMARC reports will be generated and sent to your personal report directory, right below this menu.
+            </div>
+        </a>
+    </div>
+    <hr class="w-25 text-dark">
+    <div class="dashboardSectionBox" id="dmarc-tools"><h1>SPF Tools</h1></div>
+    <div class="w-75"><p class="lead">SPF (Sender Policy Framework) is, like DMARC, a system of email validation,
+        which allows you to publish a list of mail servers that are allowed to send emails in your name. It is best used
+        in parallel with DMARC.</p></div>
+    <div class="dashboardBox">
+        <a href="/test/spf-generator/">
+            <div class="dashboardBoxPreview">
+                SPF Record Generator
+            </div>
+            <div class="dashboardBoxDescription">
+                This tool will take one of your registered mail domains and generate a DMARC
+                entry that you can add in your DNS configuration.
+                Then DMARC reports will be generated and sent to your personal report directory, right below this menu.
+            </div>
+        </a>
+    </div>
+    <hr class="w-25 text-dark">
+    <div class="dashboardBox">
+        <a href="/test/c3-protocols">
             <div class="dashboardBoxPreview">
                 C3 Protocols
             </div>

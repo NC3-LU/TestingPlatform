@@ -23,8 +23,9 @@ urlpatterns = [
     path('accounts/', include('authentication.urls')),
     path('', include('legal_section.urls')),
     path('test/', include('testing.urls')),
-    path('iot_inspector/', include('iot_inspector.urls')),
-    path('automated_testing/', include('automation.urls')),
+    path('iot-inspector/', include('iot_inspector.urls')),
+    path('automated-testing/', include('automation.urls')),
     path('admin/', admin.site.urls),
+    path('contact/', include('contact.urls'))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

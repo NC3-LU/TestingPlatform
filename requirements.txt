@@ -12,3 +12,7 @@ certifi~=2021.5.30
 pyjwt~=2.2.0
 sgqlc~=14.1
 croniter~=1.0.15
+imap_tools
+xmltodict
+checkdmarc
+ipwhois

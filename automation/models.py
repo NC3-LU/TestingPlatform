@@ -5,6 +5,7 @@ import django.utils.timezone
 
 from authentication.models import User
 from automation.tasks import *
+from testing.models import UserDomain
 
 from datetime import datetime
 
@@ -59,13 +60,13 @@ class AutomatedTest(models.Model):
 
 
 class PingAutomatedTest(AutomatedTest):
-    host = models.CharField(max_length=100, help_text='Host to be tested')
+    target = models.ForeignKey(UserDomain, on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         self.schedule = super().schedule_task(
             t_type='ping',
             func='automation.tasks.ping',
-            args=self.host,
+            args=self.target.domain,
             cron=super().get_cron_exp(self.time)
         )
         self.schedule.save()
@@ -76,13 +77,13 @@ class PingAutomatedTest(AutomatedTest):
 
 
 class HttpAutomatedTest(AutomatedTest):
-    target = models.CharField(max_length=100, help_text='Host to be tested')
+    target = models.ForeignKey(UserDomain, on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         self.schedule = super().schedule_task(
             t_type='http',
             func='automation.tasks.http',
-            args=self.target,
+            args=self.target.domain,
             cron=super().get_cron_exp(self.time)
         )
         self.schedule.save()

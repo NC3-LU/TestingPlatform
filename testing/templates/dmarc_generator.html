@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block content %}
+
+{% if form.errors and not form.non_field_errors %}
+<p class="errornote">
+    {% if form.errors.items|length == 1 %}
+    {% translate "Please correct the error below." %}
+    {% else %}
+    {% translate "Please correct the errors below." %}
+    {% endif %}
+</p>
+{% endif %}
+
+{% if form.non_field_errors %}
+{% for error in form.non_field_errors %}
+<p class="errornote">
+    {{ error }}
+</p>
+{% endfor %}
+{% endif %}
+
+<main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
+    <h1 class="authForm p-5 d-flex justify-content-center">DMARC Record Generator</h1>
+    <form class="p-5 authForm" action="{{ app_path }}" method="post" id="test-form">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-floating mb-4">
+            {% if field.name == 'spf_policy' %}
+                Please choose how the Identifier Alignment should be handled (this specifies how strictly DKIM and SPF
+                policies are evaluated)<br><br>
+                SPF Alignment:
+            {% elif field.name == 'dkim_policy' %}
+                DKIM Alignment
+            {% endif %}
+            {% if field.help_text %}
+                <small>{{ field.help_text }}</small>
+            {% endif %}
+            {{ field }}
+            {% for error in field.errors %}
+            <p style="color: red">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        <input class="btn btn-primary" type="submit" value="{% translate 'Generate' %}">
+    </form>
+
+    {% if txt and record %}
+    <section class="result-content authForm p-5">
+        <div id="result">
+            Please add a TXT record to your domain with the following target / location / host:<br>
+            <div class="bg-light p-2 text-dark mb-2">{{ txt }}</div>
+            This is your DMARC record:<br>
+            <div class="bg-light p-2 text-dark">{{ record }}</div>
+        </div>
+    </section>
+    {% endif %}
+
+</main>
+{% endblock %}

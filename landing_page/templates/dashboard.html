@@ -1,6 +1,17 @@
 <section class="w-100 h-100 d-flex justify-content-center flex-wrap">
+    <div class="dashboardSectionBox"><h1>Testing</h1></div>
     <div class="dashboardBox">
-        <a href="iot_inspector/">
+        <a href="/test">
+            <div class="dashboardBoxPreview">
+                Testing toolbox
+            </div>
+            <div class="dashboardBoxDescription">
+                Here you can find all of our free testing tools.
+            </div>
+        </a>
+    </div>
+    <div class="dashboardBox">
+        <a href="iot-inspector/">
             <div class="dashboardBoxPreview">
                 IOT Inspector
             </div>
@@ -13,48 +24,35 @@
             </div>
         </a>
     </div>
-    <div class="dashboardBox">
-        <a href="/test/c3-protocols">
-            <div class="dashboardBoxPreview">
-                C3 Protocols
-            </div>
-            <div class="dashboardBoxDescription">
-                This initiative was inspired by Start-Ups and SMB's with whom we interact daily. While trying to
-                understand why they are not engaged more systematically into Penetration Testing, the answer that came
-                back most of the time was « Cost ». Click to read further.
-            </div>
-        </a>
-    </div>
-    <div class="dashboardBox">
-        <a href="/test">
-            <div class="dashboardBoxPreview">
-                Testing
-            </div>
-            <div class="dashboardBoxDescription">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis lacinia felis id felis rhoncus,
-                consectetur
-                sagittis dui sagittis. Nullam bibendum rhoncus luctus. Aenean eu metus ornare, ornare odio vitae,
-                vestibulum
-                neque. Suspendisse consectetur lorem risus, volutpat viverra neque efficitur eget. Nulla facilisis augue
-                vitae leo convallis, at sagittis elit pharetra.
-            </div>
-        </a>
-    </div>
-    {% if user.is_superuser %}
-    <div class="dashboardBox">
-        <a href="">
-            <div class="dashboardBoxPreview">
-                Admin Dashboard
-            </div>
-            <div class="dashboardBoxDescription">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis lacinia felis id felis rhoncus,
-                consectetur
-                sagittis dui sagittis. Nullam bibendum rhoncus luctus. Aenean eu metus ornare, ornare odio vitae,
-                vestibulum
-                neque. Suspendisse consectetur lorem risus, volutpat viverra neque efficitur eget. Nulla facilisis augue
-                vitae leo convallis, at sagittis elit pharetra.
-            </div>
-        </a>
+    {% if user.tier_level %}
+        <div class="dashboardBox">
+            <a href="/automated-testing/">
+                <div class="dashboardBoxPreview">
+                    Automated testing
+                </div>
+                <div class="dashboardBoxDescription">
+                    These tests are made to provide you with light monitoring capabilities over your systems.
+                    After registering your owned domains in your profile, you can setup a number of automated tests,
+                    like ping checks to monitor availability and reachability, http headers tests to grade your website
+                    / check if it is compromised, and more.
+                </div>
+            </a>
     </div>
     {% endif %}
+    <hr class="w-25 text-dark">
+    <div class="dashboardSectionBox"><h1>Subscription options</h1></div>
+    <div class="dashboardBox">
+        <a href="/accounts/settings/subscriptions/">
+            <div class="dashboardBoxPreview">
+                Subscriptions
+            </div>
+            <div class="dashboardBoxDescription">
+                These subscription offers give you the ability to <b>automate</b> your tests: you can chose a frequency
+                and a time to have your tests scheduled, giving you control over how and when you want your systems
+                tested.
+                <br>
+                <b>Learn more about our different subscription plans!</b>
+            </div>
+        </a>
+    </div>
 </section>

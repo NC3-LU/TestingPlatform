@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+{% block content %}
+{% load timestamp_to_time %}
+{% load tags %}
+<main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
+    <div class="w-100 authForm p-5">
+        <h2>DMARC report for <b>{{ domain }}</b> sent by <b>{{ mailfrom }}</b>, <b>{{ timestamp|timestamp_to_time|date:"Y-m-d h:m:s" }}</b></h2>
+
+        <div class="p-2 bg-light text-dark">
+            <table class="table">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Report Metadata</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tr>
+                    <th></th>
+                    <th>org_name</th>
+                    <td>{{ report.feedback.report_metadata.org_name }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th>email</th>
+                    <td>{{ report.feedback.report_metadata.email }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th>extra_contact_info</th>
+                    <td>{{ report.feedback.report_metadata.extra_contact_info }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th>report_id</th>
+                    <td>{{ report.feedback.report_metadata.report_id }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th>date_range</th>
+                    <td>{{ report.feedback.report_metadata.date_range.begin|timestamp_to_time|date:"Y-m-d h:m:s" }}</td>
+                    <td>{{ report.feedback.report_metadata.date_range.end|timestamp_to_time|date:"Y-m-d h:m:s" }}</td>
+                </tr>
+                <thead class="table-dark">
+                <tr>
+                    <th>policy_published</th>
+                    <th></th>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </thead>
+                <tr>
+                    <th></th>
+                    <th>domain</th>
+                    <td>{{ report.feedback.policy_published.domain }}<br>{{ report.feedback.policy_published.domain|get_ip }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th>adkim</th>
+                    <td>{{ report.feedback.policy_published.adkim }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th>aspf</th>
+                    <td>{{ report.feedback.policy_published.aspf }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th>p</th>
+                    <td>{{ report.feedback.policy_published.p }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th>sp</th>
+                    <td>{{ report.feedback.policy_published.sp }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th>pct</th>
+                    <td>{{ report.feedback.policy_published.pct }}</td>
+                    <td></td>
+                </tr>
+                <thead class="table-dark">
+                <tr>
+                    <th>record</th>
+                    <th></th>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </thead>
+                {% for record in records %}
+                <thead class="table-dark">
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </thead>
+                <thead class="table-dark">
+                <tr>
+                    <th></th>
+                    <th>row:</th>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </thead>
+                <tr>
+                    <th></th>
+                    <th>Source IP</th>
+                    <td>{{ record.row.source_ip }}<br> {{ record.row.source_ip|get_host }}<br>{{ record.row.source_ip|get_asn }} </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th>Count</th>
+                    <td>{{ record.row.count }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th>policy_evaluated:</th>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>disposition</th>
+                    <td>{{ record.row.policy_evaluated.disposition }}</td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>dkim</th>
+                    <td>
+                        {% if record.row.policy_evaluated.dkim == "pass" %}
+                        <span class="badge bg-success">{{ record.row.policy_evaluated.dkim }}</span>
+                        {% else %}
+                        <span class="badge bg-danger">{{ record.row.policy_evaluated.dkim }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>spf</th>
+                    <td>
+                        {% if record.row.policy_evaluated.spf == "pass" %}
+                        <span class="badge bg-success">{{ record.row.policy_evaluated.spf }}</span>
+                        {% else %}
+                        <span class="badge bg-danger">{{ record.row.policy_evaluated.spf }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>reason</th>
+                    <td>type:{% if record.row.policy_evaluated.reason.type %} {{ record.row.policy_evaluated.reason.type }}
+                        {% else %} null {% endif %}
+
+                        <br>comment:{% if record.row.policy_evaluated.reason.comment %}
+                        {{ record.row.policy_evaluated.reason.comment }} {% else %} null {% endif %}
+                    </td>
+                </tr>
+                <thead class="table-dark">
+                <tr>
+                    <th></th>
+                    <th>identifiers:</th>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </thead>
+                <tr>
+                    <th></th>
+                    <th>header_from</th>
+                    <td>{{ record.identifiers.header_from }}<br>{{ record.identifiers.header_from|get_ip }}</td>
+                    <td></td>
+                </tr>
+                <thead class="table-dark">
+                <tr>
+                    <th></th>
+                    <th>auth_results:</th>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </thead>
+                {% if record.auth_results.dkim %}
+                <tr>
+                    <th></th>
+                    <th>dkim</th>
+                    <th></th>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>domain</th>
+                    <td>{{ record.auth_results.dkim.domain }}<br>{{ record.auth_results.dkim.domain|get_ip }}
+                    </td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>result</th>
+                    <td>
+                        {% if record.auth_results.dkim.result == "pass" %}
+                        <span class="badge bg-success">{{ record.auth_results.dkim.result }}</span>
+                        {% else %}
+                        <span class="badge bg-danger">{{ record.auth_results.dkim.result }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>selector</th>
+                    <td>{{ record.auth_results.dkim.selector }}</td>
+                </tr>
+                {% endif %}
+                {% if record.auth_results.spf %}
+                <tr>
+                    <th></th>
+                    <th>spf</th>
+                    <th></th>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>domain</th>
+                    <td>{{ record.auth_results.spf.domain }}<br>{{ record.auth_results.spf.domain|get_ip }}
+                    </td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>result</th>
+                    <td>
+                        {% if record.auth_results.spf.result == "pass" %}
+                        <span class="badge bg-success">{{ record.auth_results.spf.result }}</span>
+                        {% else %}
+                        <span class="badge bg-danger">{{ record.auth_results.spf.result }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+</main>
+
+
+{% endblock %}

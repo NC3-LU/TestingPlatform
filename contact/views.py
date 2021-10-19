@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
 
-@login_required
 def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
@@ -20,7 +19,7 @@ def contact(request):
             message = '\n'.join(body.values())
 
             try:
-                send_mail(subject, message, 'mailagent@securitymadein.lu', ['peer.heinen@securitymadein.lu'])
+                send_mail(subject, message, recipient_list=['do@c3.lu'])
             except BadHeaderError:
                 return HttpResponse('Invalid header found')
             return render(request, 'success.html')

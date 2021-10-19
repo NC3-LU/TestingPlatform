@@ -151,13 +151,22 @@ def add_domain(request):
             form = UserDomainForm(request.POST)
             if form.is_valid():
                 data = form.cleaned_data
-                domain = UserDomain(
-                    user=user,
-                    domain=data['domain']
-                )
-                domain.save()
-                messages.success(request, 'Domain added')
-                return redirect('edit')
+                try:
+                    db_domain = UserDomain.objects.get(domain=data['domain'])
+                except UserDomain.DoesNotExist:
+                    db_domain = None
+                if db_domain:
+                    messages.error(request, 'This domain is already registered. Please contact do@c3.lu if you think '
+                                            'someone is monitoring your systems')
+                    return redirect('add_domain')
+                else:
+                    domain = UserDomain(
+                        user=user,
+                        domain=data['domain']
+                    )
+                    domain.save()
+                    messages.success(request, 'Domain added')
+                    return redirect('edit')
         else:
             form = UserDomainForm()
             return render(request, 'add_domain.html', {'form': form})
@@ -166,9 +175,13 @@ def add_domain(request):
 @login_required
 def remove_domain(request, domain):
     user_domain = UserDomain.objects.get(domain=domain)
-    user_domain.delete()
-    messages.success(request, f'Successfully removed {domain} from your managed domains')
-    return redirect('edit')
+    if user_domain.user == request.user:
+        user_domain.delete()
+        messages.success(request, f'Successfully removed {domain} from your managed domains')
+        return redirect('edit')
+    else:
+        messages.error(request, 'This domain is not registered under your account, permission denied')
+        return redirect('edit')
 
 
 @login_required

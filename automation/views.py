@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import HttpResponse
 
 from testing.models import UserDomain
 from .forms import PingAutomatedTestForm, HttpAutomatedTestForm
@@ -26,7 +27,7 @@ def index(request):
 @login_required
 def schedule_ping(request):
     if request.method == 'POST':
-        form = PingAutomatedTestForm(request.POST)
+        form = PingAutomatedTestForm(request.POST, targets=UserDomain.objects.filter(user=request.user))
         if form.is_valid():
             data = form.cleaned_data
             automation_request = PingAutomatedTest(
@@ -40,21 +41,24 @@ def schedule_ping(request):
             automation_request.save()
             return redirect('automation')
     else:
-        form = PingAutomatedTestForm()
+        form = PingAutomatedTestForm(targets=UserDomain.objects.filter(user=request.user))
     return render(request, 'automation_request.html', {'form': form, 'title': 'ping test'})
 
 
 @login_required
 def remove_ping(request, domain):
     ping_automated_test = PingAutomatedTest.objects.get(target__domain=domain)
-    scheduled_pings = Schedule.objects.filter(func='automation.tasks.ping').filter(args=f"'{domain}'")
-    ping_tasks = Task.objects.filter(func='automation.tasks.ping').filter(args=(domain,))
-    for item in scheduled_pings:
-        item.delete()
-    for item in ping_tasks:
-        item.delete()
-    ping_automated_test.delete()
-    return redirect('automation')
+    if request.user == ping_automated_test.user:
+        scheduled_pings = Schedule.objects.filter(func='automation.tasks.ping').filter(args=f"'{domain}'")
+        ping_tasks = Task.objects.filter(func='automation.tasks.ping').filter(args=(domain,))
+        for item in scheduled_pings:
+            item.delete()
+        for item in ping_tasks:
+            item.delete()
+        ping_automated_test.delete()
+        return redirect('automation')
+    else:
+        return HttpResponse(status=401)
 
 
 @login_required
@@ -86,11 +90,14 @@ def display_http_report(request, domain):
 
 def remove_http_report(request, domain):
     http_automated_test = HttpAutomatedTest.objects.get(target__domain=domain)
-    scheduled_http = Schedule.objects.filter(func='automation.tasks.http').filter(args=f"'{domain}'")
-    http_tasks = Task.objects.filter(func='automation.tasks.http').filter(args=(domain,))
-    for item in scheduled_http:
-        item.delete()
-    for item in http_tasks:
-        item.delete()
-    http_automated_test.delete()
-    return redirect('automation')
+    if http_automated_test.user == request.user:
+        scheduled_http = Schedule.objects.filter(func='automation.tasks.http').filter(args=f"'{domain}'")
+        http_tasks = Task.objects.filter(func='automation.tasks.http').filter(args=(domain,))
+        for item in scheduled_http:
+            item.delete()
+        for item in http_tasks:
+            item.delete()
+        http_automated_test.delete()
+        return redirect('automation')
+    else:
+        return HttpResponse(status=401)

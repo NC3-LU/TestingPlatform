@@ -3,15 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.http import HttpResponseRedirect
-from decouple import config
 
 from .forms import SignUpForm, LoginForm, UserUpdateForm, ChangePasswordForm, SubscriptionRequestForm, UserDomainForm, \
     MailDomainForm
 from .models import SubscriptionRequest, Subscription
 from testing.models import UserDomain, MailDomain
 from iot_inspector.models import IOTUser
-
-from iot_inspector_client import Client
+import socket
 
 
 def signup(request):
@@ -156,20 +154,34 @@ def add_domain(request):
                 except UserDomain.DoesNotExist:
                     db_domain = None
                 if db_domain:
-                    messages.error(request, 'This domain is already registered. Please contact do@c3.lu if you think '
-                                            'someone is monitoring your systems')
+                    if db_domain.user == request.user:
+                        messages.error(request,
+                                       'You already registered this domain in your company domains.')
+                    messages.error(request, 'This domain is already registered by someone else. Please contact '
+                                            'do@c3.lu if you think someone is monitoring your systems')
                     return redirect('add_domain')
                 else:
-                    domain = UserDomain(
-                        user=user,
-                        domain=data['domain']
-                    )
-                    domain.save()
-                    messages.success(request, 'Domain added')
-                    return redirect('edit')
+                    domain = data['domain']
+                    try:
+                        ip_address = socket.gethostbyname(domain)
+                    except socket.gaierror:
+                        ip_address = None
+                    if ip_address:
+                        domain = UserDomain(
+                            user=user,
+                            domain=domain,
+                            ip_address=ip_address
+                        )
+                        domain.save()
+                        messages.success(request, 'Domain added')
+                        return redirect('edit')
+                    else:
+                        messages.error(request, "Your domain name couldn't be resolved, please verify you entered your "
+                                                "domain name correctly.")
+                        return redirect('add_domain')
         else:
             form = UserDomainForm()
-            return render(request, 'add_domain.html', {'form': form})
+        return render(request, 'add_domain.html', {'form': form})
 
 
 @login_required
@@ -201,7 +213,7 @@ def add_mail_domain(request):
             return redirect('edit')
     else:
         form = MailDomainForm()
-        return render(request, 'add_domain.html', {'form': form})
+    return render(request, 'add_domain.html', {'form': form})
 
 
 @login_required

@@ -27,7 +27,7 @@ def index(request):
 @login_required
 def schedule_ping(request):
     if request.method == 'POST':
-        form = PingAutomatedTestForm(request.POST, targets=UserDomain.objects.filter(user=request.user))
+        form = PingAutomatedTestForm(request.user, request.POST)
         if form.is_valid():
             data = form.cleaned_data
             automation_request = PingAutomatedTest(
@@ -41,7 +41,7 @@ def schedule_ping(request):
             automation_request.save()
             return redirect('automation')
     else:
-        form = PingAutomatedTestForm(targets=UserDomain.objects.filter(user=request.user))
+        form = PingAutomatedTestForm(request.user)
     return render(request, 'automation_request.html', {'form': form, 'title': 'ping test'})
 
 
@@ -64,7 +64,7 @@ def remove_ping(request, domain):
 @login_required
 def schedule_http(request):
     if request.method == 'POST':
-        form = HttpAutomatedTestForm(request.POST)
+        form = HttpAutomatedTestForm(request.user, request.POST)
         if form.is_valid():
             data = form.cleaned_data
             automation_request = HttpAutomatedTest(
@@ -78,7 +78,7 @@ def schedule_http(request):
             automation_request.save()
             return redirect('automation')
     else:
-        form = HttpAutomatedTestForm()
+        form = HttpAutomatedTestForm(request.user)
     return render(request, 'automation_request.html', {'form': form, 'title': 'http test'})
 
 

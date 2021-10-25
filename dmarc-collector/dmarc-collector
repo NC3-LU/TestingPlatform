@@ -14,7 +14,6 @@ import requests
 
 DMARC_API_URL = os.environ.get('DMARC_API_URL', '')
 DMARC_API_KEY = os.environ.get('DMARC_API_KEY', '')
-print(DMARC_API_KEY)
 UUID = str(uuid.uuid4())
 syslog.openlog("dmarc-collector[{}]".format(UUID), 0, syslog.LOG_MAIL)
 

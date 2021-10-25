@@ -1,8 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, PasswordResetForm
+from django.core.exceptions import ValidationError
 
 from .models import User, SubscriptionRequest
 from testing.models import UserDomain, MailDomain
+
+import re
 
 
 class SignUpForm(UserCreationForm):
@@ -71,25 +74,32 @@ class SubscriptionRequestForm(forms.ModelForm):
             visible.field.widget.attrs['class'] = 'form-control'
 
 
-class UserDomainForm(forms.ModelForm):
+class DomainForm(forms.ModelForm):
+    def clean_domain(self):
+        domain = self.cleaned_data['domain']
+        domain_regex = re.compile(r'^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$')
+        result = domain_regex.match(domain)
+        if not result:
+            raise ValidationError('Please enter a valid domain format, i.e: domainname.com')
+        if '\\u' in domain:
+            raise ValidationError('Unknown character encoding, please retry.')
+        return domain
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
+
+
+class UserDomainForm(DomainForm):
 
     class Meta:
         model = UserDomain
         fields = ['domain']
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            visible.field.widget.attrs['class'] = 'form-control'
 
-
-class MailDomainForm(forms.ModelForm):
+class MailDomainForm(DomainForm):
 
     class Meta:
         model = MailDomain
         fields = ['domain']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            visible.field.widget.attrs['class'] = 'form-control'

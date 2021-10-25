@@ -56,5 +56,4 @@ data = {'report': dmarc_xml_report}
 params = {'from': from_address, 'to': to_addresses, 'api-key': DMARC_API_KEY}
 session = requests.Session()
 session.verify = False
-req = session.post(url=DMARC_API_URL, params=params, data=data)
-print(req.history)
+session.post(url=DMARC_API_URL, params=params, data=data)

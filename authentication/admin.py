@@ -4,7 +4,6 @@ from .models import User, Subscription, SubscriptionRequest
 
 
 class UserAdmin(BaseUserAdmin):
-    readonly_fields = ('vat_number', 'username')
     fieldsets = (*BaseUserAdmin.fieldsets, ('Company Data', {'fields': ('company_name', 'address', 'post_code',
                                                                         'city', 'vat_number')}),
                  ('Subscriptions', {'fields': ('tier_level', )}))

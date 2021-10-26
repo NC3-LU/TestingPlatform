@@ -40,6 +40,9 @@ def schedule_ping(request):
             )
             automation_request.save()
             return redirect('automation')
+        else:
+            messages.error(request, 'There was an error, please try again')
+            return redirect('schedule_ping')
     else:
         form = PingAutomatedTestForm(request.user)
     return render(request, 'automation_request.html', {'form': form, 'title': 'ping test'})
@@ -77,6 +80,9 @@ def schedule_http(request):
             )
             automation_request.save()
             return redirect('automation')
+        else:
+            messages.error(request, 'There was an error, please try again')
+            return redirect('schedule_http')
     else:
         form = HttpAutomatedTestForm(request.user)
     return render(request, 'automation_request.html', {'form': form, 'title': 'http test'})

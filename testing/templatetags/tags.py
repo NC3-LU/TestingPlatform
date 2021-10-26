@@ -1,6 +1,5 @@
 import ipaddress
 import socket
-import html
 
 from django.utils.safestring import mark_safe
 from ipwhois import IPWhois

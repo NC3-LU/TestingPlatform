@@ -12,9 +12,8 @@ import fnmatch
 import gzip
 import requests
 
-API_URL = 'https://testing-platform.srv.office.secin.lu/test/dmarc-reporter/upload/'
-API_KEY = 'bnG0rbVIOwvibhYnRrV3JOhE0Ms3bQuTHdNtXZk01jw'
-print(API_KEY)
+DMARC_API_URL = os.environ.get('DMARC_API_URL', '')
+DMARC_API_KEY = os.environ.get('DMARC_API_KEY', '')
 UUID = str(uuid.uuid4())
 syslog.openlog("dmarc-collector[{}]".format(UUID), 0, syslog.LOG_MAIL)
 
@@ -54,8 +53,7 @@ for part in message.walk():
         logfile.close()
 
 data = {'report': dmarc_xml_report}
-params = {'from': from_address, 'to': to_addresses, 'api-key': API_KEY}
+params = {'from': from_address, 'to': to_addresses, 'api-key': DMARC_API_KEY}
 session = requests.Session()
 session.verify = False
-req = session.post(url=API_URL, params=params, data=data)
-print(req.history)
+session.post(url=DMARC_API_URL, params=params, data=data)

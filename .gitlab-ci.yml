@@ -54,13 +54,13 @@ trigger-preview-deploy:
     project: sysadmin/cfgmgt/ansible
     branch: master
 
-#trigger-production-deploy:
-#  stage: deploy
-#  only:
-#  - tags
-#  variables:
-#    ANSIBLE_JOB: deploy-testing-platform-production
-#    RAMP_VERSION: "${CI_COMMIT_REF_NAME}"
-#  trigger:
-#    project: sysadmin/cfgmgt/ansible
-#    branch: master
+trigger-production-deploy:
+  stage: deploy
+  only:
+  - tags
+  variables:
+    ANSIBLE_JOB: deploy-testing-platform-production
+    TESTING_PLATFORM_VERSION: "${CI_COMMIT_REF_NAME}"
+  trigger:
+    project: sysadmin/cfgmgt/ansible
+    branch: master

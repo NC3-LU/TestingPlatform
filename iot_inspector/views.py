@@ -35,7 +35,7 @@ def analysis_request(request):
             )
             a_request.save()
             messages.success(request, 'Your analysis request was successfully saved, you will receive a pricing offer'
-                                      'in the next few days.')
+                                      ' in the next few days.')
             return redirect('iot_index')
     else:
         form = AnalysisRequestForm()

@@ -17,10 +17,6 @@ class Domain(models.Model):
 class UserDomain(Domain):
     ip_address = models.GenericIPAddressField(blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        self.ip_address = socket.gethostbyname(self.domain)
-        super().save()
-
 
 class MailDomain(Domain):
     pass

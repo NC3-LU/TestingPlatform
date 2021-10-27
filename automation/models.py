@@ -7,6 +7,8 @@ from authentication.models import User
 from automation.tasks import *
 from testing.models import UserDomain
 
+import uuid
+
 from datetime import datetime
 
 
@@ -30,7 +32,7 @@ class AutomatedTest(models.Model):
 
     def schedule_task(self, t_type, func, args, cron):
         return Schedule(
-            name=f'{t_type}_{self.user.username}_{args}',
+            name=f'{t_type}_{self.user.username}_{args}_{uuid.uuid4()}',
             func=func,
             args="'" + args + "'",
             schedule_type=Schedule.CRON,

@@ -45,7 +45,7 @@ class DMARCRecord(models.Model):
 
     def save(self, *args, **kwargs):
         domain = self.domain.domain.strip('www.')
-        self.mailto = f'report+{self.user.company_name}-{domain}@test-dmarc.lu'
+        self.mailto = f'report+{self.user.company_name.replace(" ", "_")}-{domain}@test-dmarc.lu'
 
         self.txt_record = f'_dmarc.{domain}'
 

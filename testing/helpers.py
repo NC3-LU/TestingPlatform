@@ -15,12 +15,11 @@ def get_observatory_report(target):
 
     if rescan is True:
         do_scan = requests.post(
-            # 'https://http-observatory.security.mozilla.org/api/v1/analyze?host=' + target + '&rescan=true'
-            'http://test-dmarc.lu:57001/api/v1/analyze?host=' + target + '&rescan=true'
+            'https://http-observatory.security.mozilla.org/api/v1/analyze?host=' + target + '&rescan=true'
         ).text
     else:
         do_scan = requests.post(
-            'http://test-dmarc.lu:57001/api/v1/analyze?host=' + target
+            'https://http-observatory.security.mozilla.org/api/v1/analyze?host=' + target
         ).text
 
     json_object = json.loads(do_scan)
@@ -33,7 +32,7 @@ def get_observatory_report(target):
     else:
         scan_history = json.loads(
             requests.get(
-                'http://test-dmarc.lu:57001/api/v1/getHostHistory?host=' + target
+                'https://http-observatory.security.mozilla.org/api/v1/getHostHistory?host=' + target
             ).text
         )
         scan_id = json_object['scan_id']
@@ -42,7 +41,7 @@ def get_observatory_report(target):
         while json_object['state'] == "PENDING" or json_object['state'] == "STARTING" or json_object[
             'state'] == "RUNNING":
             get_scan = requests.get(
-                'http://test-dmarc.lu:57001/api/v1/analyze?host=' + target).text
+                'https://http-observatory.security.mozilla.org/api/v1/analyze?host=' + target).text
             check_object = json.loads(get_scan)
             if check_object["state"] == 'FINISHED':
                 use = False
@@ -52,7 +51,7 @@ def get_observatory_report(target):
                 break
 
         result_obj = json.loads(requests.get(
-            'http://test-dmarc.lu:57001/api/v1/getScanResults?scan=' + str(scan_id)).text)
+            'https://http-observatory.security.mozilla.org/api/v1/getScanResults?scan=' + str(scan_id)).text)
 
         response = {k.replace('-', '_'): v for k, v in result_obj.items()}
         if use:

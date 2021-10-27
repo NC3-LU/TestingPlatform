@@ -49,9 +49,6 @@
         }
         function generate()
         {
-            var domain = document.getElementById('domain').value;
-            if (!domain.match(/\S/)) {alert('Please enter a domain name'); return}
-
             let e = document.getElementById('others');
             hosts = e.value.split(',');
             // console.log(e);

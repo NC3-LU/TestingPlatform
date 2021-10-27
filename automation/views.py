@@ -3,18 +3,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse
 
-from testing.models import UserDomain
 from .forms import PingAutomatedTestForm, HttpAutomatedTestForm
 from .models import PingAutomatedTest, HttpAutomatedTest
 from .helpers import get_last_runs
-
-from authentication.models import User
+from testing_platform.decorators import subscription_required
 
 from django_q.models import Task, Schedule
 
 
 # Create your views here.
 @login_required
+@subscription_required
 def index(request):
     ping_tests = PingAutomatedTest.objects.filter(user=request.user.id)
     ping_list = get_last_runs(ping_tests)
@@ -25,6 +24,7 @@ def index(request):
 
 
 @login_required
+@subscription_required
 def schedule_ping(request):
     if request.method == 'POST':
         form = PingAutomatedTestForm(request.user, request.POST)
@@ -49,6 +49,15 @@ def schedule_ping(request):
 
 
 @login_required
+@subscription_required
+def display_ping_report(request, domain):
+    last_run = Task.objects.filter(func='automation.tasks.ping').filter(args=(domain,)).latest('started')
+    print(last_run.result['result'])
+    return render(request, 'automated_ping_report.html', {'result': last_run.result['result']})
+
+
+@login_required
+@subscription_required
 def remove_ping(request, domain):
     ping_automated_test = PingAutomatedTest.objects.get(target__domain=domain)
     if request.user == ping_automated_test.user:
@@ -65,6 +74,7 @@ def remove_ping(request, domain):
 
 
 @login_required
+@subscription_required
 def schedule_http(request):
     if request.method == 'POST':
         form = HttpAutomatedTestForm(request.user, request.POST)
@@ -89,11 +99,14 @@ def schedule_http(request):
 
 
 @login_required
+@subscription_required
 def display_http_report(request, domain):
     last_run = Task.objects.filter(func='automation.tasks.http').filter(args=(domain,)).latest('started')
     return render(request, 'http_report.html', last_run.result)
 
 
+@login_required
+@subscription_required
 def remove_http_report(request, domain):
     http_automated_test = HttpAutomatedTest.objects.get(target__domain=domain)
     if http_automated_test.user == request.user:

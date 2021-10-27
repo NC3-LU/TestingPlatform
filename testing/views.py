@@ -1,4 +1,5 @@
 import datetime
+import socket
 
 import xmltodict
 from django.contrib.auth.decorators import login_required
@@ -25,7 +26,11 @@ from testing_platform import settings
 def ping_test(request):
     if request.method == 'POST':
         target = request.POST['ping-target'].strip()
-
+        try:
+            target = socket.gethostbyname(target)
+        except socket.gaierror:
+            messages.error('Could not resolve hostname.')
+            return redirect('ping_test')
         obj = IPWhois(target)
         ping_result = obj.lookup_rdap(depth=1)
         # command = ['ping', '-c', '2', target, '-q']

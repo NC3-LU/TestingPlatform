@@ -48,8 +48,9 @@
                         <td>{{ target.domain }}</td>
                         <td>{{ scheduled_ping.next_run }}</td>
                         {% if last_run %}
-                            {% if last_run.result == 0 %}
+                            {% if last_run.result.code == 0 %}
                                 <td><i class="bi bi-check-circle-fill"></i></td>
+                                <td><a href="ping/{{ target.domain }}">View full report</a></td>
                             {% else %}
                                 <td><i class="bi bi-x-circle-fill"></i></td>
                             {% endif %}

@@ -6,6 +6,7 @@ urlpatterns = [
    path('', views.index, name='automation'),
 
    path('ping/', views.schedule_ping, name='schedule_ping'),
+   path('ping/<domain>', views.display_ping_report, name='display_ping_report'),
    path('ping/<domain>/remove', views.remove_ping, name='remove_ping'),
 
    path('http/', views.schedule_http, name='schedule_http'),

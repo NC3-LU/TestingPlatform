@@ -13,7 +13,7 @@ from testing_platform import settings
 
 class AnalysisRequestAdmin(admin.ModelAdmin):
 
-    actions = ['validate_status', 'decline_status', 'pending_status', ]
+    actions = ['validate_status', 'decline_status', 'pending_status', 'generate_report', ]
 
     def validate_status(self, request, queryset):
         for analysis_request in queryset:
@@ -25,14 +25,6 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
                     firmware = client_upload_firmware(client, analysis_request, default_product_group)
                     firmware_uuid = firmware['id']
                     analysis_request.firmware_uuid = firmware_uuid
-                    report = client_generate_report(client, firmware_uuid)
-                    report_uuid = report['id']
-                    analysis_request.report_uuid = report_uuid
-                    status, link = None, None
-                    while status != 'FINISHED':
-                        (status, link) = client_get_report_link(client, report_uuid)
-                        print(status)
-                    analysis_request.report_link = link
                     analysis_request.status = True
                     analysis_request.save()
                 else:
@@ -46,6 +38,29 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
 
     def pending_status(self, request, queryset):
         queryset.update(status=None)
+
+    def generate_report(self, request, queryset):
+        for analysis_request in queryset:
+            iot_user = analysis_request.iot_user
+            if iot_user.activated:
+                if not analysis_request.report_uuid:
+                    client = client_login(iot_user)
+                    report = client_generate_report(client, analysis_request.firmware_uuid)
+                    report_uuid = report['id']
+                    analysis_request.report_uuid = report_uuid
+                    status, link = None, None
+                    while status != 'FINISHED':
+                        (status, link) = client_get_report_link(client, report_uuid)
+                        if status == 'FAILED':
+                            messages.error(request, 'Report generation failed.')
+                        print(status)
+                    analysis_request.report_link = link
+                    analysis_request.save()
+                else:
+                    messages.error(request, 'This request already has a report')
+            else:
+                messages.error(request,
+                               'This user was not created on the IoT Inspector platform, please activate it first.')
 
     decline_status.short_description = "Decline"
     validate_status.short_description = "Validate"

@@ -11,7 +11,7 @@ from subprocess import check_output
 import gzip
 from urllib.parse import urlparse, parse_qs
 
-from .helpers import get_observatory_report, connect_dmarc_mail
+from .helpers import get_observatory_report
 from django.views.decorators.http import require_http_methods
 
 from authentication.models import User

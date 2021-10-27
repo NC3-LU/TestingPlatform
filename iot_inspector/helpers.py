@@ -97,15 +97,53 @@ def client_upload_firmware(client, analysis_request, default_product_group):
     return res
 
 
-def client_generate_report(client, firmware_uuid):
+def client_get_or_generate_report_config(client):
     GET_ALL_REPORT_CONFIGS = """
-    query {
-      allReportConfigurations { id, name }
+        query {
+          allReportConfigurations { id, name }
+        }
+        """
+    GENERATE_REPORT_CONFIG = """
+    mutation {
+      createReportConfiguration(input: {
+        name: "Default Report",
+        issueSeverities: [HIGH, MEDIUM, INFORMATION, LOW],
+        complianceGuidelineIds: ["ed8c41a9-24fc-4f77-bb2a-7443c31cca13"],
+        analysisTechniqueDetails: true
+      }) {
+        ... on ReportConfiguration {
+          id,
+        }
+        ...on MutationError {
+          count
+          errors {
+            message
+            code
+            ...on ValidationError {
+              fieldPath
+            }
+          }
+        }
+      }
     }
     """
     res = client.query(GET_ALL_REPORT_CONFIGS)
-    report_config = next(cfg for cfg in res['allReportConfigurations'] if cfg['name'] == 'Sample Report')
-    report = report_config['id']
+    try:
+        report_config = next(cfg for cfg in res['allReportConfigurations'] if cfg['name'] == 'Default Report')
+    except StopIteration:
+        report_config = None
+    if report_config:
+        return report_config
+    else:
+        client.query(GENERATE_REPORT_CONFIG)
+        res = client.query(GET_ALL_REPORT_CONFIGS)
+        report_config = next(cfg for cfg in res['allReportConfigurations'] if cfg['name'] == 'Default Report')
+        return report_config
+
+
+def client_generate_report(client, firmware_uuid):
+    report_config = client_get_or_generate_report_config(client)
+    report_config = report_config['id']
     GENERATE_REPORT = """
     
     mutation M {
@@ -138,7 +176,7 @@ def client_generate_report(client, firmware_uuid):
         }
       }  
     }
-    """ % (report, firmware_uuid)
+    """ % (report_config, firmware_uuid)
     res = client.query(GENERATE_REPORT)
     report = res['generateReport']
     return report
@@ -169,6 +207,7 @@ def api_get_report(user, report_uuid):
     endpoint = settings.IOT_API_URL + f'reports/{report_uuid}/pdf'
     req = requests.get(url=endpoint, headers=headers)
     return req
+
 
 def get_fs_storage(user_id):
     return FileSystemStorage(location=f"{config('FILES')}/user_{user_id}/")

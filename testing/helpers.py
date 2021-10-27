@@ -85,15 +85,3 @@ def get_observatory_report(target):
 
     return {'result': response, 'domain_name': target, 'scan_summary': scan_summary, 'headers': headers,
             'scan_history': scan_history, 'tls_results': fetch_tls}
-
-
-def dmarc_view_checker():
-    # TODO this function will be used to check if the user that is asking for the report is allowed to see it.
-    return None
-
-
-def connect_dmarc_mail():
-    # TODO change the creds with vars before commit
-    mailbox = MailBox('mail.mbox.lu')
-    mailbox.login('contact.testing@c3.lu', 'wkeNrqnYmmd!xkm8oJR&RRo2J9')
-    return mailbox

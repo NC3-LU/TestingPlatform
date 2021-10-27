@@ -43,11 +43,15 @@ def analysis_request(request):
 
 
 @login_required
-def download_report(request, uuid):
-    req = api_get_report(request.user, uuid)
+def download_report(request, firmware_uuid):
+    client = client_login(request.user.iotuser)
+    a_req = AnalysisRequest.objects.get(firmware_uuid=firmware_uuid)
+    req = api_get_report(request.user, str(a_req.report_uuid))
     file = req.content
     response = HttpResponse(file, headers={
         'Content-Type': 'application/pdf',
-        'Content-Disposition': f'attachment; filename="{request.user.company_name}_{uuid[-12:]}.pdf"'
+        'Content-Disposition': f'attachment; '
+                               f'filename="'
+                               f'{request.user.company_name}_{firmware_uuid[-12:]}_{str(a_req.report_uuid)[-12:]}.pdf"'
     })
     return response

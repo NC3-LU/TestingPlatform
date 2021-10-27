@@ -9,8 +9,9 @@ from django.contrib import messages
 from imap_tools import MailBox, AND
 from subprocess import check_output
 from urllib.parse import urlparse, parse_qs
+
 from ipwhois import IPWhois
-from .helpers import get_observatory_report, connect_dmarc_mail
+from .helpers import get_observatory_report
 from django.views.decorators.http import require_http_methods
 
 from authentication.models import User

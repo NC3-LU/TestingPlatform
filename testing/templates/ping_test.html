@@ -2,21 +2,287 @@
 
 {% block content %}
 <main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
-
+    <h1 class="authForm p-5 d-flex justify-content-center">IP Address WHOIS:</h1>
     <form action="" method="post" id="pingtest-form" class="authForm p-5">
         {% csrf_token %}
-        <label for="ping-target">Ping Target:</label><br>
+        <label for="ping-target">WHOIS Target:</label><br>
         <input type="text" id="ping-target" name="ping-target" value="{{ form }}"><br>
         <input type="submit" value="Ping" class="btn btn-primary">
-        <button class="btn btn-secondary mt-2" onclick="goBack()">Back</button>
-        <script>
-        function goBack() {
-          window.history.back();
-        }
-        </script>
     </form>
     {% if result %}
-    <code class="w-50 mt-2 bg-dark p-3"><b>Result:</b><br><br>{{ result }}</code>
+    <div class="authForm p-5">
+        <b>Result:</b>
+        <pre>{{ result }}</pre>
+
+        <table class="table table-light table-striped mb-5">
+            <tr>
+                <th>NIR</th>
+                <td>{{ result.nir }}</td>
+            </tr>
+            <tr>
+                <th>ASN Registry</th>
+                <td>{{ result.asn_registry }}</td>
+            </tr>
+            <tr>
+                <th>RIPENCC</th>
+                <td>{{ result.ripencc }}</td>
+            </tr>
+            <tr>
+                <th>ASN</th>
+                <td>{{ result.asn }}</td>
+            </tr>
+            <tr>
+                <th>ASN CIDR</th>
+                <td>{{ result.asn_cidr }}</td>
+            </tr>
+            <tr>
+                <th>ASN Country Code</th>
+                <td>{{ result.asn_country_code }}</td>
+            </tr>
+            <tr>
+                <th>ASN Date</th>
+                <td>{{ result.asn_date }}</td>
+            </tr>
+            <tr>
+                <th>ASN Description</th>
+                <td>{{ result.asn_description }}</td>
+            </tr>
+            <tr>
+                <th>Query</th>
+                <td>{{ result.query }}</td>
+            </tr>
+        </table>
+        <table class="table table-light table-striped  mb-5">
+            <tr class="table-dark">
+                <th>Network:</th>
+                <td></td>
+            </tr>
+            <tr>
+                <th>Handle</th>
+                <td>{{ result.network.handle }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ result.network.status }}</td>
+            </tr>
+            <tr>
+                <th>Remarks</th>
+                <td>{{ result.network.remarks }}</td>
+            </tr>
+            <tr class="table-dark">
+                <th>Notices:</th>
+                <td></td>
+            </tr>
+            {% for v in result.network.notices %}
+            <tr>
+                <th>Title</th>
+                <td>{{ v.title }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ v.description }}</td>
+            </tr>
+            <tr>
+                <th>Links</th>
+                <td>{{ v.links }}</td>
+            </tr>
+            <tr class="table-dark">
+                <th></th>
+                <td></td>
+            </tr>
+            {% endfor %}
+            <tr class="table-dark">
+                <th>Links:</th>
+                <td></td>
+            </tr>
+            {% for v1 in result.network.links %}
+            <tr>
+                <th></th>
+                <td><a class="text-secondary" href="{{ v1 }}">{{ v1 }}</a></td>
+            </tr>
+            <tr class="table-dark">
+                <th></th>
+                <td></td>
+            </tr>
+            {% endfor %}
+            <tr class="table-dark">
+                <th>Events:</th>
+                <td></td>
+            </tr>
+            {% for v1 in result.network.events %}
+            <tr>
+                <th>Action:</th>
+                <td>{{ v1.action }}</td>
+            </tr>
+            <tr>
+                <th>Timestamp:</th>
+                <td>{{ v1.timestamp }}</td>
+            </tr>
+            <tr>
+                <th>Actor:</th>
+                <td>{{ v1.actor }}</td>
+            </tr>
+            <tr class="table-dark">
+                <th></th>
+                <td></td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <th>Raw</th>
+                <td>{{result.network.raw}}</td>
+            </tr>
+            <tr>
+                <th>Start Address</th>
+                <td>{{result.network.start_address}}</td>
+            </tr>
+            <tr>
+                <th>End Address</th>
+                <td>{{result.network.end_address}}</td>
+            </tr>
+            <tr>
+                <th>Cidr</th>
+                <td>{{result.network.cidr}}</td>
+            </tr>
+            <tr>
+                <th>Cidr</th>
+                <td>{{result.network.cidr}}</td>
+            </tr>
+            <tr>
+                <th>IP Version</th>
+                <td>{{result.network.ip_version}}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{result.network.type}}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{result.network.name}}</td>
+            </tr>
+            <tr>
+                <th>Country</th>
+                <td>{{result.network.country}}</td>
+            </tr>
+            <tr>
+                <th>Parent Handle</th>
+                <td>{{result.network.parent_handle}}</td>
+            </tr>
+        </table>
+
+        <table class="table table-light table-striped mb-5">
+            <tr class="table-dark">
+                <th>Entities:</th>
+                <td></td>
+            </tr>
+            {% for v in result.entities %}
+            <tr>
+                <th></th>
+                <td>{{ v }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <table class="table table-light table-striped mt-5">
+            <tr class="table-dark">
+                <th>Objects:</th>
+                <td></td>
+            </tr>
+        </table>
+        {% for k, v in result.objects.items %}
+        <table class="table table-light table-striped mt-5">
+            <tr>
+                <th>{{ k }}</th>
+                <td></td>
+            </tr>
+        </table>
+        <table class="table table-light table-striped ">
+            {% for k1, v1 in v.items %}
+            {% if k1 == 'contact' or k1 == 'notices' or k1 == 'remarks' %}
+            <tr class="table-dark">
+                <th>{{ k1 }}:</th>
+                <td></td>
+                {% else %}
+            <tr>
+                <th>{{ k1 }}</th>
+
+                <td>{{ v1 }}</td>
+                {% endif %}
+            </tr>
+            {% if k1 == "remarks" %}
+            {% for remarks in v1 %}
+            <tr>
+                <th>Title</th>
+                <td>{{ remarks.title }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ remarks.description }}</td>
+            </tr>
+            <tr>
+                <th>Links</th>
+                <td>{{ remarks.links }}</td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+
+            {% if k1 == "notices" %}
+            {% for key_notices in v1 %}
+            <tr>
+                <th>Title</th>
+                <td>{{ key_notices.title }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ key_notices.description }}</td>
+            </tr>
+            <tr>
+                <th>Links</th>
+                <td>{{ key_notices.links }}</td>
+            </tr>
+            <tr class="table-dark">
+                <th></th>
+                <td></td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+            {% for k2, v2 in v1.items %}
+            {% if k2 == "role" %}
+            <tr class="table-dark">
+                <th></th>
+                <td></td>
+            </tr>
+            {% endif %}
+            {% if k2 == "phone" or k2 == "address" or k2 == "email" %}
+            <tr class="table-dark">
+                <th>{{ k2 }}:</th>
+
+                <td></td>
+                {% else %}
+            <tr>
+                <th>{{ k2 }}</th>
+                <td>{{ v2 }}</td>
+                {% endif %}
+            </tr>
+            {% for v3 in v2 %}
+            {% for k4, v4 in v3.items %}
+            <tr>
+                <th>{{ k4 }}</th>
+                <td>{{ v4 }}</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+
+            {% endfor %}
+
+            {% endfor %}
+            <tr class="table-dark">
+                <th></th>
+                <td></td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    </div>
     {% endif %}
 </main>
 {% endblock %}

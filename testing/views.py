@@ -8,9 +8,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from imap_tools import MailBox, AND
 from subprocess import check_output
-import gzip
 from urllib.parse import urlparse, parse_qs
 
+from ipwhois import IPWhois
 from .helpers import get_observatory_report
 from django.views.decorators.http import require_http_methods
 
@@ -24,15 +24,14 @@ from testing_platform import settings
 @login_required
 def ping_test(request):
     if request.method == 'POST':
-        target = request.POST['ping-target']
-        """
-        Returns True if host (str) responds to a ping request.
-        Remember that a host may not respond to a ping (ICMP) request even if the host name is valid.
-        """
-        command = ['ping', '-c', '2', target, '-q']
+        target = request.POST['ping-target'].strip()
+
+        obj = IPWhois(target)
+        ping_result = obj.lookup_rdap(depth=1)
+        # command = ['ping', '-c', '2', target, '-q']
         # ping_result = subprocess.call(command) == 0
-        ping_result = check_output(command)
-        ping_result = ping_result.decode("utf-8")
+        # ping_result = check_output(command)
+        # ping_result = ping_result.decode("utf-8")
         #        if ping_result == True:
         #            result = "Target successfully pinged"
         #        else:
@@ -63,13 +62,14 @@ def http_test(request):
 
 @login_required
 def spf_generator(request):
-    if not request.user.maildomain_set.filter(user=request.user).last():
-        print(request.user.maildomain_set.filter(user=request.user).last())
-        messages.error(request, 'Please add a mail domain in your profile first.')
-        return redirect('test_index')
-    else:
-        domains = MailDomain.objects.filter(user=request.user)
-        return render(request, 'spf_generator.html', {'domains': domains})
+    return render(request, 'spf_generator.html')
+    # if not request.user.maildomain_set.filter(user=request.user).last():
+    #    print(request.user.maildomain_set.filter(user=request.user).last())
+    #    messages.error(request, 'Please add a mail domain in your profile first.')
+    #    return redirect('test_index')
+    # else:
+    #    domains = MailDomain.objects.filter(user=request.user)
+    #    return render(request, 'spf_generator.html', {'domains': domains})
 
 
 @login_required

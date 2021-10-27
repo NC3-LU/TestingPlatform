@@ -261,7 +261,7 @@
         <span>Attempts: {{ tls_results.attempts }}</span>
     </div>
     <h3>Connection Info</h3>
-    <table class="table table-light table-stripped">
+    <table class="table table-light table-striped">
         <tr>
             <th>Scan IP</th>
             <td>{{ tls_results.connection_info.scanIP }}</td>
@@ -334,7 +334,7 @@
         {% endfor %}
     </table>
     <h3>Analysis</h3>
-    <table class="table table-light table-stripped">
+    <table class="table table-light table-striped">
         {% for v in tls_results.analysis %}
 
         <tr class="table-dark">

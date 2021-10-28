@@ -11,7 +11,7 @@ from imap_tools import MailBox, AND
 from subprocess import check_output
 from urllib.parse import urlparse, parse_qs
 
-from ipwhois import IPWhois
+from ipwhois import IPWhois, IPDefinedError
 from .helpers import get_observatory_report
 from django.views.decorators.http import require_http_methods
 
@@ -29,9 +29,16 @@ def ping_test(request):
         try:
             target = socket.gethostbyname(target)
         except socket.gaierror:
-            messages.error('Could not resolve hostname.')
+            messages.error(request, 'Could not resolve hostname.')
             return redirect('ping_test')
-        obj = IPWhois(target)
+        try:
+            obj = IPWhois(target)
+        except IPDefinedError:
+            messages.error(request, 'You are not authorized to test this host / ip address.')
+            return redirect('ping_test')
+        except ValueError:
+            messages.error(request, 'The hostname could not be resolved')
+            return redirect('ping_test')
         ping_result = obj.lookup_rdap(depth=1)
         # command = ['ping', '-c', '2', target, '-q']
         # ping_result = subprocess.call(command) == 0

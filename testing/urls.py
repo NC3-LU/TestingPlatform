@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.test_landing, name='test_index'),
-    path('pingtest/', views.ping_test, name='ping_test'),
+    path('whois-lookup/', views.ping_test, name='ping_test'),
     path('c3-protocols/', views.c3_protocols, name='c3_protocols'),
     path('http-test/', views.http_test, name='http_test'),
     path('spf-generator/', views.spf_generator, name='spf-generator'),

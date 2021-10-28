@@ -2,15 +2,15 @@
 
 {% block content %}
 <main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
-    <h1 class="authForm p-5 d-flex justify-content-center">IP Address WHOIS:</h1>
+    <h1 class="authForm p-5 d-flex justify-content-center">WHOIS Lookup</h1>
     <form action="" method="post" id="pingtest-form" class="authForm p-5">
         {% csrf_token %}
-        <label for="ping-target">WHOIS Target:</label><br>
+        <label for="ping-target">Target hostname:</label><br>
         <input type="text" id="ping-target" name="ping-target" value="{{ form }}"><br>
         <input type="submit" value="Ping" class="btn btn-primary">
     </form>
     {% if result %}
-        {% include 'ping_report.html' %}
+        {% include 'whois_report.html' %}
     {% endif %}
 </main>
 {% endblock %}

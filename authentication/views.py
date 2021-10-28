@@ -107,7 +107,7 @@ def change_password(request):
 
 @login_required
 def subscriptions(request):
-    return render(request, 'subscriptions.html')
+    return render(request, 'sub_presentation.html')
 
 
 @login_required

@@ -1,11 +1,9 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 from django.contrib import messages
 
-from decouple import config
 
 from .helpers import api_login, api_add_user, client_login, client_upload_firmware, get_default_product_group, \
-    client_get_report_link, client_generate_report, api_get_report
+    client_get_report_link, client_generate_report
 from .models import AnalysisRequest, IOTUser
 
 from testing_platform import settings
@@ -53,7 +51,6 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
                         (status, link) = client_get_report_link(client, report_uuid)
                         if status == 'FAILED':
                             messages.error(request, 'Report generation failed.')
-                        print(status)
                     analysis_request.report_link = link
                     analysis_request.save()
                 else:

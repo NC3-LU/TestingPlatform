@@ -78,6 +78,23 @@ class PingAutomatedTest(AutomatedTest):
         return self.schedule.name
 
 
+class WhoisAutomatedTest(AutomatedTest):
+    target = models.ForeignKey(UserDomain, on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        self.schedule = super().schedule_task(
+            t_type='whois',
+            func='automation.tasks.whois_lookup',
+            args=self.target.domain,
+            cron=super().get_cron_exp(self.time)
+        )
+        self.schedule.save()
+        super().save()
+
+    def __str__(self):
+        return self.schedule.name
+
+
 class HttpAutomatedTest(AutomatedTest):
     target = models.ForeignKey(UserDomain, on_delete=models.CASCADE)
 

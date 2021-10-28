@@ -19,7 +19,7 @@ def contact(request):
             message = '\n'.join(body.values())
 
             try:
-                send_mail(subject, message, recipient_list=['do@c3.lu'])
+                send_mail(subject, message, from_email=form.cleaned_data['email_address'], recipient_list=['contact.testing@c3.lu'])
             except BadHeaderError:
                 return HttpResponse('Invalid header found')
             return render(request, 'success.html')

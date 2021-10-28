@@ -48,9 +48,9 @@ def ping_test(request):
         #            result = "Target successfully pinged"
         #        else:
         #            result =  "Unable to ping target"
-        return render(request, 'ping_test.html', {'result': ping_result})
+        return render(request, 'whois_lookup.html', {'result': ping_result})
     else:
-        return render(request, 'ping_test.html')
+        return render(request, 'whois_lookup.html')
 
 
 @login_required

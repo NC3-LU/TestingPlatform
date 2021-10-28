@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse
 
-from .forms import PingAutomatedTestForm, HttpAutomatedTestForm
-from .models import PingAutomatedTest, HttpAutomatedTest
+from .forms import PingAutomatedTestForm, HttpAutomatedTestForm, WhoisAutomatedTestForm
+from .models import PingAutomatedTest, HttpAutomatedTest, WhoisAutomatedTest
 from .helpers import get_last_runs
 from testing_platform.decorators import subscription_required
 
@@ -17,9 +17,11 @@ from django_q.models import Task, Schedule
 def index(request):
     ping_tests = PingAutomatedTest.objects.filter(user=request.user.id)
     ping_list = get_last_runs(ping_tests)
+    whois_tests = WhoisAutomatedTest.objects.filter(user=request.user.id)
+    whois_list = get_last_runs(whois_tests)
     http_tests = HttpAutomatedTest.objects.filter(user=request.user.id)
     http_list = get_last_runs(http_tests)
-    context = {"ping_list": ping_list, "http_list": http_list}
+    context = {"whois_list": whois_list, "http_list": http_list, "ping_list": ping_list}
     return render(request, 'automation_index.html', context=context)
 
 
@@ -50,14 +52,6 @@ def schedule_ping(request):
 
 @login_required
 @subscription_required
-def display_ping_report(request, domain):
-    last_run = Task.objects.filter(func='automation.tasks.ping').filter(args=(domain,)).latest('started')
-    print(last_run.result['result'])
-    return render(request, 'automated_ping_report.html', {'result': last_run.result['result']})
-
-
-@login_required
-@subscription_required
 def remove_ping(request, domain):
     ping_automated_test = PingAutomatedTest.objects.get(target__domain=domain)
     if request.user == ping_automated_test.user:
@@ -68,6 +62,55 @@ def remove_ping(request, domain):
         for item in ping_tasks:
             item.delete()
         ping_automated_test.delete()
+        return redirect('automation')
+    else:
+        return HttpResponse(status=401)
+
+
+@login_required
+@subscription_required
+def schedule_whois(request):
+    if request.method == 'POST':
+        form = WhoisAutomatedTestForm(request.user, request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            automation_request = WhoisAutomatedTest(
+                user=request.user,
+                target=data['target'],
+                frequency=data['frequency'],
+                time=data['time'],
+                weekday=data['weekday'],
+                monthly_test_date=data['monthly_test_date'],
+            )
+            automation_request.save()
+            return redirect('automation')
+        else:
+            messages.error(request, 'There was an error, please try again')
+            return redirect('schedule_whois')
+    else:
+        form = PingAutomatedTestForm(request.user)
+    return render(request, 'automation_request.html', {'form': form, 'title': 'whois lookup'})
+
+
+@login_required
+@subscription_required
+def display_whois_report(request, domain):
+    last_run = Task.objects.filter(func='automation.tasks.whois_lookup').filter(args=(domain,)).latest('started')
+    return render(request, 'automated_whois_report.html', {'result': last_run.result['result'], 'domain': domain})
+
+
+@login_required
+@subscription_required
+def remove_whois(request, domain):
+    whois_automated_test = WhoisAutomatedTest.objects.get(target__domain=domain)
+    if request.user == whois_automated_test.user:
+        scheduled_whois = Schedule.objects.filter(func='automation.tasks.whois_lookup').filter(args=f"'{domain}'")
+        whois_tasks = Task.objects.filter(func='automation.tasks.whois_lookup').filter(args=(domain,))
+        for item in scheduled_whois:
+            item.delete()
+        for item in whois_tasks:
+            item.delete()
+        whois_automated_test.delete()
         return redirect('automation')
     else:
         return HttpResponse(status=401)

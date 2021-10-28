@@ -41,7 +41,6 @@
                         <th>Target</th>
                         <th>Next run</th>
                         <th>Result</th>
-                        <th>Report</th>
                         <th></th>
                     </tr>
                 {% for scheduled_ping, target, last_run in ping_list %}
@@ -49,9 +48,48 @@
                         <td>{{ target.domain }}</td>
                         <td>{{ scheduled_ping.next_run }}</td>
                         {% if last_run %}
+                            {% if last_run.result == 0 %}
+                                <td><i class="bi bi-check-circle-fill"></i></td>
+                            {% else %}
+                                <td><i class="bi bi-x-circle-fill"></i></td>
+                            {% endif %}
+                        {% else %}
+                            <td>No results</td>
+                        {% endif %}
+                        <td><a href="ping/{{ target.domain }}/remove">Remove</a></td>
+                    </tr>
+                {% endfor %}
+                </table>
+            {% else %}
+                <p>No request registered</p>
+            {% endif %}
+        </div>
+    </section>
+    <h3>My automated whois lookups</h3>
+    <section class="authForm p-5 mb-5">
+        <p class="lead">
+            <a href="whois/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+                Setup an automated whois lookup
+            </a>
+        </p>
+        <div class="d-flex">
+            {% if whois_list %}
+                <table class="table table-light table-bordered table-striped">
+                    <tr>
+                        <th>Target</th>
+                        <th>Next run</th>
+                        <th>Result</th>
+                        <th>Report</th>
+                        <th></th>
+                    </tr>
+                {% for scheduled_whois, target, last_run in whois_list %}
+                    <tr>
+                        <td>{{ target.domain }}</td>
+                        <td>{{ scheduled_whois.next_run }}</td>
+                        {% if last_run %}
                             {% if last_run.result.code == 0 %}
                                 <td><i class="bi bi-check-circle-fill"></i></td>
-                                <td><a href="ping/{{ target.domain }}">View full report</a></td>
+                                <td><a href="whois/{{ target.domain }}">View full report</a></td>
                             {% else %}
                                 <td><i class="bi bi-x-circle-fill"></i></td>
                                 <td>{{ last_run.result.result }}</td>
@@ -60,7 +98,7 @@
                             <td><i class="bi-question-circle-fill"></i></td>
                             <td>No report available</td>
                         {% endif %}
-                        <td><a href="ping/{{ target.domain }}/remove">Remove</a></td>
+                        <td><a href="whois/{{ target.domain }}/remove">Remove</a></td>
                     </tr>
                 {% endfor %}
                 </table>

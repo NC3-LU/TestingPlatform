@@ -2,7 +2,7 @@
 
 {% block content %}
     <main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
-            <h1 class="authForm p-5 d-flex justify-content-center">Ping WHOIS Test:</h1>
-            {% include 'ping_report.html' %}
+            <h1 class="authForm p-5 d-flex justify-content-center">WHOIS result for {{ domain }}:</h1>
+            {% include 'whois_report.html' %}
     </main>
 {% endblock %}

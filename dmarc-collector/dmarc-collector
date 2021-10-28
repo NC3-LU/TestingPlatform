@@ -11,9 +11,16 @@ import io
 import fnmatch
 import gzip
 import requests
+import configparser
 
-DMARC_API_URL = os.environ.get('DMARC_API_URL', '')
-DMARC_API_KEY = os.environ.get('DMARC_API_KEY', '')
+config = { "collector": { "DMARC_API_URL": "", "DMARC_API_KEY": "", "DMARC_LOG_DIR": "/var/tmp/" }}
+if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
+    config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+    config.read(sys.argv[1])
+
+DMARC_API_URL = os.environ.get('DMARC_API_URL', config["collector"]["DMARC_API_URL"])
+DMARC_API_KEY = os.environ.get('DMARC_API_KEY', config["collector"]["DMARC_API_KEY"])
+DMARC_LOG_DIR = os.environ.get('DMARC_LOG_DIR', config["collector"]["DMARC_LOG_DIR"])
 UUID = str(uuid.uuid4())
 syslog.openlog("dmarc-collector[{}]".format(UUID), 0, syslog.LOG_MAIL)
 
@@ -45,7 +52,7 @@ for part in message.walk():
         if "text/xml" in part.get("Content-Type"):
             dmarc_xml_report = part.get_payload(decode=True)
 
-        logfile = open("./dmarc-collector.log", "a")
+        logfile = open(os.path.join(DMARC_LOG_DIR, "dmarc-collector.log"), "a")
         logfile.write(UUID)
         logfile.write("\n")
         logfile.write(dmarc_xml_report.decode('utf-8'))

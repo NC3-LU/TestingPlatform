@@ -9,7 +9,7 @@
             <h1>Automated Testing</h1>
             <div class="p-5">
                 <p class="lead">
-                    It offers a number of simple tests on web servers configuration.
+                    This section offers a number of simple tests on web servers configuration.
                     The goal is to ensure your organisation is using the most up-to-date security standards and
                     limiting therefore its exposure to easy or automated exploitation.
                 </p>
@@ -41,6 +41,7 @@
                         <th>Target</th>
                         <th>Next run</th>
                         <th>Result</th>
+                        <th>Report</th>
                         <th></th>
                     </tr>
                 {% for scheduled_ping, target, last_run in ping_list %}
@@ -53,9 +54,11 @@
                                 <td><a href="ping/{{ target.domain }}">View full report</a></td>
                             {% else %}
                                 <td><i class="bi bi-x-circle-fill"></i></td>
+                                <td>{{ last_run.result.result }}</td>
                             {% endif %}
                         {% else %}
-                            <td>No results</td>
+                            <td><i class="bi-question-circle-fill"></i></td>
+                            <td>No report available</td>
                         {% endif %}
                         <td><a href="ping/{{ target.domain }}/remove">Remove</a></td>
                     </tr>

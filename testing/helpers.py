@@ -1,7 +1,12 @@
 import requests
 import json
+import logging
+import time
 
 from testing.models import TlsScanHistory
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_observatory_report(target):
@@ -38,8 +43,7 @@ def get_observatory_report(target):
         scan_id = json_object['scan_id']
         scan_summary = json_object
 
-        while json_object['state'] == "PENDING" or json_object['state'] == "STARTING" or json_object[
-            'state'] == "RUNNING":
+        while json_object['state'] == "PENDING" or json_object['state'] == "STARTING" or json_object['state'] == "RUNNING":
             get_scan = requests.get(
                 'https://http-observatory.security.mozilla.org/api/v1/analyze?host=' + target).text
             check_object = json.loads(get_scan)
@@ -49,6 +53,15 @@ def get_observatory_report(target):
                 scan_id = check_object['scan_id']
                 scan_summary = check_object
                 break
+            else:
+                state = check_object["state"]
+                if state in ('ABORTED', 'FAILED', 'PENDING', 'STARTING', 'RUNNING'):
+                    print(f'http scan: got {state} for {target}, waiting 5 seconds')
+                    logger.info(f'http scan: got {state} for {target}, waiting 5 seconds')
+                    time.sleep(5)
+                else:
+                    logger.info(f'http scan: got unknown state {state} for {target}')
+                    print(f'http scan: got unknown state {state} for {target}')
 
         result_obj = json.loads(requests.get(
             'https://http-observatory.security.mozilla.org/api/v1/getScanResults?scan=' + str(scan_id)).text)
@@ -80,6 +93,9 @@ def get_observatory_report(target):
         completion_perc = fetch_tls["completion_perc"]
         if completion_perc == 100:
             break
+        else:
+            logger.info(f'tls scan: got {completion_perc}% done for {target}, sleeping 5s')
+            time.sleep(5)
 
     return {'result': response, 'domain_name': target, 'scan_summary': scan_summary, 'headers': headers,
             'scan_history': scan_history, 'tls_results': fetch_tls}

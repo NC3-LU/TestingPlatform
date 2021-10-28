@@ -17,6 +17,7 @@ def get_upload_path(instance, filename):
 
 class IOTUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    login = models.EmailField()
     password = models.CharField(max_length=200, editable=False)
     activated = models.BooleanField(default=False)
 
@@ -33,6 +34,7 @@ class IOTUser(models.Model):
         password = secrets.token_urlsafe(32)
         signer = Signer()
         self.password = signer.sign_object(password)
+        self.email = self.user.email
         super().save(*args, **kwargs)
 
     def __str__(self):

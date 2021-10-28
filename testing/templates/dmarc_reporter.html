@@ -11,35 +11,29 @@
             No mail domain registered. Please add a domain to your list of managed mail domains by clicking <b>
             <a href="/accounts/settings/#company-mail">here</a></b>.
         </div>
-    {% endif %}
-    {% for domain, report in domain_reports %}
-        <div class="authForm p-5">
-            <h3>Reports for {{ domain.domain }}<br></h3>
-            <hr>
-            {% if not report.reports %}
-                No report available yet
-            {% else %}
-                <table class="table table-light table-stripped table-responsive">
-                    {% for mailfrom, reps in report.reports.items %}
-                        <tr>
-                            <th>{{ mailfrom }}</th>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            {% for timestamp in reps %}
-                                <th></th>
-                                <td>{{ timestamp|timestamp_to_time|date:"Y-m-d h:m:s" }}</td>
+    {% else %}
+        {% for domain, reports in domain_reports.items %}
+            <div class="authForm p-5">
+                <h3>Reports for {{ domain.domain }}<br></h3>
+                <hr>
+                {% if not reports %}
+                    No report available yet
+                {% else %}
+                    <table class="table table-light table-stripped table-responsive">
+                        {% for report in reports %}
+                            <tr>
+                                <th>{{ report.mail_from }}</th>
+                                <td>{{ report.timestamp|timestamp_to_time|date:"Y-m-d h:m:s" }}</td>
                                 <td><a class="btn btn-primary"
-                                       href="/test/dmarc-reporter/{{ report.domain }}/{{ mailfrom }}/{{ timestamp }}">
+                                       href="/test/dmarc-reporter/{{ domain }}/{{ report.mail_from }}/{{ report.timestamp }}">
                                     View report
                                 </a></td>
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </table>
-            {% endif %}
-        </div>
-    {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
 </main>
 {% endblock %}

@@ -117,15 +117,20 @@ def dmarc_generator(request):
 @login_required
 def dmarc_reporter(request):
     domains = MailDomain.objects.filter(user=request.user)
-    reports = DMARCRecord.objects.filter(user=request.user)
-    domain_reports = []
+    records = DMARCRecord.objects.filter(user=request.user)
+    domain_reports = {}
     if domains:
         for domain in domains:
             try:
-                report = DMARCRecord.objects.filter(user=request.user).get(domain=domain)
+                record = records.get(domain=domain)
             except DMARCRecord.DoesNotExist:
-                report = None
-            domain_reports.append((domain, report))
+                record = None
+            if record:
+                try:
+                    reports = DMARCReport.objects.filter(dmarc_record=record)
+                    domain_reports[domain] = list(reports)
+                except DMARCReport.DoesNotExist:
+                    domain_reports[domain] = None
     return render(request, 'dmarc_reporter.html', {'domain_reports': domain_reports})
 
 

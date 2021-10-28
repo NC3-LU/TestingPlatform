@@ -14,7 +14,8 @@ class User(AbstractUser):
 
 
 class SubscriptionBase(models.Model):
-    tier_level = models.PositiveSmallIntegerField(choices=((1, 'PRO'), (2, 'BUSINESS')))
+    tier_level = models.PositiveSmallIntegerField(choices=((1, 'PRO'), (2, 'BUSINESS')),
+                                                  help_text='Choose a package')
 
     def get_tier_level(self):
         if self.tier_level == 1:

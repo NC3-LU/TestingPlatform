@@ -26,7 +26,7 @@
 
     <h1>Subscription request</h1>
     <hr class="w-25 text-dark">
-    <form class="p-5 authForm" action="{{ app_path }}" method="post" id="login-form" enctype="multipart/form-data">
+    <form class="p-5 authForm mb-5" action="{{ app_path }}" method="post" id="login-form" enctype="multipart/form-data">
         {% csrf_token %}
 
         {% for field in form %}
@@ -46,6 +46,6 @@
 
         <input class="btn btn-primary" type="submit" value="{% translate 'Submit' %}">
     </form>
-
 </main>
+{% include 'subscriptions.html' %}
 {% endblock %}

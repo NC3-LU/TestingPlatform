@@ -28,22 +28,30 @@
         <h3>My ongoing requests</h3>
         <div class="d-flex">
             {% if requests %}
-                <table class="table table-light table-bordered">
+                <table class="table table-light table-striped">
                     <tr>
                         <th>Request number</th>
                         <th>Request name</th>
                         <th>Request status</th>
+                        <th>Report status</th>
                         <th>Report</th>
                     </tr>
-                {% for request in requests %}
-                    <td>{{ request }}</td>
-                    <td>{{ request.name }}</td>
-                    <td>{{ request.status_field }}</td>
-                    {% if request.report_link %}
-                        <td><a href="{{ request.firmware_uuid }}/download/" download>Get report</a></td>
-                    {% else %}
-                        <td>No report available</td>
-                    {% endif %}
+                {% for request, status in requests %}
+                    <tr>
+                        <td>{{ request }}</td>
+                        <td>{{ request.name }}</td>
+                        <td>{{ request.status_field }}</td>
+                        <td>{{ status }}</td>
+                        {% if request.report_link %}
+                            {% if status == 'Finished' %}
+                                <td><a href="{{ request.firmware_uuid }}/download/" download>Get report</a></td>
+                            {% else %}
+                                <td>Report is generating</td>
+                            {% endif %}
+                        {% else %}
+                            <td>No report available</td>
+                        {% endif %}
+                    </tr>
                 {% endfor %}
                 </table>
             {% else %}

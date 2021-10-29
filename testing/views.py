@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import socket
 
@@ -7,12 +8,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.template.response import TemplateResponse
+
 from imap_tools import MailBox, AND
 from subprocess import check_output
 from urllib.parse import urlparse, parse_qs
 
 from ipwhois import IPWhois, IPDefinedError
-from .helpers import get_observatory_report
+from .helpers import get_http_report, get_tls_report
 from django.views.decorators.http import require_http_methods
 
 from authentication.models import User
@@ -66,8 +69,13 @@ def c3_protocols(request):
 @login_required
 def http_test(request):
     if request.method == 'POST':
-        context = get_observatory_report(request.POST['target'])
-        return render(request, 'check_website.html', context=context)
+        context = {'rescan': False}
+        if 'rescan' in request.POST:
+            context['rescan'] = True
+        context.update(get_http_report(request.POST['target'], context['rescan']))
+        if 'tls' in request.POST:
+            context['tls_results'] = get_tls_report(request.POST['target'], context['rescan'])
+        return render(request, 'check_website.html', context)
     else:
         return render(request, 'check_website.html')
 
@@ -87,7 +95,6 @@ def spf_generator(request):
 @login_required
 def dmarc_generator(request):
     if not request.user.maildomain_set.filter(user=request.user).last():
-        print(request.user.maildomain_set.filter(user=request.user).last())
         messages.error(request, 'Please add a mail domain in your profile first.')
         return redirect('test_index')
     if request.method == 'POST':

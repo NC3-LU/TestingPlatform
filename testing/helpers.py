@@ -1,26 +1,29 @@
 import requests
 import json
+import logging
+import time
 
 from testing.models import TlsScanHistory
 
 
-def get_observatory_report(target):
+logger = logging.getLogger(__name__)
+
+
+def get_http_report(target, rescan):
     ################################
     # HTTP SCAN Mozilla Observatory
     ################################
     response = ""
     scan_summary = ""
     scan_history = ""
-    rescan = True
 
-    if rescan is True:
-        do_scan = requests.post(
-            'https://http-observatory.security.mozilla.org/api/v1/analyze?host=' + target + '&rescan=true'
-        ).text
-    else:
-        do_scan = requests.post(
-            'https://http-observatory.security.mozilla.org/api/v1/analyze?host=' + target
-        ).text
+    logger.info(f'http scan: scanning {target}, with rescan set to {rescan}')
+
+    http_url = 'https://http-observatory.security.mozilla.org/api/v1/analyze?host=' + target
+    if rescan:
+        http_url += '&rescan=true'
+
+    do_scan = requests.post(http_url).text
 
     json_object = json.loads(do_scan)
     headers = {}
@@ -37,18 +40,31 @@ def get_observatory_report(target):
         )
         scan_id = json_object['scan_id']
         scan_summary = json_object
-
-        while json_object['state'] == "PENDING" or json_object['state'] == "STARTING" or json_object[
-            'state'] == "RUNNING":
+        state = ''
+        counter = 0
+        while json_object['state'] in ("PENDING", "STARTING", "RUNNING") and counter < 5:
             get_scan = requests.get(
                 'https://http-observatory.security.mozilla.org/api/v1/analyze?host=' + target).text
             check_object = json.loads(get_scan)
-            if check_object["state"] == 'FINISHED':
+            state = check_object["state"]
+            counter += 1
+            if state == 'FINISHED':
                 use = False
                 headers = {k.replace('-', '_'): v for k, v in check_object['response_headers'].items()}
                 scan_id = check_object['scan_id']
                 scan_summary = check_object
+                logger.info(f'http scan: finished scan in {counter} request(s)')
                 break
+            else:
+                if state in ('ABORTED', 'FAILED', 'PENDING', 'STARTING', 'RUNNING'):
+                    logger.info(f'http scan: got {state} after {counter} request(s) for {target}, retrying in 5s')
+                    time.sleep(5)
+                else:
+                    logger.info(f'http scan: got unknown state {state} for {target}')
+                    print(f'http scan: got unknown state {state} for {target}')
+
+        if counter == 5 and state != 'FINISHED':
+            logger.warning(f'http scan: not finished after 5 times, skipping')
 
         result_obj = json.loads(requests.get(
             'https://http-observatory.security.mozilla.org/api/v1/getScanResults?scan=' + str(scan_id)).text)
@@ -57,14 +73,21 @@ def get_observatory_report(target):
         if use:
             headers = {k.replace('-', '_'): v for k, v in json_object['response_headers'].items()}
 
+        return {'result': response, 'domain_name': target, 'scan_summary': scan_summary, 'headers': headers,
+                'scan_history': scan_history}
+
+
+def get_tls_report(target, rescan):
     ################################
     # TLS SCAN Mozilla Observatory
     ################################
     tls_target = target.replace('www.', '')
     tls_scan_id = ""
+    url = 'https://tls-observatory.services.mozilla.com/api/v1/scan?target=' + tls_target
+    if rescan:
+        url += '&rescan=true'
     try:
-        do_tls_scan = json.loads(requests.post(
-            'https://tls-observatory.services.mozilla.com/api/v1/scan?target=' + tls_target + '&rescan=true').text)
+        do_tls_scan = json.loads(requests.post(url).text)
         tls_scan_id = do_tls_scan['scan_id']
         TlsScanHistory.objects.update_or_create(domain=tls_target, defaults={'scan_id': tls_scan_id})
     except ValueError:
@@ -74,12 +97,21 @@ def get_observatory_report(target):
     fetch_tls = json.loads(
         requests.get('https://tls-observatory.services.mozilla.com/api/v1/results?id=' + str(tls_scan_id)).text)
 
-    while fetch_tls["completion_perc"] != 100:
+    completion_perc = fetch_tls["completion_perc"]
+    counter = 0
+    while completion_perc != 100 and counter < 5:
         fetch_tls = json.loads(requests.get(
             'https://tls-observatory.services.mozilla.com/api/v1/results?id=' + str(tls_scan_id)).text)
         completion_perc = fetch_tls["completion_perc"]
+        counter += 1
         if completion_perc == 100:
+            logger.info(f'tls scan: finished scan in {counter} request(s).')
             break
+        else:
+            logger.info(f'tls scan: got {completion_perc}% done for {target} after {counter} request(s), sleeping 5s')
+            time.sleep(5)
 
-    return {'result': response, 'domain_name': target, 'scan_summary': scan_summary, 'headers': headers,
-            'scan_history': scan_history, 'tls_results': fetch_tls}
+    if completion_perc < 100 and counter == 5:
+        logger.warning(f'tls scan: scan not finished after 5 tries, skipping')
+
+    return fetch_tls

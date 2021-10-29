@@ -13,6 +13,8 @@
         {% endif %}
         <input type="text" placeholder="www.domain.com" id="target" name="target" value="{{ form }}"><br>
         <div class="mb-2">
+            <label class="text-light">Perform a TLS scan:</label>
+            <input type="checkbox" id="tls" name="tls"><br>
             <label class="text-light">Force a rescan instead of returning cached results:</label>
             <input type="checkbox" id="rescan" name="rescan">
         </div>

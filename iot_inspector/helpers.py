@@ -189,7 +189,7 @@ def client_get_report_link(client, report_uuid):
     }
     """
     res = client.query(GET_ALL_REPORTS)
-    report = next(rep for rep in res['allReports'] if rep['id'] == report_uuid)
+    report = next(rep for rep in res['allReports'] if rep['id'] == str(report_uuid))
     return report['state'], report['downloadUrl']
 
 

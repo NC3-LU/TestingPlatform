@@ -1,6 +1,6 @@
 from django.contrib import messages
 
-from testing.helpers import get_observatory_report
+from testing.helpers import get_http_report, get_tls_report
 import socket
 import subprocess
 from ipwhois import IPWhois, IPDefinedError
@@ -28,4 +28,6 @@ def ping(host):
 
 
 def http(host):
-    return get_observatory_report(host)
+    report = get_http_report(host, True)
+    report['tls_results'] = get_tls_report(host, True)
+    return report

@@ -60,6 +60,8 @@ INSTALLED_APPS = [
     'iot_inspector',
     'automation',
     'contact',
+    'c3_protocols',
+    'specialized_testing',
     'testing.templatetags'
 ]
 

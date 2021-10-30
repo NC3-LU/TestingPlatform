@@ -193,6 +193,23 @@ def client_get_report_link(client, report_uuid):
     return report['state'], report['downloadUrl']
 
 
+def client_get_all_reports_states(client, analysis_requests):
+    GET_ALL_REPORTS = """
+        query {
+          allReports { id, state, downloadUrl }
+        }
+        """
+    res = client.query(GET_ALL_REPORTS)
+    states = []
+    for req in analysis_requests:
+        if req.report_uuid:
+            state = (next(rep for rep in res['allReports'] if rep['id'] == str(req.report_uuid))['state'])
+        else:
+            state = 'Pending'
+        states.append(state.capitalize())
+    return zip(analysis_requests, states)
+
+
 def api_get_report(user, report_uuid):
     signer = Signer()
     iot_user = user.iotuser

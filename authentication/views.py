@@ -182,7 +182,7 @@ def add_domain(request):
                         return redirect('add_domain')
         else:
             form = UserDomainForm()
-        return render(request, 'add_domain.html', {'form': form})
+        return render(request, 'add_domain.html', {'form': form, 'type': 'web'})
 
 
 @login_required
@@ -214,7 +214,7 @@ def add_mail_domain(request):
             return redirect('edit')
     else:
         form = MailDomainForm()
-    return render(request, 'add_domain.html', {'form': form})
+    return render(request, 'add_domain.html', {'form': form, 'type': 'mail'})
 
 
 @login_required

@@ -3,7 +3,7 @@
 :root {
     /* MAIN BACKGROUND COLOR AND TEXT COLOR */
     --backgroundTextColor: white;
-    --secondBackgroundColor: #5C5E5B;
+    --secondBackgroundColor: #2c4261;
     --dBoxColor: #526475;
     --anchorColor: #BFD0DE;
     --anchorColorHover: #F2E422;
@@ -58,7 +58,7 @@ html, body {
 
 body{
   background:var(--backgroundTextColor);
-  font-family: 'Roboto Mono', monospace !important;
+  /*font-family: 'Roboto Mono', monospace !important;*/
 }
 
 #content{
@@ -113,6 +113,7 @@ input[type=text], input[type=placeholder], input[type=submit] {
 
 nav{
     min-height: 7%;
+    background-color: var(--secondBackgroundColor) !important;
 }
 
 .navbar-nav{
@@ -134,7 +135,7 @@ nav{
 
 .authForm{
     border: 1px solid;
-    background: var(--bs-dark);
+    background: var(--secondBackgroundColor);
     width:50%;
 }
 
@@ -145,7 +146,7 @@ nav{
     background: var(--anchorColor) !important;
 }
 .authForm > div > label{
-    color:var(--bs-dark);
+    color:var(--secondBackgroundColor);
     font-weight: bold;
 }
 

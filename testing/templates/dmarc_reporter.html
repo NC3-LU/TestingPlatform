@@ -8,8 +8,7 @@
     </div>
     {% if not domain_reports %}
         <div class="authForm p-5">
-            No mail domain registered. Please add a domain to your list of managed mail domains by clicking <b>
-            <a href="/accounts/settings/#company-mail">here</a></b>.
+            No reports available yet. Please use our DMARC record generator to start getting reports.
         </div>
     {% else %}
         {% for domain, reports in domain_reports.items %}

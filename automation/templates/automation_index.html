@@ -27,10 +27,10 @@
             </div>
         </div>
     </section>
-    <h3>My automated pings</h3>
+    <h3>Pings</h3>
     <section class="authForm p-5 mb-5">
         <p class="lead">
-            <a href="ping/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+            <a href="auto-ping/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
                 Setup an automated ping
             </a>
         </p>
@@ -56,7 +56,7 @@
                         {% else %}
                             <td>No results</td>
                         {% endif %}
-                        <td><a href="ping/{{ target.domain }}/remove">Remove</a></td>
+                        <td><a href="auto-ping/{{ target.domain }}/remove">Remove</a></td>
                     </tr>
                 {% endfor %}
                 </table>
@@ -65,10 +65,10 @@
             {% endif %}
         </div>
     </section>
-    <h3>My automated whois lookups</h3>
+    <h3>Whois lookups</h3>
     <section class="authForm p-5 mb-5">
         <p class="lead">
-            <a href="whois/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+            <a href="auto-whois/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
                 Setup an automated whois lookup
             </a>
         </p>
@@ -89,7 +89,7 @@
                         {% if last_run %}
                             {% if last_run.result.code == 0 %}
                                 <td><i class="bi bi-check-circle-fill"></i></td>
-                                <td><a href="whois/{{ target.domain }}">View full report</a></td>
+                                <td><a href="auto-whois/{{ target.domain }}">View full report</a></td>
                             {% else %}
                                 <td><i class="bi bi-x-circle-fill"></i></td>
                                 <td>{{ last_run.result.result }}</td>
@@ -98,7 +98,7 @@
                             <td><i class="bi-question-circle-fill"></i></td>
                             <td>No report available</td>
                         {% endif %}
-                        <td><a href="whois/{{ target.domain }}/remove">Remove</a></td>
+                        <td><a href="auto-whois/{{ target.domain }}/remove">Remove</a></td>
                     </tr>
                 {% endfor %}
                 </table>
@@ -107,10 +107,10 @@
             {% endif %}
         </div>
     </section>
-    <h3>My automated http tests</h3>
+    <h3>HTTP tests</h3>
     <section class="authForm p-5 mb-5">
         <p class="lead">
-            <a href="http/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+            <a href="auto-http/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
                 Setup an automated http header test
             </a>
         </p>
@@ -130,12 +130,12 @@
                         <td>{{ scheduled_http.next_run }}</td>
                         {% if last_run %}
                             <td>{{ last_run.result.scan_summary.grade }}</td>
-                            <td><a href="http/{{ target.domain }}">View full report</a></td>
+                            <td><a href="auto-http/{{ target.domain }}">View full report</a></td>
                         {% else %}
                             <td>No results</td>
                             <td></td>
                         {% endif %}
-                        <td><a href="http/{{ target.domain }}/remove">Remove</a></td>
+                        <td><a href="auto-http/{{ target.domain }}/remove">Remove</a></td>
                     </tr>
                 {% endfor %}
                 </table>

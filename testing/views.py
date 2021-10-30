@@ -62,11 +62,6 @@ def test_landing(request):
 
 
 @login_required
-def c3_protocols(request):
-    return render(request, 'c3_protocols.html')
-
-
-@login_required
 def http_test(request):
     if request.method == 'POST':
         context = {'rescan': False}

@@ -5,7 +5,7 @@ from django.contrib import messages
 
 from .forms import AnalysisRequestForm
 from .models import AnalysisRequest
-from .helpers import api_get_report, client_get_report_link
+from .helpers import api_get_report, client_get_report_link, client_get_all_reports_states
 
 from iot_inspector_client import FirmwareMetadata
 from datetime import date
@@ -19,14 +19,8 @@ def index(request):
     if request.user.iotuser.activated:
         client = client_login(request.user.iotuser)
         reqs = AnalysisRequest.objects.filter(user=request.user.id)
-        statuses = []
-        for req in reqs:
-            if req.report_uuid:
-                status, link = client_get_report_link(client, str(req.report_uuid))
-            else:
-                status = 'Pending'
-            statuses.append(status.capitalize())
-        context = {"requests": zip(reqs, statuses)}
+        all_requests = client_get_all_reports_states(client, reqs)
+        context = {"requests": all_requests}
         return render(request, 'iot_index.html', context=context)
     else:
         return render(request, 'iot_index.html')

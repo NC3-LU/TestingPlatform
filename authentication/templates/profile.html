@@ -22,7 +22,7 @@
             {% endfor %}
         </div>
         {% endfor %}
-        <small><a href="/change-password/">I want to change my password</a></small><br>
+        <small><a href="/account/change-password/">I want to change my password</a></small><br>
         <input class="mt-2 btn btn-primary" type="submit" value="Update">
     </form>
 
@@ -37,7 +37,7 @@
                     Request pending
                 {% endif %}
             {% else %}
-                <a href="subscriptions/request/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+                <a href="/subscriptions/request/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
                     {% if subscription %}
                         Request subscription update
                     {% else %}
@@ -116,8 +116,8 @@
                         <td>
                             {% if domain.dmarcrecord.dmarcreport_set.last %}
                                 <a href="/test/dmarc-reporter/{{ domain }}
-/{{ domain.dmarcrecord.dmarcreport_set.last.mail_from }}
-/{{ domain.dmarcrecord.dmarcreport_set.last.timestamp }}">
+                                    /{{ domain.dmarcrecord.dmarcreport_set.last.mail_from }}
+                                    /{{ domain.dmarcrecord.dmarcreport_set.last.timestamp }}">
                                     Latest report
                                 </a>
                             {% else %}

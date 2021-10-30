@@ -1,46 +1,41 @@
 <section class="w-100 h-100 d-flex justify-content-center flex-wrap">
     <div class="dashboardSectionBox"><h1>Testing</h1></div>
     <div class="dashboardBox">
-        <a href="/test">
+        <a href="/infra-testing">
             <div class="dashboardBoxPreview">
-                Testing toolbox
+                Infrastructure testing toolbox
             </div>
             <div class="dashboardBoxDescription">
-                Here you can find all of our free testing tools.
+                Here you can find all of our infra testing tools. Some of those tools, namely the automated scans
+                offering report generation, will only be available if you choose to subscribe to our paid services.
+                You can check our subscription plans at the bottom of this page.
             </div>
         </a>
     </div>
     <div class="dashboardBox">
-        <a href="iot-inspector/">
+        <a href="/specialized-testing/">
             <div class="dashboardBoxPreview">
-                IOT Inspector
+                Specialized Testing
             </div>
             <div class="dashboardBoxDescription">
-                In order to design proper security controls adapted to your specific environment, you need to know what
-                are the intrinsic vulnerabilities of the IoT’s you are using. This is where a solution such as the one
-                we are using on this platform, will provide you with a comprehensive report on the known weaknesses of
-                the IoT’s firmware’s. To do so, we have partnered with IoT Inspector
-                GmbH whose solution is particularly advanced and comprehensive, and generates detailed reports.
+                This section offers tests that target specific systems and devices. Currently, we offer IoT firmware
+                scanning. Click to learn more.
             </div>
         </a>
     </div>
-    {% if user.tier_level %}
         <div class="dashboardBox">
-            <a href="/automated-testing/">
+            <a href="/c3-protocols/">
                 <div class="dashboardBoxPreview">
-                    Automated testing
+                    C3 Protocols
                 </div>
                 <div class="dashboardBoxDescription">
-                    These tests are made to provide you with light monitoring capabilities over your systems.
-                    After registering your owned domains in your profile, you can setup a number of automated tests,
-                    like ping checks to monitor availability and reachability, http headers tests to grade your website
-                    / check if it is compromised, and more.
+                    This initiative was inspired by Start-Ups and SMB's with whom we interact daily. While trying to
+                    understand why they are not engaged more systematically into Penetration Testing, the answer that came
+                    back most of the time was « Cost ». Click to read further.
                 </div>
             </a>
     </div>
-    {% endif %}
     <hr class="w-25 text-dark">
-    <div class="dashboardSectionBox"><h1>Subscription options</h1></div>
     <div class="dashboardBox">
         <a href="/accounts/settings/subscriptions/">
             <div class="dashboardBoxPreview">

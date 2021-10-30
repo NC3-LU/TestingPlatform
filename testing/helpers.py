@@ -42,7 +42,8 @@ def get_http_report(target, rescan):
         scan_summary = json_object
         state = ''
         counter = 0
-        while json_object['state'] in ("PENDING", "STARTING", "RUNNING") and counter < 5:
+        response = None
+        while json_object['state'] not in ("ABORTED", "FAILED") and counter < 5:
             get_scan = requests.get(
                 'https://http-observatory.security.mozilla.org/api/v1/analyze?host=' + target).text
             check_object = json.loads(get_scan)
@@ -54,24 +55,22 @@ def get_http_report(target, rescan):
                 scan_id = check_object['scan_id']
                 scan_summary = check_object
                 logger.info(f'http scan: finished scan in {counter} request(s)')
+                result_obj = json.loads(requests.get(
+                    'https://http-observatory.security.mozilla.org/api/v1/getScanResults?scan=' + str(scan_id)).text)
+                response = {k.replace('-', '_'): v for k, v in result_obj.items()}
+                if use:
+                    headers = {k.replace('-', '_'): v for k, v in json_object['response_headers'].items()}
                 break
             else:
                 if state in ('ABORTED', 'FAILED', 'PENDING', 'STARTING', 'RUNNING'):
-                    logger.info(f'http scan: got {state} after {counter} request(s) for {target}, retrying in 5s')
-                    time.sleep(5)
+                    logger.info(f'http scan: got {state} after {counter} request(s) for {target}, retrying in 3s')
+                    time.sleep(3)
                 else:
                     logger.info(f'http scan: got unknown state {state} for {target}')
                     print(f'http scan: got unknown state {state} for {target}')
 
         if counter == 5 and state != 'FINISHED':
             logger.warning(f'http scan: not finished after 5 times, skipping')
-
-        result_obj = json.loads(requests.get(
-            'https://http-observatory.security.mozilla.org/api/v1/getScanResults?scan=' + str(scan_id)).text)
-
-        response = {k.replace('-', '_'): v for k, v in result_obj.items()}
-        if use:
-            headers = {k.replace('-', '_'): v for k, v in json_object['response_headers'].items()}
 
         return {'result': response, 'domain_name': target, 'scan_summary': scan_summary, 'headers': headers,
                 'scan_history': scan_history}
@@ -108,8 +107,8 @@ def get_tls_report(target, rescan):
             logger.info(f'tls scan: finished scan in {counter} request(s).')
             break
         else:
-            logger.info(f'tls scan: got {completion_perc}% done for {target} after {counter} request(s), sleeping 5s')
-            time.sleep(5)
+            logger.info(f'tls scan: got {completion_perc}% done for {target} after {counter} request(s), sleeping 3s')
+            time.sleep(3)
 
     if completion_perc < 100 and counter == 5:
         logger.warning(f'tls scan: scan not finished after 5 tries, skipping')

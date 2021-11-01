@@ -12,7 +12,6 @@ from .helpers import api_get_report, client_get_report_link, client_get_all_repo
 from iot_inspector_client import FirmwareMetadata
 from datetime import date
 import mimetypes
-from reportlab.pdfgen import canvas
 
 from .helpers import *
 

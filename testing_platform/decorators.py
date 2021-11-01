@@ -12,7 +12,8 @@ def subscription_required(function):
         if user_tier in (1, 2):
             return function(request, *args, **kwargs)
         else:
-            messages.error(request, 'Unauthorized access')
+            messages.warning(request, 'This feature is limited to subscribed users, please check out our offers in the '
+                                      'dedicated section!')
             return HttpResponseRedirect('/')
     return wrap
 

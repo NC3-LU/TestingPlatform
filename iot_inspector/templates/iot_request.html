@@ -42,6 +42,10 @@
         </div>
         {% endfor %}
 
+        <p>Please read our <a href="/specialized-testing/iot-inspector/tos" target="_new">terms and conditions</a> for this service.</p>
+        <label>I have read the terms and conditions:</label>
+        <input type="checkbox" name="tos" value="checked">
+
         <input type="hidden" name="next" value="{{ next }}">
 
         <input class="btn btn-primary" type="submit" value="{% translate 'Submit' %}">

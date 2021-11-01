@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-xl">
     <div class="container-fluid d-flex flex-row justify-content-around">
 
-        <a class="navbar-brand" href="/"><img src="{% static 'img/LOGO-c3-web.png' %}" height="40px"> Testing Platform</a>
+        <a class="navbar-brand" href="/"><img src="{% static 'img/LOGO-c3-web.png' %}" height="65px"> Testing Platform</a>
 
         <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar">
             <span class="navbar-toggler-icon"></span>
@@ -21,18 +21,15 @@
                     <ul class="dropdown-menu bg-dark" aria-labelledby="dropdown07">
                         <li><h6 class="dropdown-header">System Checks</h6></li>
                         <li><a class="dropdown-item" href="/infra-testing/http-test">HTTP Test</a></li>
-                        <li><a class="dropdown-item" href="/infra-testing/pingtest">WHOIS Lookup</a></li>
-
+                        <!--<li><a class="dropdown-item" href="/infra-testing/whois-lookup">WHOIS Lookup</a></li>-->
                         <li class="dropdown-divider"></li>
                         <li><h6 class="dropdown-header">Email Security Tools</h6></li>
                         <li><a class="dropdown-item" href="/infra-testing/dmarc-reporter">DMARC Reporter</a></li>
                         <li><a class="dropdown-item" href="/infra-testing/dmarc-generator">DMARC Generator</a></li>
                         <li><a class="dropdown-item" href="/infra-testing/spf-generator">SPF Generator</a></li>
-
                         <li class="dropdown-divider"></li>
                         <li><h6 class="dropdown-header">Automation</h6></li>
                         <li><a class="dropdown-item" href="/infra-testing/automation">Automated Tests</a></li>
-
                     </ul>
                 </li>
 

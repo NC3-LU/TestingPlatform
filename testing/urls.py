@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     path('', views.test_landing, name='test_index'),
 
-    path('whois-lookup/', views.ping_test, name='ping_test'),
+    # path('whois-lookup/', views.ping_test, name='ping_test'),
     path('http-test/', views.http_test, name='http_test'),
 
     path('spf-generator/', views.spf_generator, name='spf-generator'),

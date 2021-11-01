@@ -9,7 +9,7 @@ class User(AbstractUser):
     address = models.CharField(max_length=200)
     post_code = models.CharField(max_length=200)
     city = models.CharField(max_length=200)
-    vat_number = models.CharField(max_length=200, blank=True, null=True)
+    vat_number = models.CharField(max_length=200)
     tier_level = models.PositiveSmallIntegerField(choices=((0, 'None'), (1, 'PRO'), (2, 'BUSINESS')), default=0)
 
 

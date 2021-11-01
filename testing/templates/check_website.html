@@ -18,7 +18,10 @@
             <label class="text-light">Force a rescan instead of returning cached results:</label>
             <input type="checkbox" id="rescan" name="rescan">
         </div>
-        <small>Loading can take up to 5 minutes.</small>
+        <small>
+            Loading can take up to 5 minutes. If your tls scan results are empty, please retry and uncheck the
+            'force rescan' option.
+        </small>
         <input type="submit" value="Test" class="btn btn-primary">
         <button class="btn btn-secondary mt-2" onclick="window.history.back()">Back</button>
     </form>

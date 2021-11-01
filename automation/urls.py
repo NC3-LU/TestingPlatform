@@ -8,8 +8,8 @@ urlpatterns = [
    path('auto-ping/', views.schedule_ping, name='schedule_ping'),
    path('auto-ping/<domain>/remove', views.remove_ping, name='remove_ping'),
 
-   path('auto-whois/', views.schedule_whois, name='schedule_whois'),
-   path('auto-whois/<domain>', views.display_whois_report, name='display_ping_report'),
+   # path('auto-whois/', views.schedule_whois, name='schedule_whois'),
+   # path('auto-whois/<domain>', views.display_whois_report, name='display_ping_report'),
 
    path('auto-http/', views.schedule_http, name='schedule_http'),
    path('auto-http/<domain>', views.display_http_report, name='display_http_report'),

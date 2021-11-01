@@ -38,7 +38,7 @@
         {% if user.maildomain_set.all %}
             <a href="/infra-testing/dmarc-generator/">
         {% else %}
-            <a href="/settings/mail-domains/add/">
+            <a href="/settings/mail-domains/add/" next="/infra-testing/dmarc-generator/">
         {% endif %}
             <div class="dashboardBoxPreview">
                 DMARC Record Generator
@@ -96,6 +96,7 @@
                 Automated tests
             </div>
             <div class="dashboardBoxDescription">
+                <b>Subscription required</b><br>
                 These tests are made to provide you with light monitoring capabilities over your systems.
                 After registering your owned domains in your profile, you can setup a number of automated tests,
                 like ping checks to monitor availability and reachability, http headers tests to grade your website

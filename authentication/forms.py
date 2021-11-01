@@ -14,7 +14,7 @@ class SignUpForm(UserCreationForm):
     address = forms.CharField(max_length=200)
     post_code = forms.CharField(max_length=200)
     city = forms.CharField(max_length=200)
-    vat_number = forms.CharField(max_length=30, help_text='Needed for subscription')
+    vat_number = forms.CharField(max_length=30, help_text='Needed for subscription. Format: LU12345678')
 
     class Meta(UserCreationForm.Meta):
         model = User

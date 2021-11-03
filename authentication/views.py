@@ -23,7 +23,7 @@ def signup(request):
             user = authenticate(username=username,  password=raw_password)
             login(request, user)
             messages.success(request, 'Your signed up successfully!')
-            iotuser = IOTUser(user=user)
+            iotuser = IOTUser(user=user, login=clean_form.get('email'))
             iotuser.save()
             return redirect('/')
     else:

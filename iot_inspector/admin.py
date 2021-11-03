@@ -87,7 +87,7 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
 class IOTUserAdmin(admin.ModelAdmin):
 
     readonly_fields = ('password',)
-    actions = ['activate_iot']
+    actions = ['activate_iot', 'get_login']
     list_display = ['__str__', 'activated']
 
     def activate_iot(self, request, queryset):
@@ -99,6 +99,15 @@ class IOTUserAdmin(admin.ModelAdmin):
                 messages.error(request, f'{response.json()["errors"][0]["detail"]}')
             else:
                 queryset.update(activated=True)
+
+    def get_login(self, request, queryset):
+        for iotuser in queryset:
+            if not iotuser.login:
+                iotuser.login = iotuser.user.email
+                iotuser.save()
+                messages.success(request, f'Login for {iotuser.user.username} iot inspector added')
+            else:
+                messages.warning(request, f'User {iotuser.user.username} already has a login.')
 
 
 # Register your models here.

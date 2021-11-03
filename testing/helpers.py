@@ -114,3 +114,4 @@ def get_tls_report(target, rescan):
         logger.warning(f'tls scan: scan not finished after 5 tries, skipping')
 
     return fetch_tls
+

@@ -112,7 +112,11 @@
                 {% for domain in mail_domain_list %}
                     <tr>
                         <td>{{ domain.domain }}</td>
-                        <td><a href="/infra-testing/dmarc-generator/?{{ domain }}">Generate DMARC record</a></td>
+                        {% if not domain.dmarcrecord %}
+                            <td><a href="/infra-testing/dmarc-generator/?{{ domain }}">Generate DMARC record</a></td>
+                        {% else %}
+                            <td><a href="/infra-testing/dmarc-generator/?{{ domain }}">View DMARC record</a></td>
+                        {% endif %}
                         <td>
                             {% if domain.dmarcrecord.dmarcreport_set.last %}
                                 <a href="/infra-testing/dmarc-reporter/{{ domain }}

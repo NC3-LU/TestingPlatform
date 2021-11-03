@@ -1,4 +1,5 @@
 from .models import DMARCRecord
+from .models import MailDomain
 from django import forms
 
 
@@ -7,8 +8,9 @@ class DMARCRecordForm(forms.ModelForm):
         model = DMARCRecord
         fields = ['domain', 'policy', 'spf_policy', 'dkim_policy']
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['domain'].queryset = MailDomain.objects.filter(user=user)
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'form-control'
 

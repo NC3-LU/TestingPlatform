@@ -108,12 +108,17 @@ def dmarc_generator(request):
         messages.error(request, 'Please add a mail domain in your profile first.')
         return redirect('test_index')
     if request.method == 'POST':
-        form = DMARCRecordForm(request.POST)
+        form = DMARCRecordForm(request.user, request.POST)
         if form.is_valid():
             data = form.cleaned_data
+            try:
+                domain = MailDomain.objects.filter(user=request.user).get(domain=data['domain'])
+            except MailDomain.DoesNotExist:
+                messages.error(request, 'This domain is not in your managed mail domains')
+                return render(request, 'dmarc_generator.html', {'form': form})
             report = DMARCRecord(
                 user=request.user,
-                domain=data['domain'],
+                domain=domain,
                 policy=data['policy'],
                 spf_policy=data['spf_policy'],
                 dkim_policy=data['dkim_policy']
@@ -125,9 +130,15 @@ def dmarc_generator(request):
         uri = request.get_raw_uri()
         if urlparse(uri).query:
             domain = MailDomain.objects.get(domain=urlparse(uri).query)
-            form = DMARCRecordForm(initial={'domain': domain})
+            try:
+                record = DMARCRecord.objects.get(user=request.user, domain=domain.id)
+                context = {'form': DMARCRecordForm(instance=record, user=request.user), 'txt': record.txt_record, 'record': record.dmarc_record}
+                return render(request, 'dmarc_generator.html', context=context)
+            except DMARCRecord.DoesNotExist:
+                record = None
+                form = DMARCRecordForm(initial={'domain': domain}, user=request.user)
         else:
-            form = DMARCRecordForm()
+            form = DMARCRecordForm(user=request.user)
     return render(request, 'dmarc_generator.html', {'form': form})
 
 

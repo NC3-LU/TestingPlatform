@@ -221,7 +221,7 @@ def add_mail_domain(request):
                 except socket.gaierror:
                     messages.error(request, "Your domain name couldn't be resolved, please verify you entered your "
                                             "domain name correctly.")
-                    return redirect('add_domain')
+                    return redirect('add_mail_domain')
                 domain = MailDomain(
                     user=user,
                     domain=data['domain']

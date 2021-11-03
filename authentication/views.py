@@ -155,8 +155,7 @@ def add_domain(request):
                     db_domain = None
                 if db_domain:
                     if db_domain.user == request.user:
-                        messages.error(request,
-                                       'You already registered this domain in your company domains.')
+                        messages.error(request, 'You already registered this domain in your company domains.')
                     else:
                         messages.error(request, 'This domain is already registered by someone else. Please contact '
                                                 'contact.testing@c3.lu if you think someone is monitoring your systems')
@@ -205,13 +204,31 @@ def add_mail_domain(request):
         form = MailDomainForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
-            domain = MailDomain(
-                user=user,
-                domain=data['domain']
-            )
-            domain.save()
-            messages.success(request, 'Domain added')
-            return redirect('edit')
+            try:
+                mail_domain = MailDomain.objects.get(domain=data['domain'])
+            except MailDomain.DoesNotExist:
+                mail_domain = None
+            if mail_domain:
+                if mail_domain.user == request.user:
+                    messages.error(request, 'You already registered this domain in your mail domains.')
+                else:
+                    messages.error(request, 'This domain is already registered by someone else. Please contact '
+                                            'contact.testing@c3.lu if you think someone is monitoring your systems')
+            else:
+                domain = data['domain']
+                try:
+                    socket.gethostbyname(domain)
+                except socket.gaierror:
+                    messages.error(request, "Your domain name couldn't be resolved, please verify you entered your "
+                                            "domain name correctly.")
+                    return redirect('add_domain')
+                domain = MailDomain(
+                    user=user,
+                    domain=data['domain']
+                )
+                domain.save()
+                messages.success(request, 'Domain added')
+                return redirect('edit')
     else:
         form = MailDomainForm()
     return render(request, 'add_domain.html', {'form': form, 'type': 'mail'})
@@ -220,6 +237,10 @@ def add_mail_domain(request):
 @login_required
 def remove_mail_domain(request, domain):
     mail_domain = MailDomain.objects.get(domain=domain)
-    mail_domain.delete()
-    messages.success(request, f'Successfully removed {domain} from your managed mail domains')
-    return redirect('edit')
+    if mail_domain.user == request.user:
+        mail_domain.delete()
+        messages.success(request, f'Successfully removed {domain} from your managed mail domains')
+        return redirect('edit')
+    else:
+        messages.error(request, 'This domain is not registered under your account, permission denied')
+        return redirect('edit')

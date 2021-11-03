@@ -13,13 +13,14 @@ from imap_tools import MailBox, AND
 from subprocess import check_output
 from urllib.parse import urlparse, parse_qs
 
+import re
 from ipwhois import IPWhois, IPDefinedError
 from .helpers import get_http_report, get_tls_report
 from django.views.decorators.http import require_http_methods
 
 from authentication.models import User
 from .models import DMARCRecord, DMARCReport, MailDomain
-from .forms import DMARCRecordForm
+from .forms import DMARCRecordForm, SPFRecordForm
 
 from testing_platform import settings
 
@@ -76,14 +77,29 @@ def http_test(request):
 
 @login_required
 def spf_generator(request):
-    return render(request, 'spf_generator.html')
-    # if not request.user.maildomain_set.filter(user=request.user).last():
-    #    print(request.user.maildomain_set.filter(user=request.user).last())
-    #    messages.error(request, 'Please add a mail domain in your profile first.')
-    #    return redirect('test_index')
-    # else:
-    #    domains = MailDomain.objects.filter(user=request.user)
-    #    return render(request, 'spf_generator.html', {'domains': domains})
+    if request.method == 'POST':
+        form = SPFRecordForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            record = 'v=spf1 mx '
+            hosts = data['hosts'].split(',')
+            for host in hosts:
+                if host:
+                    if ' ' in host:
+                        host = host.replace(' ', '')
+                    match_ip = re.fullmatch(r'^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$', host)
+                    match_hostname = re.fullmatch(r'^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$', host)
+                    if match_ip or match_hostname:
+                        record += f'a:{host} '
+                    else:
+                        messages.error(request, 'One of the specified host / ip address does not match expected format.'
+                                                ' Please correct your entered data.')
+                        return render(request, 'spf_generator.html', {'form': form})
+            record += data['policy']
+            return render(request, 'spf_generator.html', {'form': form, 'record': record})
+    else:
+        form = SPFRecordForm()
+        return render(request, 'spf_generator.html', {'form': form})
 
 
 @login_required

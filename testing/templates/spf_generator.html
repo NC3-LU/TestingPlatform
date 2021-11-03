@@ -1,71 +1,53 @@
 {% extends "base.html" %}
-
+{% load i18n static %}
 
 {% block content %}
+
+{% if form.errors and not form.non_field_errors %}
+<p class="errornote">
+    {% if form.errors.items|length == 1 %}
+    {% translate "Please correct the error below." %}
+    {% else %}
+    {% translate "Please correct the errors below." %}
+    {% endif %}
+</p>
+{% endif %}
+
+{% if form.non_field_errors %}
+{% for error in form.non_field_errors %}
+<p class="errornote">
+    {{ error }}
+</p>
+{% endfor %}
+{% endif %}
+
 <main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
-    <h1 class="authForm p-5 d-flex justify-content-center">SPF Generator</h1>
-    <div class="authForm p-5">
-        <h4>This form will assist you in creating an SPF record for your domain:</h4>
-       <!-- Please enter the domain the record should be generated for:
-        <select class="form-control" id="domain" name="domain">
-            {% for domain in domains %}
-                <option value="{{ domain.domain }}">{{ domain.domain }}</option>
+    <h1 class="authForm p-5 d-flex justify-content-center">SPF Record Generator</h1>
+    <form class="p-5 authForm" action="{{ app_path }}" method="post" id="test-form">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-floating mb-4">
+            {% if field.help_text %}
+                <small>{{ field.help_text }}</small>
+            {% endif %}
+            {{ field }}
+            {% for error in field.errors %}
+            <p style="color: red">{{ error }}</p>
             {% endfor %}
-        </select>-->
-        <br>
-        Do you send email from this server?
-        <select class="form-control" id="mail" name="mail">
-            <option value="a" selected>Yes</option>
-            <option value="">No</option>
-        </select>
-        <br>
-        Is your MX record pointing to this server? :
-        <select class="form-control" id="mx" name="mx">
-            <option value="mx" selected>Yes</option>
-            <option value="">No</option>
-        </select>
-        <br>
-        How strict should the SPF Policy be? :
-        <select class="form-control" id="policy" name="policy">
-            <option value="-all">strict</option>
-            <option value="?all">neutral</option>
-            <option value="~all" selected>soft fail</option>
-        </select>
-        <br>
-        Enter any other ip address or domain that delivers email for your domain (please separate by comma):
-        <input type="text" id="others" size="45">
-        <br>
-        <input class="btn btn-primary" type="button" onclick="generate();" value="Generate SPF record">
-        <br>
-        <div id="result" class="mt-2" style="display: none;">
-            Please add a TXT record to your domain with the following content:<br>
-            <div id="txt" class="bg-light p-2 text-dark"></div>
         </div>
-    </div>
+        {% endfor %}
+
+        <input class="btn btn-primary" type="submit" value="{% translate 'Generate' %}">
+    </form>
+
+    {% if record %}
+    <section class="result-content authForm p-5">
+        <div id="result">
+            This is your SPF record, to be added in a TXT entry in your DNS record:<br>
+            <div class="bg-light p-2 text-dark">{{ record }}</div>
+        </div>
+    </section>
+    {% endif %}
+
 </main>
-<script type="text/javascript">
-        function addHost(item, index, arr){
-           document.getElementById('txt').innerHTML +=" a:" + item.trim() ;
-        }
-        function generate()
-        {
-            let e = document.getElementById('others');
-            hosts = e.value.split(',');
-            // console.log(e);
-            // console.log(hosts);
-            e = document.getElementById('mail');
-            mail = e.options[e.selectedIndex].value;
-            e = document.getElementById('mx');
-            mx = e.options[e.selectedIndex].value;
-            e = document.getElementById('policy');
-            policy = e.options[e.selectedIndex].value;
-            document.getElementById('result').style.display = "block";
-            document.getElementById('txt').innerHTML = "v=spf1 " + mail + "  " + mx;
-            hosts.forEach(addHost);
-            document.getElementById('txt').innerHTML +=" " + policy;
-        }
-
-
-
-</script>
 {% endblock %}

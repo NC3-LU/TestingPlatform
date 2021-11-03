@@ -1,4 +1,5 @@
 import socket
+import urllib
 from django.db import models
 from authentication.models import User
 
@@ -48,7 +49,7 @@ class DMARCRecord(models.Model):
 
     def save(self, *args, **kwargs):
         domain = self.domain.domain.strip('www.')
-        self.mailto = f'report+{self.user.company_name.replace(" ", "_")}-{domain}@test-dmarc.lu'
+        self.mailto = f'report+{urllib.parse.quote_plus(self.user.company_name.replace(" ", "_"))}-{domain}@test-dmarc.lu'
 
         self.txt_record = f'_dmarc.{domain}'
 

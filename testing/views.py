@@ -14,6 +14,7 @@ from subprocess import check_output
 from urllib.parse import urlparse, parse_qs
 
 import re
+import ipaddress
 from ipwhois import IPWhois, IPDefinedError
 from .helpers import get_http_report, get_tls_report
 from django.views.decorators.http import require_http_methods
@@ -87,9 +88,14 @@ def spf_generator(request):
                 if host:
                     if ' ' in host:
                         host = host.replace(' ', '')
-                    match_ip = re.fullmatch(r'^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$', host)
+                    try:
+                        match_ip = ipaddress.ip_address(host)
+                    except ValueError:
+                        match_ip = None
                     match_hostname = re.fullmatch(r'^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$', host)
-                    if match_ip or match_hostname:
+                    if match_ip:
+                        record += f'ip{match_ip.version}:{host} '
+                    elif match_hostname:
                         record += f'a:{host} '
                     else:
                         messages.error(request, 'One of the specified host / ip address does not match expected format.'
@@ -179,7 +185,7 @@ def dmarc_upload(request):
     uri = request.get_raw_uri()
     params = parse_qs(urlparse(uri).query)
     if params['api-key'][0] == settings.DMARC_API_KEY:
-        record = DMARCRecord.objects.get(mailto=params['to'][0])
+        record = DMARCRecord.objects.get(mailto__iexact=params['to'][0])
         report = request.POST['report']
         dmarc_report = DMARCReport(
             dmarc_record=record,

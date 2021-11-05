@@ -49,7 +49,8 @@ class DMARCRecord(models.Model):
 
     def save(self, *args, **kwargs):
         domain = self.domain.domain.strip('www.')
-        self.mailto = f'report+{urllib.parse.quote_plus(self.user.company_name.replace(" ", "_"))}-{domain}@test-dmarc.lu'
+        orga = self.user.company_name.replace(" ", "_")
+        self.mailto = f'report+{urllib.parse.quote_plus(orga)}-{domain}@test-dmarc.lu'
 
         self.txt_record = f'_dmarc.{domain}'
 
@@ -63,7 +64,7 @@ class DMARCRecord(models.Model):
         else:
             dkim = self.dkim_policy
 
-        self.dmarc_record = f'v=DMARC1; p={self.policy}; {spf}{dkim}rua=mailto:{self.mailto}'
+        self.dmarc_record = f'v=DMARC1; p={self.policy}; {spf}{dkim}rua=mailto:{self.mailto};'
 
         super().save()
 

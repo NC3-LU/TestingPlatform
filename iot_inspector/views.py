@@ -55,7 +55,6 @@ def analysis_request(request):
 
 @login_required
 def download_report(request, firmware_uuid):
-    client = client_login(request.user.iotuser)
     a_req = AnalysisRequest.objects.get(firmware_uuid=firmware_uuid)
     req = api_get_report(request.user, str(a_req.report_uuid))
     file = req.content

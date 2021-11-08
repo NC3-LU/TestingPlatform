@@ -11,7 +11,8 @@ urlpatterns = [
 
     path('dmarc-generator/', views.dmarc_generator, name='dmarc-generator'),
     path('dmarc-reporter/', views.dmarc_reporter, name='dmarc-reporter'),
-    path('dmarc-reporter/<str:domain>/<mailfrom>/<timestamp>', views.dmarc_shower, name='dmarc-shower'),
+    path('dmarc-reporter/<str:domain>/<mailfrom>/<timestamp>/', views.dmarc_shower, name='dmarc-shower'),
+    path('dmarc-reporter/<str:domain>/<mailfrom>/<timestamp>/download/', views.dmarc_dl, name='dmarc-dl'),
     # path('dmarc-reporter/upload/', views.dmarc_upload, name='dmarc-uploader'),
 
     path('automation/', include('automation.urls')),

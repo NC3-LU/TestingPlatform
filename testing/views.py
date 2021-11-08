@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.core.files.base import ContentFile
 from django.template.response import TemplateResponse
 
 from imap_tools import MailBox, AND
@@ -170,14 +171,31 @@ def dmarc_reporter(request):
 
 @login_required
 def dmarc_shower(request, domain, mailfrom, timestamp):
-    dmarc_report = DMARCReport.objects.get(mail_from=mailfrom, timestamp=timestamp)
-    if dmarc_report.dmarc_record.user == request.user:
+    dmarc_report = DMARCReport.objects.get(mail_from=mailfrom, timestamp=timestamp, dmarc_record__domain__domain=domain)
+    if dmarc_report.dmarc_record.user == request.user and request.user.maildomain_set.filter(domain=domain):
         report = xmltodict.parse(dmarc_report.report)
         record = report['feedback']['record']
         if not isinstance(record, list):
             record = [record]
         return render(request, 'dmarc_shower.html', {'report': report, 'records': record, 'domain': domain,
-                                                 'timestamp': timestamp, 'mailfrom': mailfrom})
+                                                     'timestamp': timestamp, 'mailfrom': mailfrom})
+    else:
+        messages.error(request, 'Unauthorized')
+        return redirect('index')
+
+
+@login_required
+def dmarc_dl(request, domain, mailfrom, timestamp):
+    dmarc_report = DMARCReport.objects.get(mail_from=mailfrom, timestamp=timestamp, dmarc_record__domain__domain=domain)
+    if dmarc_report.dmarc_record.user == request.user and request.user.maildomain_set.filter(domain=domain):
+        report = dmarc_report.report
+        file = ContentFile(content=report)
+        response = HttpResponse(file, headers={
+            'Content-Type': 'application/xml',
+            'Content-Disposition': f'attachment; '
+                                   f'filename="dmarc_{domain}_{mailfrom}_{timestamp}.xml"'
+        })
+        return response
     else:
         messages.error(request, 'Unauthorized')
         return redirect('index')

@@ -2,7 +2,7 @@ import ipaddress
 import socket
 
 from django.utils.safestring import mark_safe
-from ipwhois import IPWhois
+from ipwhois import IPWhois, exceptions
 from django import template
 
 register = template.Library()
@@ -34,14 +34,17 @@ def get_ip(domain):
 @register.filter('get_asn')
 def get_asn(address):
     if ipaddress.ip_address(address):
-        obj = IPWhois(address)
-        d = obj.lookup_rdap(depth=1)
-        result = f"""
-              ASN:{d["asn"]}<br>
-              ASN Description: {d["asn_description"]}<br>
-              ASN Registry: {d["asn_registry"]}<br>
-              Entities: {d["entities"]}
-              """
+        try:
+            obj = IPWhois(address)
+            d = obj.lookup_rdap(depth=1)
+            result = f"""
+                        ASN:{d["asn"]}<br>
+                        ASN Description: {d["asn_description"]}<br>
+                        ASN Registry: {d["asn_registry"]}<br>
+                        Entities: {d["entities"]}
+                     """
+        except exceptions.HTTPLookupError:
+            result = ''
     else:
         result = "No IP for ASN"
     return mark_safe(result)

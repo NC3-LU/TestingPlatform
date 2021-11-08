@@ -24,7 +24,7 @@
                                 <th>{{ report.mail_from }}</th>
                                 <td>{{ report.timestamp|timestamp_to_time|date:"Y-m-d h:m:s" }}</td>
                                 <td><a class="btn btn-primary"
-                                       href="/test/dmarc-reporter/{{ domain }}/{{ report.mail_from }}/{{ report.timestamp }}">
+                                       href="/infra-testing/dmarc-reporter/{{ domain }}/{{ report.mail_from }}/{{ report.timestamp }}">
                                     View report
                                 </a></td>
                             </tr>

@@ -171,12 +171,16 @@ def dmarc_reporter(request):
 @login_required
 def dmarc_shower(request, domain, mailfrom, timestamp):
     dmarc_report = DMARCReport.objects.get(mail_from=mailfrom, timestamp=timestamp)
-    report = xmltodict.parse(dmarc_report.report)
-    record = report['feedback']['record']
-    if not isinstance(record, list):
-        record = [record]
-    return render(request, 'dmarc_shower.html', {'report': report, 'records': record, 'domain': domain,
+    if dmarc_report.dmarc_record.user == request.user:
+        report = xmltodict.parse(dmarc_report.report)
+        record = report['feedback']['record']
+        if not isinstance(record, list):
+            record = [record]
+        return render(request, 'dmarc_shower.html', {'report': report, 'records': record, 'domain': domain,
                                                  'timestamp': timestamp, 'mailfrom': mailfrom})
+    else:
+        messages.error(request, 'Unauthorized')
+        return redirect('index')
 
 
 @csrf_exempt

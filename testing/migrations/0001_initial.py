@@ -15,58 +15,148 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='DMARCRecord',
+            name="DMARCRecord",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('policy', models.CharField(choices=[('none', 'Do nothing, just inform me (Recommended)'), ('quarantine', 'Quarantine the email'), ('reject', 'Reject the email')], default='none', help_text='How should the mail be treated?', max_length=15)),
-                ('spf_policy', models.CharField(choices=[('relaxed', 'Relaxed (Default)'), ('aspf=s; ', 'Strict')], default='', max_length=15, verbose_name='SPF Policy')),
-                ('dkim_policy', models.CharField(choices=[('relaxed', 'Relaxed (Default)'), ('adkim=s; ', 'Strict')], default='', max_length=15, verbose_name='DKIM Policy')),
-                ('txt_record', models.CharField(max_length=100)),
-                ('dmarc_record', models.CharField(max_length=100)),
-                ('mailto', models.EmailField(max_length=254)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "policy",
+                    models.CharField(
+                        choices=[
+                            ("none", "Do nothing, just inform me (Recommended)"),
+                            ("quarantine", "Quarantine the email"),
+                            ("reject", "Reject the email"),
+                        ],
+                        default="none",
+                        help_text="How should the mail be treated?",
+                        max_length=15,
+                    ),
+                ),
+                (
+                    "spf_policy",
+                    models.CharField(
+                        choices=[
+                            ("relaxed", "Relaxed (Default)"),
+                            ("aspf=s; ", "Strict"),
+                        ],
+                        default="",
+                        max_length=15,
+                        verbose_name="SPF Policy",
+                    ),
+                ),
+                (
+                    "dkim_policy",
+                    models.CharField(
+                        choices=[
+                            ("relaxed", "Relaxed (Default)"),
+                            ("adkim=s; ", "Strict"),
+                        ],
+                        default="",
+                        max_length=15,
+                        verbose_name="DKIM Policy",
+                    ),
+                ),
+                ("txt_record", models.CharField(max_length=100)),
+                ("dmarc_record", models.CharField(max_length=100)),
+                ("mailto", models.EmailField(max_length=254)),
             ],
         ),
         migrations.CreateModel(
-            name='UserDomain',
+            name="UserDomain",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('domain', models.CharField(max_length=255)),
-                ('ip_address', models.GenericIPAddressField(blank=True, null=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("domain", models.CharField(max_length=255)),
+                ("ip_address", models.GenericIPAddressField(blank=True, null=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='MailDomain',
+            name="MailDomain",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('domain', models.CharField(max_length=255)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("domain", models.CharField(max_length=255)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='DMARCReport',
+            name="DMARCReport",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('timestamp', models.CharField(max_length=15)),
-                ('mail_from', models.EmailField(max_length=254)),
-                ('report', models.JSONField()),
-                ('dmarc_record', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='testing.dmarcrecord')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("timestamp", models.CharField(max_length=15)),
+                ("mail_from", models.EmailField(max_length=254)),
+                ("report", models.JSONField()),
+                (
+                    "dmarc_record",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="testing.dmarcrecord",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='dmarcrecord',
-            name='domain',
-            field=models.OneToOneField(help_text='Please select the domain name the record should be generated for', on_delete=django.db.models.deletion.CASCADE, to='testing.maildomain'),
+            model_name="dmarcrecord",
+            name="domain",
+            field=models.OneToOneField(
+                help_text="Please select the domain name the record should be generated for",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="testing.maildomain",
+            ),
         ),
         migrations.AddField(
-            model_name='dmarcrecord',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="dmarcrecord",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

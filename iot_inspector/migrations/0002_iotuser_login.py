@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('iot_inspector', '0001_initial'),
+        ("iot_inspector", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='iotuser',
-            name='login',
+            model_name="iotuser",
+            name="login",
             field=models.EmailField(default=None, max_length=254),
             preserve_default=False,
         ),

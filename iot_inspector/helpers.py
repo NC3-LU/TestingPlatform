@@ -18,33 +18,54 @@ def generate_nonce():
 
 def api_login(email, password):
     headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        "Accept": "application/json",
+        "Content-Type": "application/json",
     }
-    payload = json.dumps({"client_id": settings.IOT_CLIENT_ID, "nonce": f"{generate_nonce()}",
-                          "email": email, "password": password})
-    endpoint = settings.IOT_API_URL + 'authorize'
-    id_token = requests.post(endpoint, headers=headers, data=payload).json()['id_token']
-    tenant_id = jwt.decode(id_token, options={"verify_signature": False},
-                           audience='NeSPys5jIT_3OKn7R_ZyBqPubkDl9amI3sGOxJLXCy4')['https://www.iot-inspector.com/tenants'][0]['id']
+    payload = json.dumps(
+        {
+            "client_id": settings.IOT_CLIENT_ID,
+            "nonce": f"{generate_nonce()}",
+            "email": email,
+            "password": password,
+        }
+    )
+    endpoint = settings.IOT_API_URL + "authorize"
+    id_token = requests.post(endpoint, headers=headers, data=payload).json()["id_token"]
+    tenant_id = jwt.decode(
+        id_token,
+        options={"verify_signature": False},
+        audience="NeSPys5jIT_3OKn7R_ZyBqPubkDl9amI3sGOxJLXCy4",
+    )["https://www.iot-inspector.com/tenants"][0]["id"]
 
-    payload = json.dumps({"client_id": settings.IOT_CLIENT_ID, "nonce": f"{generate_nonce()}",
-                          "id_token": id_token, 'tenant_id': tenant_id})
-    endpoint = settings.IOT_API_URL + 'token'
+    payload = json.dumps(
+        {
+            "client_id": settings.IOT_CLIENT_ID,
+            "nonce": f"{generate_nonce()}",
+            "id_token": id_token,
+            "tenant_id": tenant_id,
+        }
+    )
+    endpoint = settings.IOT_API_URL + "token"
     response = requests.post(endpoint, headers=headers, data=payload).json()
     return response
 
 
 def api_add_user(iotuser, token):
     headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {token}'
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
-    endpoint = settings.IOT_API_URL + 'add-user'
+    endpoint = settings.IOT_API_URL + "add-user"
     signer = Signer()
-    payload = json.dumps({'email': iotuser.user.email, 'password': signer.unsign_object(iotuser.password),
-                          'policy': True, 'company_name': iotuser.user.company_name})
+    payload = json.dumps(
+        {
+            "email": iotuser.user.email,
+            "password": signer.unsign_object(iotuser.password),
+            "policy": True,
+            "company_name": iotuser.user.company_name,
+        }
+    )
     response = requests.post(endpoint, headers=headers, data=payload)
     return response
 
@@ -59,7 +80,7 @@ def get_product_group_id(client):
     }
     """
     res = client.query(query)
-    return next(pg for pg in res["allProductGroups"] if pg["name"] == "Default")['id']
+    return next(pg for pg in res["allProductGroups"] if pg["name"] == "Default")["id"]
 
 
 def client_login(iot_user):
@@ -81,7 +102,9 @@ def get_default_product_group(client):
     }
     """
     res = client.query(GET_PRODUCT_GROUPS)
-    default_product_group = next(pg for pg in res["allProductGroups"] if pg["name"] == "Default")
+    default_product_group = next(
+        pg for pg in res["allProductGroups"] if pg["name"] == "Default"
+    )
     return default_product_group
 
 
@@ -90,7 +113,7 @@ def client_upload_firmware(client, analysis_request, default_product_group):
         name=analysis_request.name,
         vendor_name=analysis_request.vendor_name,
         product_name=analysis_request.product_name,
-        product_group_id=default_product_group['id']
+        product_group_id=default_product_group["id"],
     )
     firmware_path = Path(analysis_request.file.path)
     res = client.upload_firmware(metadata, firmware_path, enable_monitoring=True)
@@ -129,7 +152,11 @@ def client_get_or_generate_report_config(client):
     """
     res = client.query(GET_ALL_REPORT_CONFIGS)
     try:
-        report_config = next(cfg for cfg in res['allReportConfigurations'] if cfg['name'] == 'Default Report')
+        report_config = next(
+            cfg
+            for cfg in res["allReportConfigurations"]
+            if cfg["name"] == "Default Report"
+        )
     except StopIteration:
         report_config = None
     if report_config:
@@ -137,13 +164,17 @@ def client_get_or_generate_report_config(client):
     else:
         client.query(GENERATE_REPORT_CONFIG)
         res = client.query(GET_ALL_REPORT_CONFIGS)
-        report_config = next(cfg for cfg in res['allReportConfigurations'] if cfg['name'] == 'Default Report')
+        report_config = next(
+            cfg
+            for cfg in res["allReportConfigurations"]
+            if cfg["name"] == "Default Report"
+        )
         return report_config
 
 
 def client_generate_report(client, firmware_uuid):
     report_config = client_get_or_generate_report_config(client)
-    report_config = report_config['id']
+    report_config = report_config["id"]
     GENERATE_REPORT = """
     
     mutation M {
@@ -176,9 +207,12 @@ def client_generate_report(client, firmware_uuid):
         }
       }  
     }
-    """ % (report_config, firmware_uuid)
+    """ % (
+        report_config,
+        firmware_uuid,
+    )
     res = client.query(GENERATE_REPORT)
-    report = res['generateReport']
+    report = res["generateReport"]
     return report
 
 
@@ -189,8 +223,8 @@ def client_get_report_link(client, report_uuid):
     }
     """
     res = client.query(GET_ALL_REPORTS)
-    report = next(rep for rep in res['allReports'] if rep['id'] == str(report_uuid))
-    return report['state'], report['downloadUrl']
+    report = next(rep for rep in res["allReports"] if rep["id"] == str(report_uuid))
+    return report["state"], report["downloadUrl"]
 
 
 def client_get_all_reports_states(client, analysis_requests):
@@ -203,9 +237,11 @@ def client_get_all_reports_states(client, analysis_requests):
     states = []
     for req in analysis_requests:
         if req.report_uuid:
-            state = (next(rep for rep in res['allReports'] if rep['id'] == str(req.report_uuid))['state'])
+            state = next(
+                rep for rep in res["allReports"] if rep["id"] == str(req.report_uuid)
+            )["state"]
         else:
-            state = 'Pending'
+            state = "Pending"
         states.append(state.capitalize())
     return zip(analysis_requests, states)
 
@@ -214,14 +250,14 @@ def api_get_report(user, report_uuid):
     signer = Signer()
     iot_user = user.iotuser
     login = api_login(iot_user.user.email, signer.unsign_object(iot_user.password))
-    token = login['tenant_token']
+    token = login["tenant_token"]
     headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {token}'
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
-    endpoint = settings.IOT_API_URL + f'reports/{report_uuid}/pdf'
+    endpoint = settings.IOT_API_URL + f"reports/{report_uuid}/pdf"
     req = requests.get(url=endpoint, headers=headers)
     return req
 

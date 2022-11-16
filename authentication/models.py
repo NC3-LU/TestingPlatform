@@ -10,22 +10,25 @@ class User(AbstractUser):
     post_code = models.CharField(max_length=200)
     city = models.CharField(max_length=200)
     vat_number = models.CharField(max_length=200)
-    tier_level = models.PositiveSmallIntegerField(choices=((0, 'None'), (1, 'PRO'), (2, 'BUSINESS')), default=0)
+    tier_level = models.PositiveSmallIntegerField(
+        choices=((0, "None"), (1, "PRO"), (2, "BUSINESS")), default=0
+    )
 
 
 class SubscriptionBase(models.Model):
-    tier_level = models.PositiveSmallIntegerField(choices=((1, 'PRO'), (2, 'BUSINESS')),
-                                                  help_text='Choose a package')
+    tier_level = models.PositiveSmallIntegerField(
+        choices=((1, "PRO"), (2, "BUSINESS")), help_text="Choose a package"
+    )
 
     def get_tier_level(self):
         if self.tier_level == 1:
-            tier = 'PRO'
+            tier = "PRO"
         else:
-            tier = 'BUSINESS'
+            tier = "BUSINESS"
         return tier
 
     def __str__(self):
-        return f'{self.user.username}_{self.user.company_name}'
+        return f"{self.user.username}_{self.user.company_name}"
 
     class Meta:
         abstract = True
@@ -53,7 +56,7 @@ class SubscriptionRequest(SubscriptionBase):
 
     def __str__(self):
         if self.tier_level == 1:
-            tier = 'pro'
+            tier = "pro"
         else:
-            tier = 'business'
-        return f'{self.user.username}_{tier}'
+            tier = "business"
+        return f"{self.user.username}_{tier}"

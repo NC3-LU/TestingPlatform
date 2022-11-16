@@ -16,29 +16,70 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='IOTUser',
+            name="IOTUser",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('password', models.CharField(editable=False, max_length=200)),
-                ('activated', models.BooleanField(default=False)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("password", models.CharField(editable=False, max_length=200)),
+                ("activated", models.BooleanField(default=False)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='AnalysisRequest',
+            name="AnalysisRequest",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('request_nb', models.CharField(max_length=12)),
-                ('name', models.CharField(max_length=200)),
-                ('vendor_name', models.CharField(max_length=200)),
-                ('product_name', models.CharField(max_length=200)),
-                ('file', models.FileField(upload_to=iot_inspector.models.get_upload_path)),
-                ('status', models.BooleanField(blank=True, default=None, null=True)),
-                ('firmware_uuid', models.UUIDField(blank=True, default=None, null=True)),
-                ('report_uuid', models.UUIDField(blank=True, default=None, null=True)),
-                ('report_link', models.URLField(blank=True, default=None, null=True)),
-                ('iot_user', models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, to='iot_inspector.iotuser')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("request_nb", models.CharField(max_length=12)),
+                ("name", models.CharField(max_length=200)),
+                ("vendor_name", models.CharField(max_length=200)),
+                ("product_name", models.CharField(max_length=200)),
+                (
+                    "file",
+                    models.FileField(upload_to=iot_inspector.models.get_upload_path),
+                ),
+                ("status", models.BooleanField(blank=True, default=None, null=True)),
+                (
+                    "firmware_uuid",
+                    models.UUIDField(blank=True, default=None, null=True),
+                ),
+                ("report_uuid", models.UUIDField(blank=True, default=None, null=True)),
+                ("report_link", models.URLField(blank=True, default=None, null=True)),
+                (
+                    "iot_user",
+                    models.ForeignKey(
+                        default=None,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="iot_inspector.iotuser",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

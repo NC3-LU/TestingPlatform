@@ -20,14 +20,13 @@ from testing_platform import settings
 from testing import views
 
 urlpatterns = [
-    path('', include('landing_page.urls')),
-    path('', include('authentication.urls')),
-    path('', include('legal_section.urls')),
-    path('infra-testing/', include('testing.urls')),
-    path('c3-protocols/', include('c3_protocols.urls')),
-    path('specialized-testing/', include('specialized_testing.urls')),
-    path('admin/', admin.site.urls),
-    path('contact/', include('contact.urls')),
-    path('test/dmarc-reporter/upload/', views.dmarc_upload, name='dmarc-uploader'),
+    path("", include("landing_page.urls")),
+    path("", include("authentication.urls")),
+    path("", include("legal_section.urls")),
+    path("infra-testing/", include("testing.urls")),
+    path("c3-protocols/", include("c3_protocols.urls")),
+    path("specialized-testing/", include("specialized_testing.urls")),
+    path("admin/", admin.site.urls),
+    path("contact/", include("contact.urls")),
+    path("test/dmarc-reporter/upload/", views.dmarc_upload, name="dmarc-uploader"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-

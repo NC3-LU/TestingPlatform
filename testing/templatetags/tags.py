@@ -8,7 +8,7 @@ from django import template
 register = template.Library()
 
 
-@register.filter('get_host')
+@register.filter("get_host")
 def get_host(address):
     if address is not None:
         try:
@@ -20,7 +20,7 @@ def get_host(address):
         return "No IP to check"
 
 
-@register.filter('get_ip')
+@register.filter("get_ip")
 def get_ip(domain):
     if domain is not None:
         try:
@@ -31,7 +31,7 @@ def get_ip(domain):
         return "No domain to check"
 
 
-@register.filter('get_asn')
+@register.filter("get_asn")
 def get_asn(address):
     if ipaddress.ip_address(address):
         try:
@@ -44,7 +44,7 @@ def get_asn(address):
                         Entities: {d["entities"]}
                      """
         except exceptions.HTTPLookupError:
-            result = ''
+            result = ""
     else:
         result = "No IP for ASN"
     return mark_safe(result)

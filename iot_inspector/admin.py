@@ -1,21 +1,18 @@
+import logging
+
 from django.contrib import admin
 from django.contrib import messages
 
-
-from .helpers import (
-    api_login,
-    api_add_user,
-    client_login,
-    client_upload_firmware,
-    get_default_product_group,
-    client_get_report_link,
-    client_generate_report,
-)
-from .models import AnalysisRequest, IOTUser
+from .helpers import api_add_user
+from .helpers import api_login
+from .helpers import client_generate_report
+from .helpers import client_get_report_link
+from .helpers import client_login
+from .helpers import client_upload_firmware
+from .helpers import get_default_product_group
+from .models import AnalysisRequest
+from .models import IOTUser
 from testing_platform import settings
-
-import time
-import logging
 
 
 logger = logging.getLogger(__name__)

@@ -1,9 +1,11 @@
-from django.contrib import messages
-
-from testing.helpers import get_http_report, get_tls_report
 import socket
 import subprocess
-from ipwhois import IPWhois, IPDefinedError
+
+from ipwhois import IPDefinedError
+from ipwhois import IPWhois
+
+from testing.helpers import get_http_report
+from testing.helpers import get_tls_report
 
 
 def whois_lookup(host):

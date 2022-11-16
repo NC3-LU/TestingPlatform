@@ -1,14 +1,11 @@
-from django.db import models
-from authentication.models import User
-from decouple import config
-from .helpers import get_fs_storage
 import datetime
-from django.core.files.storage import FileSystemStorage
-from django.core.signing import Signer
-
+import os
 import secrets
 
-import os
+from django.core.signing import Signer
+from django.db import models
+
+from authentication.models import User
 
 
 def get_upload_path(instance, filename):
@@ -83,7 +80,7 @@ class AnalysisRequest(models.Model):
                     self.request_nb = request_id + 1
                 else:
                     pass
-            except:
+            except Exception:
                 request_id = 1
                 self.request_nb = (
                     f'{request_date.year}{request_date.month}{(2-len(str(request_date.day)))*"0"}'

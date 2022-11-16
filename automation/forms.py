@@ -1,9 +1,9 @@
 from django import forms
-from django.db.models import QuerySet
 
-from .models import PingAutomatedTest, WhoisAutomatedTest, HttpAutomatedTest
+from .models import HttpAutomatedTest
+from .models import PingAutomatedTest
+from .models import WhoisAutomatedTest
 from testing.models import UserDomain
-from authentication.models import User
 
 
 class AutomatedTestForm(forms.ModelForm):

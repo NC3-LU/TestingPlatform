@@ -1,23 +1,18 @@
 import os
 
-from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect, HttpResponse, FileResponse
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.http import FileResponse
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.shortcuts import render
 
 from .forms import AnalysisRequestForm
+from .helpers import api_get_report
+from .helpers import client_get_all_reports_states
+from .helpers import client_login
+from .helpers import settings
 from .models import AnalysisRequest
-from .helpers import (
-    api_get_report,
-    client_get_report_link,
-    client_get_all_reports_states,
-)
-
-from iot_inspector_client import FirmwareMetadata
-from datetime import date
-import mimetypes
-
-from .helpers import *
 
 
 @login_required

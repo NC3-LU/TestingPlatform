@@ -1,7 +1,6 @@
 import django.utils.timezone
-from django.db import models
 from django.contrib.auth.models import AbstractUser
-from datetime import datetime
+from django.db import models
 
 
 class User(AbstractUser):

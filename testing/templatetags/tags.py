@@ -1,9 +1,10 @@
 import ipaddress
 import socket
 
-from django.utils.safestring import mark_safe
-from ipwhois import IPWhois, exceptions
 from django import template
+from django.utils.safestring import mark_safe
+from ipwhois import exceptions
+from ipwhois import IPWhois
 
 register = template.Library()
 

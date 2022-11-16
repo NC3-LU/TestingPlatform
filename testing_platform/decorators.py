@@ -1,4 +1,5 @@
 from functools import wraps
+
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 

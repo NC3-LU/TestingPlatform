@@ -1,15 +1,16 @@
+import json
+import secrets
+from pathlib import Path
+
+import jwt
+import requests
+from decouple import config
 from django.core.files.storage import FileSystemStorage
 from django.core.signing import Signer
+from iot_inspector_client import Client
+from iot_inspector_client import FirmwareMetadata
 
 from testing_platform import settings
-
-from decouple import config
-from iot_inspector_client import Client, FirmwareMetadata
-from pathlib import Path
-import secrets
-import requests
-import json
-import jwt
 
 
 def generate_nonce():
@@ -176,38 +177,38 @@ def client_generate_report(client, firmware_uuid):
     report_config = client_get_or_generate_report_config(client)
     report_config = report_config["id"]
     GENERATE_REPORT = """
-    
-    mutation M {
-      generateReport(input: {
-        reportConfigurationId: "%s",
+
+    mutation M {{
+      generateReport(input: {{
+        reportConfigurationId: "{}",
         firmwareIds: [
-          "%s"
+          "{}"
         ],
         title: null,
-       
-      }) {
-        ... on Report {
+
+      }}) {{
+        ... on Report {{
         id,
         title,
         classification,
         generatedTime,
         downloadUrl,
         size,
-       
-       }
-       ... on MutationError {
+
+       }}
+       ... on MutationError {{
           count
-          errors {
+          errors {{
             message
             code
-            ... on ValidationError {
+            ... on ValidationError {{
               fieldPath
-            }
-          }
-        }
-      }  
-    }
-    """ % (
+            }}
+          }}
+        }}
+      }}
+    }}
+    """.format(
         report_config,
         firmware_uuid,
     )

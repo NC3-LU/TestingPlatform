@@ -28,6 +28,14 @@ checkdmarc = "^4.4.5"
 ipwhois = "^1.2.0"
 
 
+[tool.poetry.group.dev.dependencies]
+flake8 = "^5.0.4"
+pre-commit = "^2.20.0"
+black = "^22.10.0"
+pyupgrade = "^3.2.2"
+reorder-python-imports = "^3.9.0"
+autoflake = "^1.7.7"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

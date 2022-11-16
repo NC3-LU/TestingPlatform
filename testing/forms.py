@@ -1,6 +1,7 @@
+from django import forms
+
 from .models import DMARCRecord
 from .models import MailDomain
-from django import forms
 
 
 class DMARCRecordForm(forms.ModelForm):

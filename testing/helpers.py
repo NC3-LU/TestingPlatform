@@ -1,7 +1,8 @@
-import requests
 import json
 import logging
 import time
+
+import requests
 
 from testing.models import TlsScanHistory
 
@@ -87,7 +88,7 @@ def get_http_report(target, rescan):
                     print(f"http scan: got unknown state {state} for {target}")
 
         if counter == 5 and state != "FINISHED":
-            logger.warning(f"http scan: not finished after 5 times, skipping")
+            logger.warning("http scan: not finished after 5 times, skipping")
 
         return {
             "result": response,
@@ -147,6 +148,6 @@ def get_tls_report(target, rescan):
             time.sleep(3)
 
     if completion_perc < 100 and counter == 5:
-        logger.warning(f"tls scan: scan not finished after 5 tries, skipping")
+        logger.warning("tls scan: scan not finished after 5 tries, skipping")
 
     return fetch_tls

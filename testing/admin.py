@@ -1,14 +1,13 @@
 from django.contrib import admin
 from django.contrib.admin.decorators import display
 
+from testing.models import DMARCRecord
+from testing.models import DMARCReport
+from testing.models import MailDomain
+from testing.models import TlsScanHistory
+from testing.models import UserDomain
+
 # Register your models here.
-from testing.models import (
-    UserDomain,
-    MailDomain,
-    DMARCRecord,
-    DMARCReport,
-    TlsScanHistory,
-)
 
 
 class DomainAdmin(admin.ModelAdmin):

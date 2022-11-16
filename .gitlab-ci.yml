@@ -20,7 +20,7 @@ build:
   except:
   - tags
   script:
-  - docker build 
+  - docker build
     -t $DOCKER_IMAGE:$CI_COMMIT_SHA
     --build-arg PYTHON_VERSION=$PYTHON_VERSION
     .

@@ -1,22 +1,27 @@
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
-from django.http import HttpResponseRedirect
-
-from .forms import (
-    SignUpForm,
-    LoginForm,
-    UserUpdateForm,
-    ChangePasswordForm,
-    SubscriptionRequestForm,
-    UserDomainForm,
-    MailDomainForm,
-)
-from .models import SubscriptionRequest, Subscription
-from testing.models import UserDomain, MailDomain
-from iot_inspector.models import IOTUser
 import socket
+
+from django.contrib import messages
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
+from django.contrib.auth import logout
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
+from django.shortcuts import render
+
+from .forms import ChangePasswordForm
+from .forms import LoginForm
+from .forms import MailDomainForm
+from .forms import SignUpForm
+from .forms import SubscriptionRequestForm
+from .forms import UserDomainForm
+from .forms import UserUpdateForm
+from .models import Subscription
+from .models import SubscriptionRequest
+from iot_inspector.models import IOTUser
+from testing.models import MailDomain
+from testing.models import UserDomain
 
 
 def signup(request):
@@ -232,7 +237,7 @@ def remove_domain(request, domain):
 @login_required
 def add_mail_domain(request):
     user = request.user
-    domains = user.maildomain_set.all()
+    user.maildomain_set.all()
     if request.method == "POST":
         form = MailDomainForm(request.POST)
         if form.is_valid():

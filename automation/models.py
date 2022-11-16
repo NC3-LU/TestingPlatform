@@ -1,15 +1,11 @@
-from django.db import models
-from django_q.models import Schedule
-from django_q.tasks import schedule
-import django.utils.timezone
-
-from authentication.models import User
-from automation.tasks import *
-from testing.models import UserDomain
-
 import uuid
 
-from datetime import datetime
+import django.utils.timezone
+from django.db import models
+from django_q.models import Schedule
+
+from authentication.models import User
+from testing.models import UserDomain
 
 
 # Create your models here.
@@ -39,7 +35,7 @@ class AutomatedTest(models.Model):
         null=True,
     )
     monthly_test_date = models.IntegerField(
-        choices=tuple([(d, d) for d in range(1, 29)]),
+        choices=tuple((d, d) for d in range(1, 29)),
         help_text="If monthly, select day in month up to the 28th",
         blank=True,
         null=True,

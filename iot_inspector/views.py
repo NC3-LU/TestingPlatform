@@ -13,18 +13,23 @@ from .helpers import client_get_all_reports_states
 from .helpers import client_login
 from .helpers import settings
 from .models import AnalysisRequest
+from .models import IOTUser
 
 
 @login_required
 def index(request):
-    if request.user.iotuser.activated:
-        client = client_login(request.user.iotuser)
-        reqs = AnalysisRequest.objects.filter(user=request.user.id)
-        all_requests = client_get_all_reports_states(client, reqs)
-        context = {"requests": all_requests}
-        return render(request, "iot_index.html", context=context)
-    else:
-        return render(request, "iot_index.html")
+    try:
+        if IOTUser.objects.get(user=request.user).activated:
+            client = client_login(request.user.iotuser)
+            reqs = AnalysisRequest.objects.filter(user=request.user.id)
+            all_requests = client_get_all_reports_states(client, reqs)
+            context = {"requests": all_requests}
+            return render(request, "iot_index.html", context=context)
+    except IOTUser.DoesNotExist:
+        pass
+    except Exception:
+        pass
+    return render(request, "iot_index.html")
 
 
 @login_required

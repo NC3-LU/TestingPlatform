@@ -85,11 +85,15 @@ def get_product_group_id(client):
 
 
 def client_login(iot_user):
+
     client = Client(api_url=settings.IOT_API_URL)
     signer = Signer()
-    client.login(iot_user.login, signer.unsign_object(iot_user.password))
-    tenant = client.get_tenant(iot_user.user.company_name)
-    client.use_tenant(tenant)
+    try:
+        client.login(iot_user.login, signer.unsign_object(iot_user.password))
+        tenant = client.get_tenant(iot_user.user.company_name)
+        client.use_tenant(tenant)
+    except Exception as e:
+        raise e
     return client
 
 

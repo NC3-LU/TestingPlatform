@@ -27,7 +27,6 @@ xmltodict = "^0.13.0"
 checkdmarc = "^4.4.5"
 ipwhois = "^1.2.0"
 
-
 [tool.poetry.group.dev.dependencies]
 flake8 = "^5.0.4"
 pre-commit = "^2.20.0"
@@ -35,6 +34,11 @@ black = "^22.10.0"
 pyupgrade = "^3.2.2"
 reorder-python-imports = "^3.9.0"
 autoflake = "^1.7.7"
+sphinx-book-theme = "^0.3.2"
+sphinx-multiversion = "^0.2.4"
+sphinx-autodoc-typehints = "^1.18.3"
+sphinxcontrib-mermaid = "^0.7.1"
+sphinxcontrib-bibtex = "^2.5.0"
 
 [build-system]
 requires = ["poetry-core"]

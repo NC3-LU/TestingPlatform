@@ -153,7 +153,7 @@ def dmarc_generator(request):
             }
             return render(request, "dmarc_generator.html", context=context)
     else:
-        uri = request.get_raw_uri()
+        uri = request.build_absolute_uri()
         if urlparse(uri).query:
             domain = MailDomain.objects.get(domain=urlparse(uri).query)
             try:
@@ -249,7 +249,7 @@ def dmarc_dl(request, domain, mailfrom, timestamp):
 @csrf_exempt
 @require_http_methods("POST")
 def dmarc_upload(request):
-    uri = request.get_raw_uri()
+    uri = request.build_absolute_uri()
     params = parse_qs(urlparse(uri).query)
     if params["api-key"][0] == settings.DMARC_API_KEY:
         record = DMARCRecord.objects.get(mailto__iexact=params["to"][0])

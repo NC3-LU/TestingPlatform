@@ -2,4 +2,4 @@
 
 Romain Kieffer <romain.kieffer@nc3.lu>
 Philippe Parage <philippe.parage@nc3.lu>
-Cédric Bonhomme <cedric@cedricbonhomme.org>
+Cedric Bonhomme <cedric@cedricbonhomme.org>

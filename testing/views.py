@@ -65,7 +65,6 @@ def test_landing(request):
     return render(request, "test_landing.html")
 
 
-@login_required
 def http_test(request):
     if request.method == "POST":
         context = {"rescan": False}

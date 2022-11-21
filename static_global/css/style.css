@@ -245,6 +245,7 @@ nav{
 /* FOOTER */
 footer{
     color: white;
+    background: #2c4261 !important;
     height:auto;
 }
 

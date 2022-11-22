@@ -12,6 +12,7 @@ Testing Platform documentation
    :hidden:
 
    installation
+   architecture
 
 
 Modules

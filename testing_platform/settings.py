@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     "django_icons",
     "django_q",
     "widget_tweaks",
-    "bootstrap5",
+    "django_bootstrap5",
     "landing_page",
     "legal_section",
     "authentication",
@@ -200,5 +200,27 @@ LOGGING = {
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
             "propagate": False,
         },
+    },
+}
+
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(PROJECT_ROOT, "static")
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+BOOTSTRAP5 = {
+    "css_url": {
+        "url": "/static/npm_components/bootstrap/dist/css/bootstrap.min.css",
+        "crossorigin": "anonymous",
+    },
+    # The complete URL to the Bootstrap JavaScript file
+    "javascript_url": {
+        "url": "/static/npm_components/bootstrap/dist/js/bootstrap.bundle.min.js",
+        "crossorigin": "anonymous",
     },
 }

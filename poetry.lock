@@ -88,7 +88,7 @@ tzdata = ["tzdata"]
 name = "beautifulsoup4"
 version = "4.11.1"
 description = "Screen-scraping library"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6.0"
 
@@ -280,19 +280,15 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
-name = "django-bootstrap-v5"
-version = "1.0.11"
-description = "Bootstrap 5 support for Django projects"
+name = "django-bootstrap5"
+version = "22.1"
+description = "Bootstrap 5 for Django"
 category = "main"
 optional = false
-python-versions = ">=3.6,<4.0"
+python-versions = ">=3.7"
 
 [package.dependencies]
-beautifulsoup4 = ">=4.8.0,<5.0.0"
-django = ">=2.2,<5.0"
-
-[package.extras]
-docs = ["m2r2 (>=0.2.5,<0.3.0)", "sphinx (>=4.4,<5.0)", "sphinx_rtd_theme (>=1.0,<2.0)"]
+Django = ">=3.2"
 
 [[package]]
 name = "django-icons"
@@ -960,7 +956,7 @@ python-versions = "*"
 name = "soupsieve"
 version = "2.3.2.post1"
 description = "A modern CSS selector implementation for Beautiful Soup."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -1251,7 +1247,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "d2e545af37db6293f96951c0ea38410ddc1c1fc9a3f1d9a047cb392ef9b23778"
+content-hash = "1a719deaed7396a1869f050331f0b9ab60db38ba5df7e731f7ebab7b341adc76"
 
 [metadata.files]
 alabaster = [
@@ -1469,9 +1465,9 @@ django = [
     {file = "Django-4.1.3-py3-none-any.whl", hash = "sha256:6b1de6886cae14c7c44d188f580f8ba8da05750f544c80ae5ad43375ab293cd5"},
     {file = "Django-4.1.3.tar.gz", hash = "sha256:678bbfc8604eb246ed54e2063f0765f13b321a50526bdc8cb1f943eda7fa31f1"},
 ]
-django-bootstrap-v5 = [
-    {file = "django-bootstrap-v5-1.0.11.tar.gz", hash = "sha256:2d431308859ce3cab7729bb09c76039059cd5fbdd34484da82c4c7f8d49da3a2"},
-    {file = "django_bootstrap_v5-1.0.11-py3-none-any.whl", hash = "sha256:a207aa804938164c8450bbbef4faaba6d2093b3236000557a50f3bd44b53d268"},
+django-bootstrap5 = [
+    {file = "django-bootstrap5-22.1.tar.gz", hash = "sha256:70b51f020ef95a64780a0b5d5fdb1fade6e7b5e26c53355cc4f3648eca239cab"},
+    {file = "django_bootstrap5-22.1-py3-none-any.whl", hash = "sha256:cf3f257abf750f19e47eddc106066ddb182576185494965d1408eddcb3a7380b"},
 ]
 django-icons = [
     {file = "django-icons-22.1.tar.gz", hash = "sha256:66453e153456ca7c7783960990cd06c66e3c33e97627fd13b205af9d9d72afba"},

@@ -7,5 +7,6 @@ db.sqlite3
 db/db.sqlite3
 static
 files
+node_modules/
 
 docs/_build/

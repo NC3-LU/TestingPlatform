@@ -7,7 +7,7 @@ There will be no security patches for other releases (tagged or not).
 
 ## Reporting a Vulnerability
 
-If you think you have found a potential security issue in MOSP, do not open
+If you think you have found a potential security issue, do not open
 directly a GitHub issue. Please email us. You can contact
 [opensource@nc3.lu](mailto:opensource@nc3.lu).
 

@@ -23,9 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY", "aey5eeCh2eij3jox8ieNohjee1iok8oojaiD2Shie9aenahtooC3ieyohkeuhuas"
-)
+SECRET_KEY = os.environ.get("SECRET_KEY", "secret")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "1") == "1"
@@ -224,3 +222,8 @@ BOOTSTRAP5 = {
         "crossorigin": "anonymous",
     },
 }
+
+
+if not DEBUG and SECRET_KEY == "secret":
+    print("FATAL: the secret key in the config has not yet been configured. Quitting.")
+    exit(-1)

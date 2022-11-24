@@ -1,7 +1,7 @@
 {% load static %}
 
 <main class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
-    <h1><span style="color: #28abe2">NC</span><span style="color:#ec1e27;">3</span> Testing Platform</h1>
+    <h1><span style="font-weight: bold;color: #28abe2">NC</span><span style="font-weight: bold;color:#ec1e27;">3</span> Testing Platform</h1>
     <p class="lead">Modern Internet Standards provide for more reliability and further growth of the Internet. Are you using them?</p>
 </main>
 
@@ -20,7 +20,7 @@
               {% if error %}
               <span class="text-danger">{{ error }}</span>
               {% endif %}
-              <input type="text" placeholder="www.domain.com" id="target" name="target" value="{{ form }}"><br>
+              <input type="text" placeholder="www.domain.com" id="target" name="target" value="{{ form }}" required><br>
               <div class="">
                   <label class="">Perform a TLS scan:</label>
                   <input type="checkbox" id="tls" name="tls"><br>
@@ -57,7 +57,7 @@
   <br />
   <div class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
     <div class="col">
-      <p class="lead">By registering to our platform you will have access to various tools.</p>
+      <p class="lead">By registering to our platform you will have access to various <a href="">services and tools</a>.</p>
       <p class="lead">
         <a href="/signup" class="btn btn-lg btn-secondary fw-bold border-white text-light" style="background-color:#009fe3;">Register now!</a>
     </p>

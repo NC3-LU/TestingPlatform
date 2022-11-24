@@ -2,7 +2,8 @@
 name = "testing-platform"
 version = "0.1.0"
 description = "NC3 Testing Platform"
-authors = ["Romain Kieffer <romain.kieffer@nc3.lu>",
+authors = [
+    "Romain Kieffer <romain.kieffer@nc3.lu>",
     "Cédric Bonhomme <cedric@cedricbonhomme.org>",
 ]
 license = "AGPL-3.0-or-later"

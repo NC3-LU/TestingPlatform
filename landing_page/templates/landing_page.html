@@ -8,23 +8,43 @@
 <div class="container">
   <br />
   <div class="row justify-content-center">
-    <div class="col">
-      <div class="card" style="width: 24rem;">
+    <div class="col mx-auto">
+      <div class="card shadow border mx-auto" style="width: 30rem;">
         <div class="card-body">
-          <h5 class="card-title">Test your website</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Modern address? Signed domain? Secure connection? Route authorisation?</h6>
-          <p class="card-text">Some quick example...</p>
-          <a href="#" class="card-link">About the test</a>
+          <h5 class="card-title">Website</h5>
+          <h6 class="card-subtitle mb-2 text-muted">Secure connection? Signed domain? Content Security Policy?</h6>
+
+          <form method="post" action="infra-testing/http-test/" class="">
+              {% csrf_token %}
+              <label>Enter a website domain:</label><br>
+              {% if error %}
+              <span class="text-danger">{{ error }}</span>
+              {% endif %}
+              <input type="text" placeholder="www.domain.com" id="target" name="target" value="{{ form }}"><br>
+              <div class="">
+                  <label class="">Perform a TLS scan:</label>
+                  <input type="checkbox" id="tls" name="tls"><br>
+                  <label class="">Force a rescan instead of returning cached results:</label>
+                  <input type="checkbox" id="rescan" name="rescan">
+              </div>
+              <small>
+                  Loading can take up to 5 minutes. If your tls scan results are empty, please retry and uncheck the
+                  'force rescan' option.
+              </small><br /><br />
+              <input type="submit" value="Test" class="btn btn-secondary">
+          </form><br />
+
+          <a href="/kb/1" class="card-link">About the test</a>
         </div>
       </div>
     </div>
 
-    <div class="col">
-      <div class="card" style="width: 24rem;">
+    <div class="col mx-auto">
+      <div class="card shadow border mx-auto" style="width: 30rem;">
         <div class="card-body">
-          <h5 class="card-title">Test your email</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-          <p class="card-text">Some quick example...</p>
+          <h5 class="card-title">Email</h5>
+          <h6 class="card-subtitle mb-2 text-muted">DKIM</h6>
+          <p class="card-text">...</p>
           <a href="#" class="card-link">Card link</a>
           <a href="#" class="card-link">Another link</a>
         </div>

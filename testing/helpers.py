@@ -53,7 +53,7 @@ def get_http_report(target, rescan):
                 + target
             ).text
             check_object = json.loads(get_scan)
-            state = check_object["state"]
+            state = check_object.get("state", "NO_STATE")
             counter += 1
             if state == "FINISHED":
                 use = False
@@ -78,7 +78,14 @@ def get_http_report(target, rescan):
                     }
                 break
             else:
-                if state in ("ABORTED", "FAILED", "PENDING", "STARTING", "RUNNING"):
+                if state in (
+                    "ABORTED",
+                    "FAILED",
+                    "PENDING",
+                    "STARTING",
+                    "RUNNING",
+                    "NO_STATE",
+                ):
                     logger.info(
                         f"http scan: got {state} after {counter} request(s) for {target}, retrying in 3s"
                     )

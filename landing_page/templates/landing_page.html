@@ -20,17 +20,7 @@
               {% if error %}
               <span class="text-danger">{{ error }}</span>
               {% endif %}
-              <input type="text" placeholder="www.domain.com" id="target" name="target" value="{{ form }}" required><br>
-              <div class="">
-                  <label class="">Perform a TLS scan:</label>
-                  <input type="checkbox" id="tls" name="tls"><br>
-                  <label class="">Force a rescan instead of returning cached results:</label>
-                  <input type="checkbox" id="rescan" name="rescan">
-              </div>
-              <small>
-                  Loading can take up to 5 minutes. If your tls scan results are empty, please retry and uncheck the
-                  'force rescan' option.
-              </small><br /><br />
+              <input type="text" placeholder="www.domain.com" id="target" name="target" value="{{ form }}" required><br />
               <input type="submit" value="Test" class="btn btn-secondary">
           </form><br />
 

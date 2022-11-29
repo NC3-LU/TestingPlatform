@@ -18,11 +18,15 @@ Testing Platform documentation
 Modules
 -------
 
-Public Modules
-``````````````
+Public checks
+`````````````
 
-- Email server checks
-- Web checks
+.. toctree::
+   :maxdepth: 3
+   :caption: Contents:
+   :hidden:
+
+   checks
 
 
 

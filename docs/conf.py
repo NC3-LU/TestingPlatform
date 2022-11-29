@@ -74,10 +74,10 @@ html_static_path = ["_static"]
 html_title = "Testing Platform"
 html_theme_options = {
     "path_to_docs": "docs",
-    "repository_url": "https://github.com/",
+    "repository_url": "https://github.com/NC3-LU/TestingPlatform",
     # "repository_branch": "gh-pages",  # For testing
     "launch_buttons": {
-        "binderhub_url": "https://github.com/",
+        "binderhub_url": "https://github.com/NC3-LU/TestingPlatform",
     },
     "use_edit_page_button": True,
     "use_issues_button": True,

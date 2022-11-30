@@ -7,8 +7,8 @@ import requests
 from decouple import config
 from django.core.files.storage import FileSystemStorage
 from django.core.signing import Signer
-from iot_inspector_client import Client
-from iot_inspector_client import FirmwareMetadata
+from onekey_client import Client
+from onekey_client import FirmwareMetadata
 
 from testing_platform import settings
 

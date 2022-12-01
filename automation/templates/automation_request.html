@@ -2,31 +2,7 @@
 {% load i18n static %}
 
 {% block content %}
-{% if not user.tier_level %}
-    <main class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
-    <section class="container">
-        <div class="p-5">
-            <h1>Automated Testing</h1>
-            <div class="p-5">
-                <p class="lead">
-                    It offers a number of simple tests on web servers configuration.
-                    The goal is to ensure your organisation is using the most up-to-date security standards and
-                    limiting therefore its exposure to easy or automated exploitation.
-                </p>
-                <div class="mb-5 p-5">
-                    <p class="lead">
-                        A subscription is required to perform automated tests on your systems.
-                        Make sure you check out our subscription plans and select the one that is best suited to your needs!
-                    </p>
-                </div>
-                <a href="#" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
-                    Check out our subscription offers
-                </a>
-            </div>
-        </div>
-    </section>
-    </main>
-{% else %}
+
 
     {% if form.errors and not form.non_field_errors %}
     <p class="errornote">
@@ -72,5 +48,5 @@
         </form>
 
     </main>
-    {% endif %}
+
 {% endblock %}

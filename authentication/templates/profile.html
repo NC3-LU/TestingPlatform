@@ -26,42 +26,6 @@
         <input class="mt-2 btn btn-primary" type="submit" value="Update">
     </form>
 
-    <h1>My subscription</h1>
-    <hr class="w-25 text-dark">
-    <section class="authForm p-5 mb-5">
-        <p class="lead mb-5">
-            {% if request.user.subscriptionrequest_set.all %}
-                {% if subscription %}
-                    Upgrade request pending
-                {% else %}
-                    Request pending
-                {% endif %}
-            {% else %}
-                <a href="/subscriptions/request/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
-                    {% if subscription %}
-                        Request subscription update
-                    {% else %}
-                        Request subscription
-                    {% endif %}
-                </a>
-            {% endif %}
-        </p>
-        <div class="d-flex">
-            {% if subscription %}
-                <table class="table table-light table-bordered table-striped">
-                    <tr>
-                        <th>Tier</th>
-                        <th>Activation Date</th>
-                    </tr>
-                    <tr>
-                        <td>{{ subscription.get_tier_level }}</td>
-                        <td>{{ subscription.date_activated }}</td>
-                    </tr>
-                </table>
-            {% endif %}
-        </div>
-    </section>
-
     <h1>My company domains</h1>
     <hr class="w-25 text-dark">
     <section class="authForm p-5 mb-5">

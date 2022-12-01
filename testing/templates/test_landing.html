@@ -87,21 +87,16 @@
     <hr class="w-25 text-dark">
     <div class="dashboardSectionBox" id="dmarc-tools"><h1>Automation</h1></div>
     <div class="dashboardBox">
-        {% if user.tier_level %}
-            <a href="/infra-testing/automation/">
-        {% else %}
-            <a href="/subscriptions">
-        {% endif %}
-            <div class="dashboardBoxPreview">
-                Automated tests
-            </div>
-            <div class="dashboardBoxDescription">
-                <b>Subscription required</b><br>
-                These tests are made to provide you with light monitoring capabilities over your systems.
-                After registering your owned domains in your profile, you can setup a number of automated tests,
-                like ping checks to monitor availability and reachability, http headers tests to grade your website
-                / check if it is compromised, and more.
-            </div>
+      <a href="/infra-testing/automation/">
+        <div class="dashboardBoxPreview">
+            Automated tests
+        </div>
+        <div class="dashboardBoxDescription">
+            These tests are made to provide you with light monitoring capabilities over your systems.
+            After registering your owned domains in your profile, you can setup a number of automated tests,
+            like ping checks to monitor availability and reachability, http headers tests to grade your website
+            / check if it is compromised, and more.
+        </div>
         </a>
     </div>
 </section>

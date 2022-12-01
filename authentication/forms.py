@@ -7,7 +7,6 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
-from .models import SubscriptionRequest
 from .models import User
 from testing.models import MailDomain
 from testing.models import UserDomain
@@ -19,9 +18,7 @@ class SignUpForm(UserCreationForm):
     address = forms.CharField(max_length=200)
     post_code = forms.CharField(max_length=200)
     city = forms.CharField(max_length=200)
-    vat_number = forms.CharField(
-        max_length=30, help_text="Needed for subscription. Format: LU12345678"
-    )
+    vat_number = forms.CharField(max_length=30, help_text="Format: LU12345678")
 
     class Meta(UserCreationForm.Meta):
         model = User
@@ -77,17 +74,6 @@ class ChangePasswordForm(PasswordChangeForm):
 
 
 class ResetPasswordEmail(PasswordResetForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            visible.field.widget.attrs["class"] = "form-control"
-
-
-class SubscriptionRequestForm(forms.ModelForm):
-    class Meta:
-        model = SubscriptionRequest
-        fields = ["tier_level"]
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for visible in self.visible_fields():

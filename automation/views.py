@@ -13,12 +13,10 @@ from .helpers import get_last_runs
 from .models import HttpAutomatedTest
 from .models import PingAutomatedTest
 from .models import WhoisAutomatedTest
-from testing_platform.decorators import subscription_required
 
 
 # Create your views here.
 @login_required
-@subscription_required
 def index(request):
     ping_tests = PingAutomatedTest.objects.filter(user=request.user.id)
     ping_list = get_last_runs(ping_tests)
@@ -31,7 +29,6 @@ def index(request):
 
 
 @login_required
-@subscription_required
 def schedule_ping(request):
     if request.method == "POST":
         form = PingAutomatedTestForm(request.user, request.POST)
@@ -58,7 +55,6 @@ def schedule_ping(request):
 
 
 @login_required
-@subscription_required
 def remove_ping(request, domain):
     ping_automated_test = PingAutomatedTest.objects.get(target__domain=domain)
     if request.user == ping_automated_test.user:
@@ -79,7 +75,6 @@ def remove_ping(request, domain):
 
 
 @login_required
-@subscription_required
 def schedule_whois(request):
     if request.method == "POST":
         form = WhoisAutomatedTestForm(request.user, request.POST)
@@ -106,7 +101,6 @@ def schedule_whois(request):
 
 
 @login_required
-@subscription_required
 def display_whois_report(request, domain):
     last_run = (
         Task.objects.filter(func="automation.tasks.whois_lookup")
@@ -121,7 +115,6 @@ def display_whois_report(request, domain):
 
 
 @login_required
-@subscription_required
 def remove_whois(request, domain):
     whois_automated_test = WhoisAutomatedTest.objects.get(target__domain=domain)
     if request.user == whois_automated_test.user:
@@ -142,7 +135,6 @@ def remove_whois(request, domain):
 
 
 @login_required
-@subscription_required
 def schedule_http(request):
     if request.method == "POST":
         form = HttpAutomatedTestForm(request.user, request.POST)
@@ -169,7 +161,6 @@ def schedule_http(request):
 
 
 @login_required
-@subscription_required
 def display_http_report(request, domain):
     last_run = (
         Task.objects.filter(func="automation.tasks.http")
@@ -180,7 +171,6 @@ def display_http_report(request, domain):
 
 
 @login_required
-@subscription_required
 def remove_http_report(request, domain):
     http_automated_test = HttpAutomatedTest.objects.get(target__domain=domain)
     if http_automated_test.user == request.user:

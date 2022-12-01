@@ -13,7 +13,7 @@ class AutomatedTest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     frequency = models.CharField(
         max_length=20,
-        choices=(("D", "Dayly"), ("W", "Weekly"), ("M", "Monthly")),
+        choices=(("D", "Daily"), ("W", "Weekly"), ("M", "Monthly")),
         help_text="Choose frequency of tests",
     )
     time = models.TimeField(

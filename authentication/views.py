@@ -14,11 +14,8 @@ from .forms import ChangePasswordForm
 from .forms import LoginForm
 from .forms import MailDomainForm
 from .forms import SignUpForm
-from .forms import SubscriptionRequestForm
 from .forms import UserDomainForm
 from .forms import UserUpdateForm
-from .models import Subscription
-from .models import SubscriptionRequest
 from iot_inspector.models import IOTUser
 from testing.models import MailDomain
 from testing.models import UserDomain
@@ -88,10 +85,6 @@ def edit_profile(request):
 
     user_domains = UserDomain.objects.filter(user=request.user.id)
     mail_domains = MailDomain.objects.filter(user=request.user.id)
-    try:
-        subscription = Subscription.objects.get(user=request.user.id)
-    except Subscription.DoesNotExist:
-        subscription = None
     domain_list, mail_domain_list = [], []
     for domain in user_domains:
         domain_list.append(domain)
@@ -102,7 +95,6 @@ def edit_profile(request):
         "form": form,
         "domain_list": user_domains,
         "mail_domain_list": mail_domain_list,
-        "subscription": subscription,
     }
     return render(request, "profile.html", context=context)
 
@@ -124,97 +116,52 @@ def change_password(request):
 
 
 @login_required
-def subscriptions(request):
-    return render(request, "sub_presentation.html")
-
-
-@login_required
-def request_subscription(request):
-    if request.method == "POST":
-        form = SubscriptionRequestForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            tier = data["tier_level"]
-            if request.user.tier_level == tier:
-                messages.error(request, "You already have this user tier")
-                return render(request, "subscription_request.html", {"form": form})
-            sub_request = SubscriptionRequest(
-                user=request.user, tier_level=data["tier_level"]
-            )
-            sub_request.save()
-            messages.success(
-                request,
-                "Your subscription request has been sent successfully, you will receive an email "
-                "with your pricing offer in the next few days",
-            )
-            return redirect("edit")
-    else:
-        form = SubscriptionRequestForm()
-    return render(request, "subscription_request.html", {"form": form})
-
-
-@login_required
 def add_domain(request):
     user = request.user
-    domains = user.userdomain_set.all()
-    if user.tier_level == 0:
-        messages.error(
-            request,
-            "You must have at least a PRO tier subscription if you wish to register a domain",
-        )
-        return redirect("edit")
-    elif user.tier_level == 1 and len(domains) == 1:
-        messages.error(
-            request,
-            "You must have at least a BUSINESS tier subscription if you wish to register more "
-            "domains",
-        )
-        return redirect("edit")
-    else:
-        if request.method == "POST":
-            form = UserDomainForm(request.POST)
-            if form.is_valid():
-                data = form.cleaned_data
-                try:
-                    db_domain = UserDomain.objects.get(domain=data["domain"])
-                except UserDomain.DoesNotExist:
-                    db_domain = None
-                if db_domain:
-                    if db_domain.user == request.user:
-                        messages.error(
-                            request,
-                            "You already registered this domain in your company domains.",
-                        )
-                    else:
-                        messages.error(
-                            request,
-                            "This domain is already registered by someone else. Please contact "
-                            "contact.testing@c3.lu if you think someone is monitoring your systems",
-                        )
-                    return redirect("add_domain")
+    # domains = user.userdomain_set.all()
+
+    if request.method == "POST":
+        form = UserDomainForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            try:
+                db_domain = UserDomain.objects.get(domain=data["domain"])
+            except UserDomain.DoesNotExist:
+                db_domain = None
+            if db_domain:
+                if db_domain.user == request.user:
+                    messages.error(
+                        request,
+                        "You already registered this domain in your company domains.",
+                    )
                 else:
-                    domain = data["domain"]
-                    try:
-                        ip_address = socket.gethostbyname(domain)
-                    except socket.gaierror:
-                        ip_address = None
-                    if ip_address:
-                        domain = UserDomain(
-                            user=user, domain=domain, ip_address=ip_address
-                        )
-                        domain.save()
-                        messages.success(request, "Domain added")
-                        return redirect("edit")
-                    else:
-                        messages.error(
-                            request,
-                            "Your domain name couldn't be resolved, please verify you entered your "
-                            "domain name correctly.",
-                        )
-                        return redirect("add_domain")
-        else:
-            form = UserDomainForm()
-        return render(request, "add_domain.html", {"form": form, "type": "web"})
+                    messages.error(
+                        request,
+                        "This domain is already registered by someone else. Please contact "
+                        "contact.testing@c3.lu if you think someone is monitoring your systems",
+                    )
+                return redirect("add_domain")
+            else:
+                domain = data["domain"]
+                try:
+                    ip_address = socket.gethostbyname(domain)
+                except socket.gaierror:
+                    ip_address = None
+                if ip_address:
+                    domain = UserDomain(user=user, domain=domain, ip_address=ip_address)
+                    domain.save()
+                    messages.success(request, "Domain added")
+                    return redirect("edit")
+                else:
+                    messages.error(
+                        request,
+                        "Your domain name couldn't be resolved, please verify you entered your "
+                        "domain name correctly.",
+                    )
+                    return redirect("add_domain")
+    else:
+        form = UserDomainForm()
+    return render(request, "add_domain.html", {"form": form, "type": "web"})
 
 
 @login_required

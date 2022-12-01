@@ -187,7 +187,7 @@ def dmarc_reporter(request):
                     reports = DMARCReport.objects.filter(dmarc_record=record)
                     domain_reports[domain] = list(reports)
                 except DMARCReport.DoesNotExist:
-                    domain_reports[domain] = None
+                    domain_reports[domain] = []
     return render(request, "dmarc_reporter.html", {"domain_reports": domain_reports})
 
 

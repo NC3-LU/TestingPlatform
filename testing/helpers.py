@@ -14,7 +14,7 @@ def get_http_report(target, rescan):
     ################################
     # HTTP SCAN Mozilla Observatory
     ################################
-    response = ""
+    response = {}
     scan_summary = ""
     scan_history = ""
 
@@ -46,7 +46,7 @@ def get_http_report(target, rescan):
         scan_summary = json_object
         state = ""
         counter = 0
-        response = None
+
         while json_object["state"] not in ("ABORTED", "FAILED") and counter < 5:
             get_scan = requests.get(
                 "https://http-observatory.security.mozilla.org/api/v1/analyze?host="

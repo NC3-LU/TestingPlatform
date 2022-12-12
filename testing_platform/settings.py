@@ -41,6 +41,37 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "webmaster@localhost")
 
+
+# Infrastructure
+# # Celery
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "amqp://guest@localhost//")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
+
+# Infrastructure
+# # Redis Cache
+CACHE_LOCATION = os.getenv("CACHE_LOCATION", "redis://localhost:6379/0")
+
+
+# --- Celery configuration
+#
+CELERY_RESULT_EXPIRES = 7200
+CELERY_BROKER_HEARTBEAT = (
+    0  # Workaround for https://github.com/celery/celery/issues/4817
+)
+CELERY_TASK_ACKS_LATE = True
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+
+CELERY_IMPORTS = (
+    "interface.batch.scheduler",
+    "interface.batch.util",
+)
+
+# Celery 4 settings
+CELERY_TASK_SERIALIZER = "pickle"
+CELERY_RESULT_SERIALIZER = "pickle"
+CELERY_ACCEPT_CONTENT = ["pickle"]
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -64,6 +95,7 @@ INSTALLED_APPS = [
     "c3_protocols",
     "specialized_testing",
     "testing.templatetags",
+    "checks",
 ]
 
 MIDDLEWARE = [

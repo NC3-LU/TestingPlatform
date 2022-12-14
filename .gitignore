@@ -5,7 +5,6 @@ __pycache__/
 testing_platform/__pycache__/
 db.sqlite3
 db/db.sqlite3
-static
 files
 node_modules/
 

@@ -1,8 +1,5 @@
-import os
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import FileResponse
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -11,7 +8,6 @@ from .forms import AnalysisRequestForm
 from .helpers import api_get_report
 from .helpers import client_get_all_reports_states
 from .helpers import client_login
-from .helpers import settings
 from .models import AnalysisRequest
 from .models import IOTUser
 
@@ -77,11 +73,4 @@ def download_report(request, firmware_uuid):
             f'{request.user.company_name}_{firmware_uuid[-12:]}_{str(a_req.report_uuid)[-12:]}.pdf"',
         },
     )
-    return response
-
-
-@login_required
-def read_tos(request):
-    fp = os.path.join(settings.STATIC_ROOT, "pdf", "terms_and_conditions.pdf")
-    response = FileResponse(open(fp, "rb"), content_type="application/pdf")
     return response

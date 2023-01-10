@@ -42,14 +42,6 @@ Please provide documentation when changing, removing, or adding features.
 Documentation resides in the project's [docs](docs/) folder.
 
 ```bash
-$ poetry install
-$ make doc
-```
-
-It will generate the main documentation.
-If you want a documenation per tags and development branches:
-
-```bash
-$ poetry install
-$ make multidoc
+$ poetry install --only docs
+$ make html
 ```

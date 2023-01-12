@@ -14,7 +14,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "Testing Platform"
-copyright = "LHC <info@nc3.lu>"
+copyright = "LHC <opensource@nc3.lu>"
 author = "Cédric Bonhomme <cedric@cedricbonhomme.org>"
 
 # The full version, including alpha/beta/rc tags

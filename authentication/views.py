@@ -138,7 +138,7 @@ def add_domain(request):
                     messages.error(
                         request,
                         "This domain is already registered by someone else. Please contact "
-                        "contact.testing@c3.lu if you think someone is monitoring your systems",
+                        "contact.testing@nc3.lu if you think someone is monitoring your systems",
                     )
                 return redirect("add_domain")
             else:

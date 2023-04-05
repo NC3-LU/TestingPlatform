@@ -1,24 +1,22 @@
 import socket
 
 from django.contrib import messages
-from django.contrib.auth import authenticate
-from django.contrib.auth import login
-from django.contrib.auth import logout
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
-from .forms import ChangePasswordForm
-from .forms import LoginForm
-from .forms import MailDomainForm
-from .forms import SignUpForm
-from .forms import UserDomainForm
-from .forms import UserUpdateForm
 from iot_inspector.models import IOTUser
-from testing.models import MailDomain
-from testing.models import UserDomain
+from testing.models import MailDomain, UserDomain
+
+from .forms import (
+    ChangePasswordForm,
+    LoginForm,
+    MailDomainForm,
+    SignUpForm,
+    UserDomainForm,
+    UserUpdateForm,
+)
 
 
 def signup(request):

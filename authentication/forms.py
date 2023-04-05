@@ -1,15 +1,17 @@
 import re
 
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordChangeForm,
+    PasswordResetForm,
+    UserCreationForm,
+)
 from django.core.exceptions import ValidationError
 
+from testing.models import MailDomain, UserDomain
+
 from .models import User
-from testing.models import MailDomain
-from testing.models import UserDomain
 
 
 class SignUpForm(UserCreationForm):

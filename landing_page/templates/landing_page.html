@@ -20,7 +20,7 @@
               {% if error %}
               <span class="text-danger">{{ error }}</span>
               {% endif %}
-              <input type="text" placeholder="www.domain.com" id="target" name="target" value="{{ form }}" required><br />
+              <input type="text" placeholder="www.domain.lu" id="target" name="target" value="{{ form }}" required><br />
               <input type="submit" value="Test" class="btn btn-secondary">
           </form><br />
 
@@ -34,9 +34,12 @@
         <div class="card-body">
           <h5 class="card-title">Email</h5>
           <h6 class="card-subtitle mb-2 text-muted">DKIM</h6>
-          <p class="card-text">...</p>
-          <a href="#" class="card-link">Card link</a>
-          <a href="#" class="card-link">Another link</a>
+          <form method="post" action="#" class=""><br />
+            <label>Enter a server address:</label><br>
+            <input type="text" placeholder="server.lu" id="target" name="target" value="" required><br />
+            <input type="submit" value="Test" class="btn btn-secondary">
+          </form><br />
+          <a href="#" class="card-link">About the test</a>
         </div>
       </div>
     </div>

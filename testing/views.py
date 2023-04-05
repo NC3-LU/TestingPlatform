@@ -2,29 +2,23 @@ import datetime
 import ipaddress
 import re
 import socket
-from urllib.parse import parse_qs
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 import xmltodict
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from ipwhois import IPDefinedError
-from ipwhois import IPWhois
+from ipwhois import IPDefinedError, IPWhois
 
-from .forms import DMARCRecordForm
-from .forms import SPFRecordForm
-from .helpers import get_http_report
-from .helpers import get_tls_report
-from .models import DMARCRecord
-from .models import DMARCReport
-from .models import MailDomain
 from testing_platform import settings
+
+from .forms import DMARCRecordForm, SPFRecordForm
+from .helpers import get_http_report, get_tls_report
+from .models import DMARCRecord, DMARCReport, MailDomain
 
 
 @login_required

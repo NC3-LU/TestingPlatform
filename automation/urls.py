@@ -2,7 +2,6 @@ from django.urls import path
 
 from . import views
 
-
 urlpatterns = [
     path("", views.index, name="automation"),
     path("auto-ping/", views.schedule_ping, name="schedule_ping"),

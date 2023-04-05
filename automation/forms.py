@@ -1,9 +1,8 @@
 from django import forms
 
-from .models import HttpAutomatedTest
-from .models import PingAutomatedTest
-from .models import WhoisAutomatedTest
 from testing.models import UserDomain
+
+from .models import HttpAutomatedTest, PingAutomatedTest, WhoisAutomatedTest
 
 
 class AutomatedTestForm(forms.ModelForm):

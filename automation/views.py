@@ -1,18 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.shortcuts import render
-from django_q.models import Schedule
-from django_q.models import Task
+from django.shortcuts import redirect, render
+from django_q.models import Schedule, Task
 
-from .forms import HttpAutomatedTestForm
-from .forms import PingAutomatedTestForm
-from .forms import WhoisAutomatedTestForm
+from .forms import HttpAutomatedTestForm, PingAutomatedTestForm, WhoisAutomatedTestForm
 from .helpers import get_last_runs
-from .models import HttpAutomatedTest
-from .models import PingAutomatedTest
-from .models import WhoisAutomatedTest
+from .models import HttpAutomatedTest, PingAutomatedTest, WhoisAutomatedTest
 
 
 # Create your views here.

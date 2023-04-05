@@ -2,18 +2,17 @@ import os
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import FileResponse
-from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.shortcuts import render
+from django.http import FileResponse, HttpResponse
+from django.shortcuts import redirect, render
 
 from .forms import AnalysisRequestForm
-from .helpers import api_get_report
-from .helpers import client_get_all_reports_states
-from .helpers import client_login
-from .helpers import settings
-from .models import AnalysisRequest
-from .models import IOTUser
+from .helpers import (
+    api_get_report,
+    client_get_all_reports_states,
+    client_login,
+    settings,
+)
+from .models import AnalysisRequest, IOTUser
 
 
 @login_required

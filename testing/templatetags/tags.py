@@ -3,8 +3,7 @@ import socket
 
 from django import template
 from django.utils.safestring import mark_safe
-from ipwhois import exceptions
-from ipwhois import IPWhois
+from ipwhois import IPWhois, exceptions
 
 register = template.Library()
 

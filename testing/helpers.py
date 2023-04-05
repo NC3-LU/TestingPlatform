@@ -6,7 +6,6 @@ import requests
 
 from testing.models import TlsScanHistory
 
-
 logger = logging.getLogger(__name__)
 
 

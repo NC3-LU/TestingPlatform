@@ -2,7 +2,6 @@ from django.urls import path
 
 from . import views
 
-
 urlpatterns = [
     path("", views.index, name="iot_index"),
     path("tos/", views.read_tos, name="iot_tos"),

@@ -1,11 +1,9 @@
 import socket
 import subprocess
 
-from ipwhois import IPDefinedError
-from ipwhois import IPWhois
+from ipwhois import IPDefinedError, IPWhois
 
-from testing.helpers import get_http_report
-from testing.helpers import get_tls_report
+from testing.helpers import get_http_report, get_tls_report
 
 
 def whois_lookup(host):

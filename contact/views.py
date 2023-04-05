@@ -1,5 +1,4 @@
-from django.core.mail import BadHeaderError
-from django.core.mail import send_mail
+from django.core.mail import BadHeaderError, send_mail
 from django.http import HttpResponse
 from django.shortcuts import render
 

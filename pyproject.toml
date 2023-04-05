@@ -37,22 +37,29 @@ ipwhois = "^1.2.0"
 onekey-client = "^2.0.2"
 psutil = "^5.9.4"
 certifi = "^2022.12.7"
+django-enumfields = "^2.1.1"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^5.0.4"
 pre-commit = "^2.20.0"
 black = "^22.10.0"
 pyupgrade = "^3.2.2"
-reorder-python-imports = "^3.9.0"
 autoflake = "^1.7.7"
-sphinx-book-theme = "^0.3.2"
-sphinx-multiversion = "^0.2.4"
-sphinx-autodoc-typehints = "^1.18.3"
-sphinxcontrib-mermaid = "^0.7.1"
-sphinxcontrib-bibtex = "^2.5.0"
 mypy = "^0.991"
 types-requests = "^2.28.11.5"
-pip-audit = "^2.4.8"
+pip-audit = "^2.5.4"
+isort = "^5.12.0"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^5.0.0"
+sphinx-book-theme = "0.4.0rc1"
+sphinx-multiversion = "^0.2.4"
+sphinx-autodoc-typehints = "^1.20.1"
+sphinxcontrib-mermaid = "^0.7.1"
+sphinxcontrib-bibtex = "^2.5.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -74,3 +81,6 @@ show_error_context = true
 pretty = true
 
 exclude = "migrations|docs"
+
+[tool.isort]
+profile = "black"

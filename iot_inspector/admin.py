@@ -1,23 +1,24 @@
 import logging
 
-from django.contrib import admin
-from django.contrib import messages
+from django.contrib import admin, messages
 
-from .helpers import api_add_user
-from .helpers import api_login
-from .helpers import client_generate_report
-from .helpers import client_get_report_link
-from .helpers import client_login
-from .helpers import client_upload_firmware
-from .helpers import get_default_product_group
-from .models import AnalysisRequest
-from .models import IOTUser
 from testing_platform import settings
 
+from .helpers import (
+    api_add_user,
+    api_login,
+    client_generate_report,
+    client_get_report_link,
+    client_login,
+    client_upload_firmware,
+    get_default_product_group,
+)
+from .models import AnalysisRequest, IOTUser
 
 logger = logging.getLogger(__name__)
 
 
+@admin.register(AnalysisRequest)
 class AnalysisRequestAdmin(admin.ModelAdmin):
 
     actions = [
@@ -27,6 +28,7 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
         "generate_report",
     ]
 
+    @admin.action(description="Validate")
     def validate_status(self, request, queryset):
         for analysis_request in queryset:
             iot_user = analysis_request.iot_user
@@ -49,9 +51,11 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
                     "This user was not created on the IoT Inspector platform, please activate it first.",
                 )
 
+    @admin.action(description="Decline")
     def decline_status(self, request, queryset):
         queryset.update(status=False)
 
+    @admin.action(description="Set to pending")
     def pending_status(self, request, queryset):
         queryset.update(status=None)
 
@@ -107,13 +111,10 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
                     "The firmware has not been uploaded yet, please validate the request first.",
                 )
 
-    decline_status.short_description = "Decline"
-    validate_status.short_description = "Validate"
-    pending_status.short_description = "Set to pending"
-
     list_display = ["__str__", "status", "iot_user"]
 
 
+@admin.register(IOTUser)
 class IOTUserAdmin(admin.ModelAdmin):
 
     readonly_fields = ("password",)
@@ -145,5 +146,3 @@ class IOTUserAdmin(admin.ModelAdmin):
 
 
 # Register your models here.
-admin.site.register(AnalysisRequest, AnalysisRequestAdmin)
-admin.site.register(IOTUser, IOTUserAdmin)

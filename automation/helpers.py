@@ -1,5 +1,4 @@
-from django_q.models import Schedule
-from django_q.models import Task
+from django_q.models import Schedule, Task
 
 
 def get_last_runs(tasks):

@@ -1,4 +1,5 @@
 import sys
+from typing import Any, Dict
 
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -17,7 +18,7 @@ def about(request):
 
 
 def health(request):
-    result = {
+    result: Dict[str, Any] = {
         "python_version": "{}.{}.{}".format(*sys.version_info[:3]),
         "database": {},
     }

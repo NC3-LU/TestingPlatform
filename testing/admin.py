@@ -9,8 +9,6 @@ from testing.models import (
     UserDomain,
 )
 
-# Register your models here.
-
 
 @admin.register(MailDomain, UserDomain)
 class DomainAdmin(admin.ModelAdmin):

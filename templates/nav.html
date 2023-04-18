@@ -7,8 +7,8 @@
         <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div id="navbar" class="collapse navbar-collapse">
-            <ul class="navbar-nav">
+        <div id="navbar" class="collapse navbar-collapse ">
+            <ul class="navbar-nav navbar-dark">
                 <li class="nav-item dropdown">
                     {% if user.is_authenticated %}
                     <a class="nav-link dropdown-toggle" href="#" id="dropdown07" data-bs-toggle="dropdown"
@@ -30,7 +30,7 @@
                 </li>
             </ul>
 
-            <ul class="navbar-nav d-flex ms-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav d-flex ms-auto mb-2 mb-lg-0 navbar-dark ">
               <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
               <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
               {% if user.is_authenticated %}

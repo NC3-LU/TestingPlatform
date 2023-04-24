@@ -2,6 +2,7 @@ import json
 import logging
 import time
 
+import checkdmarc
 import requests
 
 from testing.models import TlsScanHistory
@@ -157,3 +158,12 @@ def get_tls_report(target, rescan):
         logger.warning("tls scan: scan not finished after 5 tries, skipping")
 
     return fetch_tls
+
+
+def email_check(target, rescan):
+    result = checkdmarc.check_domains([target])
+    json_result = checkdmarc.results_to_json(result)
+    return {
+        "result": json_result,
+        "domain_name": target,
+    }

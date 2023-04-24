@@ -17,7 +17,7 @@ from ipwhois import IPDefinedError, IPWhois
 from testing_platform import settings
 
 from .forms import DMARCRecordForm, SPFRecordForm
-from .helpers import get_http_report, get_tls_report
+from .helpers import email_check, get_http_report, get_tls_report
 from .models import DMARCRecord, DMARCReport, MailDomain
 
 
@@ -72,6 +72,18 @@ def http_test(request):
         return render(request, "check_website.html", context)
     else:
         return render(request, "check_website.html")
+
+
+def email_test(request):
+    print(request.POST["target"])
+    if request.method == "POST":
+        context = {"rescan": False}
+        if "rescan" in request.POST:
+            context["rescan"] = True
+        context.update(email_check(request.POST["target"], context["rescan"]))
+        return render(request, "check_email.html", context)
+    else:
+        return render(request, "check_email.html")
 
 
 @login_required

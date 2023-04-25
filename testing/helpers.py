@@ -1,7 +1,7 @@
 import json
 import logging
 import time
-from typing import BytesIO
+from typing import Any, BytesIO, Dict
 
 import checkdmarc
 import pypandora
@@ -162,7 +162,9 @@ def get_tls_report(target, rescan):
     return fetch_tls
 
 
-def email_check(target, rescan):
+def email_check(target: str, rescan: bool) -> Dict[str, Any]:
+    """Parses and validates MX, SPF, and DMARC records,
+    Checks for DNSSEC deployment, Checks for STARTTLS and TLS support."""
     result = checkdmarc.check_domains([target])
     json_result = checkdmarc.results_to_json(result)
     return {
@@ -171,8 +173,8 @@ def email_check(target, rescan):
     }
 
 
-def file_check(file_in_memory: BytesIO, rescan):
-    """Check a file by submitting it to a Pandora instance."""
+def file_check(file_in_memory: BytesIO, rescan: bool) -> Dict[str, Any]:
+    """Checks a file by submitting it to a Pandora instance."""
     pandora_cli = pypandora.PyPandora()
     result = pandora_cli.submit(file_in_memory, "name", 0)
     return {

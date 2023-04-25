@@ -177,7 +177,10 @@ def email_check(target: str, rescan: bool) -> Dict[str, Any]:
 def file_check(file_in_memory: BytesIO, rescan: bool) -> Dict[str, Any]:
     """Checks a file by submitting it to a Pandora instance."""
     pandora_cli = pypandora.PyPandora()
+    # Submit the file to Pandora for analysis.
     result = pandora_cli.submit(file_in_memory, "name", 0)
+    # Get the status of a task.
+    res = pandora_cli.task_status(result["taskId"])
     return {
-        "result": result,
+        "result": res,
     }

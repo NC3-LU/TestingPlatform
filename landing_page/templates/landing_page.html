@@ -31,7 +31,7 @@
                 Enter your websites domain name:
               </label>
               <input class="form-control" type="text" placeholder="www.domain.lu"
-                     id="target5" name="target"
+                     id="target" name="target"
                      value="{{ form }}" required>
             </div>
             <input type="submit" value="Test" class="btn btn-secondary">
@@ -69,7 +69,7 @@
           </p>
 
           <a class="align-self-end" href="#">Find out more about the test</a>
-          <form method="post" action="infra-testing/http-test/">
+          <form method="post" action="infra-testing/file-test/" enctype="multipart/form-data">
             {% csrf_token %}
             {% if error %}
             <span class="text-danger">{{ error }}</span>
@@ -78,9 +78,8 @@
               <label class="mb-1">
                 Select the file you want to check.
               </label>
-              <input class="form-control" type="file" placeholder=""
-                     id="target3" name="target"
-                     value="{{ form }}" required>
+              <input class="form-control" type="file" placeholder="Select the file you want to check."
+                id="target3" name="target" required>
             </div>
             <input type="submit" value="Test" class="btn btn-secondary">
           </form>

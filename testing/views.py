@@ -87,10 +87,11 @@ def email_test(request):
 
 
 def file_test(request):
-    print(request.POST["target"])
-    if request.method == "POST":
+    if request.method == "POST" and request.FILES["target"]:
         context: Dict[str, Any] = {}
-        context.update(file_check(request.POST["target"], False))
+        # request.FILES['target'].name
+        file_to_check = request.FILES["target"].read()
+        context.update(file_check(file_to_check, False))
         return render(request, "check_file.html", context)
     else:
         return render(request, "check_file.html")

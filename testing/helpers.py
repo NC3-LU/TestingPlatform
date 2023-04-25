@@ -1,8 +1,10 @@
 import json
 import logging
 import time
+from typing import BytesIO
 
 import checkdmarc
+import pypandora
 import requests
 
 from testing.models import TlsScanHistory
@@ -166,4 +168,13 @@ def email_check(target, rescan):
     return {
         "result": json_result,
         "domain_name": target,
+    }
+
+
+def file_check(file_in_memory: BytesIO, rescan):
+    """Check a file by submitting it to a Pandora instance."""
+    pandora_cli = pypandora.PyPandora()
+    result = pandora_cli.submit(file_in_memory, "name", 0)
+    return {
+        "result": result,
     }

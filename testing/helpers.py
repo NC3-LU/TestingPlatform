@@ -1,7 +1,8 @@
 import json
 import logging
 import time
-from typing import Any, BytesIO, Dict
+from io import BytesIO
+from typing import Any, Dict
 
 import checkdmarc
 import pypandora

@@ -1,12 +1,11 @@
-/* PLEASE CHANGE COLORS HERE */
+   /* PLEASE CHANGE COLORS HERE */
 
 :root {
     /* MAIN BACKGROUND COLOR AND TEXT COLOR */
-    --backgroundTextColor: white;
     --secondBackgroundColor: #2c4261;
     --dBoxColor: #526475;
-    --anchorColor: #BFD0DE;
-    --anchorColorHover: #F2E422;
+    --anchorColor: #2c4261;
+    --anchorColorHover: #3e5d86;
     --gradeAPlus:#0C751D;
     --gradeA:#13C230;
     --gradeAMinus:#63F77B;
@@ -57,30 +56,16 @@ html, body {
 }
 
 body{
-  background:var(--backgroundTextColor);
+
   /*font-family: 'Roboto Mono', monospace !important;*/
 }
 
 #content{
-    min-height: 85%;
+   /* min-height: 85%;*/
     height:auto;
 }
 
-a {color: var(--anchorColor) !important; font-weight:bold; text-decoration:none;}
-.anchorBgLight {color: var(--anchorColor) !important;}
-
-a:hover {color: var(--anchorColorHover) !important;}
-
-.btn-primary{
-    background:var(--dBoxColor) !important;
-    border:var(--dBoxColor) solid 1px !important ;
-    transition: 1s;
-}
-
-.btn-primary:hover{
-    background:var(--secondBackgroundColor) !important;
-    transition: 0.5s;
-}
+a { text-decoration:none;}
 
 /* FORMS */
 input[type=text], input[type=placeholder], input[type=submit] {
@@ -98,15 +83,18 @@ input[type=text], input[type=placeholder], input[type=submit] {
     -moz-appearance: none;
     appearance: none;
     border-radius: .25rem;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-}
-.form-control{
-    border: 1px var(--bs-dark) solid;
+
 }
 
-.form-control:hover{
-    border: 1px var(--anchorColorHover) solid;
+input[type=submit]:hover{
+    background: black;
 }
+
+.form-control{
+    border: 1px var(--bs-dark) solid;
+    transition:0.2s;
+}
+
 
 
 /* NAVIGATION */
@@ -114,12 +102,29 @@ input[type=text], input[type=placeholder], input[type=submit] {
 nav{
     min-height: 7%;
     background-color: var(--secondBackgroundColor) !important;
+    color:white !important;
 }
 
 .navbar-nav{
     padding-left: 2rem !important;
 }
 
+.navbar-brand{
+    color:white !important;
+    transition: 0.2s;
+}
+
+.nav-link {
+  color:white !important;
+}
+
+.nav-link:hover {
+  color: #eeeeee !important;
+}
+
+.navbar-brand:hover{
+    color: white !important;
+}
 .dropdown-item:hover{
     background:var(--secondBackgroundColor) !important;
 }
@@ -142,9 +147,7 @@ nav{
 .authForm{
     color: white !important;
 }
-.authForm > div > input, select{
-    background: var(--anchorColor) !important;
-}
+
 .authForm > div > label{
     color:var(--secondBackgroundColor);
     font-weight: bold;
@@ -201,7 +204,7 @@ nav{
     display:flex;
     align-items: center;
     justify-content: center !important;
-    color: black !important;
+    color: white !important;
     font-weight: normal !important;
 
 }
@@ -261,3 +264,4 @@ footer{
        padding-top: .5rem
     }
 }
+

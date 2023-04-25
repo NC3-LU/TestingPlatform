@@ -2,6 +2,7 @@ import datetime
 import ipaddress
 import re
 import socket
+from typing import Any, Dict
 from urllib.parse import parse_qs, urlparse
 
 import xmltodict
@@ -17,7 +18,7 @@ from ipwhois import IPDefinedError, IPWhois
 from testing_platform import settings
 
 from .forms import DMARCRecordForm, SPFRecordForm
-from .helpers import email_check, get_http_report, get_tls_report
+from .helpers import email_check, file_check, get_http_report, get_tls_report
 from .models import DMARCRecord, DMARCReport, MailDomain
 
 
@@ -75,7 +76,6 @@ def http_test(request):
 
 
 def email_test(request):
-    print(request.POST["target"])
     if request.method == "POST":
         context = {"rescan": False}
         if "rescan" in request.POST:
@@ -84,6 +84,16 @@ def email_test(request):
         return render(request, "check_email.html", context)
     else:
         return render(request, "check_email.html")
+
+
+def file_test(request):
+    print(request.POST["target"])
+    if request.method == "POST":
+        context: Dict[str, Any] = {}
+        context.update(file_check(request.POST["target"], False))
+        return render(request, "check_file.html", context)
+    else:
+        return render(request, "check_file.html")
 
 
 @login_required

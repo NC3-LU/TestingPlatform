@@ -7,6 +7,7 @@ urlpatterns = [
     # path('whois-lookup/', views.ping_test, name='ping_test'),
     path("http-test/", views.http_test, name="http_test"),
     path("email-test/", views.email_test, name="email_test"),
+    path("file-test/", views.file_test, name="file_test"),
     path("spf-generator/", views.spf_generator, name="spf-generator"),
     path("dmarc-generator/", views.dmarc_generator, name="dmarc-generator"),
     path("dmarc-reporter/", views.dmarc_reporter, name="dmarc-reporter"),

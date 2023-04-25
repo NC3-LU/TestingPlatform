@@ -50,7 +50,7 @@ Get the source code and install the software:
     $ git clone https://github.com/NC3-LU/TestingPlatform.git
     $ cd TestingPlatform/
     $ npm ci
-    $ poetry install --no-dev
+    $ poetry install --only main
     $ poetry shell
 
     $ python manage.py collectstatic

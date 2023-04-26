@@ -174,9 +174,7 @@ def email_check(target: str, rescan: bool) -> Dict[str, Any]:
     }
 
 
-def file_check(
-    file_in_memory: BytesIO, file_to_check_name: str, rescan: bool
-) -> Dict[str, Any]:
+def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, Any]:
     """Checks a file by submitting it to a Pandora instance."""
     pandora_root_url = "https://pandora.circl.lu/"
     pandora_cli = pypandora.PyPandora(root_url=pandora_root_url)

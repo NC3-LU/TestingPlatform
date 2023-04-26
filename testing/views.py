@@ -92,7 +92,7 @@ def file_test(request):
         # request.FILES['target'].name
         file_to_check = request.FILES["target"].read()
         file_to_check_name = request.FILES["target"].name
-        context.update(file_check(file_to_check, file_to_check_name, False))
+        context.update(file_check(file_to_check, file_to_check_name))
         print(context)
         return render(request, "check_file.html", context)
     else:

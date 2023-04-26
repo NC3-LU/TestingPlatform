@@ -178,16 +178,17 @@ def file_check(file_in_memory: BytesIO, rescan: bool) -> Dict[str, Any]:
     """Checks a file by submitting it to a Pandora instance."""
     pandora_cli = pypandora.PyPandora()
 
-    # file_scan_start_time = time.time()
+    # scan_start_time = time.time()
 
     # Submit the file to Pandora for analysis.
     result = pandora_cli.submit(file_in_memory, "name", 0)
+    time.sleep(0.1)
     # Get the status of a task.
     res = pandora_cli.task_status(result["taskId"])
 
     time.sleep(0.1)
     loop = 0
-    while loop < (1024 * 256):
+    while loop < (50 * 10):
         res = pandora_cli.task_status(res["taskId"])
         # Handle responde from Pandora
         status = res["status"]
@@ -200,7 +201,7 @@ def file_check(file_in_memory: BytesIO, rescan: bool) -> Dict[str, Any]:
         time.sleep(0.1)
 
         loop += 1
-    # file_scan_end_time = time.time()
+    # scan_end_time = time.time()
 
     return {
         "result": res,

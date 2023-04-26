@@ -2,4 +2,18 @@
 
 {% block content %}
 
+<main class="row p-3 flex-column align-items-center">
+
+  <div class="col-lg-5 col-md-5 mb-2">
+    {% if result %}
+      {% if result.success %}
+        {% if result.status == "CLEAN" %}
+          <i class="bi bi-check-circle-fill color-success"> </i> Clean File!
+        {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  </div>
+</main>
 {% endblock %}

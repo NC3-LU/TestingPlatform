@@ -2,6 +2,7 @@
 
 
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
+
   <h1 class="text-center">Overview of {{ domain_name }}</h1>
   <div class="row justify-content-evenly mb-5">
     <div class="col-lg-3 d-flex align-items-center">
@@ -45,16 +46,6 @@
       </div>
       <div class="row my-1">
         <div class="col-lg-12 fs-3">
-          {% if result.public_key_pinning.pass %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
-          {% else %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
-          {% endif %}
-          {{ result.public_key_pinning.score_description }}
-        </div>
-      </div>
-      <div class="row my-1">
-        <div class="col-lg-12 fs-3">
           {% if result.redirection.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
           {% else %}
@@ -70,7 +61,7 @@
           {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
           {% endif %}
-          {{ result.referrer_policy.score_description }}
+          {{ result.referrer_policy.score_description }} (optional)
         </div>
       </div>
       <div class="row my-1">
@@ -129,13 +120,14 @@
       <h1>Test Discovery</h1>
       <div class="row my-4">
         <div class="col-lg-6 fs-2">Good</div>
-        <div class="col-lg-6"><span class="rounded-circle p-2 fs-3 text-white"
-                                    style="background:#71cdba;">{{ scan_summary.tests_passed }}</span>
+        <div class="col-lg-6"><span id="good-count" class="rounded-circle p-2 fs-3 text-white"
+                                    style="background:#71cdba;"></span>
         </div>
       </div>
       <div class="row my-4">
         <div class="col-lg-6 fs-2">Vulnerable</div>
-        <div class="col-lg-6"><span id="vulnerable-count" class="rounded-circle p-2 fs-3 text-white"
+        <div class="col-lg-6"><span id="vulnerable-count"
+                                    class="rounded-circle p-2 fs-3 text-white"
                                     style=" background:#ff5c5c;">
         </span>
         </div>
@@ -156,9 +148,10 @@
   </div>
 </section>
 <script>
-    const result = parseInt({{ scan_summary.tests_quantity }}) - parseInt({{ scan_summary.tests_passed }});
-    console.log(result);
-     document.getElementById('vulnerable-count').innerHTML = result ;
+    const result = parseInt({{ scan_summary.tests_quantity }} - 1) - parseInt({{ scan_summary.tests_passed }} - 1);
+
+     document.getElementById('vulnerable-count').innerHTML = '&nbsp;' + result + '&nbsp;' ;
+     document.getElementById('good-count').innerHTML = '&nbsp;' + parseInt({{ scan_summary.tests_passed }} - 1) + '&nbsp;' ;
 </script>
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
   <div class="row">
@@ -167,7 +160,7 @@
       <i class="bi bi-check-circle-fill color-success"> </i>
       {% else %}
       <i class="bi bi-x-circle-fill color-danger"></i>
-      {% endif %} Content Security Policy (CSP)
+      {% endif %} {{ result.content_security_policy.score_description}}
     </div>
     <div class="col-lg-12 fs-4">
       <p>Content Security Policy (CSP) is an HTTP header that allows site operators
@@ -255,7 +248,7 @@
       <i class="bi bi-check-circle-fill color-success"> </i>
       {% else %}
       <i class="bi bi-x-circle-fill color-danger"></i>
-      {% endif %} Cookies
+      {% endif %} {{ result.cookies.score_description}}
     </div>
     <div class="col-lg-12 fs-4">
       <p>Using cookies attributes such as Secure and HttpOnly can protect users from
@@ -302,7 +295,7 @@
       <i class="bi bi-check-circle-fill color-success"> </i>
       {% else %}
       <i class="bi bi-x-circle-fill color-danger"></i>
-      {% endif %} Cross-origin Resource Sharing
+      {% endif %} {{ result.cross_origin_resource_sharing.score_description}}
     </div>
     <div class="col-lg-12 fs-4">
       <p>Cross-Origin Resource Sharing (CORS) is an HTTP-header based mechanism that
@@ -315,7 +308,112 @@
     </div>
   </div>
 </section>
+<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+  <div class="row">
+    <div class="col-lg-12 fs-1 fw-bold">
+      {% if result.redirection.pass %}
+      <i class="bi bi-check-circle-fill color-success"></i>
+      {% else %}
+      <i class="bi bi-x-circle-fill color-danger"></i>
+      {% endif %} {{ result.redirection.score_description}}
+    </div>
+    <div class="col-lg-12 fs-4">
+      <p>Properly configured redirections from HTTP to HTTPS allow browsers to correctly
+        apply HTTP Strict Transport Security (HSTS) settings.</p>
+    </div>
+  </div>
+</section>
 
+<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+  <div class="row">
+    <div class="col-lg-12 fs-1 fw-bold">
+      {% if result.referrer_policy.pass %}
+      <i class="bi bi-check-circle-fill color-success"></i>
+      {% else %}
+      <i class="bi bi-x-circle-fill color-danger"></i>
+      {% endif %} {{ result.referrer_policy.score_description}}
+    </div>
+    <div class="col-lg-12 fs-4">
+      <p>Referrer Policy can protect the privacy of your users by restricting the
+        contents of the HTTP Referer header.</p>
+    </div>
+    <div class="row my-2">
+      <button type="button" data-bs-toggle="collapse" data-bs-target="#referrer-policy"
+              aria-expanded="false" aria-controls="collapseExample"
+              class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+        <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+        How to set the referrer policy and what to set?
+      </button>
+
+      <div class="p-0 collapse" id="referrer-policy">
+        <div class=" p-3 border-bottom border-end border-start">
+          <p>You can set the header in an apache configuration file or in a
+            root web directory over an <code>.htaccess</code> file.</p>
+
+          <p>You need to add:<br>
+            <code>Header set Referrer-Policy <b>"replace-with-the-policy-you-want-to-use"</b></code>
+          </p>
+          <div class="col-lg-6">
+            <h4>What policies do exist?</h4>
+            <ul>
+              <li><b>"no-referrer"</b>- Do not send the referrer header.</li>
+              <li><b>"no-referrer-when-downgrade"</b> - Send the referrer header only
+                when
+                the referring page is using HTTPS.
+              </li>
+              <li><b>"same-origin"</b>- Send the referrer header only when the referring
+                page is from the same origin (same domain and protocol).
+              </li>
+              <li><b>"strict-origin"</b> - Send the referrer header only when the
+                referring page is from the same origin, and only include the origin, not
+                the full URL.
+              </li>
+              <li><b>"strict-origin-when-cross-origin"</b> - Send the referrer header
+                only
+                when the referring page is from the same origin, and only include the
+                origin when the referring page is from a different origin.
+              </li>
+              <li><b>"unsafe-url"</b> - Always send the full URL in the referrer header,
+                even when the referring page is from a different origin.
+              </li>
+            </ul>
+            <h4>Which one to use?</h4>
+            <p>
+              If your website doesn't need to send any referrer information to other
+              domains, you can use the <code>"no-referrer"</code> directive. This will
+              prevent the
+              browser from sending any referrer information in the HTTP header.</p>
+
+            <p>If your website needs to send referrer information only when the user is
+              navigating within your own domain, you can use the
+              <code>"same-origin"</code> directive.
+              This will prevent the browser from sending referrer information when the
+              user navigates to a different domain.</p>
+
+            <p>If your website needs to send referrer information to other domains, but
+              you
+              don't want to leak sensitive information, you can use the
+              <code>"strict-origin-when-cross-origin"</code> directive. This will send
+              the referrer
+              information only when the referring page is from the same origin, and will
+              only include the origin (not the full URL) when the referring page is from
+              a
+              different origin.</p>
+
+            <p>If your website needs to send referrer information to other domains, and
+              you
+              don't need to hide the URL of the referring page, you can use the "origin"
+              or <code>"unsafe-url"</code> directive. The <code>"origin"</code>
+              directive will send only the origin
+              (not the full URL) in the referrer header, while the
+              <code>"unsafe-url"</code> directive
+              will send the full URL of the referring page.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
   <div class="row">
@@ -453,9 +551,15 @@
     options: options2
   });*/
 
+
+
+
+
 </script>
 <script>
-  var successPercentage = {{ scan_summary.tests_passed }} / {{ scan_summary.tests_quantity }} * 100;
+  const total = {{ scan_summary.tests_quantity }} -1;
+  const totalGood = {{ scan_summary.tests_passed }} -1;
+  var successPercentage = totalGood / total * 100;
   var failurePercentage = 100 - successPercentage;
 
   var data = [{
@@ -500,33 +604,6 @@
     },
     options: options
   });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1085,6 +1162,14 @@
       }
     });
   }
+
+
+
+
+
+
+
+
 
 
   </script>

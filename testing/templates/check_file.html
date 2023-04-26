@@ -12,8 +12,14 @@
         {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
         {% endif %}
+        <br />
+        <a href="{{ result.link }}" rel="noreferrer" target="_blank">Details of the scan.</a>
       {% endif %}
     {% endif %}
+  </div>
+
+  <div class="col-lg-5 col-md-5 mb-2">
+    Results provided by the <a href="https://github.com/pandora-analysis" rel="noreferrer" target="_blank">Pandora is an analysis framework</a>.
   </div>
 </main>
 {% endblock %}

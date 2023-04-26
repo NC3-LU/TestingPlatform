@@ -16,11 +16,9 @@
           <h5 class="card-title">Website</h5>
           <p>
             The website testing assesses the security of your website against known
-            vulnerabilities, then provides you recommendations to resolve each security
-            weakness identified
+            vulnerabilities, then provides you recommendations.
           </p>
 
-          <a class="align-self-end" href="#">Find out more about the test</a>
           <form method="post" action="infra-testing/http-test/">
             {% csrf_token %}
             {% if error %}
@@ -36,6 +34,7 @@
             </div>
             <input type="submit" value="Test" class="btn btn-secondary">
           </form>
+          <a class="align-self-end" href="#">About the test</a>
         </div>
       </div>
     </div>
@@ -44,9 +43,8 @@
         <div class="card-body d-flex flex-column ">
           <h5 class="card-title">Email</h5>
           <p>The email system testing assesses the security of your email systems
-            against known vulnerabilities, then provides you recommendations to resolve
-            each security weakness identified.</p>
-          <a class="align-self-end" href="#">Find out more about the test</a>
+            against known vulnerabilities.</p>
+
           <form method="post" action="infra-testing/email-test/" class="">
             {% csrf_token %}
             <div class="mb-3">
@@ -57,6 +55,7 @@
             </div>
             <input type="submit" value="Test" class="btn btn-secondary">
           </form>
+          <a class="align-self-end" href="#">About the test</a>
         </div>
       </div>
     </div>
@@ -65,10 +64,9 @@
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">File testing</h5>
           <p>
-            The website testing assesses...
+            Discover if a file is suspicious thanks to the Pandora analysis framework.
           </p>
 
-          <a class="align-self-end" href="#">Find out more about the test</a>
           <form method="post" action="infra-testing/file-test/" enctype="multipart/form-data">
             {% csrf_token %}
             {% if error %}
@@ -83,6 +81,7 @@
             </div>
             <input type="submit" value="Test" class="btn btn-secondary">
           </form>
+          <a class="align-self-end" href="#">About the test</a>
         </div>
       </div>
     </div>

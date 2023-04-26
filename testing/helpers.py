@@ -180,21 +180,26 @@ def file_check(
     """Checks a file by submitting it to a Pandora instance."""
     pandora_root_url = "https://pandora.circl.lu/"
     pandora_cli = pypandora.PyPandora(root_url=pandora_root_url)
-
-    # scan_start_time = time.time()
+    analysis_result: Dict[str, Any] = {}
 
     # Submit the file to Pandora for analysis.
+    # scan_start_time = time.time()
     result = pandora_cli.submit(file_in_memory, file_to_check_name, 50)
+    if not result["success"]:
+        # unsuccessfull submission of the file
+        return {
+            "result": analysis_result,
+        }
+
     time.sleep(0.1)
     # Get the status of a task.
-    res = pandora_cli.task_status(result["taskId"])
-
+    analysis_result = pandora_cli.task_status(result["taskId"])
     time.sleep(0.1)
     loop = 0
     while loop < (50 * 10):
-        res = pandora_cli.task_status(res["taskId"])
+        analysis_result = pandora_cli.task_status(analysis_result["taskId"])
         # Handle responde from Pandora
-        status = res["status"]
+        status = analysis_result["status"]
         if status != "WAITING":
             break
         print("Waiting...")
@@ -206,6 +211,8 @@ def file_check(
         loop += 1
     # scan_end_time = time.time()
 
+    analysis_result.update({"link": result["link"]})
+
     return {
-        "result": res,
+        "result": analysis_result,
     }

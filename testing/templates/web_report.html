@@ -7,9 +7,9 @@
     <div class="col-lg-3 d-flex align-items-center">
       <canvas id="chart1"></canvas>
     </div>
-    <div class="col-lg-6 d-flex align-items-center">
+    <!--<div class="col-lg-6 d-flex align-items-center">
       <canvas id="chart2"></canvas>
-    </div>
+    </div>-->
   </div>
   <div class="row justify-content-between">
     <div class="col-lg-7">
@@ -135,11 +135,12 @@
       </div>
       <div class="row my-4">
         <div class="col-lg-6 fs-2">Vulnerable</div>
-        <div class="col-lg-6"><span class="rounded-circle p-2 fs-3 text-white"
-                                    style=" background:#ff5c5c;">10</span>
+        <div class="col-lg-6"><span id="vulnerable-count" class="rounded-circle p-2 fs-3 text-white"
+                                    style=" background:#ff5c5c;">
+        </span>
         </div>
       </div>
-      <div class="row my-4">
+      <!--<div class="row my-4">
         <div class="col-lg-6 fs-2">Warning</div>
         <div class="col-lg-6"><span class="rounded-circle p-2 fs-3 text-black"
                                     style="background:#f5e230;">10</span>
@@ -150,10 +151,15 @@
         <div class="col-lg-6"><span class="rounded-circle p-2 fs-3 text-white"
                                     style="background:#2475e8;">10</span>
         </div>
-      </div>
+      </div>-->
     </div>
   </div>
 </section>
+<script>
+    const result = parseInt({{ scan_summary.tests_quantity }}) - parseInt({{ scan_summary.tests_passed }});
+    console.log(result);
+     document.getElementById('vulnerable-count').innerHTML = result ;
+</script>
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
@@ -198,7 +204,7 @@
               class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
         <i
           class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-       Global Recommendation
+        Global Recommendation
       </button>
 
       <div class="p-0 collapse" id="target2">
@@ -207,13 +213,14 @@
             implementing
             CSP, it is important to identify which types of resources your site needs to
             load such as scripts, stylesheets, images, and fonts.</p>
-            <p><b>Create a whitelist of
+          <p><b>Create a whitelist of
             allowed sources:</b><br> Once you have determined the types of
             resources your site needs to load, you should create a whitelist of allowed
             sources for each of them. This will prevent malicious sources from injecting
             unwanted code into your site.</p>
 
-          <p><b>Use the Content-Security-Policy header:</b><br>Add the Content-Security-Policy
+          <p><b>Use the Content-Security-Policy header:</b><br>Add the
+            Content-Security-Policy
             header
             to the HTTP response of your site. This header specifies the whitelist of
             allowed sources for each resource type.</p>
@@ -223,11 +230,13 @@
           <ul>
             <li><b>Content-Security-Policy: default-src 'self'</b></li>
           </ul>
-          <p><b>Test your CSP policy:</b> <br>After implementing your CSP policy, it is important
+          <p><b>Test your CSP policy:</b> <br>After implementing your CSP policy, it is
+            important
             to
             test it to ensure that it does not break any functionality of your site. You
             can use rescan and check if the CSP will pass.</p>
-            <p><b>Keep your CSP policy up to date:</b><br> As your site evolves, you may need to add
+          <p><b>Keep your CSP policy up to date:</b><br> As your site evolves, you may
+            need to add
             new
             resources or change the sources of existing resources. Therefore, it is
             important to review and update your CSP policy regularly to ensure that it
@@ -269,7 +278,7 @@
           <h3>Cookie: {{ cookie_key }}</h3>
           <ul>
             {% for attribute_key, attribute_value in cookie_value.items %}
-{% if attribute_key == "secure" and not attribute_value or attribute_key == "httponly" and not attribute_value %}
+            {% if attribute_key == "secure" and not attribute_value or attribute_key == "httponly" and not attribute_value %}
             <li class="text-danger fw-bold">{{ attribute_key }}: {{ attribute_value }}
             </li>
             {% else %}
@@ -393,7 +402,7 @@
 </section>
 
 <script>
-  const ctx2 = document.getElementById('chart2').getContext('2d');
+  /*const ctx2 = document.getElementById('chart2').getContext('2d');
 
   const data2 = {
     datasets: [{
@@ -442,36 +451,7 @@
     type: 'scatter',
     data: data2,
     options: options2
-  });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  });*/
 
 </script>
 <script>
@@ -520,6 +500,7 @@
     },
     options: options
   });
+
 
 
 
@@ -1106,20 +1087,5 @@
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   </script>
+</section>

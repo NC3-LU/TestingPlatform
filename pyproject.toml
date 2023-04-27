@@ -18,7 +18,7 @@ documentation = "https://testingplatform.readthedocs.io"
 keywords = ["test", "security", "internet-standard"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8,<4.0"
 django = "^4.1.7"
 django-bootstrap5 = "^22.1"
 django-icons = "^22.1"

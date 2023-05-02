@@ -5,7 +5,6 @@ import socket
 from typing import Any, Dict
 from urllib.parse import parse_qs, urlparse
 
-import checkdmarc
 import xmltodict
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -19,7 +18,7 @@ from ipwhois import IPDefinedError, IPWhois
 from testing_platform import settings
 
 from .forms import DMARCRecordForm, SPFRecordForm
-from .helpers import file_check, get_http_report, get_tls_report
+from .helpers import email_check, file_check, get_http_report, get_tls_report
 from .models import DMARCRecord, DMARCReport, MailDomain
 
 
@@ -81,9 +80,7 @@ def email_test(request):
         context = {"rescan": False}
         if "rescan" in request.POST:
             context["rescan"] = True
-        result = checkdmarc.check_domains([request.POST["target"]])
-        print(result)
-        # context.update(email_check(request.POST["target"], context["rescan"]))
+        context.update(email_check(request.POST["target"], context["rescan"]))
         return render(request, "check_email.html", context)
     else:
         return render(request, "check_email.html")
@@ -92,7 +89,6 @@ def email_test(request):
 def file_test(request):
     if request.method == "POST" and request.FILES["target"]:
         context: Dict[str, Any] = {}
-        # request.FILES['target'].name
         file_to_check = request.FILES["target"].read()
         file_to_check_name = request.FILES["target"].name
         context.update(file_check(file_to_check, file_to_check_name))

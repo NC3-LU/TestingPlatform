@@ -1,5 +1,7 @@
 import json
 import logging
+import os
+import subprocess
 import time
 from io import BytesIO
 from typing import Any, Dict
@@ -166,7 +168,19 @@ def get_tls_report(target, rescan):
 def email_check(target: str, rescan: bool) -> Dict[str, Any]:
     """Parses and validates MX, SPF, and DMARC records,
     Checks for DNSSEC deployment, Checks for STARTTLS and TLS support."""
-    result = checkdmarc.check_domains([target])
+
+    env = os.environ.copy()
+    cmd = [
+        # sys.exec_prefix + "/bin/python",
+        "checkdmarc",
+        target,
+        "-f",
+        "JSON",
+    ]
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+    (stdout, stderr) = p.communicate()
+    result = json.loads(stdout)
+    # result = checkdmarc.check_domains([target])
     json_result = checkdmarc.results_to_json(result)
     return {
         "result": json_result,

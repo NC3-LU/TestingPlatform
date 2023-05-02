@@ -179,9 +179,12 @@ def email_check(target: str, rescan: bool) -> Dict[str, Any]:
     ]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     (stdout, stderr) = p.communicate()
-    result = json.loads(stdout)
-    # result = checkdmarc.check_domains([target])
-    json_result = checkdmarc.results_to_json(result)
+    try:
+        result = json.loads(stdout)
+        # result = checkdmarc.check_domains([target])
+        json_result = checkdmarc.results_to_json(result)
+    except Exception:
+        json_result = {}
     return {
         "result": json_result,
         "domain_name": target,

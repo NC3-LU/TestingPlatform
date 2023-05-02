@@ -182,7 +182,7 @@ def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, An
 
     # Submit the file to Pandora for analysis.
     # scan_start_time = time.time()
-    result = pandora_cli.submit(file_in_memory, file_to_check_name, 50)
+    result = pandora_cli.submit(file_in_memory, file_to_check_name, 100)
     if not result["success"]:
         # unsuccessfull submission of the file
         return {

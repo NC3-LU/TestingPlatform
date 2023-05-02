@@ -6,7 +6,6 @@ import time
 from io import BytesIO
 from typing import Any, Dict
 
-import checkdmarc
 import pypandora
 import requests
 
@@ -182,11 +181,11 @@ def email_check(target: str, rescan: bool) -> Dict[str, Any]:
     try:
         result = json.loads(stdout)
         # result = checkdmarc.check_domains([target])
-        json_result = checkdmarc.results_to_json(result)
+        # json_result = checkdmarc.results_to_json(result)
     except Exception:
-        json_result = {}
+        result = {}
     return {
-        "result": json_result,
+        "result": result,
         "domain_name": target,
     }
 

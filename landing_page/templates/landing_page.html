@@ -10,13 +10,13 @@
 
 <div class="container-fluid my-5">
   <div class="row justify-content-center">
-    <div class="col-lg-5 col-md-5 mb-2">
+    <div class="col-lg-3 col-md-3 mb-2">
       <div class="h-100 card border border-2 ">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">Website</h5>
           <p>
             The website testing assesses the security of your website against known
-            vulnerabilities, then provides you recommendations.
+            vulnerabilities and provides you recommendations.
           </p>
 
           <form method="post" action="infra-testing/http-test/">
@@ -34,16 +34,17 @@
             </div>
             <input type="submit" value="Test" class="btn btn-secondary">
           </form>
-          <a class="align-self-end" href="#">About the test</a>
         </div>
+        <a class="align-self-end" href="#">About the test</a>
       </div>
     </div>
-    <div class="col-lg-5 col-md-5 mb-2">
+    <div class="col-lg-3 col-md-3 mb-2">
       <div class="card h-100 border border-2">
         <div class="card-body d-flex flex-column ">
           <h5 class="card-title">Email</h5>
           <p>The email system testing assesses the security of your email systems
-            against known vulnerabilities.</p>
+            against known vulnerabilities. It validates SPF and DMARC DNS records,
+            DNSSEC deployment, etc.</p>
 
           <form method="post" action="infra-testing/email-test/" class="">
             {% csrf_token %}
@@ -55,11 +56,11 @@
             </div>
             <input type="submit" value="Test" class="btn btn-secondary">
           </form>
-          <a class="align-self-end" href="#">About the test</a>
         </div>
+        <a class="align-self-end" href="#">About the test</a>
       </div>
     </div>
-    <div class="col-lg-3 col-md-5 mb-2">
+    <div class="col-lg-3 col-md-3 mb-2">
       <div class=" h-100 card border border-2 ">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">File testing</h5>
@@ -81,12 +82,12 @@
             </div>
             <input type="submit" value="Test" class="btn btn-secondary">
           </form>
-          <a class="align-self-end" href="#">About the test</a>
         </div>
+        <a class="align-self-end" href="#">About the test</a>
       </div>
     </div>
   </div>
-  <div class="row justify-content-center">
+  <!-- <div class="row justify-content-center">
     <div class="col-lg-3 mb-2">
       <div class=" h-100 card border border-2 ">
         <div class="card-body d-flex flex-column">
@@ -124,13 +125,13 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
 
 <div class="container-fluid">
-
+  <br />
   <div
-    class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
+    class="row bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
     <div class="col">
       <p class="lead">By registering to our platform you will have access to
         various <a

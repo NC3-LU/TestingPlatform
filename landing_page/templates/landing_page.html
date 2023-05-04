@@ -11,11 +11,11 @@
 <div class="container-fluid my-5">
   <div class="row justify-content-center">
     <div class="col-lg-3 col-md-3 mb-2">
-      <div class="h-100 card border border-2 ">
+      <div class="h-100 card shadow border border-2">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">Website</h5>
           <p>
-            The website testing assesses the security of your website against known
+            Assess the security of your website against known
             vulnerabilities and provides you recommendations.
           </p>
 
@@ -39,12 +39,11 @@
       </div>
     </div>
     <div class="col-lg-3 col-md-3 mb-2">
-      <div class="card h-100 border border-2">
+      <div class="card shadow h-100 border border-2">
         <div class="card-body d-flex flex-column ">
           <h5 class="card-title">Email</h5>
-          <p>The email system testing assesses the security of your email systems
-            against known vulnerabilities. It validates SPF and DMARC DNS records,
-            DNSSEC deployment, etc.</p>
+          <p>Assess the security of your email setup
+            (SPF and DMARC DNS records, DNSSEC deployment, etc.)</p>
 
           <form method="post" action="infra-testing/email-test/" class="">
             {% csrf_token %}
@@ -61,7 +60,7 @@
       </div>
     </div>
     <div class="col-lg-3 col-md-3 mb-2">
-      <div class=" h-100 card border border-2 ">
+      <div class=" h-100 card shadow border border-2">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">File testing</h5>
           <p>

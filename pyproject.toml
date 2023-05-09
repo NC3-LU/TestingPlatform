@@ -19,7 +19,7 @@ keywords = ["test", "security", "internet-standard"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-django = "^4.1.7"
+django = "^4.2.1"
 django-bootstrap5 = "^22.1"
 django-icons = "^22.1"
 django-widget-tweaks = ">=1.4.8,<1.5.0"

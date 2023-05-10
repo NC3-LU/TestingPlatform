@@ -4,13 +4,13 @@ project.
 Before starting to contribute please install the Git hook scripts:
 
 ```bash
-$ git clone https://github.com/
-$ cd testing-platform/
+$ git clone https://github.com/NC3-LU/TestingPlatform
+$ cd TestingPlatform/
 $ poetry install
 $ pre-commit install
 ```
 
-You can contribute to MOSP by:
+You can contribute by:
 
 - reporting bugs;
 - suggesting enhancements or new features;

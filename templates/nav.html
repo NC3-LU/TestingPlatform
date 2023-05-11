@@ -1,5 +1,5 @@
 {% load static %}
-<nav class="navbar navbar-expand-xl">
+<nav class="navbar navbar-light navbar-expand-xl">
     <div class="container-fluid d-flex flex-row justify-content-around">
 
         <a class="navbar-brand d-none d-lg-block" href="/"><img src="{% static 'img/logo-nc3-web.png' %}" height="65px"> Testing Platform</a>
@@ -7,14 +7,14 @@
         <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div id="navbar" class="collapse navbar-collapse">
-            <ul class="navbar-nav">
+        <div id="navbar" class="collapse navbar-collapse ">
+            <ul class="navbar-nav navbar-dark">
                 <li class="nav-item dropdown">
                     {% if user.is_authenticated %}
                     <a class="nav-link dropdown-toggle" href="#" id="dropdown07" data-bs-toggle="dropdown"
                        aria-expanded="false">Testing</a>
                     {% endif %}
-                    <ul class="dropdown-menu bg-dark" aria-labelledby="dropdown07">
+                    <ul class="dropdown-menu" aria-labelledby="dropdown07">
                         <li><h6 class="dropdown-header">System Checks</h6></li>
                         <li><a class="dropdown-item" href="/infra-testing/http-test">HTTP Test</a></li>
                         <!--<li><a class="dropdown-item" href="/infra-testing/whois-lookup">WHOIS Lookup</a></li>-->
@@ -30,9 +30,9 @@
                 </li>
             </ul>
 
-            <ul class="navbar-nav d-flex ms-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav d-flex ms-auto mb-2 mb-lg-0 navbar-dark ">
               <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-              <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+              <li class="nav-item"><a class="nav-link" href="{% url 'about'  %}">About</a></li>
               {% if user.is_authenticated %}
               <li><span class="nav-link" style="color: #BFD0DE">Welcome, {{ user.username }} | </span></li>
               {% if user.is_superuser %}

@@ -1,643 +1,1176 @@
 {% if result %}
-<button class="btn btn-light w-50 collapsible">HTTP Results</button>
-<section class="result-content authForm p-5">
-    <h2>Result for {{ domain_name }}:</h2>
-    <hr>
-    <div id="scan-summary" class="d-flex flex-column">
-        <div class="bg-light text-dark gradeBox">
-            <span>{{ scan_summary.grade }}</span>
+
+
+<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+
+  <h1 class="text-center">Overview of {{ domain_name }}</h1>
+  <div class="row justify-content-evenly mb-5">
+    <div class="col-lg-3 d-flex align-items-center">
+      <canvas id="chart1"></canvas>
+    </div>
+    <!--<div class="col-lg-6 d-flex align-items-center">
+      <canvas id="chart2"></canvas>
+    </div>-->
+  </div>
+  <div class="row justify-content-between">
+    <div class="col-lg-7">
+      <div class="row my-1">
+        <div class="col-lg-12 fs-3">
+          {% if result.content_security_policy.pass %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+          {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+          {% endif %}
+          {{ result.content_security_policy.score_description }}
         </div>
-        <span>Start time:  {{ scan_summary.start_time }}</span>
-        <span>End time:  {{ scan_summary.end_time }}</span>
-        <span>Score:  {{ scan_summary.score }}</span>
-        <span>Tests made:  {{ scan_summary.tests_passed }} [Passed] / {{ scan_summary.tests_quantity }} [Total]</span>
+      </div>
+      <div class="row my-1">
+        <div class="col-lg-12 fs-3">
+          {% if result.cookies.pass %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+          {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+          {% endif %}
+          {{ result.cookies.score_description }}
+        </div>
+      </div>
+      <div class="row my-1">
+        <div class="col-lg-12 fs-3">
+          {% if result.cross_origin_resource_sharing.pass %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+          {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+          {% endif %}
+          {{ result.cross_origin_resource_sharing.score_description }}
+        </div>
+      </div>
+      <div class="row my-1">
+        <div class="col-lg-12 fs-3">
+          {% if result.redirection.pass %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+          {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+          {% endif %}
+          {{ result.redirection.score_description }}
+        </div>
+      </div>
+      <div class="row my-1">
+        <div class="col-lg-12 fs-3">
+          {% if result.referrer_policy.pass %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+          {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+          {% endif %}
+          {{ result.referrer_policy.score_description }} (optional)
+        </div>
+      </div>
+      <div class="row my-1">
+        <div class="col-lg-12 fs-3">
+          {% if result.strict_transport_security.pass %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+          {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+          {% endif %}
+          {{ result.strict_transport_security.score_description }}
+        </div>
+      </div>
+      <div class="row my-1">
+        <div class="col-lg-12 fs-3">
+          {% if result.subresource_integrity.pass %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+          {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+          {% endif %}
+          {{ result.subresource_integrity.score_description }}
+        </div>
+      </div>
+      <div class="row my-1">
+        <div class="col-lg-12 fs-3">
+          {% if result.x_content_type_options.pass %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+          {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+          {% endif %}
+          {{ result.x_content_type_options.score_description }}
+        </div>
+      </div>
+      <div class="row my-1">
+        <div class="col-lg-12 fs-3">
+          {% if result.x_frame_options.pass %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+          {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+          {% endif %}
+          {{ result.x_frame_options.score_description }}
+        </div>
+      </div>
+      <div class="row my-1">
+        <div class="col-lg-12 fs-3">
+          {% if result.x_xss_protection.pass %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+          {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+          {% endif %}
+          {{ result.x_xss_protection.score_description }}
+        </div>
+      </div>
+      <!-- -- -->
     </div>
-    <hr>
-    <div class="">
-        <h3>Tests:</h3>
-        <table class="table table-light table-striped table-responsive">
-            <tr>
-                <th>Test</th>
-                <th>Pass</th>
-                <th>Reason</th>
-                <th>Score</th>
-            </tr>
-            <tr>
-                <td>Content Security Policy</td>
-                <td>{% if result.content_security_policy.pass %}
-                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                    {% else %}
-                    <i class="bi bi-hand-thumbs-down-fill"></i>
-                    {% endif %}
-                </td>
-                <td><code>{{ result.content_security_policy.score_description }}</code></td>
-                <td>{{ result.content_security_policy.score_modifier }}</td>
-            </tr>
-            <tr>
-                <td>Cookies</td>
-                <td>{% if result.cookies.pass %}
-                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                    {% else %}
-                    <i class="bi bi-hand-thumbs-down-fill"></i>
-                    {% endif %}
-                </td>
-                <td><code>{{ result.cookies.score_description }}</code></td>
-                <td>{{ result.cookies.score_modifier }}</td>
-            </tr>
-            <tr>
-                <td>Cross-origin Resource Sharing</td>
-                <td>{% if result.cross_origin_resource_sharing.pass %}
-                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                    {% else %}
-                    <i class="bi bi-hand-thumbs-down-fill"></i>
-                    {% endif %}
-                </td>
-                <td><code>{{ result.cross_origin_resource_sharing.score_description }}</code></td>
-                <td>{{ result.cross_origin_resource_sharing.score_modifier }}</td>
-            </tr>
-            <tr>
-                <td>HTTP Public Key Pinning</td>
-                <td>{% if result.public_key_pinning.pass %}
-                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                    {% else %}
-                    <i class="bi bi-hand-thumbs-down-fill"></i>
-                    {% endif %}
-                </td>
-                <td><code>{{ result.public_key_pinning.score_description }}</code></td>
-                <td>{{ result.public_key_pinning.score_modifier }}</td>
-            </tr>
-            <tr>
-                <td>Redirection</td>
-                <td>{% if result.redirection.pass %}
-                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                    {% else %}
-                    <i class="bi bi-hand-thumbs-down-fill"></i>
-                    {% endif %}
-                </td>
-                <td><code>{{ result.redirection.score_description }}</code></td>
-                <td>{{ result.redirection.score_modifier }}</td>
-            </tr>
-            <tr>
-                <td>Referrer Policy</td>
-                <td>{% if result.referrer_policy.pass %}
-                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                    {% else %}
-                    <i class="bi bi-hand-thumbs-down-fill"></i>
-                    {% endif %}
-                </td>
-                <td><code>{{ result.referrer_policy.score_description }}</code></td>
-                <td>{{ result.referrer_policy.score_modifier }}</td>
-            </tr>
-            <tr>
-                <td>HTTP Strict Transport Security</td>
-                <td>{% if result.strict_transport_security.pass %}
-                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                    {% else %}
-                    <i class="bi bi-hand-thumbs-down-fill"></i>
-                    {% endif %}
-                </td>
-                <td><code>{{ result.strict_transport_security.score_description }}</code></td>
-                <td>{{ result.strict_transport_security.score_modifier }}</td>
-            </tr>
-            <tr>
-                <td>Subresource Integrity</td>
-                <td>{% if result.subresource_integrity.pass %}
-                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                    {% else %}
-                    <i class="bi bi-hand-thumbs-down-fill"></i>
-                    {% endif %}
-                </td>
-                <td><code>{{ result.subresource_integrity.score_description }}</code></td>
-                <td>{{ result.subresource_integrity.score_modifier }}</td>
-            </tr>
-            <tr>
-                <td>X-Content-Type-Options</td>
-                <td>{% if result.x_content_type_options.pass %}
-                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                    {% else %}
-                    <i class="bi bi-hand-thumbs-down-fill"></i>
-                    {% endif %}
-                </td>
-                <td><code>{{ result.x_content_type_options.score_description }}</code></td>
-                <td>{{ result.x_content_type_options.score_modifier }}</td>
-            </tr>
-            <tr>
-                <td>X-Frame-Options</td>
-                <td>{% if result.x_frame_options.pass %}
-                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                    {% else %}
-                    <i class="bi bi-hand-thumbs-down-fill"></i>
-                    {% endif %}
-                </td>
-                <td><code>{{ result.x_frame_options.score_description }}</code></td>
-                <td>{{ result.x_frame_options.score_modifier }}</td>
-            </tr>
-            <tr>
-                <td>X-XSS-Protection</td>
-                <td>{% if result.x_xss_protection.pass %}
-                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                    {% else %}
-                    <i class="bi bi-hand-thumbs-down-fill"></i>
-                    {% endif %}
-                </td>
-                <td><code>{{ result.x_xss_protection.score_description }}</code></td>
-                <td>{{ result.x_xss_protection.score_modifier }}</td>
-            </tr>
-        </table>
+    <div class="col-lg-3">
+      <h1>Test Discovery</h1>
+      <div class="row my-4">
+        <div class="col-lg-6 fs-2">Good</div>
+        <div class="col-lg-6"><span id="good-count" class="rounded-circle p-2 fs-3 text-white"
+                                    style="background:#71cdba;"></span>
+        </div>
+      </div>
+      <div class="row my-4">
+        <div class="col-lg-6 fs-2">Vulnerable</div>
+        <div class="col-lg-6"><span id="vulnerable-count"
+                                    class="rounded-circle p-2 fs-3 text-white"
+                                    style=" background:#ff5c5c;">
+        </span>
+        </div>
+      </div>
+      <!--<div class="row my-4">
+        <div class="col-lg-6 fs-2">Warning</div>
+        <div class="col-lg-6"><span class="rounded-circle p-2 fs-3 text-black"
+                                    style="background:#f5e230;">10</span>
+        </div>
+      </div>
+      <div class="row my-4">
+        <div class="col-lg-6 fs-2">Informational</div>
+        <div class="col-lg-6"><span class="rounded-circle p-2 fs-3 text-white"
+                                    style="background:#2475e8;">10</span>
+        </div>
+      </div>-->
     </div>
-    <h3>Server Headers</h3>
-    <table class="table table-light table-bordered table-striped">
-        <tr>
-            <th>Header</th>
-            <th>Value</th>
-        </tr>
-        <tr>
-            <td>Accept-Ranges</td>
-            <td>{{ headers.Accept_Ranges }}</td>
-        </tr>
-        <tr>
-            <td>Connection</td>
-            <td>{{ headers.Connection }}</td>
-        </tr>
-        <tr>
-            <td>Content-Encoding</td>
-            <td>{{ headers.Content_Encoding }}</td>
-        </tr>
-        <tr>
-            <td>Content-Length</td>
-            <td>{{ headers.Content_Length}}</td>
-        </tr>
-        <tr>
-            <td>Content-Security-Policy</td>
-            <td>{{ headers.Content_Security_Policy}}</td>
-        </tr>
-        <tr>
-            <td>Content-Type</td>
-            <td>{{ headers.Content_Type}}</td>
-        </tr>
-        <tr>
-            <td>Date</td>
-            <td>{{ headers.Date}}</td>
-        </tr>
-        <tr>
-            <td>ETag</td>
-            <td>{{ headers.ETag}}</td>
-        </tr>
-        <tr>
-            <td>Keep-Alive</td>
-            <td>{{ headers.Keep_Alive}}</td>
-        </tr>
-        <tr>
-            <td>Last-Modified</td>
-            <td>{{ headers.Last_Modified}}</td>
-        </tr>
-        <tr>
-            <td>Permissions-Policy</td>
-            <td>{{ headers.Permissions_Policy}}</td>
-        </tr>
-        <tr>
-            <td>Referrer-Policy</td>
-            <td>{{ headers.Referrer_Policy}}</td>
-        </tr>
-        <tr>
-            <td>Server</td>
-            <td>{{ headers.Server}}</td>
-        </tr>
-        <tr>
-            <td>Strict-Transport-Security</td>
-            <td>{{ headers.Strict_Transport_Security}}</td>
-        </tr>
-        <tr>
-            <td>Vary</td>
-            <td>{{ headers.Vary}}</td>
-        </tr>
-        <tr>
-            <td>X-Content-Type-Options</td>
-            <td>{{ headers.X_Content_Type_Options}}</td>
-        </tr>
-    </table>
-    <h3>Grade history</h3>
-    <table class="table table-light table-bordered table-striped">
-        <tr>
-            <th>Date</th>
-            <th>Score</th>
-            <th>Grade</th>
-        </tr>
-        {%for v in scan_history%}
-        <tr>
-            <td>{{v.end_time}}</td>
-            <td>{{v.score}}</td>
-            <td>{{v.grade}}</td>
-        </tr>
-        {% endfor %}
-    </table>
+  </div>
 </section>
-{% endif %}
-{% if tls_results %}
-    <button class="btn w-50 btn-light collapsible">TLS Results</button>
-    <section class="result-content authForm p-5">
-        <h2>Result for {{ domain_name }}:</h2>
-        <hr>
-        <div id="tls-scan-summary" class="d-flex flex-column mb-4">
-            <span>TLS Scan ID: {{ tls_results.id }}</span>
-            <span>Timestamp: {{ tls_results.timestamp }}</span>
-            <span>Target: {{ tls_results.target }}</span>
-            <span>Replay: {{ tls_results.replay }}</span>
-            <span>Has TLS: {% if tls_results.has_tls is True %}
-                        <span class="badge bg-success">{{ tls_results.has_tls }}</span>
-                        {% else %}
-                        <span class="badge bg-danger">{{ tls_results.has_tls }}</span>
-                        {% endif %}</span>
-            <span>CERT ID: {{ tls_results.cert_id }}</span>
-            <span>TRUST ID: {{ tls_results.trust_id }}</span>
-            <span>Is valid: {% if tls_results.is_valid is True %}
-                        <span class="badge bg-success">{{ tls_results.is_valid }}</span>
-                        {% else %}
-                        <span class="badge bg-danger">{{ tls_results.is_valid }}</span>
-                        {% endif %}</span>
-            <span>Completion perc: {{ tls_results.completion_perc }}</span>
-            <span>Ack: {% if tls_results.ack is True %}
-                        <span class="badge bg-success">{{ tls_results.ack }}</span>
-                        {% else %}
-                        <span class="badge bg-danger">{{ tls_results.ack }}</span>
-                        {% endif %}</span>
-            <span>Attempts: {{ tls_results.attempts }}</span>
+<script>
+    const result = parseInt({{ scan_summary.tests_quantity }} - 1) - parseInt({{ scan_summary.tests_passed }} - 1);
+
+     document.getElementById('vulnerable-count').innerHTML = '&nbsp;' + result + '&nbsp;' ;
+     document.getElementById('good-count').innerHTML = '&nbsp;' + parseInt({{ scan_summary.tests_passed }} - 1) + '&nbsp;' ;
+</script>
+<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+  <div class="row">
+    <div class="col-lg-12 fs-1 fw-bold">
+      {% if result.content_security_policy.pass %}
+      <i class="bi bi-check-circle-fill color-success"> </i>
+      {% else %}
+      <i class="bi bi-x-circle-fill color-danger"></i>
+      {% endif %} {{ result.content_security_policy.score_description}}
+    </div>
+    <div class="col-lg-12 fs-4">
+      <p>Content Security Policy (CSP) is an HTTP header that allows site operators
+        fine-grained control over where resources on their site can be loaded from. The
+        use of this header is the best method to prevent cross-site scripting (XSS)
+        vulnerabilities. Due to the difficulty in retrofitting CSP into existing
+        websites, CSP is mandatory for all new websites and is strongly recommended for
+        all existing high-risk sites.</p>
+    </div>
+    {% if result.content_security_policy.data %}
+    <div class="row my-2">
+      <button type="button" data-bs-toggle="collapse" data-bs-target="#target1"
+              aria-expanded="false" aria-controls="collapseExample"
+              class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+        <i style="color: #4ecb71 !important;"
+           class="p-2 rounded-circle bi bi-chevron-right bg-white me-3"></i>
+        Current CSP
+      </button>
+
+      <div class="p-0 collapse" id="target1">
+        <div class="p-3 border-bottom border-end border-start">
+          The current set CSP is the following:
+          <code>
+            Content-Security-Policy
+          </code>
         </div>
-        <h3>Connection Info</h3>
-        <table class="table table-light table-striped">
-            <tr>
-                <th>Scan IP</th>
-                <td>{{ tls_results.connection_info.scanIP }}</td>
-            </tr>
-            <tr>
-                <th>Serverside</th>
-                <td>{% if tls_results.connection_info.serverside is True %}
-                    <span class="badge bg-success">{{ tls_results.connection_info.serverside }}</span>
-                    {% else %}
-                    <span class="badge bg-danger">{{ tls_results.connection_info.serverside }}</span>
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <th>Curves Fallback</th>
-                <td>{% if tls_results.connection_info.curvesFallback is True %}
-                    <span class="badge bg-success">{{ tls_results.connection_info.curvesFallback }}</span>
-                    {% else %}
-                    <span class="badge bg-danger">{{ tls_results.connection_info.curvesFallback }}</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% for v in tls_results.connection_info.ciphersuite %}
-            <tr class="table-dark">
-                <th>Row</th>
-                <td></td>
-            </tr>
-            <tr>
-                <th>Cipher</th>
-                <td>{{ v.cipher }}</td>
-            </tr>
-            <tr>
-                <th>Code</th>
-                <td>{{ v.code }}</td>
-            </tr>
-            <tr>
-                <th>Protocols</th>
-                <td>{{ v.protocols }}</td>
-            </tr>
-            <tr>
-                <th>Pubkey</th>
-                <td>{{ v.pubkey }}</td>
-            </tr>
-            <tr>
-                <th>Sigalg</th>
-                <td>{{ v.sigalg }}</td>
-            </tr>
-            <tr>
-                <th>Ticket Hint</th>
-                <td>{{ v.ticket_hint }}</td>
-            </tr>
-            <tr>
-                <th>OCSP Stapling</th>
-                <td>
-                    {% if v.ocsp_stapling is True %}
-                    <span class="badge bg-success">{{ v.ocsp_stapling }}</span>
-                    {% else %}
-                    <span class="badge bg-danger">{{ v.ocsp_stapling }}</span>
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <th>PFS</th>
-                <td>{{ v.pfs }}</td>
-            </tr>
-            <tr>
-                <th>Curves</th>
-                <td>{{ v.curves}}</td>
-            </tr>
+      </div>
+    </div>
+    {% endif %}
+    {% if not result.content_security_policy.pass %}
+    <div class="row my-2">
+      <button type="button" data-bs-toggle="collapse" data-bs-target="#target2"
+              aria-expanded="false" aria-controls="collapseExample"
+              class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+        <i
+          class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+        Global Recommendation
+      </button>
+
+      <div class="p-0 collapse" id="target2">
+        <div class="p-4 border-bottom border-end border-start">
+          <p>Determine what types of resources your site should load: Before
+            implementing
+            CSP, it is important to identify which types of resources your site needs to
+            load such as scripts, stylesheets, images, and fonts.</p>
+          <p><b>Create a whitelist of
+            allowed sources:</b><br> Once you have determined the types of
+            resources your site needs to load, you should create a whitelist of allowed
+            sources for each of them. This will prevent malicious sources from injecting
+            unwanted code into your site.</p>
+
+          <p><b>Use the Content-Security-Policy header:</b><br>Add the
+            Content-Security-Policy
+            header
+            to the HTTP response of your site. This header specifies the whitelist of
+            allowed sources for each resource type.</p>
+          <p>For example, the following header
+            specifies that only resources from the same origin as the site are allowed:
+          </p>
+          <ul>
+            <li><b>Content-Security-Policy: default-src 'self'</b></li>
+          </ul>
+          <p><b>Test your CSP policy:</b> <br>After implementing your CSP policy, it is
+            important
+            to
+            test it to ensure that it does not break any functionality of your site. You
+            can use rescan and check if the CSP will pass.</p>
+          <p><b>Keep your CSP policy up to date:</b><br> As your site evolves, you may
+            need to add
+            new
+            resources or change the sources of existing resources. Therefore, it is
+            important to review and update your CSP policy regularly to ensure that it
+            remains effective.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</section>
+
+<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+  <div class="row">
+    <div class="col-lg-12 fs-1 fw-bold">
+      {% if result.cookies.pass %}
+      <i class="bi bi-check-circle-fill color-success"> </i>
+      {% else %}
+      <i class="bi bi-x-circle-fill color-danger"></i>
+      {% endif %} {{ result.cookies.score_description}}
+    </div>
+    <div class="col-lg-12 fs-4">
+      <p>Using cookies attributes such as Secure and HttpOnly can protect users from
+        having their personal information stolen.</p>
+    </div>
+  </div>
+  {% if result.cookies.output.data %}
+  <div class="row my-2">
+    <button type="button" data-bs-toggle="collapse" data-bs-target="#cookies-found"
+            aria-expanded="false" aria-controls="collapseExample"
+            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+      <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+      Cookies found
+    </button>
+
+    <div class="p-0 collapse" id="cookies-found">
+      <div class="p-3 border-bottom border-end border-start">
+        <div class="table-responsive">
+          {% for cookie_key, cookie_value in result.cookies.output.data.items %}
+          <h3>Cookie: {{ cookie_key }}</h3>
+          <ul>
+            {% for attribute_key, attribute_value in cookie_value.items %}
+            {% if attribute_key == "secure" and not attribute_value or attribute_key == "httponly" and not attribute_value %}
+            <li class="text-danger fw-bold">{{ attribute_key }}: {{ attribute_value }}
+            </li>
+            {% else %}
+            <li>{{ attribute_key }}: {{ attribute_value }}</li>
+            {% endif %}
             {% endfor %}
-        </table>
-        <h3>Analysis</h3>
-        <table class="table table-light table-striped">
-            {% for v in tls_results.analysis %}
+          </ul>
+          {% endfor %}
+        </div>
 
-            <tr class="table-dark">
-                <th>Row</th>
-                <td></td>
-            </tr>
-            <tr>
-                <th>ID</th>
-                <td>{{ v.id }}</td>
-            </tr>
-            <tr>
-                <th>Analyzer</th>
-                <td>{{ v.analyzer}}</td>
-            </tr>
-            <tr>
-                <th>Success</th>
-                <td> {% if v.success is True %}
-                    <span class="badge bg-success">{{ v.success }}</span>
-                    {% else %}
-                    <span class="badge bg-danger">{{ v.success }}</span>
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <th>Result:</th>
-                <td></td>
-            </tr>
-            {% if v.result.bugs %}
-            <tr>
-                <th>Bugs:</th>
-                <td>{{ v.result.bugs }}</td>
-            </tr>
-            {% endif %}
-            {% if v.result.errors %}
-            <tr>
-                <th>Errors:</th>
-                <td>{{ v.result.errors }}</td>
-            </tr>
-            {% endif %}
-            {% if v.result.notices %}
-            <tr>
-                <th>Notices:</th>
-                <td>{{ v.result.notices }}</td>
-            </tr>
-            {% endif %}
-            {% if v.result.warnings %}
-            <tr>
-                <th>Warnings:</th>
-                <td>{{ v.result.warnings }}</td>
-            </tr>
-            {% endif %}
-            {% if v.result.fatalErrors %}
-            <tr>
-                <th>Fatal Errors:</th>
-                <td>{{ v.result.fatalErrors }}</td>
-            </tr>
-            {% endif %}
-            {% if v.result.informational %}
-            <tr>
-                <th>Informational:</th>
-                <td>{{ v.result.informational }}</td>
-            </tr>
-            {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</section>
 
-            {% if v.result.host %}
-            <tr>
-                <th>Host:</th>
-                <td>{{ v.result.host }}</td>
-            </tr>
-            {% endif %}
-            {% if v.result.issue %}
-            <tr>
-                <th>Issue:</th>
-                <td>{{ v.result.issue }}</td>
-            </tr>
-            {% endif %}
-            {% if v.result.has_caa is True or v.result.has_caa is False %}
-            <tr>
-                <th>Has CAA:</th>
-                <td>
-                    {% if v.result.has_caa is True %}
-                    <span class="badge bg-success">{{ v.result.has_caa }}</span>
-                    {% else %}
-                    <span class="badge bg-danger">{{ v.result.has_caa }}</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endif %}
-            {% if v.result.issuewild %}
-            <tr>
-                <th>Issue Wild:</th>
-                <td>{{ v.result.issuewild }}</td>
-            </tr>
-            {% endif %}
-            {% if v.result.level %}
-            <tr>
-                <th>Level</th>
-                <td>{{ v.result.level }}</td>
-            </tr>
-            {% endif %}
-            {% if v.result.grade %}
-            <tr>
-                <th>Grade:</th>
-                <td>{{ v.result.grade }}</td>
-            </tr>
-            {% endif %}
-            {% if v.result.lettergrade %}
-            <tr>
-                <th>Lettergrade:</th>
-                <td>{{ v.result.lettergrade }}</td>
-            </tr>
-            {% endif %}
-            {% if v.result.failures %}
-            <tr>
-                <th>Failures:</th>
-                <td></td>
-            </tr>
-            {% endif %}
-            {% for k1, v1 in v.result.failures.items %}
-            <tr>
-                <th>{{ k1 }}</th>
-                <td></td>
-            </tr>
-            {% for v2 in v1 %}
-            <tr>
-                <th></th>
-                <td>{{ v2 }}</td>
-            </tr>
-            {% endfor %}
-            {% endfor %}
-            <!-- ANDROID ROWS SECTION -->
+<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+  <div class="row">
+    <div class="col-lg-12 fs-1 fw-bold">
+      {% if result.cross_origin_resource_sharing.pass %}
+      <i class="bi bi-check-circle-fill color-success"> </i>
+      {% else %}
+      <i class="bi bi-x-circle-fill color-danger"></i>
+      {% endif %} {{ result.cross_origin_resource_sharing.score_description}}
+    </div>
+    <div class="col-lg-12 fs-4">
+      <p>Cross-Origin Resource Sharing (CORS) is an HTTP-header based mechanism that
+        allows a server to indicate any origins (domain, scheme, or port) other than its
+        own from which a browser should permit loading resources. CORS also relies on a
+        mechanism by which browsers make a "preflight" request to the server hosting the
+        cross-origin resource, in order to check that the server will permit the actual
+        request. In that preflight, the browser sends headers that indicate the HTTP
+        method and headers that will be used in the actual request.</p>
+    </div>
+  </div>
+</section>
+<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+  <div class="row">
+    <div class="col-lg-12 fs-1 fw-bold">
+      {% if result.redirection.pass %}
+      <i class="bi bi-check-circle-fill color-success"></i>
+      {% else %}
+      <i class="bi bi-x-circle-fill color-danger"></i>
+      {% endif %} {{ result.redirection.score_description}}
+    </div>
+    <div class="col-lg-12 fs-4">
+      <p>Properly configured redirections from HTTP to HTTPS allow browsers to correctly
+        apply HTTP Strict Transport Security (HSTS) settings.</p>
+    </div>
+  </div>
+</section>
 
-            {% for v10 in v.result %}
+<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+  <div class="row">
+    <div class="col-lg-12 fs-1 fw-bold">
+      {% if result.referrer_policy.pass %}
+      <i class="bi bi-check-circle-fill color-success"></i>
+      {% else %}
+      <i class="bi bi-x-circle-fill color-danger"></i>
+      {% endif %} {{ result.referrer_policy.score_description}}
+    </div>
+    <div class="col-lg-12 fs-4">
+      <p>Referrer Policy can protect the privacy of your users by restricting the
+        contents of the HTTP Referer header.</p>
+    </div>
+    <div class="row my-2">
+      <button type="button" data-bs-toggle="collapse" data-bs-target="#referrer-policy"
+              aria-expanded="false" aria-controls="collapseExample"
+              class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+        <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+        How to set the referrer policy and what to set?
+      </button>
 
-            {% if v10.name %}
-            <tr class="table-dark">
-                <th></th>
-                <th>Subrow</th>
-            </tr>
-            <tr>
-                <th>Name:</th>
-                <td>{{ v10.name }}</td>
-            </tr>
-            {% endif %}
-            {% if v10.version %}
-            <tr>
-                <th>Version:</th>
-                <td>{{ v10.version }}</td>
-            </tr>
-            {% endif %}
-            {% if v10.curve_code %}
-            <tr>
-                <th>Curve Code:</th>
-                <td>{{ v10.curve_code }}</td>
-            </tr>
-            {% endif %}
-            {% if v10.is_supported is True or v10.is_supported is False %}
-            <tr>
-                <th>Is supported:</th>
-                <td>
-                    {% if v10.is_supported is True %}
-                    <span class="badge bg-success">{{ v10.is_supported }}</span>
-                    {% else %}
-                    <span class="badge bg-danger">{{ v10.is_supported }}</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endif %}
-            {% if v10.protocol_code %}
-            <tr>
-                <th>Protocol Code:</th>
-                <td>{{ v10.protocol_code }}</td>
-            </tr>
-            {% endif %}
-            {% if v10.curve %}
-            <tr>
-                <th>Curve:</th>
-                <td>{{ v10.curve }}</td>
-            </tr>
-            {% endif %}
-            {% if v10.platform %}
-            <tr>
-                <th>Platform:</th>
-                <td>{{ v10.platform }}</td>
-            </tr>
-            {% endif %}
-            {% if v10.ciphersuite %}
-            <tr>
-                <th>Ciphersuite:</th>
-                <td>{{ v10.ciphersuite }}</td>
-            </tr>
-            {% endif %}
-             {% if v10.ciphersuite_code %}
-            <tr>
-                <th>Ciphersuite Code:</th>
-                <td>{{ v10.ciphersuite_code }}</td>
-            </tr>
-            {% endif %}
+      <div class="p-0 collapse" id="referrer-policy">
+        <div class=" p-3 border-bottom border-end border-start">
+          <p>You can set the header in an apache configuration file or in a
+            root web directory over an <code>.htaccess</code> file.</p>
 
-            {% endfor %}
+          <p>You need to add:<br>
+            <code>Header set Referrer-Policy <b>"replace-with-the-policy-you-want-to-use"</b></code>
+          </p>
+          <div class="col-lg-6">
+            <h4>What policies do exist?</h4>
+            <ul>
+              <li><b>"no-referrer"</b>- Do not send the referrer header.</li>
+              <li><b>"no-referrer-when-downgrade"</b> - Send the referrer header only
+                when
+                the referring page is using HTTPS.
+              </li>
+              <li><b>"same-origin"</b>- Send the referrer header only when the referring
+                page is from the same origin (same domain and protocol).
+              </li>
+              <li><b>"strict-origin"</b> - Send the referrer header only when the
+                referring page is from the same origin, and only include the origin, not
+                the full URL.
+              </li>
+              <li><b>"strict-origin-when-cross-origin"</b> - Send the referrer header
+                only
+                when the referring page is from the same origin, and only include the
+                origin when the referring page is from a different origin.
+              </li>
+              <li><b>"unsafe-url"</b> - Always send the full URL in the referrer header,
+                even when the referring page is from a different origin.
+              </li>
+            </ul>
+            <h4>Which one to use?</h4>
+            <p>
+              If your website doesn't need to send any referrer information to other
+              domains, you can use the <code>"no-referrer"</code> directive. This will
+              prevent the
+              browser from sending any referrer information in the HTTP header.</p>
 
-            <!-- SymantecDistrust -->
-            {% if v.result.reasons %}
-            <tr>
-                <th>Reasons:</th>
-                <td></td>
-            </tr>
-            {% for v3 in v.result.reasons%}
-            <tr>
-                <th></th>
-                <td>{{ v3 }}</td>
-            </tr>
-            {% endfor %}
-            {% endif %}
+            <p>If your website needs to send referrer information only when the user is
+              navigating within your own domain, you can use the
+              <code>"same-origin"</code> directive.
+              This will prevent the browser from sending referrer information when the
+              user navigates to a different domain.</p>
 
-            {% if v.result.isDistrusted is True or v.result.isDistrusted is False %}
-            <tr>
-                <th>Is Distrusted:</th>
-                <td>
-                    {% if v.result.isDistrusted is True %}
-                    <span class="badge bg-success">{{ v.result.isDistrusted }}</span>
-                    {% else %}
-                    <span class="badge bg-danger">{{ v.result.isDistrusted }}</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endif %}
+            <p>If your website needs to send referrer information to other domains, but
+              you
+              don't want to leak sensitive information, you can use the
+              <code>"strict-origin-when-cross-origin"</code> directive. This will send
+              the referrer
+              information only when the referring page is from the same origin, and will
+              only include the origin (not the full URL) when the referring page is from
+              a
+              different origin.</p>
 
+            <p>If your website needs to send referrer information to other domains, and
+              you
+              don't need to hide the URL of the referring page, you can use the "origin"
+              or <code>"unsafe-url"</code> directive. The <code>"origin"</code>
+              directive will send only the origin
+              (not the full URL) in the referrer header, while the
+              <code>"unsafe-url"</code> directive
+              will send the full URL of the referring page.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-            <!-- TOP1M -->
-            {% if v.result.target %}
-            <tr>
-                <th>Target:</th>
-                <td></td>
-            </tr>
-            {% for k4,v4 in v.result.target.items %}
-            <tr>
-                <th>{{ k4 }}</th>
-                <td>{{ v4 }}</td>
-            </tr>
-            {% endfor %}
-            {% endif %}
-
-            {% if v.result.certificate %}
-            <tr>
-                <th>Certificate:</th>
-                <td></td>
-            </tr>
-            {% for k5,v5 in v.result.certificate.items %}
-            <tr>
-                <th>{{ k5 }}</th>
-                <td>{{ v5 }}</td>
-            </tr>
-            {% endfor %}
-            {% endif %}
-
-            {% endfor %}
-        </table>
-    </section>
-{% endif %}
+<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+  <div class="row">
+    <div class="col-lg-12 fs-1 fw-bold">
+      <i class="bi bi-database-fill-gear text-warning"></i> Server Headers
+    </div>
+  </div>
+  <div class="row my-2">
+    <table class="table table-light table-bordered table-striped">
+      <tr>
+        <th>Header</th>
+        <th>Value</th>
+      </tr>
+      <tr>
+        <td>Accept-Ranges</td>
+        <td>{{ headers.Accept_Ranges }}</td>
+      </tr>
+      <tr>
+        <td>Connection</td>
+        <td>{{ headers.Connection }}</td>
+      </tr>
+      <tr>
+        <td>Content-Encoding</td>
+        <td>{{ headers.Content_Encoding }}</td>
+      </tr>
+      <tr>
+        <td>Content-Length</td>
+        <td>{{ headers.Content_Length}}</td>
+      </tr>
+      <tr>
+        <td>Content-Security-Policy</td>
+        {% if headers.Content_Security_Policy %}
+        <td>{{ headers.Content_Security_Policy}}</td>
+        {% else %}
+        <td class="bg-danger fw-bold">Not implemented</td>
+        {% endif %}
+      </tr>
+      <tr>
+        <td>Content-Type</td>
+        <td>{{ headers.Content_Type}}</td>
+      </tr>
+      <tr>
+        <td>Date</td>
+        <td>{{ headers.Date}}</td>
+      </tr>
+      <tr>
+        <td>ETag</td>
+        <td>{{ headers.ETag}}</td>
+      </tr>
+      <tr>
+        <td>Keep-Alive</td>
+        <td>{{ headers.Keep_Alive}}</td>
+      </tr>
+      <tr>
+        <td>Last-Modified</td>
+        <td>{{ headers.Last_Modified}}</td>
+      </tr>
+      <tr>
+        <td>Permissions-Policy</td>
+        <td>{{ headers.Permissions_Policy}}</td>
+      </tr>
+      <tr>
+        <td>Referrer-Policy</td>
+        <td>{{ headers.Referrer_Policy}}</td>
+      </tr>
+      <tr>
+        <td>Server</td>
+        <td>{{ headers.Server}}</td>
+      </tr>
+      <tr>
+        <td>Strict-Transport-Security</td>
+        <td>{{ headers.Strict_Transport_Security}}</td>
+      </tr>
+      <tr>
+        <td>Vary</td>
+        <td>{{ headers.Vary}}</td>
+      </tr>
+      <tr>
+        <td>X-Content-Type-Options</td>
+        <td>{{ headers.X_Content_Type_Options}}</td>
+      </tr>
+    </table>
+  </div>
+</section>
 
 <script>
-var coll = document.getElementsByClassName("collapsible");
-var i;
+  /*const ctx2 = document.getElementById('chart2').getContext('2d');
 
-for (i = 0; i < coll.length; i++) {
-coll[i].addEventListener("click", function() {
-this.classList.toggle("active");
-var content = this.nextElementSibling;
-if (content.style.display === "block") {
-  content.style.display = "none";
-} else {
-    content.style.display = "block";
-}
-});
-}
+  const data2 = {
+    datasets: [{
+      label: 'Blue Dataset',
+      data: [
+        {x: 1, y: 3},
+        {x: 2, y: 7},
+        {x: 3, y: 5},
+      ],
+      backgroundColor: 'rgba(75, 192, 192, 0.5)',
+      borderColor: 'rgba(75, 192, 192, 1)',
+      borderWidth: 1,
+    }, {
+      label: 'Red Dataset',
+      data: [
+        {x: 4, y: 8},
+        {x: 5, y: 2},
+        {x: 6, y: 1},
+      ],
+      backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      borderColor: 'rgba(255, 99, 132, 1)',
+      borderWidth: 1,
+    }, {
+      label: 'Orange Dataset',
+      data: [
+        {x: 7, y: 6},
+        {x: 8, y: 9},
+        {x: 9, y: 4},
+      ],
+      backgroundColor: 'rgba(255, 159, 64, 0.5)',
+      borderColor: 'rgba(255, 159, 64, 1)',
+      borderWidth: 1,
+    }]
+  };
 
+  const options2 = {
+    scales: {
+      x: {
+        type: 'linear',
+        position: 'bottom',
+      }
+    }
+  };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  const myChart2 = new Chart(ctx2, {
+    type: 'scatter',
+    data: data2,
+    options: options2
+  });*/
 
 
 
 
 
 </script>
+<script>
+  const total = {{ scan_summary.tests_quantity }} -1;
+  const totalGood = {{ scan_summary.tests_passed }} -1;
+  var successPercentage = totalGood / total * 100;
+  var failurePercentage = 100 - successPercentage;
+
+  var data = [{
+    data: [successPercentage, failurePercentage],
+    backgroundColor: [
+      "#4ecb71",
+      "#ff5c5c",
+    ],
+    borderColor: "#fff"
+  }];
+
+  var options = {
+    tooltips: {
+      enabled: false
+    },
+    plugins: {
+       datalabels: {
+            formatter: (value, ctx) => {
+                let sum = 0;
+                let dataArr = ctx.chart.data.datasets[0].data;
+                dataArr.map(data => {
+                    sum += data;
+                });
+                let percentage = (value*100 / sum).toFixed(2)+"%";
+                return percentage;
+            },
+            color: '#fff',
+        },
+        title: {
+      display: true,
+      text: 'Score'
+    }
+    },
+
+  };
+
+  var ctx = document.getElementById("chart1").getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      datasets: data
+    },
+    options: options
+  });
+
+
+
+
+</script>
+
+<button class="btn btn-light w-50 collapsible">HTTP Results</button>
+<section class="result-content authForm p-5">
+  <h2>Result for {{ domain_name }}:</h2>
+  <hr>
+  <div id="scan-summary" class="d-flex flex-column">
+    <div class="bg-light text-dark gradeBox">
+      <span>{{ scan_summary.grade }}</span>
+    </div>
+    <span>Start time:  {{ scan_summary.start_time }}</span>
+    <span>End time:  {{ scan_summary.end_time }}</span>
+    <span>Score:  {{ scan_summary.score }}</span>
+    <span>Tests made:  {{ scan_summary.tests_passed }} [Passed] / {{ scan_summary.tests_quantity }} [Total]</span>
+  </div>
+  <hr>
+  <div class="">
+    <h3>Tests:</h3>
+    <table class="table table-light table-striped table-responsive">
+      <tr>
+        <th>Test</th>
+        <th>Pass</th>
+        <th>Reason</th>
+        <th>Score</th>
+      </tr>
+      <tr>
+        <td>Content Security Policy</td>
+        <td>{% if result.content_security_policy.pass %}
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+          {% else %}
+          <i class="bi bi-hand-thumbs-down-fill"></i>
+          {% endif %}
+        </td>
+        <td><code>{{ result.content_security_policy.score_description }}</code></td>
+        <td>{{ result.content_security_policy.score_modifier }}</td>
+      </tr>
+      <tr>
+        <td>Cookies</td>
+        <td>{% if result.cookies.pass %}
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+          {% else %}
+          <i class="bi bi-hand-thumbs-down-fill"></i>
+          {% endif %}
+        </td>
+        <td><code>{{ result.cookies.score_description }}</code></td>
+        <td>{{ result.cookies.score_modifier }}</td>
+      </tr>
+      <tr>
+        <td>Cross-origin Resource Sharing</td>
+        <td>{% if result.cross_origin_resource_sharing.pass %}
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+          {% else %}
+          <i class="bi bi-hand-thumbs-down-fill"></i>
+          {% endif %}
+        </td>
+        <td><code>{{ result.cross_origin_resource_sharing.score_description }}</code>
+        </td>
+        <td>{{ result.cross_origin_resource_sharing.score_modifier }}</td>
+      </tr>
+      <tr>
+        <td>HTTP Public Key Pinning</td>
+        <td>{% if result.public_key_pinning.pass %}
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+          {% else %}
+          <i class="bi bi-hand-thumbs-down-fill"></i>
+          {% endif %}
+        </td>
+        <td><code>{{ result.public_key_pinning.score_description }}</code></td>
+        <td>{{ result.public_key_pinning.score_modifier }}</td>
+      </tr>
+      <tr>
+        <td>Redirection</td>
+        <td>{% if result.redirection.pass %}
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+          {% else %}
+          <i class="bi bi-hand-thumbs-down-fill"></i>
+          {% endif %}
+        </td>
+        <td><code>{{ result.redirection.score_description }}</code></td>
+        <td>{{ result.redirection.score_modifier }}</td>
+      </tr>
+      <tr>
+        <td>Referrer Policy</td>
+        <td>{% if result.referrer_policy.pass %}
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+          {% else %}
+          <i class="bi bi-hand-thumbs-down-fill"></i>
+          {% endif %}
+        </td>
+        <td><code>{{ result.referrer_policy.score_description }}</code></td>
+        <td>{{ result.referrer_policy.score_modifier }}</td>
+      </tr>
+      <tr>
+        <td>HTTP Strict Transport Security</td>
+        <td>{% if result.strict_transport_security.pass %}
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+          {% else %}
+          <i class="bi bi-hand-thumbs-down-fill"></i>
+          {% endif %}
+        </td>
+        <td><code>{{ result.strict_transport_security.score_description }}</code></td>
+        <td>{{ result.strict_transport_security.score_modifier }}</td>
+      </tr>
+      <tr>
+        <td>Subresource Integrity</td>
+        <td>{% if result.subresource_integrity.pass %}
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+          {% else %}
+          <i class="bi bi-hand-thumbs-down-fill"></i>
+          {% endif %}
+        </td>
+        <td><code>{{ result.subresource_integrity.score_description }}</code></td>
+        <td>{{ result.subresource_integrity.score_modifier }}</td>
+      </tr>
+      <tr>
+        <td>X-Content-Type-Options</td>
+        <td>{% if result.x_content_type_options.pass %}
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+          {% else %}
+          <i class="bi bi-hand-thumbs-down-fill"></i>
+          {% endif %}
+        </td>
+        <td><code>{{ result.x_content_type_options.score_description }}</code></td>
+        <td>{{ result.x_content_type_options.score_modifier }}</td>
+      </tr>
+      <tr>
+        <td>X-Frame-Options</td>
+        <td>{% if result.x_frame_options.pass %}
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+          {% else %}
+          <i class="bi bi-hand-thumbs-down-fill"></i>
+          {% endif %}
+        </td>
+        <td><code>{{ result.x_frame_options.score_description }}</code></td>
+        <td>{{ result.x_frame_options.score_modifier }}</td>
+      </tr>
+      <tr>
+        <td>X-XSS-Protection</td>
+        <td>{% if result.x_xss_protection.pass %}
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+          {% else %}
+          <i class="bi bi-hand-thumbs-down-fill"></i>
+          {% endif %}
+        </td>
+        <td><code>{{ result.x_xss_protection.score_description }}</code></td>
+        <td>{{ result.x_xss_protection.score_modifier }}</td>
+      </tr>
+
+    </table>
+  </div>
+
+  <!--<h3>Grade history</h3>
+  <table class="table table-light table-bordered table-striped">
+    <tr>
+      <th>Date</th>
+      <th>Score</th>
+      <th>Grade</th>
+    </tr>
+    {%for v in scan_history%}
+    <tr>
+      <td>{{v.end_time}}</td>
+      <td>{{v.score}}</td>
+      <td>{{v.grade}}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</section>-->
+  {% endif %}
+  {% if tls_results %}
+  <button class="btn w-50 btn-light collapsible">TLS Results</button>
+  <section class="result-content authForm p-5">
+    <h2>Result for {{ domain_name }}:</h2>
+    <hr>
+    <div id="tls-scan-summary" class="d-flex flex-column mb-4">
+      <span>TLS Scan ID: {{ tls_results.id }}</span>
+      <span>Timestamp: {{ tls_results.timestamp }}</span>
+      <span>Target: {{ tls_results.target }}</span>
+      <span>Replay: {{ tls_results.replay }}</span>
+      <span>Has TLS: {% if tls_results.has_tls is True %}
+                    <span class="badge bg-success">{{ tls_results.has_tls }}</span>
+                    {% else %}
+                    <span class="badge bg-danger">{{ tls_results.has_tls }}</span>
+                    {% endif %}</span>
+      <span>CERT ID: {{ tls_results.cert_id }}</span>
+      <span>TRUST ID: {{ tls_results.trust_id }}</span>
+      <span>Is valid: {% if tls_results.is_valid is True %}
+                    <span class="badge bg-success">{{ tls_results.is_valid }}</span>
+                    {% else %}
+                    <span class="badge bg-danger">{{ tls_results.is_valid }}</span>
+                    {% endif %}</span>
+      <span>Completion perc: {{ tls_results.completion_perc }}</span>
+      <span>Ack: {% if tls_results.ack is True %}
+                    <span class="badge bg-success">{{ tls_results.ack }}</span>
+                    {% else %}
+                    <span class="badge bg-danger">{{ tls_results.ack }}</span>
+                    {% endif %}</span>
+      <span>Attempts: {{ tls_results.attempts }}</span>
+    </div>
+    <h3>Connection Info</h3>
+    <table class="table table-light table-striped">
+      <tr>
+        <th>Scan IP</th>
+        <td>{{ tls_results.connection_info.scanIP }}</td>
+      </tr>
+      <tr>
+        <th>Serverside</th>
+        <td>{% if tls_results.connection_info.serverside is True %}
+          <span
+            class="badge bg-success">{{ tls_results.connection_info.serverside }}</span>
+          {% else %}
+          <span
+            class="badge bg-danger">{{ tls_results.connection_info.serverside }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Curves Fallback</th>
+        <td>{% if tls_results.connection_info.curvesFallback is True %}
+          <span
+            class="badge bg-success">{{ tls_results.connection_info.curvesFallback }}</span>
+          {% else %}
+          <span
+            class="badge bg-danger">{{ tls_results.connection_info.curvesFallback }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% for v in tls_results.connection_info.ciphersuite %}
+      <tr class="table-dark">
+        <th>Row</th>
+        <td></td>
+      </tr>
+      <tr>
+        <th>Cipher</th>
+        <td>{{ v.cipher }}</td>
+      </tr>
+      <tr>
+        <th>Code</th>
+        <td>{{ v.code }}</td>
+      </tr>
+      <tr>
+        <th>Protocols</th>
+        <td>{{ v.protocols }}</td>
+      </tr>
+      <tr>
+        <th>Pubkey</th>
+        <td>{{ v.pubkey }}</td>
+      </tr>
+      <tr>
+        <th>Sigalg</th>
+        <td>{{ v.sigalg }}</td>
+      </tr>
+      <tr>
+        <th>Ticket Hint</th>
+        <td>{{ v.ticket_hint }}</td>
+      </tr>
+      <tr>
+        <th>OCSP Stapling</th>
+        <td>
+          {% if v.ocsp_stapling is True %}
+          <span class="badge bg-success">{{ v.ocsp_stapling }}</span>
+          {% else %}
+          <span class="badge bg-danger">{{ v.ocsp_stapling }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>PFS</th>
+        <td>{{ v.pfs }}</td>
+      </tr>
+      <tr>
+        <th>Curves</th>
+        <td>{{ v.curves}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <h3>Analysis</h3>
+    <table class="table table-light table-striped">
+      {% for v in tls_results.analysis %}
+
+      <tr class="table-dark">
+        <th>Row</th>
+        <td></td>
+      </tr>
+      <tr>
+        <th>ID</th>
+        <td>{{ v.id }}</td>
+      </tr>
+      <tr>
+        <th>Analyzer</th>
+        <td>{{ v.analyzer}}</td>
+      </tr>
+      <tr>
+        <th>Success</th>
+        <td> {% if v.success is True %}
+          <span class="badge bg-success">{{ v.success }}</span>
+          {% else %}
+          <span class="badge bg-danger">{{ v.success }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Result:</th>
+        <td></td>
+      </tr>
+      {% if v.result.bugs %}
+      <tr>
+        <th>Bugs:</th>
+        <td>{{ v.result.bugs }}</td>
+      </tr>
+      {% endif %}
+      {% if v.result.errors %}
+      <tr>
+        <th>Errors:</th>
+        <td>{{ v.result.errors }}</td>
+      </tr>
+      {% endif %}
+      {% if v.result.notices %}
+      <tr>
+        <th>Notices:</th>
+        <td>{{ v.result.notices }}</td>
+      </tr>
+      {% endif %}
+      {% if v.result.warnings %}
+      <tr>
+        <th>Warnings:</th>
+        <td>{{ v.result.warnings }}</td>
+      </tr>
+      {% endif %}
+      {% if v.result.fatalErrors %}
+      <tr>
+        <th>Fatal Errors:</th>
+        <td>{{ v.result.fatalErrors }}</td>
+      </tr>
+      {% endif %}
+      {% if v.result.informational %}
+      <tr>
+        <th>Informational:</th>
+        <td>{{ v.result.informational }}</td>
+      </tr>
+      {% endif %}
+
+      {% if v.result.host %}
+      <tr>
+        <th>Host:</th>
+        <td>{{ v.result.host }}</td>
+      </tr>
+      {% endif %}
+      {% if v.result.issue %}
+      <tr>
+        <th>Issue:</th>
+        <td>{{ v.result.issue }}</td>
+      </tr>
+      {% endif %}
+      {% if v.result.has_caa is True or v.result.has_caa is False %}
+      <tr>
+        <th>Has CAA:</th>
+        <td>
+          {% if v.result.has_caa is True %}
+          <span class="badge bg-success">{{ v.result.has_caa }}</span>
+          {% else %}
+          <span class="badge bg-danger">{{ v.result.has_caa }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endif %}
+      {% if v.result.issuewild %}
+      <tr>
+        <th>Issue Wild:</th>
+        <td>{{ v.result.issuewild }}</td>
+      </tr>
+      {% endif %}
+      {% if v.result.level %}
+      <tr>
+        <th>Level</th>
+        <td>{{ v.result.level }}</td>
+      </tr>
+      {% endif %}
+      {% if v.result.grade %}
+      <tr>
+        <th>Grade:</th>
+        <td>{{ v.result.grade }}</td>
+      </tr>
+      {% endif %}
+      {% if v.result.lettergrade %}
+      <tr>
+        <th>Lettergrade:</th>
+        <td>{{ v.result.lettergrade }}</td>
+      </tr>
+      {% endif %}
+      {% if v.result.failures %}
+      <tr>
+        <th>Failures:</th>
+        <td></td>
+      </tr>
+      {% endif %}
+      {% for k1, v1 in v.result.failures.items %}
+      <tr>
+        <th>{{ k1 }}</th>
+        <td></td>
+      </tr>
+      {% for v2 in v1 %}
+      <tr>
+        <th></th>
+        <td>{{ v2 }}</td>
+      </tr>
+      {% endfor %}
+      {% endfor %}
+      <!-- ANDROID ROWS SECTION -->
+
+      {% for v10 in v.result %}
+
+      {% if v10.name %}
+      <tr class="table-dark">
+        <th></th>
+        <th>Subrow</th>
+      </tr>
+      <tr>
+        <th>Name:</th>
+        <td>{{ v10.name }}</td>
+      </tr>
+      {% endif %}
+      {% if v10.version %}
+      <tr>
+        <th>Version:</th>
+        <td>{{ v10.version }}</td>
+      </tr>
+      {% endif %}
+      {% if v10.curve_code %}
+      <tr>
+        <th>Curve Code:</th>
+        <td>{{ v10.curve_code }}</td>
+      </tr>
+      {% endif %}
+      {% if v10.is_supported is True or v10.is_supported is False %}
+      <tr>
+        <th>Is supported:</th>
+        <td>
+          {% if v10.is_supported is True %}
+          <span class="badge bg-success">{{ v10.is_supported }}</span>
+          {% else %}
+          <span class="badge bg-danger">{{ v10.is_supported }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endif %}
+      {% if v10.protocol_code %}
+      <tr>
+        <th>Protocol Code:</th>
+        <td>{{ v10.protocol_code }}</td>
+      </tr>
+      {% endif %}
+      {% if v10.curve %}
+      <tr>
+        <th>Curve:</th>
+        <td>{{ v10.curve }}</td>
+      </tr>
+      {% endif %}
+      {% if v10.platform %}
+      <tr>
+        <th>Platform:</th>
+        <td>{{ v10.platform }}</td>
+      </tr>
+      {% endif %}
+      {% if v10.ciphersuite %}
+      <tr>
+        <th>Ciphersuite:</th>
+        <td>{{ v10.ciphersuite }}</td>
+      </tr>
+      {% endif %}
+      {% if v10.ciphersuite_code %}
+      <tr>
+        <th>Ciphersuite Code:</th>
+        <td>{{ v10.ciphersuite_code }}</td>
+      </tr>
+      {% endif %}
+
+      {% endfor %}
+
+      <!-- SymantecDistrust -->
+      {% if v.result.reasons %}
+      <tr>
+        <th>Reasons:</th>
+        <td></td>
+      </tr>
+      {% for v3 in v.result.reasons%}
+      <tr>
+        <th></th>
+        <td>{{ v3 }}</td>
+      </tr>
+      {% endfor %}
+      {% endif %}
+
+      {% if v.result.isDistrusted is True or v.result.isDistrusted is False %}
+      <tr>
+        <th>Is Distrusted:</th>
+        <td>
+          {% if v.result.isDistrusted is True %}
+          <span class="badge bg-success">{{ v.result.isDistrusted }}</span>
+          {% else %}
+          <span class="badge bg-danger">{{ v.result.isDistrusted }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endif %}
+
+
+      <!-- TOP1M -->
+      {% if v.result.target %}
+      <tr>
+        <th>Target:</th>
+        <td></td>
+      </tr>
+      {% for k4,v4 in v.result.target.items %}
+      <tr>
+        <th>{{ k4 }}</th>
+        <td>{{ v4 }}</td>
+      </tr>
+      {% endfor %}
+      {% endif %}
+
+      {% if v.result.certificate %}
+      <tr>
+        <th>Certificate:</th>
+        <td></td>
+      </tr>
+      {% for k5,v5 in v.result.certificate.items %}
+      <tr>
+        <th>{{ k5 }}</th>
+        <td>{{ v5 }}</td>
+      </tr>
+      {% endfor %}
+      {% endif %}
+
+      {% endfor %}
+    </table>
+  </section>
+  {% endif %}
+
+
+  <script>
+  var coll = document.getElementsByClassName("collapsible");
+  var i;
+
+  for (i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function () {
+      this.classList.toggle("active");
+      var content = this.nextElementSibling;
+      if (content.style.display === "block") {
+        content.style.display = "none";
+      } else {
+        content.style.display = "block";
+      }
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+  </script>
+</section>

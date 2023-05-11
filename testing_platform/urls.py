@@ -29,5 +29,6 @@ urlpatterns = [
     path("specialized-testing/", include("specialized_testing.urls")),
     path("admin/", admin.site.urls),
     path("contact/", include("contact.urls")),
+    path("kb/", include("knowledge_base.urls")),
     path("test/dmarc-reporter/upload/", views.dmarc_upload, name="dmarc-uploader"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

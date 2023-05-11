@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<main class="row p-3 flex-column align-items-center">
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4 justify-content-center">
+    <h1 class="text-center">Email Test Results</h1>
+    <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
+      <p>DNSSEC (Domain Name System Security Extensions): {{ result.dnssec }}</p>
+      <p>{{ result.dnssec.warnings }}</p>
+
+      <p>MX warnings:</p>
+      <ul class="list-group">
+      {% for warning in result.mx.warnings %}
+        <li class="list-group-item">{{ warning }}</li>
+      {% endfor %}
+      <ul></ul>
+    </div>
+  </section>
+</main>
+{% endblock %}

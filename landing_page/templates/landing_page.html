@@ -1,59 +1,164 @@
 {% load static %}
 
-<main class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
-    <h1><span style="font-weight: bold;color: #28abe2">NC</span><span style="font-weight: bold;color:#ec1e27;">3</span> Testing Platform</h1>
-    <p class="lead">Modern Internet Standards provide for more reliability and further growth of the Internet. Are you using them?</p>
+<main
+  class="bg-light d-flex  p-3 flex-column align-items-center text-center">
+  <h1><span style="font-weight: bold;color: #28abe2">NC</span><span
+    style="font-weight: bold;color:#ec1e27;">3</span> Testing Platform</h1>
+  <p class="lead">Modern Internet Standards provide for more reliability and further
+    growth of the Internet. Are you using them?</p>
 </main>
 
-<div class="container">
-  <br />
+<div class="container-fluid my-5">
   <div class="row justify-content-center">
-    <div class="col mx-auto">
-      <div class="card shadow border mx-auto" style="width: 30rem;">
-        <div class="card-body">
+    <div class="col-lg-3 col-md-3 mb-2">
+      <div class="h-100 card shadow border border-2">
+        <div class="card-body d-flex flex-column">
           <h5 class="card-title">Website</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Secure connection? Signed domain? Content Security Policy?</h6>
+          <p>
+            Assess the security of your website against known
+            vulnerabilities and provides you recommendations.
+          </p>
 
-          <form method="post" action="infra-testing/http-test/" class="">
-              {% csrf_token %}
-              <label>Enter a website domain:</label><br>
-              {% if error %}
-              <span class="text-danger">{{ error }}</span>
-              {% endif %}
-              <input type="text" placeholder="www.domain.lu" id="target" name="target" value="{{ form }}" required><br />
-              <input type="submit" value="Test" class="btn btn-secondary">
-          </form><br />
+          <form method="post" action="infra-testing/http-test/">
+            {% csrf_token %}
+            {% if error %}
+            <span class="text-danger">{{ error }}</span>
+            {% endif %}
+            <div class="mb-3">
+              <label class="mb-1">
+                Enter your websites domain name:
+              </label>
+              <input class="form-control" type="text" placeholder="www.domain.lu"
+                     id="target" name="target"
+                     value="{{ form }}" required>
+            </div>
+            <input type="submit" value="Test" class="btn btn-secondary">
+          </form>
+        </div>
+        <div class="card-footer text-center text-muted"><a href="#">About the test</a></div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-3 mb-2">
+      <div class="card shadow h-100 border border-2">
+        <div class="card-body d-flex flex-column ">
+          <h5 class="card-title">IPv6</h5>
+          <p>Assess the reachability of your domain/website setup from a modern internet
+            address (IPv6)</p>
+          <form method="post" action="infra-testing/ipv6-test/" class="">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label>Enter a domain address:</label>
+              <input type="text" placeholder="server.lu" id="target4" name="target"
+                     value="" required>
+            </div>
+            <input type="submit" value="Test" class="btn btn-secondary">
+          </form>
+        </div>
+        <div class="card-footer text-center text-muted"><a href="#">About the test</a></div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-3 mb-2">
+      <div class="card shadow h-100 border border-2">
+        <div class="card-body d-flex flex-column ">
+          <h5 class="card-title">Email</h5>
+          <p>Assess the security of your email setup
+            (SPF and DMARC DNS records, DNSSEC deployment, etc.)</p>
 
-          <a href="/kb/1" class="card-link">About the test</a>
+          <form method="post" action="infra-testing/email-test/" class="">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label>Enter a server address:</label>
+              <input type="text" placeholder="server.lu" id="target2" name="target"
+                     value="" required>
+
+            </div>
+            <input type="submit" value="Test" class="btn btn-secondary">
+          </form>
+        </div>
+        <div class="card-footer text-center text-muted"><a href="#">About the test</a></div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-3 mb-2">
+      <div class=" h-100 card shadow border border-2">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">File testing</h5>
+          <p>
+            Discover if a file is suspicious thanks to the Pandora analysis framework.
+          </p>
+
+          <form method="post" action="infra-testing/file-test/" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if error %}
+            <span class="text-danger">{{ error }}</span>
+            {% endif %}
+            <div class="mb-3">
+              <label class="mb-1">
+                Select the file you want to check.
+              </label>
+              <input class="form-control" type="file" placeholder="Select the file you want to check."
+                id="target3" name="target" required>
+            </div>
+            <input type="submit" value="Test" class="btn btn-secondary">
+          </form>
+        </div>
+        <div class="card-footer text-center text-muted"><a href="#">About the test</a></div>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="row justify-content-center">
+    <div class="col-lg-3 mb-2">
+      <div class=" h-100 card border border-2 ">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">Publications</h5>
+          <p>
+            The publications contain lorem ipsum.
+          </p>
+          <a href="">Publication 1 </a>
+          <a href="">Publication 2 </a>
         </div>
       </div>
     </div>
-
-    <div class="col mx-auto">
-      <div class="card shadow border mx-auto" style="width: 30rem;">
-        <div class="card-body">
-          <h5 class="card-title">Email</h5>
-          <h6 class="card-subtitle mb-2 text-muted">DKIM</h6>
-          <form method="post" action="#" class=""><br />
-            <label>Enter a server address:</label><br>
-            <input type="text" placeholder="server.lu" id="target" name="target" value="" required><br />
-            <input type="submit" value="Test" class="btn btn-secondary">
-          </form><br />
-          <a href="#" class="card-link">About the test</a>
+    <div class="col-lg-3 mb-2">
+      <div class=" h-100 card border border-2 ">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">Statistics</h5>
+          <p>
+            The publications contain lorem ipsum.
+          </p>
+          <a href="">Publication 1 </a>
+          <a href="">Publication 2 </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 mb-2">
+      <div class=" h-100 card border border-2 ">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">Placeholder</h5>
+          <p>
+            Placeholder as a text.
+          </p>
+          <a href="">Publication 1 </a>
+          <a href="">Publication 2 </a>
         </div>
       </div>
     </div>
   </div>
-</div>
+</div> -->
+
 
 <div class="container-fluid">
   <br />
-  <div class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
+  <div
+    class="row bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
     <div class="col">
-      <p class="lead">By registering to our platform you will have access to various <a href="">services and tools</a>.</p>
+      <p class="lead">By registering to our platform you will have access to
+        various <a
+          href="">services and tools</a>.</p>
       <p class="lead">
-        <a href="/signup" class="btn btn-lg btn-secondary fw-bold border-white text-light" style="background-color:#009fe3;">Register now!</a>
-    </p>
+        <a href="/signup"
+           class="btn btn-lg btn-secondary fw-bold border-white text-light"
+           style="background-color:#009fe3;">Register now!</a>
+      </p>
     </div>
   </div>
 </div>

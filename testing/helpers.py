@@ -2,9 +2,17 @@ import json
 import logging
 import os
 import subprocess
+import sys
 import time
+import ipaddress
 from io import BytesIO
-from typing import Any, Dict
+from sys import stdout
+from typing import Any, Dict, List, Tuple, Union
+
+import socket
+import dns.resolver
+import dns.message
+import dns.rdatatype
 
 import pypandora
 import requests
@@ -229,4 +237,177 @@ def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, An
 
     return {
         "result": analysis_result,
+    }
+
+
+def ipv6_check(domain: str, port=None) -> Dict[
+    str, Union[Dict[Any, Any], List[Union[str, int]], List[Any]]]:
+
+    results = {}
+
+    # Check Name Servers connectivity:
+    default_resolver = dns.resolver.Resolver().nameservers[0]
+    q = dns.message.make_query(domain, dns.rdatatype.NS)
+    ns_response = dns.query.udp(q, default_resolver)
+    ns_names = [t.target.to_text() for ans in ns_response.answer for t in ans]
+    results['nameservers'] = {}
+
+    for ns_name in ns_names:
+        results['nameservers'][ns_name] = {}
+
+        # Test IPv4:
+        q = dns.message.make_query(ns_name, dns.rdatatype.A)
+        response = dns.query.udp(q, default_resolver)
+        if response.answer:
+            nameserver_ips = [item.address for answer in response.answer for item in
+                              answer.items if answer.rdtype == dns.rdatatype.A]
+            for nameserver_ip in nameserver_ips:
+                q = dns.message.make_query("example.com", dns.rdatatype.A)
+                try:
+                    udp_response = dns.query.udp(q, nameserver_ip)
+                    supports_udp_v4 = True
+                except dns.exception.Timeout:
+                    supports_udp_v4 = False
+                try:
+                    tcp_response = dns.query.tcp(q, nameserver_ip)
+                    supports_tcp_v4 = True
+                except dns.exception.Timeout:
+                    supports_tcp_v4 = False
+
+                if supports_tcp_v4 or supports_udp_v4:
+                    reachable = True
+                else:
+                    reachable = False
+
+                results['nameservers'][ns_name]["ipv4"] = {
+                    "address": nameserver_ip,
+                    "reachable": reachable
+                }
+        else:
+            results['nameservers'][ns_name]["ipv4"] = {
+                "address": None
+            }
+
+        # Test IPv6:
+        q = dns.message.make_query(ns_name, dns.rdatatype.AAAA)
+        response = dns.query.udp(q, default_resolver)
+        if response.answer:
+            nameserver_ips = [item.address for answer in response.answer for item in
+                              answer.items if answer.rdtype == dns.rdatatype.AAAA]
+            for nameserver_ip in nameserver_ips:
+                q = dns.message.make_query("example.com", dns.rdatatype.AAAA)
+                connect_udp = True
+                connect_tcp = True
+                try:
+                    udp_response = dns.query.udp(q, nameserver_ip)
+                except dns.exception.Timeout:
+                    connect_udp = False
+                except OSError:
+                    connect_udp = False
+                try:
+                    tcp_response = dns.query.tcp(q, nameserver_ip)
+                except dns.exception.Timeout:
+                    connect_tcp = False
+                except OSError:
+                    connect_tcp = False
+
+                if connect_udp and connect_tcp:
+                    reachable = True
+                else:
+                    reachable = False
+
+                results['nameservers'][ns_name]["ipv6"] = {
+                    "address": nameserver_ip,
+                    "reachable": reachable
+                }
+        else:
+            results['nameservers'][ns_name]["ipv6"] = {
+                "address": None
+            }
+
+    # Grading results
+    counter = 0
+    for key in results["nameservers"]:
+        if results["nameservers"][key]["ipv6"]["address"]:
+            counter += 1
+    if counter >= 2:
+        nameservers_comments = {
+            "grade": "full",
+            "comment": "Your domain has at least 2 name servers with ipv6 records."}
+    elif counter == 1:
+        nameservers_comments = {
+            "grade": "half",
+            "comment": "Your domain has 1 name server with an ipv6 record."}
+    else:
+        nameservers_comments = {
+            "grade": "null",
+            "comment": "Your domain has no name server with an ipv6 record."}
+    counter = 0
+    for key in results["nameservers"]:
+        if results["nameservers"][key]["ipv6"]["reachable"]:
+            counter += 1
+    if counter == 0:
+        nameservers_reachability_comments = {
+            "grade": "null",
+            "comment": "Your domain name servers are not reachable over ipv6."}
+    else:
+        nameservers_reachability_comments = {
+            "grade": "full",
+            "comment": "At least one of your domain name servers is reachable over ipv6."}
+
+    # Check website connectivity (available ips and reachability)
+    try:
+        resolved_v4 = socket.getaddrinfo(domain, port, socket.AF_INET)
+        records_v4 = [hit[4][0] for hit in resolved_v4]
+        records_v4 = list(set(records_v4))
+    except socket.gaierror as e:
+        records_v4 = []
+    try:
+        resolved_v6 = socket.getaddrinfo(domain, port, socket.AF_INET6)
+        records_v6 = [hit[4][0] for hit in resolved_v6]
+        records_v6 = list(set(records_v6))
+    except socket.gaierror as e:
+        records_v6 = []
+
+    records = [(domain, records_v4[i], records_v6[i]) for i in range(len(records_v4))]
+
+    response = False
+    records_v4_comments = None
+    if records_v4:
+        for ip4 in records_v4:
+            command = ['ping', '-c', '1', ip4]
+            if subprocess.call(command) == 0:
+                response = True
+        if response:
+            records_v4_comments = {
+                "grade": "full",
+                "comment": "Your web server is reachable over ipv4."}
+        else:
+            records_v4_comments = {
+                "grade": "null",
+                "comment": "Your web server is not reachable over ipv4."}
+
+    response = False
+    records_v6_comments = None
+    if records_v6:
+        for ip6 in records_v6:
+            command = ['ping', '-c', '1', ip6]
+            if subprocess.call(command) == 0:
+                response = True
+        if response:
+            records_v6_comments = {
+                "grade": "full",
+                "comment": "Your web server is reachable over ipv6."}
+        else:
+            records_v6_comments = {
+                "grade": "null",
+                "comment": "Your web server is not reachable over ipv6."}
+
+    return {
+        "nameservers": results["nameservers"],
+        "nameservers_comments": nameservers_comments,
+        "nameservers_reachability_comments": nameservers_reachability_comments,
+        "records": records,
+        "records_v4_comments": records_v4_comments,
+        "records_v6_comments": records_v6_comments
     }

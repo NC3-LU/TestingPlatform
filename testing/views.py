@@ -18,7 +18,7 @@ from ipwhois import IPDefinedError, IPWhois
 from testing_platform import settings
 
 from .forms import DMARCRecordForm, SPFRecordForm
-from .helpers import email_check, file_check, get_http_report, get_tls_report
+from .helpers import email_check, file_check, get_http_report, get_tls_report, ipv6_check
 from .models import DMARCRecord, DMARCReport, MailDomain
 
 
@@ -96,6 +96,15 @@ def file_test(request):
         return render(request, "check_file.html", context)
     else:
         return render(request, "check_file.html")
+
+
+def ipv6_test(request):
+    if request.method == "POST":
+        context = {}
+        context.update(ipv6_check(request.POST["target"], None))
+        return render(request, "check_ipv6.html", context)
+    else:
+        return render(request, "check_ipv6.html")
 
 
 @login_required

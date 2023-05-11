@@ -56,7 +56,6 @@ Get the source code and install the software:
     $ python manage.py collectstatic
 
     $ export ALLOWED_HOSTS=127.0.0.1
-    $ export IOT_API_URL=https://demo.iot-inspector.com/api
 
 
 For production you should use `Gunicorn <https://gunicorn.org>`_ or ``mod_wsgi``.

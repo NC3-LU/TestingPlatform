@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 import socket
 import subprocess
 import time
@@ -16,6 +17,35 @@ import requests
 from testing.models import TlsScanHistory
 
 logger = logging.getLogger(__name__)
+
+
+def full_domain_validator(hostname):
+    """
+    Fully validates a domain name as compilant with the standard rules:
+        - Composed of series of labels concatenated with dots, as are all domain names.
+        - Each label must be between 1 and 63 characters long.
+        - The entire hostname (including the delimiting dots) has a maximum of 255 characters.
+        - Only characters 'a' through 'z' (in a case-insensitive manner), the digits '0' through '9'.
+        - Labels can't start or end with a hyphen.
+    """
+    HOSTNAME_LABEL_PATTERN = re.compile(r"(?!-)[A-Z\d-]+(?<!-)$", re.IGNORECASE)
+    if not hostname:
+        return
+    if len(hostname) > 255:
+        raise Exception(
+            "The domain name cannot be composed of more than 255 characters."
+        )
+    if hostname[-1:] == ".":
+        hostname = hostname[:-1]  # strip exactly one dot from the right, if present
+    for label in hostname.split("."):
+        if len(label) > 63:
+            raise Exception(
+                "The label '%(label)s' is too long (maximum is 63 characters)."
+                % {"label": label}
+            )
+        if not HOSTNAME_LABEL_PATTERN.match(label):
+            raise Exception(f"Unallowed characters in label '{label}'.")
+    return hostname
 
 
 def get_http_report(target, rescan):
@@ -176,7 +206,7 @@ def email_check(target: str, rescan: bool) -> Dict[str, Any]:
     cmd = [
         # sys.exec_prefix + "/bin/python",
         "checkdmarc",
-        target,
+        full_domain_validator(target),
         "-f",
         "JSON",
     ]

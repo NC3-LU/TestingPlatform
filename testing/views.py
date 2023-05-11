@@ -18,7 +18,13 @@ from ipwhois import IPDefinedError, IPWhois
 from testing_platform import settings
 
 from .forms import DMARCRecordForm, SPFRecordForm
-from .helpers import email_check, file_check, get_http_report, get_tls_report, ipv6_check
+from .helpers import (
+    email_check,
+    file_check,
+    get_http_report,
+    get_tls_report,
+    ipv6_check,
+)
 from .models import DMARCRecord, DMARCReport, MailDomain
 
 

@@ -42,7 +42,7 @@ checkdmarc = "^4.5.2"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^5.0.4"
-pre-commit = "^2.20.0"
+pre-commit = "^3.3.1"
 black = "^22.10.0"
 pyupgrade = "^3.2.2"
 autoflake = "^1.7.7"

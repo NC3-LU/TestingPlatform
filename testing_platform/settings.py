@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "contact",
     "c3_protocols",
     "specialized_testing",
+    "knowledge_base",
     "testing.templatetags",
 ]
 

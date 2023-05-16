@@ -13,18 +13,26 @@
 <div class="container-fluid my-5">
   <h2 class="bg-light d-flex p-3 flex-column align-items-center text-center">Tests</h2>
   <div class="row justify-content-left">
-    <div class="col-lg col-md mb-2">
+    <div class="col-lg col-md mb">
       <h3 id="tests-website">Website</h3>
-      After you enter a domain name of a website, we will test if the website offers support for the modern Internet Standards.
+      After entering a website's domain name, we will test whether the website supports various
+      modern Internet standards such as:
       <ul>
-        <li></li>
+        <li>Content Security Policy (CSP) header</li>
+        <li>Cross-Origin Resource Sharing (CORS)</li>
+        <li>HTTP Strict Transport Security (HSTS) header implementation</li>
+        <li>X-XSS-Protection header</li>
       </ul>
+      We are as well providing a tool in order to verify the reachability
+      of your server from a modern internet address (IPv6).
     </div>
   </div>
 
   <div class="row justify-content-left">
-    <div class="col-lg col-md-3 mb-2">
+    <div class="col-lg col-md mb">
       <h3 id="tests-email">Email</h3>
+      Our suite of tools is able to verify a series of standards concerning
+      the proper implementation of an email server.
       <ul>
         <li>Parses and validates MX, SPF, and DMARC records</li>
         <li>Checks for DNSSEC deployment</li>
@@ -53,20 +61,27 @@
 
   <h2 class="bg-light d-flex p-3 flex-column align-items-center text-center">Standards</h2>
   <div class="row justify-content-left">
-    <div class="col-lg-3 col-md mb-2">
-      <h3 id="tests-spf">SPF</h3>
+    <div class="col-lg col-md mb">
+      <h3 id="standards-spf">SPF</h3>
+      <p>The Sender Policy Framework (SPF) is an email authentication method designed to detect
+        forging sender addresses during the delivery of an email.</p>
     </div>
   </div>
 
   <div class="row justify-content-left">
-    <div class="col-lg-3 col-md mb-2">
-      <h3 id="tests-dmarc">DMARC DNS records</h3>
-    </div>
+    <div class="col-lg col-md mb">
+      <h3 id="standards-dmarc">DMARC DNS records</h3>
+      <p>A DMARC record is a TXT record that contains instructions for how an email server should
+        handle an email that fails authentication. Using DMARC records, you can control if email
+        receivers should reject, quarantine, or do nothing with a suspicious email.</p>
   </div>
 
   <div class="row justify-content-left">
-    <div class="col-lg-3 col-md mb-2">
-      <h3 id="tests-dnssec">DNSSEC</h3>
+    <div class="col-lg col-md mb">
+      <h3 id="standards-dnssec">DNSSEC</h3>
+      <p>The Domain Name System Security Extensions (DNSSEC) are a suite of extension specifications
+        by the Internet Engineering Task Force (IETF) for securing data exchanged in the
+        Domain Name System (DNS).</p>
     </div>
   </div>
 </div>

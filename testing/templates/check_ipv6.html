@@ -60,10 +60,6 @@
       <br>
     <p>Records:</p>
       {% if records %}
-        <p>
-          <i class="bi bi-check-circle-fill color-success"></i>
-          Your server has an IPv6 address.
-        </p>
         <table class="table table-light table-bordered table-striped">
           <tr>
             <th>Server</th>
@@ -78,11 +74,17 @@
             </tr>
           {% endfor %}
         </table>
-      {% else %}
-        <p>
-          <i class="bi bi-x-circle-fill color-danger"></i>
-          Your server does not have an IPv6 address.
-        </p>
+        {% if record.2 %}
+          <p>
+            <i class="bi bi-check-circle-fill color-success"></i>
+            Your server has an IPv6 address.
+          </p>
+        {% else %}
+          <p>
+            <i class="bi bi-x-circle-fill color-danger"></i>
+            Your server does not have an IPv6 address.
+          </p>
+        {% endif %}
       {% endif %}
       <p>
         {% if records_v4_comments.grade == "full" %}

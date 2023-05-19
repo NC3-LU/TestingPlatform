@@ -396,14 +396,14 @@ def ipv6_check(
         resolved_v4 = socket.getaddrinfo(domain, port, socket.AF_INET)
         records_v4 = [hit[4][0] for hit in resolved_v4]
         records_v4 = list(set(records_v4))
-    except socket.gaierror as e:
-        records_v4 = ['']
+    except socket.gaierror:
+        records_v4 = [""]
     try:
         resolved_v6 = socket.getaddrinfo(domain, port, socket.AF_INET6)
         records_v6 = [hit[4][0] for hit in resolved_v6]
         records_v6 = list(set(records_v6))
-    except socket.gaierror as e:
-        records_v6 = ['']
+    except socket.gaierror:
+        records_v6 = [""]
 
     records = [(domain, records_v4[i], records_v6[i]) for i in range(len(records_v4))]
 

@@ -5,49 +5,54 @@
 
 {% if form.errors and not form.non_field_errors %}
 <p class="errornote">
-    {% if form.errors.items|length == 1 %}
-    {% translate "Please correct the error below." %}
-    {% else %}
-    {% translate "Please correct the errors below." %}
-    {% endif %}
+  {% if form.errors.items|length == 1 %}
+  {% translate "Please correct the error below." %}
+  {% else %}
+  {% translate "Please correct the errors below." %}
+  {% endif %}
 </p>
 {% endif %}
 
 {% if form.non_field_errors %}
 {% for error in form.non_field_errors %}
 <p class="errornote">
-    {{ error }}
+  {{ error }}
 </p>
 {% endfor %}
 {% endif %}
-
-<main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
-    <h1 class="authForm p-5 d-flex justify-content-center">SPF Record Generator</h1>
-    <form class="p-5 authForm" action="{{ app_path }}" method="post" id="test-form">
-        {% csrf_token %}
-        {% for field in form %}
-        <div class="form-floating mb-4">
+<main class="row p-3 flex-column align-items-center">
+  <div class="col-lg-5 col-md-5 mb-2">
+      <div class="h-100 card border border-2 ">
+        <div class="card-body d-flex flex-column">
+        <h3 class="card-title">SPF Record Generator</h3>
+        <form class="" action="{{ app_path }}" method="post" id="test-form">
+          {% csrf_token %}
+          {% for field in form %}
+          <div class=" mb-4">
             {% if field.help_text %}
-                <small>{{ field.help_text }}</small>
+            <small>{{ field.help_text }}</small>
             {% endif %}
             {{ field }}
             {% for error in field.errors %}
             <p style="color: red">{{ error }}</p>
             {% endfor %}
-        </div>
-        {% endfor %}
+          </div>
+          {% endfor %}
 
-        <input class="btn btn-primary" type="submit" value="{% translate 'Generate' %}">
-    </form>
+          <input class="btn btn-primary" type="submit"
+                 value="{% translate 'Generate' %}">
+        </form>
 
-    {% if record %}
-    <section class="result-content authForm p-5">
-        <div id="result">
+        {% if record %}
+        <section class="result-content p-5">
+          <div id="result">
             This is your SPF record, to be added in a TXT entry in your DNS record:<br>
             <div class="bg-light p-2 text-dark">{{ record }}</div>
-        </div>
-    </section>
-    {% endif %}
-
+          </div>
+        </section>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </main>
 {% endblock %}

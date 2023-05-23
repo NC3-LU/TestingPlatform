@@ -1,38 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
 {% load timestamp_to_time %}
-
-<main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
-    <div class="authForm p-5">
+<main class="row p-3 flex-column align-items-center">
+  <div class="col-lg-5 col-md-5 mb-2">
+    <div class="h-100 card border border-2 ">
+      <div class="card-body d-flex flex-column">
         <h1>DMARC Reporter</h1>
-    </div>
-    {% if not domain_reports %}
-        <div class="authForm p-5">
-            No reports available yet. Please use our DMARC record generator to start getting reports.
+        {% if not domain_reports %}
+        <div class="my-3">
+          No reports available yet. Please use our DMARC record generator to start
+          getting
+          reports.
         </div>
-    {% else %}
+        {% else %}
         {% for domain, reports in domain_reports.items %}
-            <div class="authForm p-5">
-                <h3>Reports for {{ domain.domain }}<br></h3>
-                <hr>
-                {% if not reports %}
-                    No report available yet
-                {% else %}
-                    <table class="table table-light table-stripped table-responsive">
-                        {% for report in reports %}
-                            <tr>
-                                <th>{{ report.mail_from }}</th>
-                                <td>{{ report.timestamp|timestamp_to_time|date:"Y-m-d h:m:s" }}</td>
-                                <td><a class="btn btn-primary"
-                                       href="/infra-testing/dmarc-reporter/{{ domain }}/{{ report.mail_from }}/{{ report.timestamp }}">
-                                    View report
-                                </a></td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                {% endif %}
-            </div>
+
+        <h3 class="mt-2">Reports for {{ domain.domain }}</h3>
+        <hr>
+        {% if not reports %}
+        No report available yet
+        {% else %}
+        <table class="table table-light table-stripped table-responsive">
+          {% for report in reports %}
+          <tr>
+            <th>{{ report.mail_from }}</th>
+            <td>{{ report.timestamp|timestamp_to_time|date:"Y-m-d h:m:s" }}</td>
+            <td><a class="btn btn-primary"
+                   href="/infra-testing/dmarc-reporter/{{ domain }}/{{ report.mail_from }}/{{ report.timestamp }}">
+              View report
+            </a></td>
+          </tr>
+          {% endfor %}
+        </table>
+        {% endif %}
+
         {% endfor %}
-    {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </main>
 {% endblock %}

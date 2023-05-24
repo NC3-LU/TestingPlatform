@@ -71,10 +71,7 @@
               <td>{{ record.0 }}</td>
               <td>{{ record.1 }}</td>
               <td>{{ record.2 }}</td>
-            </tr>
-          {% endfor %}
-        </table>
-        {% if record.2 %}
+            </tr>{% if record.2 %}
           <p>
             <i class="bi bi-check-circle-fill color-success"></i>
             Your server has an IPv6 address.
@@ -85,6 +82,9 @@
             Your server does not have an IPv6 address.
           </p>
         {% endif %}
+
+          {% endfor %}
+        </table>
       {% endif %}
       <p>
         {% if records_v4_comments.grade == "full" %}

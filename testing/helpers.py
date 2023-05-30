@@ -480,7 +480,12 @@ def web_server_check(domain: str):
                     except TypeError as e:
                         list_of_vulns = []
             services.append(service)
-            vulnerabilities.append({"service": f'{service["product"]} - {service["name"]}', "vuln_list": list_of_vulns})
+            try:
+                vulnerabilities.append(
+                    {"service": f'{service["product"]} - {service["name"]}',
+                     "vuln_list": list_of_vulns})
+            except KeyError as e:
+                pass
     return {
         "services": services,
         "vulnerabilities": vulnerabilities

@@ -1,3 +1,4 @@
+import ipaddress
 import json
 import logging
 import os
@@ -13,6 +14,8 @@ import dns.rdatatype
 import dns.resolver
 import pypandora
 import requests
+
+import nmap3
 
 from testing.models import TlsScanHistory
 
@@ -450,4 +453,35 @@ def ipv6_check(
         "records": records,
         "records_v4_comments": records_v4_comments,
         "records_v6_comments": records_v6_comments,
+    }
+
+
+def web_server_check(domain: str):
+    nmap = nmap3.Nmap()
+    scans = nmap.nmap_version_detection(
+        domain, args="--script vulners --script-args mincvss+5.0"
+    )
+    runtime = scans.pop("runtime")
+    stats = scans.pop("stats")
+    task_results = scans.pop("task_results")
+    services = []
+    vulnerabilities = []
+    ip, scans = list(scans.items())[0]
+    for port in scans["ports"]:
+        if port["state"] != "closed":
+            service = port["service"]
+            vulners = port["scripts"]
+            list_of_vulns = []
+            if vulners:
+                vulners = vulners[0]["data"]
+                for vuln, vuln_data in vulners.items():
+                    try:
+                        list_of_vulns += vuln_data["children"]
+                    except TypeError as e:
+                        list_of_vulns = []
+            services.append(service)
+            vulnerabilities.append({"service": f'{service["product"]} - {service["name"]}', "vuln_list": list_of_vulns})
+    return {
+        "services": services,
+        "vulnerabilities": vulnerabilities
     }

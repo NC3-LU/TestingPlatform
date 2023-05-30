@@ -24,6 +24,7 @@ from .helpers import (
     get_http_report,
     get_tls_report,
     ipv6_check,
+    web_server_check,
 )
 from .models import DMARCRecord, DMARCReport, MailDomain
 
@@ -111,6 +112,15 @@ def ipv6_test(request):
         return render(request, "check_ipv6.html", context)
     else:
         return render(request, "check_ipv6.html")
+
+
+def web_server_test(request):
+    if request.method == "POST":
+        context = {}
+        context.update(web_server_check(request.POST["target"]))
+        return render(request, "check_web_server.html", context)
+    else:
+        return render(request, "check_web_server.html")
 
 
 @login_required

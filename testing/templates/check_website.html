@@ -43,29 +43,6 @@
         </div>
       </div>
     </div>
-   <!-- <h1 class=" p-5 d-flex justify-content-center">Website Test:</h1>
-    <form method="post" class="authForm p-5">
-        {% csrf_token %}
-        <div></div>
-        <label>Enter your website domain:</label><br>
-        {% if error %}
-        <span class="text-danger">{{ error }}</span>
-        {% endif %}
-        <input type="text" placeholder="www.domain.com" id="target" name="target" value="{{ form }}"><br>
-        <div class="mb-2">
-            <label class="text-light">Perform a TLS scan:</label>
-            <input type="checkbox" id="tls" name="tls"><br>
-            <label class="text-light">Force a rescan instead of returning cached results:</label>
-            <input type="checkbox" id="rescan" name="rescan">
-        </div>
-        <small>
-            Loading can take up to 5 minutes. If your tls scan results are empty, please retry and uncheck the
-            'force rescan' option.
-        </small>
-        <input type="submit" value="Test" class="btn btn-primary">
-        <button class="btn btn-secondary mt-2" onclick="window.history.back()">Back</button>
-    </form>-->
-
 </main>
 <main class="container-fluid d-flex flex-column align-items-center">
   {% if result %}

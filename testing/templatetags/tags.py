@@ -1,5 +1,6 @@
 import ipaddress
 import socket
+import re
 
 from django import template
 from django.utils.safestring import mark_safe
@@ -48,3 +49,9 @@ def get_asn(address):
     else:
         result = "No IP for ASN"
     return mark_safe(result)
+
+
+@register.filter("split")
+def split(value, delimiter):
+    return value.split(delimiter)
+

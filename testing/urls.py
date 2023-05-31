@@ -6,6 +6,7 @@ urlpatterns = [
     path("", views.test_landing, name="test_index"),
     # path('whois-lookup/', views.ping_test, name='ping_test'),
     path("http-test/", views.http_test, name="http_test"),
+    path("web-test/", views.web_test, name="web_test"),
     path("email-test/", views.email_test, name="email_test"),
     path("file-test/", views.file_test, name="file_test"),
     path("ipv6-test/", views.ipv6_test, name="ipv6_test"),

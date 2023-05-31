@@ -9,4 +9,5 @@ static
 files
 node_modules/
 poetry.lock
+poetry.lock*
 docs/_build/

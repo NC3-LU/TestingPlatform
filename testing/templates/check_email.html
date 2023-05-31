@@ -3,19 +3,72 @@
 {% block content %}
 
 <main class="row p-3 flex-column align-items-center">
-  <section class="col-lg-11 row my-5 border border-2 rounded p-4 justify-content-center">
-    <h1 class="text-center">Email Test Results</h1>
-    <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
-      <p>DNSSEC (Domain Name System Security Extensions): {{ result.dnssec }}</p>
-      <p>{{ result.dnssec.warnings }}</p>
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
+    <div class="row">
+      <div class="col-lg-12 fs-1 fw-bold">
+        Mailserver settings test for: {{ result.domain }}
+      </div>
+      <div class="col-lg-12 fs-4">
+        <p>DNSSEC status: {{ result.dnssec }}</p>
+        <p>Base Domain: {{ result.base_domain }}</p>
 
-      <p>MX warnings:</p>
-      <ul class="list-group">
-      {% for warning in result.mx.warnings %}
-        <li class="list-group-item">{{ warning }}</li>
-      {% endfor %}
-      </ul>
+        <h2>Name Servers</h2>
+        <ul>
+          {% for hostname in result.ns.hostnames %}
+          <li>{{ hostname }}</li>
+          {% endfor %}
+        </ul>
+      </div>
     </div>
   </section>
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
+    <div class="row">
+      <div class="col-lg-12 fs-1 fw-bold">
+        Mail Exchanger (MX) Records
+      </div>
+      <div class="col-lg-12 fs-4">
+
+        {% for host in result.mx.hosts %}
+        <h3>{{ host.hostname }}</h3>
+        <ul>
+          <li>Preference: {{ host.preference }}</li>
+          <li>StartTLS: {{ host.starttls }}</li>
+          <li>TLS: {{ host.tls }}</li>
+          <li>Addresses:</li>
+          <li class="list-unstyled">
+            <ul>
+              {% if result.host.addresses %}
+              {% for address in result.host.addresses  %}
+              <li>{{ address }}</li>
+              {% endfor %}
+               {% else %}
+              <li>No addresses available</li>
+              {% endif %}
+
+            </ul>
+          </li>
+        </ul>
+        {% endfor %}
+
+      </div>
+    </div>
+  </section>
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
+    <div class="row">
+      <div class="col-lg-12 fs-1 fw-bold">
+        Records
+      </div>
+      <div class="col-lg-12 fs-4">
+        <h2>SPF Record</h2>
+        <code>{{ result.spf.record }}</code>
+        <p>Valid: {{ result.spf.valid }}</p>
+
+        <h2>DMARC Record</h2>
+        <code>{{ result.dmarc.record }}</code>
+        <p>Valid: {{ result.dmarc.valid }}</p>
+      </div>
+    </div>
+  </section>
+
 </main>
 {% endblock %}

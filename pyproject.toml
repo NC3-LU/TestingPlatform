@@ -40,6 +40,7 @@ django-enumfields = "^2.1.1"
 pypandora = "^1.4.0"
 checkdmarc = "^4.5.2"
 python3-nmap = "^1.6.0"
+python-owasp-zap-v2-4 = "^0.0.21"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^5.0.4"

@@ -1693,6 +1693,24 @@ files = [
 ]
 
 [[package]]
+name = "python-owasp-zap-v2-4"
+version = "0.0.21"
+description = "OWASP ZAP 2.12 API client"
+optional = false
+python-versions = "*"
+files = [
+    {file = "python-owasp-zap-v2.4-0.0.21.tar.gz", hash = "sha256:00c963ea6d9eaf3f0c0e09ec0a9d033192c0c136a090af286385c9cf6271825b"},
+    {file = "python_owasp_zap_v2.4-0.0.21-py2.py3-none-any.whl", hash = "sha256:94717afb0c64720763b09f224c0966cafd906d10b34c9a3f6b91b8c23e167355"},
+]
+
+[package.dependencies]
+requests = "*"
+six = "*"
+
+[package.extras]
+tests = ["mock", "pyhamcrest", "pylama", "pytest", "requests-mock"]
+
+[[package]]
 name = "python3-nmap"
 version = "1.6.0"
 description = "Python3-nmap converts Nmap commands into python3 methods making it very easy to use nmap in any of your python pentesting projects"
@@ -2435,4 +2453,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "4591ecc57e728d309dd0c671ca55ab5fb21e277b2c2dc3179046bf179e8c35dd"
+content-hash = "d48314d4427f85472cc1b6964c6662f0ff7f496739e1745b2e874b6328694f70"

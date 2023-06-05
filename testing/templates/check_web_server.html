@@ -53,14 +53,6 @@
         <li>Check out the <a href="#general-recommendations">general recommendations</a>
         below for more details.</li>
       </ul>
-      <p>Listing of all the potential vulnerabilities found on your system, when
-        applicable.</p>
-      <p>Click on the <i class="bi bi-exclamation-circle-fill text-warning"></i> icon to
-        see more details on the exploitable vulnerabilities.</p>
-      <p>Click on the <i class="bi bi-search"></i> icon for more details on CVEs
-        (powered by CIRCL CVE Search).</p>
-      <p>Check out the <a href="#general-recommendations">general recommendations</a>
-        below for more details.</p>
       <br>
       {% for vulnerability in vulnerabilities %}
       <h3>{{ vulnerability.service }}</h3>

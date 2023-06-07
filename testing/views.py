@@ -1,5 +1,4 @@
 import datetime
-from zapv2 import ZAPv2
 import ipaddress
 import re
 import socket
@@ -16,6 +15,7 @@ from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from ipwhois import IPDefinedError, IPWhois
+from zapv2 import ZAPv2
 
 from testing_platform import settings
 
@@ -94,20 +94,22 @@ def web_test(request):
         # The URL of the application to be tested
         target = request.POST["target"]
         # Change to match the API key set in ZAP, or use None if the API key is disabled
-        apikey = '12345'
+        apikey = "12345"
 
         # By default ZAP API client will connect to port 8080
-        zap = ZAPv2(apikey=apikey, proxies={'http': 'http://127.0.0.1:8081',
-                                            'https': 'http://127.0.0.1:8081'})
+        zap = ZAPv2(
+            apikey=apikey,
+            proxies={"http": "http://127.0.0.1:8081", "https": "http://127.0.0.1:8081"},
+        )
 
-        scanid = zap.spider.scan('http://' + target)
+        scanid = zap.spider.scan("http://" + target)
         while int(zap.spider.status(scanid)) < 100:
             time.sleep(1)
 
         results_url = zap.spider.results(scanid)
         while int(zap.pscan.records_to_scan) > 0:
             # Loop until the passive scan has finished
-            print('Records to passive scan : ' + zap.pscan.records_to_scan)
+            print("Records to passive scan : " + zap.pscan.records_to_scan)
             time.sleep(2)
         alerts = zap.core.alerts()
 
@@ -117,14 +119,16 @@ def web_test(request):
         # Loop through the alerts
         for alert in alerts:
             # Check if the alert's URL is in the list
-            if alert['url'] in results_url:
-                if alert['confidence'] == "High":
+            if alert["url"] in results_url:
+                if alert["confidence"] == "High":
                     # If it is, append the alert to the matching_alerts list
                     matching_alerts.append(alert)
 
-        return render(request, "check_webapp.html",
-                      {'results_url': results_url, 'alerts': matching_alerts,
-                       'target': target})
+        return render(
+            request,
+            "check_webapp.html",
+            {"results_url": results_url, "alerts": matching_alerts, "target": target},
+        )
 
     else:
         return render(request, "check_webapp.html")
@@ -327,7 +331,7 @@ def dmarc_dl(request, domain, mailfrom, timestamp):
             headers={
                 "Content-Type": "application/xml",
                 "Content-Disposition": f"attachment; "
-                                       f'filename="dmarc_{domain}_{mailfrom}_{timestamp}.xml"',
+                f'filename="dmarc_{domain}_{mailfrom}_{timestamp}.xml"',
             },
         )
         return response

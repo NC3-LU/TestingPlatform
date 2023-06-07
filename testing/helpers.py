@@ -12,10 +12,9 @@ from typing import Any, Dict, List, Union
 import dns.message
 import dns.rdatatype
 import dns.resolver
+import nmap3
 import pypandora
 import requests
-
-import nmap3
 
 from testing.models import TlsScanHistory
 
@@ -253,7 +252,6 @@ def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, An
         status = analysis_result["status"]
         if status != "WAITING":
             break
-        print("Waiting...")
 
         # wait a little
         pass
@@ -482,11 +480,11 @@ def web_server_check(domain: str):
             services.append(service)
             try:
                 vulnerabilities.append(
-                    {"service": f'{service["product"]} - {service["name"]}',
-                     "vuln_list": list_of_vulns})
+                    {
+                        "service": f'{service["product"]} - {service["name"]}',
+                        "vuln_list": list_of_vulns,
+                    }
+                )
             except KeyError as e:
                 pass
-    return {
-        "services": services,
-        "vulnerabilities": vulnerabilities
-    }
+    return {"services": services, "vulnerabilities": vulnerabilities}

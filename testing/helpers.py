@@ -1,4 +1,3 @@
-import ipaddress
 import json
 import logging
 import os
@@ -459,9 +458,9 @@ def web_server_check(domain: str):
     scans = nmap.nmap_version_detection(
         domain, args="--script vulners --script-args mincvss+5.0"
     )
-    runtime = scans.pop("runtime")
-    stats = scans.pop("stats")
-    task_results = scans.pop("task_results")
+    # runtime = scans.pop("runtime")
+    # stats = scans.pop("stats")
+    # task_results = scans.pop("task_results")
     services = []
     vulnerabilities = []
     ip, scans = list(scans.items())[0]
@@ -472,10 +471,10 @@ def web_server_check(domain: str):
             list_of_vulns = []
             if vulners:
                 vulners = vulners[0]["data"]
-                for vuln, vuln_data in vulners.items():
+                for _vuln, vuln_data in vulners.items():
                     try:
                         list_of_vulns += vuln_data["children"]
-                    except TypeError as e:
+                    except TypeError:
                         list_of_vulns = []
             services.append(service)
             try:
@@ -485,6 +484,6 @@ def web_server_check(domain: str):
                         "vuln_list": list_of_vulns,
                     }
                 )
-            except KeyError as e:
+            except KeyError:
                 pass
     return {"services": services, "vulnerabilities": vulnerabilities}

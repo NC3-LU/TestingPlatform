@@ -1,5 +1,4 @@
 import ipaddress
-import re
 import socket
 
 from django import template

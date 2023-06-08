@@ -5,6 +5,7 @@ import re
 import socket
 import subprocess
 import time
+from base64 import b64decode
 from io import BytesIO
 from typing import Any, Dict, List, Union
 
@@ -14,6 +15,7 @@ import dns.resolver
 import nmap3
 import pypandora
 import requests
+from Crypto.PublicKey import RSA
 
 from testing.models import TlsScanHistory
 
@@ -215,10 +217,11 @@ def email_check(target: str, rescan: bool) -> Dict[str, Any]:
     (stdout, stderr) = p.communicate()
     try:
         result = json.loads(stdout)
-        # result = checkdmarc.check_domains([target])
-        # json_result = checkdmarc.results_to_json(result)
     except Exception:
         result = {}
+
+    result["dkim"] = get_dkim_public_key(target)
+
     return {
         "result": result,
         "domain_name": target,
@@ -487,3 +490,21 @@ def web_server_check(domain: str):
             except KeyError:
                 pass
     return {"services": services, "vulnerabilities": vulnerabilities}
+
+
+def get_dkim_public_key(domain: str, selectors: str = None):
+    """Looks for a DKIM public key in a DNS field and verifies that it can be used to encrypt data."""
+    if selectors is None:
+        selectors = ["selector1", "selector2", "google", "dkim", "k1"]
+    for selector in selectors:
+        try:
+            dns_response = (
+                dns.resolver.query(f"{selector}._domainkey.{domain}.", "TXT")
+                .response.answer[1]
+                .to_text()
+            )
+            p = re.search(r"p=([\w\d/+]*)", dns_response).group(1)
+            key = RSA.importKey(b64decode(p))
+            return key.can_encrypt()
+        except Exception:
+            continue

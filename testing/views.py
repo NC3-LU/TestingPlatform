@@ -75,7 +75,7 @@ def http_test(request):
         if "rescan" in request.POST:
             context["rescan"] = True
         context.update(get_http_report(request.POST["target"], context["rescan"]))
-        if "tls" in request.POST:
+        if True:  # "tls" in request.POST:
             context["tls_results"] = get_tls_report(
                 request.POST["target"], context["rescan"]
             )

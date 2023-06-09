@@ -2,14 +2,33 @@
 
 {% block content %}
 <main class="row p-3 flex-column align-items-center">
+  <div class="col-lg-5 col-md-3 mb-2">
+      <div class="card shadow h-100 border border-2">
+        <div class="card-body d-flex flex-column ">
+          <h5 class="card-title">Web Server Configuration</h5>
+          <p>Assess the configuration of your web server (if publicly available)</p>
+          <form method="post" action="infra-testing/web-server-test/" class="">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label>Enter a web server hostname / ip address:</label>
+              <input type="text" placeholder="server.lu" id="target5" name="target"
+                     value="" required>
+            </div>
+            <input type="submit" value="Test" class="btn btn-secondary">
+          </form>
+        </div>
+        <div class="card-footer text-center text-muted"><a
+          href="{% url 'knowledge_base'  %}#tests-web-server">About the test</a></div>
+      </div>
+    </div>
   <section
     class="col-lg-11 row my-5 border border-2 rounded p-4 ">
-     <div class="col-lg-12 fs-1 fw-bold">
+    <div class="col-lg-12 fs-1 fw-bold">
       Services
     </div>
-    <div class="col-lg-6 col-md-5 mb-2 text-left fs-5">
+    <div class="col-lg-6 mb-2 text-left fs-5">
       <p>Listing of all the services found running on your server.</p>
-      <p>Check out the <a href="#general-recommendations">general recommendations</a>
+      <p>Check out the <a href="#general-recommendations-webconf">general recommendations</a>
         below for more details.</p>
       <br>
       {% if services %}
@@ -42,97 +61,107 @@
     <div class="col-lg-12 fs-1 fw-bold">
       Vulnerabilities
     </div>
-    <div class="col-lg-12 col-md-5 mb-2 text-left fs-5 " id="vulnerabilities">
+    <div class="col-lg-12 mb-2 text-left fs-5 " id="vulnerabilities">
       <ul>
         <li>Listing of all the potential vulnerabilities found on your system, when
-        applicable.</li>
-        <li>Click on the <i class="bi bi-exclamation-circle-fill text-warning"></i> icon to
-        see more details on the exploitable vulnerabilities.</li>
+          applicable.
+        </li>
+        <li>Click on the <i class="bi bi-exclamation-circle-fill text-warning"></i> icon
+          to
+          see more details on the exploitable vulnerabilities.
+        </li>
         <li>Click on the <i class="bi bi-search"></i> icon for more details on CVEs
-        (powered by CIRCL CVE Search).</li>
-        <li>Check out the <a href="#general-recommendations">general recommendations</a>
-        below for more details.</li>
+          (powered by CIRCL CVE Search).
+        </li>
+        <li>Check out the <a href="#general-recommendations-webconf">general recommendations</a>
+          below for more details.
+        </li>
       </ul>
       <br>
       {% for vulnerability in vulnerabilities %}
       <h3>{{ vulnerability.service }}</h3>
       {% if vulnerability.vuln_list %}
-      <table class="table table-light table-bordered table-striped">
-        <tr>
-          <th>ID</th>
-          <th>CVSS</th>
-          <th>Type</th>
-          <th>Exploit status</th>
-        </tr>
-        {% for vuln in vulnerability.vuln_list %}
-        <tr>
-          <td>{{ vuln.id }}</td>
-          <td>{{ vuln.cvss }}</td>
-          <td>{{ vuln.type }}</td>
-          <td>
-            {% if vuln.is_exploit == 'true' %}
-            <a onclick='openPopup("popup-{{ vuln.id }}")' href="#vulnerabilities">
-              <i class="bi bi-exclamation-circle-fill text-warning"></i>
-            </a>
-            <div class="custom-popup shadow bg-light" id="popup-{{ vuln.id }}">
-              <h4>{{ vuln.id }}</h4>
-              <p>This vulnerability is exploitable by adversaries.</p>
-              <p>A few interesting links with info on the exploit and how to mitigate
-                it:</p>
-              <a href="https://vulners.com/{{ vuln.type }}/{{ vuln.id }}"
-                 target="_blank">Vulners info page</a>
-              <input type="submit" value="Close" class="btn btn-secondary"
-                     onclick='hidePopup("popup-{{ vuln.id }}")'>
-            </div>
-            {% else %}
-            <i class="bi bi-check-circle-fill color-success"></i>
-            {% endif %}
-            {% if vuln.type == 'cve' %}
-            <a href="https://cvepremium.circl.lu/cve/{{ vuln.id }}" target="_blank">
-              <i class="bi bi-search"></i>
-            </a>
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-        {% else %}
-        <p>No vulnerabilities found for this service.</p>
-        {% endif %}
-      </table>
-      <br>
+
+      <div class="table-responsive">
+        <table class="table table-light table-bordered table-striped">
+          <tr>
+            <th>ID</th>
+            <th>CVSS</th>
+            <th>Type</th>
+            <th>Exploit status</th>
+          </tr>
+          {% for vuln in vulnerability.vuln_list %}
+          <tr>
+            <td>{{ vuln.id }}</td>
+            <td>{{ vuln.cvss }}</td>
+            <td>{{ vuln.type }}</td>
+            <td>
+              {% if vuln.is_exploit == 'true' %}
+              <a onclick='openPopup("popup-{{ vuln.id }}")' href="#vulnerabilities">
+                <i class="bi bi-exclamation-circle-fill text-warning"></i>
+              </a>
+              <div class="custom-popup shadow bg-light" id="popup-{{ vuln.id }}">
+                <h4>{{ vuln.id }}</h4>
+                <p>This vulnerability is exploitable by adversaries.</p>
+                <p>A few interesting links with info on the exploit and how to mitigate
+                  it:</p>
+                <a href="https://vulners.com/{{ vuln.type }}/{{ vuln.id }}"
+                   target="_blank">Vulners info page</a>
+                <input type="submit" value="Close" class="btn btn-secondary"
+                       onclick='hidePopup("popup-{{ vuln.id }}")'>
+              </div>
+              {% else %}
+              <i class="bi bi-check-circle-fill color-success"></i>
+              {% endif %}
+              {% if vuln.type == 'cve' %}
+              <a href="https://cvepremium.circl.lu/cve/{{ vuln.id }}" target="_blank">
+                <i class="bi bi-search"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+          {% else %}
+          <p>No vulnerabilities found for this service.</p>
+          {% endif %}
+        </table>
+      </div>
       {% endfor %}
     </div>
-    <div class="row my-2" id="general-recommendations">
-      <button type="button" data-bs-toggle="collapse" data-bs-target="#referrer-policy"
-              aria-expanded="false" aria-controls="collapseExample"
-              class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
-        <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-        General recommendations
-      </button>
-      <div class="p-0 collapse" id="referrer-policy">
-        <div class=" p-3 border-bottom border-end border-start">
-          <p>
-            Generally speaking, make sure all of your software is up-to-date.
-            Most of the time, results show that a service may be exploited when the
-            software behind it is outdated.
-          </p>
-          <h4>Why is my software version not showed, and what should I do?</h4>
-          This information was not found, as it is not visible either in your server's
-          HTTP headers or any of the publicly available data from your server.
-          Possible course of actions:
-          <ul>
-            <li>
-              Best practice is to find documentation for the service, and follow the
-              instructions to find what version is running on your system.
-            </li>
-            <li>
-              If your infrastructure is administered by third party, please contact them
-              to inquire about possible updates to be made on your systems.
-            </li>
-          </ul>
+    <div class="col-lg-12 my-2" id="general-recommendations-webconf">
+        <button type="button" data-bs-toggle="collapse"
+                data-bs-target="#referrer-policy"
+                aria-expanded="false" aria-controls="collapseExample"
+                class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+          <i
+            class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+          General recommendations
+        </button>
+        <div class="p-0 collapse" id="referrer-policy">
+          <div class=" p-3 border-bottom border-end border-start">
+            <p>
+              Generally speaking, make sure all of your software is up-to-date.
+              Most of the time, results show that a service may be exploited when the
+              software behind it is outdated.
+            </p>
+            <h4>Why is my software version not showed, and what should I do?</h4>
+            This information was not found, as it is not visible either in your server's
+            HTTP headers or any of the publicly available data from your server.
+            Possible course of actions:
+            <ul>
+              <li>
+                Best practice is to find documentation for the service, and follow the
+                instructions to find what version is running on your system.
+              </li>
+              <li>
+                If your infrastructure is administered by third party, please contact
+                them
+                to inquire about possible updates to be made on your systems.
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
   </section>
 
   <script>
@@ -144,7 +173,6 @@
       let popup = document.getElementById(id);
       popup.classList.remove("open-popup");
     }
-
   </script>
   <script>
   var coll = document.getElementsByClassName("collapsible");
@@ -161,7 +189,6 @@
       }
     });
   }
-
   </script>
 </main>
 {% endblock %}

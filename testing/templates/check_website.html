@@ -12,7 +12,6 @@
             vulnerabilities, then provides you recommendations to resolve each security
             weakness identified
           </p>
-          <a class="align-self-end" href="#">Find out more about the test</a>
           <form method="post">
             {% csrf_token %}
             {% if error %}
@@ -29,6 +28,9 @@
             <input type="submit" value="Test" class="btn btn-secondary">
           </form>
         </div>
+          <div class="card-footer text-center text-muted">
+            <!-- TODO change href --><a
+          href="{% url 'knowledge_base'  %}#tests-email">About the test</a></div>
       </div>
     </div>
 </main>

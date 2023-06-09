@@ -3,6 +3,25 @@
 {% block content %}
 
 <main class="row p-3 flex-column align-items-center">
+  <div class="col-lg-5 col-md-3 mb-2">
+      <div class="card shadow h-100 border border-2">
+        <div class="card-body d-flex flex-column ">
+          <h5 class="card-title">IPv6 Resr</h5>
+          <p>Assess the configuration of your web server (if publicly available)</p>
+          <form method="post" class="">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label>Enter a web server hostname / ip address:</label>
+              <input type="text" placeholder="server.lu" id="target5" name="target"
+                     value="" required>
+            </div>
+            <input type="submit" value="Test" class="btn btn-secondary">
+          </form>
+        </div>
+        <div class="card-footer text-center text-muted"><a
+          href="{% url 'knowledge_base'  %}#tests-web-server">About the test</a></div>
+      </div>
+    </div>
   <section class="col-lg-11 row my-5 border border-2 rounded p-4 justify-content-center">
     <h1 class="text-center">IPv6 Test Results</h1>
     <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">

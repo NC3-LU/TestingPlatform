@@ -26,6 +26,7 @@ from .helpers import (
     get_http_report,
     get_tls_report,
     ipv6_check,
+    tls_version_check,
     web_server_check,
 )
 from .models import DMARCRecord, DMARCReport, MailDomain
@@ -75,10 +76,11 @@ def http_test(request):
         if "rescan" in request.POST:
             context["rescan"] = True
         context.update(get_http_report(request.POST["target"], context["rescan"]))
-        if "tls" in request.POST:
-            context["tls_results"] = get_tls_report(
-                request.POST["target"], context["rescan"]
-            )
+
+        context["tls_results"] = get_tls_report(
+            request.POST["target"], True
+        )
+        # context.update(ipv6_check("nc3.lu", None))
         return render(request, "check_website.html", context)
     else:
         return render(request, "check_website.html")
@@ -88,7 +90,7 @@ def web_test(request):
     # TODO check that for a new scan a new session is created an after
     #  getting the result it shall be closed
     if request.method == "POST":
-
+        ipv6 = ipv6_check(request.POST["target"], None)
         # Command used to start zap locally (ubuntu)
         # zap.sh -daemon -config api.key=12345 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true
         # The URL of the application to be tested
@@ -127,7 +129,8 @@ def web_test(request):
         return render(
             request,
             "check_webapp.html",
-            {"results_url": results_url, "alerts": matching_alerts, "target": target},
+            {"results_url": results_url, "alerts": matching_alerts, "target": target,
+             "ipv6": ipv6},
         )
 
     else:
@@ -139,7 +142,16 @@ def email_test(request):
         context = {"rescan": False}
         if "rescan" in request.POST:
             context["rescan"] = True
-        context.update(email_check(request.POST["target"], context["rescan"]))
+        email_results = email_check(request.POST["target"], context["rescan"])
+        context.update(ipv6_check(request.POST["target"], None))
+        context.update(email_results)
+        # for host in email_results['result']['mx']['hosts']:
+        # context["ipv6_mx"] = ipv6_check(
+        #        host["hostname"], None
+        #    )
+        #    context["tls_mx"] = tls_version_check(
+        #        host["hostname"]
+        #    )
         return render(request, "check_email.html", context)
     else:
         return render(request, "check_email.html")
@@ -201,7 +213,8 @@ def spf_generator(request):
                     else:
                         messages.error(
                             request,
-                            "One of the specified host / ip address does not match expected format."
+                            "One of the specified host / ip address does not match "
+                            "expected format."
                             " Please correct your entered data.",
                         )
                         return render(request, "spf_generator.html", {"form": form})
@@ -331,7 +344,7 @@ def dmarc_dl(request, domain, mailfrom, timestamp):
             headers={
                 "Content-Type": "application/xml",
                 "Content-Disposition": f"attachment; "
-                f'filename="dmarc_{domain}_{mailfrom}_{timestamp}.xml"',
+                                       f'filename="dmarc_{domain}_{mailfrom}_{timestamp}.xml"',
             },
         )
         return response

@@ -1,11 +1,17 @@
 {% load static %}
 
 <main
-  class="bg-light d-flex  p-3 flex-column align-items-center text-center">
+  class="d-flex p-3 flex-column align-items-center text-center">
   <h1><span style="font-weight: bold;color: #28abe2">NC</span><span
     style="font-weight: bold;color:#ec1e27;">3</span> Testing Platform</h1>
   <p class="lead">Modern Internet Standards provide for more reliability and further
     growth of the Internet. Are you using them?</p>
+  <p class="fs-5 col-lg-7">
+    The NC3 Testing platform offers a range of straightforward and efficient tests
+    designed to assist your organization in evaluating the initial security status of
+    your websites, email systems, and infrastructure. These tests are conducted in a
+    non-invasive manner, focusing on discovery rather than exploiting any identified
+    vulnerabilities.</p>
 </main>
 
 <div class="container-fluid my-5">
@@ -13,7 +19,7 @@
     <div class="col-lg-3 col-md-3 mb-2">
       <div class="h-100 card shadow border border-2">
         <div class="card-body d-flex flex-column">
-          <h5 class="card-title">Website</h5>
+          <h5 class="card-title">Website Application Testing</h5>
           <p>
             Assess the security of your website against known
             vulnerabilities and provides you recommendations.
@@ -35,10 +41,11 @@
             <input type="submit" value="Test" class="btn btn-secondary">
           </form>
         </div>
-        <div class="card-footer text-center text-muted"><a href="{% url 'knowledge_base'  %}#tests-website">About the test</a></div>
+        <div class="card-footer text-center text-muted"><a
+          href="{% url 'knowledge_base'  %}#tests-website">About the test</a></div>
       </div>
     </div>
-    <div class="col-lg-3 col-md-3 mb-2">
+    <!--<div class="col-lg-3 col-md-3 mb-2">
       <div class="card shadow h-100 border border-2">
         <div class="card-body d-flex flex-column ">
           <h5 class="card-title">IPv6</h5>
@@ -56,11 +63,12 @@
         </div>
         <div class="card-footer text-center text-muted"><a href="{% url 'knowledge_base'  %}#tests-ipv6">About the test</a></div>
       </div>
-    </div>
+    </div>-->
+
     <div class="col-lg-3 col-md-3 mb-2">
       <div class="card shadow h-100 border border-2">
         <div class="card-body d-flex flex-column ">
-          <h5 class="card-title">Web Server Configuration</h5>
+          <h5 class="card-title">Infrastructure Testing</h5>
           <p>Assess the configuration of your web server (if publicly available)</p>
           <form method="post" action="infra-testing/web-server-test/" class="">
             {% csrf_token %}
@@ -72,13 +80,14 @@
             <input type="submit" value="Test" class="btn btn-secondary">
           </form>
         </div>
-        <div class="card-footer text-center text-muted"><a href="{% url 'knowledge_base'  %}#tests-web-server">About the test</a></div>
+        <div class="card-footer text-center text-muted"><a
+          href="{% url 'knowledge_base'  %}#tests-web-server">About the test</a></div>
       </div>
     </div>
     <div class="col-lg-3 col-md-3 mb-2">
       <div class="card shadow h-100 border border-2">
         <div class="card-body d-flex flex-column ">
-          <h5 class="card-title">Email</h5>
+          <h5 class="card-title">Email Systems Testing</h5>
           <p>Assess the security of your email setup
             (SPF and DMARC DNS records, DNSSEC deployment, etc.)</p>
 
@@ -93,10 +102,13 @@
             <input type="submit" value="Test" class="btn btn-secondary">
           </form>
         </div>
-        <div class="card-footer text-center text-muted"><a href="{% url 'knowledge_base'  %}#tests-email">About the test</a></div>
+        <div class="card-footer text-center text-muted"><a
+          href="{% url 'knowledge_base'  %}#tests-email">About the test</a></div>
       </div>
     </div>
+
     <!-- <div class="col-lg-3 col-md-3 mb-2">
+
       <div class=" h-100 card shadow border border-2">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">File testing</h5>
@@ -122,61 +134,62 @@
         <div class="card-footer text-center text-muted"><a href="{% url 'knowledge_base'  %}#tests-file">About the test</a></div>
       </div>
     </div> -->
-  </div>
-  <!-- <div class="row justify-content-center">
-    <div class="col-lg-3 mb-2">
-      <div class=" h-100 card border border-2 ">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">Publications</h5>
-          <p>
-            The publications contain lorem ipsum.
-          </p>
-          <a href="">Publication 1 </a>
-          <a href="">Publication 2 </a>
+
+    <!-- <div class="row justify-content-center">
+      <div class="col-lg-3 mb-2">
+        <div class=" h-100 card border border-2 ">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">Publications</h5>
+            <p>
+              The publications contain lorem ipsum.
+            </p>
+            <a href="">Publication 1 </a>
+            <a href="">Publication 2 </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 mb-2">
+        <div class=" h-100 card border border-2 ">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">Statistics</h5>
+            <p>
+              The publications contain lorem ipsum.
+            </p>
+            <a href="">Publication 1 </a>
+            <a href="">Publication 2 </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 mb-2">
+        <div class=" h-100 card border border-2 ">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">Placeholder</h5>
+            <p>
+              Placeholder as a text.
+            </p>
+            <a href="">Publication 1 </a>
+            <a href="">Publication 2 </a>
+          </div>
         </div>
       </div>
     </div>
-    <div class="col-lg-3 mb-2">
-      <div class=" h-100 card border border-2 ">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">Statistics</h5>
-          <p>
-            The publications contain lorem ipsum.
-          </p>
-          <a href="">Publication 1 </a>
-          <a href="">Publication 2 </a>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-3 mb-2">
-      <div class=" h-100 card border border-2 ">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">Placeholder</h5>
-          <p>
-            Placeholder as a text.
-          </p>
-          <a href="">Publication 1 </a>
-          <a href="">Publication 2 </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div> -->
+  </div> -->
 
 
-  <div class="container-fluid">
-    <br />
-    <div
-      class="row bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
-      <div class="col">
-        <p class="lead">By registering to our platform you will have access to
-          various <a
-            href="">services and tools</a>.</p>
-        <p class="lead">
-          <a href="/signup"
-             class="btn btn-lg btn-secondary fw-bold border-white text-light"
-             style="background-color:#009fe3;">Register now!</a>
-        </p>
+    <div class="container-fluid">
+      <br/>
+      <div
+        class="row d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
+        <div class="col">
+          <p class="lead">By registering to our platform you will have access to
+            various <a
+              href="">services and tools</a>.</p>
+          <p class="lead">
+            <a href="/signup"
+               class="btn btn-lg btn-secondary fw-bold border-white text-light"
+               style="background-color:#009fe3;">Register now!</a>
+          </p>
+        </div>
       </div>
     </div>
   </div>

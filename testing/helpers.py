@@ -279,7 +279,7 @@ def ipv6_check(
     default_resolver = dns.resolver.Resolver().nameservers[0]
     q = dns.message.make_query(domain, dns.rdatatype.NS)
     ns_response = dns.query.udp(q, default_resolver)
-    ns_names = [t.target.to_text() for ans in ns_response.answer for t in ans]
+    ns_names = [t.target.to_text() for ans in ns_response.answer for t in ans if hasattr(t, 'target')]
     results["nameservers"] = {}
 
     for ns_name in ns_names:
@@ -367,17 +367,17 @@ def ipv6_check(
     if counter >= 2:
         nameservers_comments = {
             "grade": "full",
-            "comment": "Your domain has at least 2 name servers with ipv6 records.",
+            "comment": "Your domain has at least 2 name servers with IPv6 records.",
         }
     elif counter == 1:
         nameservers_comments = {
             "grade": "half",
-            "comment": "Your domain has 1 name server with an ipv6 record.",
+            "comment": "Your domain has 1 name server with an IPv6 record.",
         }
     else:
         nameservers_comments = {
             "grade": "null",
-            "comment": "Your domain has no name server with an ipv6 record.",
+            "comment": "Your domain has no name server with an IPv6 record.",
         }
     counter = 0
     for key in results["nameservers"]:
@@ -386,12 +386,12 @@ def ipv6_check(
     if counter == 0:
         nameservers_reachability_comments = {
             "grade": "null",
-            "comment": "Your domain name servers are not reachable over ipv6.",
+            "comment": "Your domain name servers are not reachable over IPv6.",
         }
     else:
         nameservers_reachability_comments = {
             "grade": "full",
-            "comment": "At least one of your domain name servers is reachable over ipv6.",
+            "comment": "At least one of your domain name servers is reachable over IPv6.",
         }
 
     # Check website connectivity (available ips and reachability)
@@ -420,12 +420,12 @@ def ipv6_check(
         if response:
             records_v4_comments = {
                 "grade": "full",
-                "comment": "Your web server is reachable over ipv4.",
+                "comment": "Your server is reachable over IPv4.",
             }
         else:
             records_v4_comments = {
                 "grade": "null",
-                "comment": "Your web server is not reachable over ipv4.",
+                "comment": "Your server is not reachable over IPv4.",
             }
 
     response = False
@@ -438,12 +438,12 @@ def ipv6_check(
         if response:
             records_v6_comments = {
                 "grade": "full",
-                "comment": "Your web server is reachable over ipv6.",
+                "comment": "Your server is reachable over IPv6.",
             }
         else:
             records_v6_comments = {
                 "grade": "null",
-                "comment": "Your web server is not reachable over ipv6.",
+                "comment": "Your server is not reachable over IPv6.",
             }
 
     return {
@@ -517,8 +517,10 @@ def tls_version_check(domain: str):
 
 
 def get_dkim_public_key(domain: str, selectors: str = None):
-    """Looks for a DKIM public key in a DNS field and verifies that it can be used to encrypt data."""
+    """Looks for a DKIM public key in a DNS field and verifies that it can be used to
+    encrypt data."""
     if selectors is None:
+        # TODO Check to get proper selector or have a database of selectors
         selectors = ["selector1", "selector2", "google", "dkim", "k1"]
     for selector in selectors:
         try:

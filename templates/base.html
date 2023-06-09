@@ -318,14 +318,14 @@ footer{
   </style>
 </head>
 
-<body>
+<body class="bg-light">
 
 {% include 'nav.html' %}
 
 {% bootstrap_messages %}
 
 
-<div id="content" class="container-fluid">
+<div id="content" class="col-lg-11 container-fluid bg-white">
   {% block content %}{% endblock %}
 </div>
 

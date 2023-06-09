@@ -455,16 +455,18 @@ def ipv6_check(
 
 def web_server_check(domain: str):
     nmap = nmap3.Nmap()
-    scans = nmap.nmap_version_detection(
-        domain, args="--script vulners --script-args mincvss+5.0"
+    service_scans = nmap.nmap_version_detection(
+        domain,
+        args="--script vulners --script-args mincvss+5.0"
     )
-    # runtime = scans.pop("runtime")
-    # stats = scans.pop("stats")
-    # task_results = scans.pop("task_results")
+    # Could be used later for better reporting
+    # runtime = service_scans.pop("runtime")
+    # stats = service_scans.pop("stats")
+    # task_results = service_scans.pop("task_results")
     services = []
     vulnerabilities = []
-    ip, scans = list(scans.items())[0]
-    for port in scans["ports"]:
+    ip, service_scans = list(service_scans.items())[0]
+    for port in service_scans["ports"]:
         if port["state"] != "closed":
             service = port["service"]
             vulners = port["scripts"]
@@ -487,3 +489,25 @@ def web_server_check(domain: str):
             except KeyError:
                 pass
     return {"services": services, "vulnerabilities": vulnerabilities}
+
+
+def tls_version_check(domain: str):
+    nmap = nmap3.Nmap()
+    tls_scans = nmap.nmap_version_detection(
+        domain,
+        args="--script ssl-enum-ciphers"
+    )
+    ip, tls_scans = list(tls_scans.items())[0]
+    tls_scans = list(filter(lambda element: element["state"] == "open",
+                            tls_scans["ports"]))
+    results = None
+    for port in tls_scans:
+        if port["service"]["name"] == "ssl":
+            for script in port["scripts"]:
+                if script["name"] == "ssl-enum-ciphers":
+                    results = script["data"]
+    least_strength = results.pop("least strength")
+    for k in results.keys():
+        results[k] = results[k]["ciphers"]["children"]
+    results.update({"least_strength": least_strength})
+    return results

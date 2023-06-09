@@ -9,7 +9,7 @@
         <p>
           Discover if a file is suspicious thanks to the Pandora analysis framework.
         </p>
-        <a class="align-self-end" href="#">Find out more about the test</a>
+        <a class="align-self-end" href="{% url 'knowledge_base'  %}#tests-file">Find out more about the test</a>
         <form method="post" action="/infra-testing/file-test/" enctype="multipart/form-data">
           {% csrf_token %}
           {% if error %}

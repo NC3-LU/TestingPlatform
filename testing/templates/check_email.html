@@ -310,7 +310,11 @@
           <div class="p-0 collapse" id="dkim_record">
             <div class="p-4 border-bottom border-end border-start">
               <h2>DKIM Record</h2>
-              <code>{{ result.dkim }}</code>
+              {% if result.dkim %}
+                <p>DKIM public key found and can encrypt.</p>
+              {% else %}
+                <p>No suitable DKIM public key found.</p>
+              {% endif %}
               <h3>General Best Practices</h3>
             </div>
           </div>

@@ -203,8 +203,9 @@ def get_tls_report(target, rescan):
 
 def email_check(target: str, rescan: bool) -> Dict[str, Any]:
     """Parses and validates MX, SPF, and DMARC records,
-    Checks for DNSSEC deployment, Checks for STARTTLS and TLS support."""
-
+    Checks for DNSSEC deployment, Checks for STARTTLS and TLS support.
+    Checks for the validity of the DKIM public key."""
+    result = {}
     env = os.environ.copy()
     cmd = [
         # sys.exec_prefix + "/bin/python",
@@ -220,7 +221,7 @@ def email_check(target: str, rescan: bool) -> Dict[str, Any]:
     except Exception:
         result = {}
 
-    result["dkim"] = get_dkim_public_key(target)
+    result["dkim"] = check_dkim_public_key(target, [])
 
     return {
         "result": result,
@@ -279,7 +280,12 @@ def ipv6_check(
     default_resolver = dns.resolver.Resolver().nameservers[0]
     q = dns.message.make_query(domain, dns.rdatatype.NS)
     ns_response = dns.query.udp(q, default_resolver)
-    ns_names = [t.target.to_text() for ans in ns_response.answer for t in ans if hasattr(t, 'target')]
+    ns_names = [
+        t.target.to_text()
+        for ans in ns_response.answer
+        for t in ans
+        if hasattr(t, "target")
+    ]
     results["nameservers"] = {}
 
     for ns_name in ns_names:
@@ -381,7 +387,7 @@ def ipv6_check(
         }
     counter = 0
     for key in results["nameservers"]:
-        if results["nameservers"][key]["ipv6"]["reachable"]:
+        if results["nameservers"][key]["ipv6"].get("reachable", False):
             counter += 1
     if counter == 0:
         nameservers_reachability_comments = {
@@ -459,8 +465,7 @@ def ipv6_check(
 def web_server_check(domain: str):
     nmap = nmap3.Nmap()
     service_scans = nmap.nmap_version_detection(
-        domain,
-        args="--script vulners --script-args mincvss+5.0"
+        domain, args="--script vulners --script-args mincvss+5.0"
     )
     # Could be used later for better reporting
     # runtime = service_scans.pop("runtime")
@@ -496,13 +501,11 @@ def web_server_check(domain: str):
 
 def tls_version_check(domain: str):
     nmap = nmap3.Nmap()
-    tls_scans = nmap.nmap_version_detection(
-        domain,
-        args="--script ssl-enum-ciphers"
-    )
+    tls_scans = nmap.nmap_version_detection(domain, args="--script ssl-enum-ciphers")
     ip, tls_scans = list(tls_scans.items())[0]
-    tls_scans = list(filter(lambda element: element["state"] == "open",
-                            tls_scans["ports"]))
+    tls_scans = list(
+        filter(lambda element: element["state"] == "open", tls_scans["ports"])
+    )
     results = None
     for port in tls_scans:
         if port["service"]["name"] == "ssl":
@@ -516,12 +519,21 @@ def tls_version_check(domain: str):
     return results
 
 
-def get_dkim_public_key(domain: str, selectors: str = None):
+def check_dkim_public_key(domain: str, selectors: list):
     """Looks for a DKIM public key in a DNS field and verifies that it can be used to
     encrypt data."""
-    if selectors is None:
+    if len(selectors) == 0:
         # TODO Check to get proper selector or have a database of selectors
-        selectors = ["selector1", "selector2", "google", "dkim", "k1"]
+        selectors = [
+            "selector1",
+            "selector2",
+            "google",
+            "dkim",
+            "k1",
+            "default",
+            "mxvault",
+            "mail",
+        ]
     for selector in selectors:
         try:
             dns_response = (

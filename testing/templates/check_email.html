@@ -311,7 +311,7 @@
             <div class="p-4 border-bottom border-end border-start">
               <h2>DKIM Record</h2>
               {% if result.dkim %}
-                <p>DKIM public key found and can encrypt.</p>
+                <p>DKIM public key found and can be used to encrypt data.</p>
               {% else %}
                 <p>No suitable DKIM public key found.</p>
               {% endif %}
@@ -368,7 +368,6 @@
                 CSP, it is important to identify which types of resources your site
                 needs to
                 load such as scripts, stylesheets, images, and fonts.</p>
-
             </div>
           </div>
         </div>

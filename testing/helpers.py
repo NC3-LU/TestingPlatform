@@ -214,8 +214,9 @@ def email_check(target: str, rescan: bool) -> Dict[str, Any]:
         "-f",
         "JSON",
     ]
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
-    (stdout, stderr) = p.communicate()
+    (stdout, stderr) = (
+        subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+    ).communicate()
     try:
         result = json.loads(stdout)
     except Exception:

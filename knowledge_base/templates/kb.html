@@ -14,7 +14,7 @@
   <h2 class="bg-light d-flex p-3 flex-column align-items-center text-center">Tests</h2>
   <div class="row justify-content-left">
     <div class="col-lg col-md mb">
-      <h3 id="tests-website">Website</h3>
+      <h3 id="tests-website">Website Application Testing</h3>
       After entering a website's domain name, we will test whether the website supports
       various
       modern Internet standards such as:
@@ -47,6 +47,7 @@
       the proper implementation of an email server.
       <ul>
         <li>Parses and validates MX, SPF, and DMARC records</li>
+        <li>Checks the presence and validity of <a href="{% url 'knowledge_base'  %}#standards-dkim">DKIM</a> public key</li>
         <li>Checks for <a href="https://datatracker.ietf.org/doc/rfc9364/"
                           target="_blank" rel="noopener noreferrer">DNSSEC</a>
           deployment
@@ -106,7 +107,7 @@
 
   <div class="row justify-content-left">
     <div class="col-lg col-md mb">
-      <h3 id="standards-dmarc">DMARC and SPF</h3>
+      <h3 id="standards-dmarc-spf">DMARC and SPF</h3>
       <p>DMARC and SPF are protections against email phishing.
       <p>DMARC record is a TXT record that contains instructions for how an email server
         should
@@ -128,6 +129,18 @@
       </div>
     </div>
   </div>
+
+  <div class="row justify-content-left">
+    <div class="col-lg col-md mb">
+      <h3 id="standards-dkim">DKIM</h3>
+      <p><a href="https://www.rfc-editor.org/info/rfc6376" target="_blank" rel="noopener noreferrer">DomainKeys Identified Mail</a>
+        is an email authentication method designed to
+        detect forged sender addresses in email (email spoofing).</p>
+      <p>DKIM allows the receiver to check that an email that claimed to have come
+        from a specific domain was indeed authorized by the owner of that domain.</p>
+    </div>
+  </div>
+</div>
 
 </div>
 {% endblock %}

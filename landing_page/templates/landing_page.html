@@ -38,7 +38,7 @@
                      id="target" name="target"
                      value="{{ form }}" required>
             </div>
-            <input type="submit" value="Test" class="btn btn-secondary">
+            <input type="submit" value="Test" class="btn btn-secondary" onclick='openPopup()'>
           </form>
         </div>
         <div class="card-footer text-center text-muted"><a
@@ -77,7 +77,7 @@
               <input type="text" placeholder="server.lu" id="target5" name="target"
                      value="" required>
             </div>
-            <input type="submit" value="Test" class="btn btn-secondary">
+            <input type="submit" value="Test" class="btn btn-secondary" onclick='openPopup()'>
           </form>
         </div>
         <div class="card-footer text-center text-muted"><a
@@ -101,7 +101,7 @@
                      value="" required>
 
             </div>
-            <input type="submit" value="Test" class="btn btn-secondary">
+            <input type="submit" value="Test" class="btn btn-secondary" onclick='openPopup()'>
           </form>
         </div>
         <div class="card-footer text-center text-muted"><a
@@ -196,3 +196,35 @@
     </div>
   </div>
 </div>
+
+<section class="blur-bg" id="blur-bg">
+  <div class="custom-popup-content custom-popup-loading" id="popup-content">
+    While you wait, you can <a href="#" target="_blank">click here</a> to launch other tests if you want to try something else!
+  </div>
+  <div class="loading-wave custom-popup-loading" id="popup-loading">
+    <div class="loading-bar"></div>
+    <div class="loading-bar"></div>
+    <div class="loading-bar"></div>
+    <div class="loading-bar"></div>
+  </div>
+</section>
+
+<script>
+    function openPopup(){
+      let popup_loading = document.getElementById('popup-loading');
+      popup_loading.classList.add("open-popup");
+      let bg = document.getElementById('blur-bg');
+      bg.classList.add("open-popup");
+      let popup_content = document.getElementById('popup-content');
+      popup_content.classList.add("open-popup");
+    }
+    function hidePopup(){
+      let popup = document.getElementById('popup-loading');
+      popup.classList.remove("open-popup");
+      let popup_content = document.getElementById('popup-content');
+      popup_content.classList.remove("open-popup");
+      let bg = document.getElementById('blur-bg');
+      bg.classList.remove("open-popup");
+    }
+    window.onpageshow = hidePopup;
+</script>

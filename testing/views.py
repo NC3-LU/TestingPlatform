@@ -21,6 +21,8 @@ from testing_platform import settings
 
 from .forms import DMARCRecordForm, SPFRecordForm
 from .helpers import (
+    check_dkim_public_key,
+    check_soa_record,
     email_check,
     file_check,
     get_http_report,
@@ -139,21 +141,25 @@ def web_test(request):
 
 
 def email_test(request):
+    context = {}
     if request.method == "POST":
-        context = {"rescan": False}
-        if "rescan" in request.POST:
-            context["rescan"] = True
-        email_results = email_check(request.POST["target"], context["rescan"])
-        context.update(ipv6_check(request.POST["target"], None))
-        context.update(email_results)
-        # for host in email_results['result']['mx']['hosts']:
-        # context["ipv6_mx"] = ipv6_check(
-        #        host["hostname"], None
-        #    )
-        #    context["tls_mx"] = tls_version_check(
-        #        host["hostname"]
-        #    )
-        return render(request, "check_email.html", context)
+        target = request.POST["target"]
+        if not check_soa_record(target):
+            context = {"status": False, "statusmessage": "The given domain is invalid!"}
+        else:
+            context.update(email_check(target))
+            context.update(check_dkim_public_key(target, []))
+            context.update(ipv6_check(target, None))
+            context.update({"status": True})
+            # for host in email_results['result']['mx']['hosts']:
+            # context["ipv6_mx"] = ipv6_check(
+            #        host["hostname"], None
+            #    )
+            #    context["tls_mx"] = tls_version_check(
+            #        host["hostname"]
+            #    )
+        print(context)
+        return render(request, "check_email.html", {"result": context})
     else:
         return render(request, "check_email.html")
 
@@ -164,7 +170,6 @@ def file_test(request):
         file_to_check = request.FILES["target"].read()
         file_to_check_name = request.FILES["target"].name
         context.update(file_check(file_to_check, file_to_check_name))
-        print(context)
         return render(request, "check_file.html", context)
     else:
         return render(request, "check_file.html")

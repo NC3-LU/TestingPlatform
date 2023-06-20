@@ -12,24 +12,11 @@
             vulnerabilities, then provides you recommendations to resolve each security
             weakness identified
           </p>
-          <a class="align-self-end" href="#">Find out more about the test</a>
           <form method="post">
             {% csrf_token %}
             {% if error %}
             <span class="text-danger">{{ error }}</span>
             {% endif %}
-            <div class="mb-3">
-              <!--TODO add the sectors -->
-              <label class="mb-1">
-                What is your sector?
-              </label>
-              <select class="form-select" aria-label="Default select example">
-                <option selected>Open this select menu</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
-              </select>
-            </div>
             <div class="mb-3">
               <label class="mb-1">
                 Enter your websites domain name:
@@ -41,35 +28,16 @@
             <input type="submit" value="Test" class="btn btn-secondary">
           </form>
         </div>
+          <div class="card-footer text-center text-muted">
+            <!-- TODO change href --><a
+          href="{% url 'knowledge_base'  %}#tests-email">About the test</a></div>
       </div>
     </div>
-   <!-- <h1 class=" p-5 d-flex justify-content-center">Website Test:</h1>
-    <form method="post" class="authForm p-5">
-        {% csrf_token %}
-        <div></div>
-        <label>Enter your website domain:</label><br>
-        {% if error %}
-        <span class="text-danger">{{ error }}</span>
-        {% endif %}
-        <input type="text" placeholder="www.domain.com" id="target" name="target" value="{{ form }}"><br>
-        <div class="mb-2">
-            <label class="text-light">Perform a TLS scan:</label>
-            <input type="checkbox" id="tls" name="tls"><br>
-            <label class="text-light">Force a rescan instead of returning cached results:</label>
-            <input type="checkbox" id="rescan" name="rescan">
-        </div>
-        <small>
-            Loading can take up to 5 minutes. If your tls scan results are empty, please retry and uncheck the
-            'force rescan' option.
-        </small>
-        <input type="submit" value="Test" class="btn btn-primary">
-        <button class="btn btn-secondary mt-2" onclick="window.history.back()">Back</button>
-    </form>-->
-
 </main>
 <main class="container-fluid d-flex flex-column align-items-center">
   {% if result %}
   {% include "web_report.html" %}
   {% endif %}
 </main>
+<br>
 {% endblock %}

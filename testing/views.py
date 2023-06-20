@@ -2,6 +2,7 @@ import datetime
 import ipaddress
 import re
 import socket
+import time
 from typing import Any, Dict
 from urllib.parse import parse_qs, urlparse
 
@@ -14,16 +15,20 @@ from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from ipwhois import IPDefinedError, IPWhois
+from zapv2 import ZAPv2
 
 from testing_platform import settings
 
 from .forms import DMARCRecordForm, SPFRecordForm
 from .helpers import (
+    check_dkim_public_key,
+    check_soa_record,
     email_check,
     file_check,
     get_http_report,
     get_tls_report,
     ipv6_check,
+    web_server_check,
 )
 from .models import DMARCRecord, DMARCReport, MailDomain
 
@@ -72,22 +77,89 @@ def http_test(request):
         if "rescan" in request.POST:
             context["rescan"] = True
         context.update(get_http_report(request.POST["target"], context["rescan"]))
-        if "tls" in request.POST:
-            context["tls_results"] = get_tls_report(
-                request.POST["target"], context["rescan"]
-            )
+
+        context["tls_results"] = get_tls_report(request.POST["target"], True)
+        # context.update(ipv6_check("nc3.lu", None))
         return render(request, "check_website.html", context)
     else:
         return render(request, "check_website.html")
 
 
-def email_test(request):
+def web_test(request):
+    # TODO check that for a new scan a new session is created an after
+    #  getting the result it shall be closed
     if request.method == "POST":
-        context = {"rescan": False}
-        if "rescan" in request.POST:
-            context["rescan"] = True
-        context.update(email_check(request.POST["target"], context["rescan"]))
-        return render(request, "check_email.html", context)
+        ipv6 = ipv6_check(request.POST["target"], None)
+        # Command used to start zap locally (ubuntu)
+        # zap.sh -daemon -config api.key=12345 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true
+        # The URL of the application to be tested
+        target = request.POST["target"]
+        # Change to match the API key set in ZAP, or use None if the API key is disabled
+        apikey = "12345"
+
+        # By default ZAP API client will connect to port 8080
+        zap = ZAPv2(
+            apikey=apikey,
+            proxies={"http": "http://127.0.0.1:8081", "https": "http://127.0.0.1:8081"},
+        )
+
+        scanid = zap.spider.scan("http://" + target)
+        while int(zap.spider.status(scanid)) < 100:
+            time.sleep(1)
+
+        results_url = zap.spider.results(scanid)
+        while int(zap.pscan.records_to_scan) > 0:
+            # Loop until the passive scan has finished
+            print("Records to passive scan : " + zap.pscan.records_to_scan)
+            time.sleep(2)
+        alerts = zap.core.alerts()
+
+        # Create an empty list to hold the matching alerts
+        matching_alerts = []
+
+        # Loop through the alerts
+        for alert in alerts:
+            # Check if the alert's URL is in the list
+            if alert["url"] in results_url:
+                if alert["confidence"] == "High":
+                    # If it is, append the alert to the matching_alerts list
+                    matching_alerts.append(alert)
+
+        return render(
+            request,
+            "check_webapp.html",
+            {
+                "results_url": results_url,
+                "alerts": matching_alerts,
+                "target": target,
+                "ipv6": ipv6,
+            },
+        )
+
+    else:
+        return render(request, "check_webapp.html")
+
+
+def email_test(request):
+    context = {}
+    if request.method == "POST":
+        target = request.POST["target"]
+        if not check_soa_record(target):
+            context = {"status": False, "statusmessage": "The given domain is invalid!"}
+        else:
+            context.update(email_check(target))
+            context.update(check_dkim_public_key(target, []))
+            context.update(ipv6_check(target, None))
+            context.update({"status": True})
+            # for host in email_results['result']['mx']['hosts']:
+            # context["ipv6_mx"] = ipv6_check(
+            #        host["hostname"], None
+            #    )
+            #    context["tls_mx"] = tls_version_check(
+            #        host["hostname"]
+            #    )
+        print(context)
+        return render(request, "check_email.html", {"result": context})
     else:
         return render(request, "check_email.html")
 
@@ -98,7 +170,6 @@ def file_test(request):
         file_to_check = request.FILES["target"].read()
         file_to_check_name = request.FILES["target"].name
         context.update(file_check(file_to_check, file_to_check_name))
-        print(context)
         return render(request, "check_file.html", context)
     else:
         return render(request, "check_file.html")
@@ -111,6 +182,15 @@ def ipv6_test(request):
         return render(request, "check_ipv6.html", context)
     else:
         return render(request, "check_ipv6.html")
+
+
+def web_server_test(request):
+    if request.method == "POST":
+        context = {}
+        context.update(web_server_check(request.POST["target"]))
+        return render(request, "check_web_server.html", context)
+    else:
+        return render(request, "check_web_server.html")
 
 
 @login_required
@@ -139,7 +219,8 @@ def spf_generator(request):
                     else:
                         messages.error(
                             request,
-                            "One of the specified host / ip address does not match expected format."
+                            "One of the specified host / ip address does not match "
+                            "expected format."
                             " Please correct your entered data.",
                         )
                         return render(request, "spf_generator.html", {"form": form})

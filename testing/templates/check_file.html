@@ -1,32 +1,50 @@
 {% extends "base.html" %}
 
 {% block content %}
-
 <main class="row p-3 flex-column align-items-center">
-  <section class="col-lg-11 row my-5 border border-2 rounded p-4 justify-content-center">
-    <h1 class="text-center">File Test Results</h1>
-    <div class="col-lg-6 col-md-5 mb-2 text-center fs-5 ">
-
-      {% if result %}
-      {% if result.success %}
-      {% if result.status == "CLEAN" %}
-      <i class="bi bi-check-circle-fill color-success"> </i> Clean File!
-      {% else %}
-      <i class="bi bi-x-circle-fill color-danger"></i> Please check the details of the
-      scan!
-      {% endif %}
-      <br/>
-      <a href="{{ result.link }}" rel="noreferrer" target="_blank">Details of the
-        scan.</a>
-      {% endif %}
-      {% endif %}
+  <div class="col-lg-5 col-md-5 mb-2">
+    <div class="h-100 card border border-2 ">
+      <div class="card-body d-flex flex-column">
+        <h3 class="card-title">File testing</h3>
+        <p>
+          Discover if a file is suspicious thanks to the Pandora analysis framework.
+        </p>
+        <a class="align-self-end" href="{% url 'knowledge_base'  %}#tests-file">Find out more about the test</a>
+        <form method="post" action="/infra-testing/file-test/" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% if error %}
+          <span class="text-danger">{{ error }}</span>
+          {% endif %}
+          <div class="mb-3">
+            <label class="mb-1">
+              Select the file you want to check.
+            </label>
+            <input class="form-control" type="file" placeholder="Select the file you want to check."
+              id="target3" name="target" required>
+          </div>
+          <input type="submit" value="Test" class="btn btn-secondary">
+        </form>
+      </div>
     </div>
-
-    <div class="col-lg-8 col-md-5 mb-2 text-center">
-      Results provided by the <a href="https://github.com/pandora-analysis"
-                                 rel="noreferrer" target="_blank"><b>Pandora Analysis
-      framework</b></a>.
+  </div>
+  {% if result %}
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4 justify-content-center">
+    <div class="col-lg-6 col-md-5 mb-2 text-center fs-5 ">
+      <h1 class="text-center">File Test Results</h1>
+      {% if result.success %}
+        {% if result.status == "CLEAN" %}
+          <i class="bi bi-check-circle-fill color-success"> </i> Clean File!
+        {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i> Please check the details of the scan!
+        {% endif %}
+        <br/>
+        <a href="{{ result.link }}" rel="noreferrer" target="_blank">Details of the scan.</a>
+      {% endif %}
+      <div class="col-lg col-md mb-2 text-center">
+        Results provided by the <a href="https://github.com/pandora-analysis" rel="noreferrer" target="_blank"><b>Pandora Analysis framework</b></a>.
+      </div>
     </div>
   </section>
+  {% endif %}
 </main>
 {% endblock %}

@@ -15,7 +15,7 @@
   <div class="row justify-content-between">
     <div class="col-lg-7">
       <div class="row my-1">
-        <div class="col-lg-12 fs-3">
+        <div class="col-lg-12 fs-4">
           {% if result.content_security_policy.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
           {% else %}
@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="row my-1">
-        <div class="col-lg-12 fs-3">
+        <div class="col-lg-12 fs-4">
           {% if result.cookies.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
           {% else %}
@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="row my-1">
-        <div class="col-lg-12 fs-3">
+        <div class="col-lg-12 fs-4">
           {% if result.cross_origin_resource_sharing.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
           {% else %}
@@ -45,7 +45,7 @@
         </div>
       </div>
       <div class="row my-1">
-        <div class="col-lg-12 fs-3">
+        <div class="col-lg-12 fs-4">
           {% if result.redirection.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
           {% else %}
@@ -55,7 +55,7 @@
         </div>
       </div>
       <div class="row my-1">
-        <div class="col-lg-12 fs-3">
+        <div class="col-lg-12 fs-4">
           {% if result.referrer_policy.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
           {% else %}
@@ -65,7 +65,7 @@
         </div>
       </div>
       <div class="row my-1">
-        <div class="col-lg-12 fs-3">
+        <div class="col-lg-12 fs-4">
           {% if result.strict_transport_security.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
           {% else %}
@@ -75,7 +75,7 @@
         </div>
       </div>
       <div class="row my-1">
-        <div class="col-lg-12 fs-3">
+        <div class="col-lg-12 fs-4">
           {% if result.subresource_integrity.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
           {% else %}
@@ -85,7 +85,7 @@
         </div>
       </div>
       <div class="row my-1">
-        <div class="col-lg-12 fs-3">
+        <div class="col-lg-12 fs-4">
           {% if result.x_content_type_options.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
           {% else %}
@@ -95,7 +95,7 @@
         </div>
       </div>
       <div class="row my-1">
-        <div class="col-lg-12 fs-3">
+        <div class="col-lg-12 fs-4">
           {% if result.x_frame_options.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
           {% else %}
@@ -105,7 +105,7 @@
         </div>
       </div>
       <div class="row my-1">
-        <div class="col-lg-12 fs-3">
+        <div class="col-lg-12 fs-4">
           {% if result.x_xss_protection.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
           {% else %}
@@ -120,27 +120,27 @@
       <h1>Test Discovery</h1>
       <div class="row my-4">
         <div class="col-lg-6 fs-2">Good</div>
-        <div class="col-lg-6"><span id="good-count" class="rounded-circle p-2 fs-3 text-white"
+        <div class="col-lg-6"><span id="good-count" class="rounded-circle p-2 fs-4 text-white"
                                     style="background:#71cdba;"></span>
         </div>
       </div>
       <div class="row my-4">
         <div class="col-lg-6 fs-2">Vulnerable</div>
         <div class="col-lg-6"><span id="vulnerable-count"
-                                    class="rounded-circle p-2 fs-3 text-white"
+                                    class="rounded-circle p-2 fs-4 text-white"
                                     style=" background:#ff5c5c;">
         </span>
         </div>
       </div>
       <!--<div class="row my-4">
         <div class="col-lg-6 fs-2">Warning</div>
-        <div class="col-lg-6"><span class="rounded-circle p-2 fs-3 text-black"
+        <div class="col-lg-6"><span class="rounded-circle p-2 fs-4 text-black"
                                     style="background:#f5e230;">10</span>
         </div>
       </div>
       <div class="row my-4">
         <div class="col-lg-6 fs-2">Informational</div>
-        <div class="col-lg-6"><span class="rounded-circle p-2 fs-3 text-white"
+        <div class="col-lg-6"><span class="rounded-circle p-2 fs-4 text-white"
                                     style="background:#2475e8;">10</span>
         </div>
       </div>-->
@@ -197,7 +197,7 @@
               class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
         <i
           class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-        Global Recommendation
+        General Recommendation
       </button>
 
       <div class="p-0 collapse" id="target2">
@@ -551,10 +551,6 @@
     options: options2
   });*/
 
-
-
-
-
 </script>
 <script>
   const total = {{ scan_summary.tests_quantity }} -1;
@@ -604,13 +600,9 @@
     },
     options: options
   });
-
-
-
-
 </script>
 
-<button class="btn btn-light w-50 collapsible">HTTP Results</button>
+<!--<button class="btn btn-light w-50 collapsible">HTTP Results</button>
 <section class="result-content authForm p-5">
   <h2>Result for {{ domain_name }}:</h2>
   <hr>
@@ -759,7 +751,7 @@
     </table>
   </div>
 
-  <!--<h3>Grade history</h3>
+  <h3>Grade history</h3>
   <table class="table table-light table-bordered table-striped">
     <tr>
       <th>Date</th>
@@ -776,375 +768,479 @@
   </table>
 </section>-->
   {% endif %}
-  {% if tls_results %}
-  <button class="btn w-50 btn-light collapsible">TLS Results</button>
-  <section class="result-content authForm p-5">
-    <h2>Result for {{ domain_name }}:</h2>
-    <hr>
-    <div id="tls-scan-summary" class="d-flex flex-column mb-4">
-      <span>TLS Scan ID: {{ tls_results.id }}</span>
-      <span>Timestamp: {{ tls_results.timestamp }}</span>
-      <span>Target: {{ tls_results.target }}</span>
-      <span>Replay: {{ tls_results.replay }}</span>
-      <span>Has TLS: {% if tls_results.has_tls is True %}
-                    <span class="badge bg-success">{{ tls_results.has_tls }}</span>
-                    {% else %}
-                    <span class="badge bg-danger">{{ tls_results.has_tls }}</span>
-                    {% endif %}</span>
-      <span>CERT ID: {{ tls_results.cert_id }}</span>
-      <span>TRUST ID: {{ tls_results.trust_id }}</span>
-      <span>Is valid: {% if tls_results.is_valid is True %}
-                    <span class="badge bg-success">{{ tls_results.is_valid }}</span>
-                    {% else %}
-                    <span class="badge bg-danger">{{ tls_results.is_valid }}</span>
-                    {% endif %}</span>
-      <span>Completion perc: {{ tls_results.completion_perc }}</span>
-      <span>Ack: {% if tls_results.ack is True %}
-                    <span class="badge bg-success">{{ tls_results.ack }}</span>
-                    {% else %}
-                    <span class="badge bg-danger">{{ tls_results.ack }}</span>
-                    {% endif %}</span>
-      <span>Attempts: {{ tls_results.attempts }}</span>
+{{ipv6_results}}
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4 justify-content-center">
+    <h1 class="text-center">IPv6 Test Results</h1>
+    <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
+      <p>Name Servers:</p>
+      <p>
+        {% if nameservers_comments.grade == "full" %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% elif nameservers_comments.grade == "half" %}
+          <i class="bi bi-exclamation-circle-fill color-warning"></i>
+        {% elif nameservers_comments.grade == "null" %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        {{ nameservers_comments.comment }}
+      </p>
+      <table class="table table-light table-bordered table-striped">
+        <tr>
+          <th>Name</th>
+          <th>Address (v4)</th>
+          <th>Reachable (v4)</th>
+          <th>Address (v6)</th>
+          <th>Reachable (v6)</th>
+        </tr>
+        {% for nameserver, ns in nameservers.items %}
+          <tr>
+            <td>{{ nameserver }}</td>
+            <td>{{ ns.ipv4.address }}</td>
+            <td>
+              {{ ns.ipv4.reachable }}
+              {% if ns.ipv4.reachable %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+              {% else %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+              {% endif %}
+            </td>
+            <td>{{ ns.ipv6.address }}</td>
+            <td>
+              {{ ns.ipv6.reachable }}
+              {% if ns.ipv6.reachable %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+              {% else %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+      <p>
+        {% if nameservers_reachability_comments.grade == "full" %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% elif nameservers_reachability_comments.grade == "null" %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        {{ nameservers_reachability_comments.comment }}
+      </p>
+      <br>
+    <p>Records:</p>
+      {% if records %}
+        <table class="table table-light table-bordered table-striped">
+          <tr>
+            <th>Server</th>
+            <th>IPv4</th>
+            <th>IPv6</th>
+          </tr>
+          {% for record in records %}
+            <tr>
+              <td>{{ record.0 }}</td>
+              <td>{{ record.1 }}</td>
+              <td>{{ record.2 }}</td>
+            </tr>{% if record.2 %}
+          <p>
+            <i class="bi bi-check-circle-fill color-success"></i>
+            Your server has an IPv6 address.
+          </p>
+        {% else %}
+          <p>
+            <i class="bi bi-x-circle-fill color-danger"></i>
+            Your server does not have an IPv6 address.
+          </p>
+        {% endif %}
+
+          {% endfor %}
+        </table>
+      {% endif %}
+      <p>
+        {% if records_v4_comments.grade == "full" %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% elif records_v4_comments.grade == "null" %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        {{ records_v4_comments.comment }}
+      </p>
+      <p>
+        {% if records_v6_comments.grade == "full" %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% elif records_v6_comments.grade == "null" %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        {{ records_v6_comments.comment }}
+      </p>
     </div>
-    <h3>Connection Info</h3>
-    <table class="table table-light table-striped">
-      <tr>
-        <th>Scan IP</th>
-        <td>{{ tls_results.connection_info.scanIP }}</td>
-      </tr>
-      <tr>
-        <th>Serverside</th>
-        <td>{% if tls_results.connection_info.serverside is True %}
-          <span
-            class="badge bg-success">{{ tls_results.connection_info.serverside }}</span>
-          {% else %}
-          <span
-            class="badge bg-danger">{{ tls_results.connection_info.serverside }}</span>
-          {% endif %}
-        </td>
-      </tr>
-      <tr>
-        <th>Curves Fallback</th>
-        <td>{% if tls_results.connection_info.curvesFallback is True %}
-          <span
-            class="badge bg-success">{{ tls_results.connection_info.curvesFallback }}</span>
-          {% else %}
-          <span
-            class="badge bg-danger">{{ tls_results.connection_info.curvesFallback }}</span>
-          {% endif %}
-        </td>
-      </tr>
-      {% for v in tls_results.connection_info.ciphersuite %}
-      <tr class="table-dark">
-        <th>Row</th>
-        <td></td>
-      </tr>
-      <tr>
-        <th>Cipher</th>
-        <td>{{ v.cipher }}</td>
-      </tr>
-      <tr>
-        <th>Code</th>
-        <td>{{ v.code }}</td>
-      </tr>
-      <tr>
-        <th>Protocols</th>
-        <td>{{ v.protocols }}</td>
-      </tr>
-      <tr>
-        <th>Pubkey</th>
-        <td>{{ v.pubkey }}</td>
-      </tr>
-      <tr>
-        <th>Sigalg</th>
-        <td>{{ v.sigalg }}</td>
-      </tr>
-      <tr>
-        <th>Ticket Hint</th>
-        <td>{{ v.ticket_hint }}</td>
-      </tr>
-      <tr>
-        <th>OCSP Stapling</th>
-        <td>
-          {% if v.ocsp_stapling is True %}
-          <span class="badge bg-success">{{ v.ocsp_stapling }}</span>
-          {% else %}
-          <span class="badge bg-danger">{{ v.ocsp_stapling }}</span>
-          {% endif %}
-        </td>
-      </tr>
-      <tr>
-        <th>PFS</th>
-        <td>{{ v.pfs }}</td>
-      </tr>
-      <tr>
-        <th>Curves</th>
-        <td>{{ v.curves}}</td>
-      </tr>
-      {% endfor %}
-    </table>
-    <h3>Analysis</h3>
-    <table class="table table-light table-striped">
-      {% for v in tls_results.analysis %}
-
-      <tr class="table-dark">
-        <th>Row</th>
-        <td></td>
-      </tr>
-      <tr>
-        <th>ID</th>
-        <td>{{ v.id }}</td>
-      </tr>
-      <tr>
-        <th>Analyzer</th>
-        <td>{{ v.analyzer}}</td>
-      </tr>
-      <tr>
-        <th>Success</th>
-        <td> {% if v.success is True %}
-          <span class="badge bg-success">{{ v.success }}</span>
-          {% else %}
-          <span class="badge bg-danger">{{ v.success }}</span>
-          {% endif %}
-        </td>
-      </tr>
-      <tr>
-        <th>Result:</th>
-        <td></td>
-      </tr>
-      {% if v.result.bugs %}
-      <tr>
-        <th>Bugs:</th>
-        <td>{{ v.result.bugs }}</td>
-      </tr>
-      {% endif %}
-      {% if v.result.errors %}
-      <tr>
-        <th>Errors:</th>
-        <td>{{ v.result.errors }}</td>
-      </tr>
-      {% endif %}
-      {% if v.result.notices %}
-      <tr>
-        <th>Notices:</th>
-        <td>{{ v.result.notices }}</td>
-      </tr>
-      {% endif %}
-      {% if v.result.warnings %}
-      <tr>
-        <th>Warnings:</th>
-        <td>{{ v.result.warnings }}</td>
-      </tr>
-      {% endif %}
-      {% if v.result.fatalErrors %}
-      <tr>
-        <th>Fatal Errors:</th>
-        <td>{{ v.result.fatalErrors }}</td>
-      </tr>
-      {% endif %}
-      {% if v.result.informational %}
-      <tr>
-        <th>Informational:</th>
-        <td>{{ v.result.informational }}</td>
-      </tr>
-      {% endif %}
-
-      {% if v.result.host %}
-      <tr>
-        <th>Host:</th>
-        <td>{{ v.result.host }}</td>
-      </tr>
-      {% endif %}
-      {% if v.result.issue %}
-      <tr>
-        <th>Issue:</th>
-        <td>{{ v.result.issue }}</td>
-      </tr>
-      {% endif %}
-      {% if v.result.has_caa is True or v.result.has_caa is False %}
-      <tr>
-        <th>Has CAA:</th>
-        <td>
-          {% if v.result.has_caa is True %}
-          <span class="badge bg-success">{{ v.result.has_caa }}</span>
-          {% else %}
-          <span class="badge bg-danger">{{ v.result.has_caa }}</span>
-          {% endif %}
-        </td>
-      </tr>
-      {% endif %}
-      {% if v.result.issuewild %}
-      <tr>
-        <th>Issue Wild:</th>
-        <td>{{ v.result.issuewild }}</td>
-      </tr>
-      {% endif %}
-      {% if v.result.level %}
-      <tr>
-        <th>Level</th>
-        <td>{{ v.result.level }}</td>
-      </tr>
-      {% endif %}
-      {% if v.result.grade %}
-      <tr>
-        <th>Grade:</th>
-        <td>{{ v.result.grade }}</td>
-      </tr>
-      {% endif %}
-      {% if v.result.lettergrade %}
-      <tr>
-        <th>Lettergrade:</th>
-        <td>{{ v.result.lettergrade }}</td>
-      </tr>
-      {% endif %}
-      {% if v.result.failures %}
-      <tr>
-        <th>Failures:</th>
-        <td></td>
-      </tr>
-      {% endif %}
-      {% for k1, v1 in v.result.failures.items %}
-      <tr>
-        <th>{{ k1 }}</th>
-        <td></td>
-      </tr>
-      {% for v2 in v1 %}
-      <tr>
-        <th></th>
-        <td>{{ v2 }}</td>
-      </tr>
-      {% endfor %}
-      {% endfor %}
-      <!-- ANDROID ROWS SECTION -->
-
-      {% for v10 in v.result %}
-
-      {% if v10.name %}
-      <tr class="table-dark">
-        <th></th>
-        <th>Subrow</th>
-      </tr>
-      <tr>
-        <th>Name:</th>
-        <td>{{ v10.name }}</td>
-      </tr>
-      {% endif %}
-      {% if v10.version %}
-      <tr>
-        <th>Version:</th>
-        <td>{{ v10.version }}</td>
-      </tr>
-      {% endif %}
-      {% if v10.curve_code %}
-      <tr>
-        <th>Curve Code:</th>
-        <td>{{ v10.curve_code }}</td>
-      </tr>
-      {% endif %}
-      {% if v10.is_supported is True or v10.is_supported is False %}
-      <tr>
-        <th>Is supported:</th>
-        <td>
-          {% if v10.is_supported is True %}
-          <span class="badge bg-success">{{ v10.is_supported }}</span>
-          {% else %}
-          <span class="badge bg-danger">{{ v10.is_supported }}</span>
-          {% endif %}
-        </td>
-      </tr>
-      {% endif %}
-      {% if v10.protocol_code %}
-      <tr>
-        <th>Protocol Code:</th>
-        <td>{{ v10.protocol_code }}</td>
-      </tr>
-      {% endif %}
-      {% if v10.curve %}
-      <tr>
-        <th>Curve:</th>
-        <td>{{ v10.curve }}</td>
-      </tr>
-      {% endif %}
-      {% if v10.platform %}
-      <tr>
-        <th>Platform:</th>
-        <td>{{ v10.platform }}</td>
-      </tr>
-      {% endif %}
-      {% if v10.ciphersuite %}
-      <tr>
-        <th>Ciphersuite:</th>
-        <td>{{ v10.ciphersuite }}</td>
-      </tr>
-      {% endif %}
-      {% if v10.ciphersuite_code %}
-      <tr>
-        <th>Ciphersuite Code:</th>
-        <td>{{ v10.ciphersuite_code }}</td>
-      </tr>
-      {% endif %}
-
-      {% endfor %}
-
-      <!-- SymantecDistrust -->
-      {% if v.result.reasons %}
-      <tr>
-        <th>Reasons:</th>
-        <td></td>
-      </tr>
-      {% for v3 in v.result.reasons%}
-      <tr>
-        <th></th>
-        <td>{{ v3 }}</td>
-      </tr>
-      {% endfor %}
-      {% endif %}
-
-      {% if v.result.isDistrusted is True or v.result.isDistrusted is False %}
-      <tr>
-        <th>Is Distrusted:</th>
-        <td>
-          {% if v.result.isDistrusted is True %}
-          <span class="badge bg-success">{{ v.result.isDistrusted }}</span>
-          {% else %}
-          <span class="badge bg-danger">{{ v.result.isDistrusted }}</span>
-          {% endif %}
-        </td>
-      </tr>
-      {% endif %}
-
-
-      <!-- TOP1M -->
-      {% if v.result.target %}
-      <tr>
-        <th>Target:</th>
-        <td></td>
-      </tr>
-      {% for k4,v4 in v.result.target.items %}
-      <tr>
-        <th>{{ k4 }}</th>
-        <td>{{ v4 }}</td>
-      </tr>
-      {% endfor %}
-      {% endif %}
-
-      {% if v.result.certificate %}
-      <tr>
-        <th>Certificate:</th>
-        <td></td>
-      </tr>
-      {% for k5,v5 in v.result.certificate.items %}
-      <tr>
-        <th>{{ k5 }}</th>
-        <td>{{ v5 }}</td>
-      </tr>
-      {% endfor %}
-      {% endif %}
-
-      {% endfor %}
-    </table>
   </section>
-  {% endif %}
+
+  {% if tls_results %}
+<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+  <h2>Result for {{ domain_name }}:</h2>
+  <hr>
+  <div id="tls-scan-summary" class="d-flex flex-column mb-4">
+    <span>TLS Scan ID: {{ tls_results.id }}</span>
+    <span>Timestamp: {{ tls_results.timestamp }}</span>
+    <span>Target: {{ tls_results.target }}</span>
+    <span>Replay: {{ tls_results.replay }}</span>
+    <span>Has TLS: {% if tls_results.has_tls is True %}
+                        <span class="badge bg-success">{{ tls_results.has_tls }}</span>
+                        {% else %}
+                        <span class="badge bg-danger">{{ tls_results.has_tls }}</span>
+                        {% endif %}</span>
+    <span>CERT ID: {{ tls_results.cert_id }}</span>
+    <span>TRUST ID: {{ tls_results.trust_id }}</span>
+    <span>Is valid: {% if tls_results.is_valid is True %}
+                        <span class="badge bg-success">{{ tls_results.is_valid }}</span>
+                        {% else %}
+                        <span class="badge bg-danger">{{ tls_results.is_valid }}</span>
+                        {% endif %}</span>
+    <span>Completion perc: {{ tls_results.completion_perc }}</span>
+    <span>Ack: {% if tls_results.ack is True %}
+                        <span class="badge bg-success">{{ tls_results.ack }}</span>
+                        {% else %}
+                        <span class="badge bg-danger">{{ tls_results.ack }}</span>
+                        {% endif %}</span>
+    <span>Attempts: {{ tls_results.attempts }}</span>
+  </div>
+  <h3>Connection Info</h3>
+  <table class="table table-light table-striped">
+    <tr>
+      <th>Scan IP</th>
+      <td>{{ tls_results.connection_info.scanIP }}</td>
+    </tr>
+    <tr>
+      <th>Serverside</th>
+      <td>{% if tls_results.connection_info.serverside is True %}
+        <span
+          class="badge bg-success">{{ tls_results.connection_info.serverside }}</span>
+        {% else %}
+        <span
+          class="badge bg-danger">{{ tls_results.connection_info.serverside }}</span>
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <th>Curves Fallback</th>
+      <td>{% if tls_results.connection_info.curvesFallback is True %}
+        <span
+          class="badge bg-success">{{ tls_results.connection_info.curvesFallback }}</span>
+        {% else %}
+        <span
+          class="badge bg-danger">{{ tls_results.connection_info.curvesFallback }}</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% for v in tls_results.connection_info.ciphersuite %}
+    <tr class="table-dark">
+      <th>Row</th>
+      <td></td>
+    </tr>
+    <tr>
+      <th>Cipher</th>
+      <td>{{ v.cipher }}</td>
+    </tr>
+    <tr>
+      <th>Code</th>
+      <td>{{ v.code }}</td>
+    </tr>
+    <tr>
+      <th>Protocols</th>
+      <td>{{ v.protocols }}</td>
+    </tr>
+    <tr>
+      <th>Pubkey</th>
+      <td>{{ v.pubkey }}</td>
+    </tr>
+    <tr>
+      <th>Sigalg</th>
+      <td>{{ v.sigalg }}</td>
+    </tr>
+    <tr>
+      <th>Ticket Hint</th>
+      <td>{{ v.ticket_hint }}</td>
+    </tr>
+    <tr>
+      <th>OCSP Stapling</th>
+      <td>
+        {% if v.ocsp_stapling is True %}
+        <span class="badge bg-success">{{ v.ocsp_stapling }}</span>
+        {% else %}
+        <span class="badge bg-danger">{{ v.ocsp_stapling }}</span>
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <th>PFS</th>
+      <td>{{ v.pfs }}</td>
+    </tr>
+    <tr>
+      <th>Curves</th>
+      <td>{{ v.curves}}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <h3>Analysis</h3>
+  <table class="table table-light table-striped">
+    {% for v in tls_results.analysis %}
+
+    <tr class="table-dark">
+      <th>Row</th>
+      <td></td>
+    </tr>
+    <tr>
+      <th>ID</th>
+      <td>{{ v.id }}</td>
+    </tr>
+    <tr>
+      <th>Analyzer</th>
+      <td>{{ v.analyzer}}</td>
+    </tr>
+    <tr>
+      <th>Success</th>
+      <td> {% if v.success is True %}
+        <span class="badge bg-success">{{ v.success }}</span>
+        {% else %}
+        <span class="badge bg-danger">{{ v.success }}</span>
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <th>Result:</th>
+      <td></td>
+    </tr>
+    {% if v.result.bugs %}
+    <tr>
+      <th>Bugs:</th>
+      <td>{{ v.result.bugs }}</td>
+    </tr>
+    {% endif %}
+    {% if v.result.errors %}
+    <tr>
+      <th>Errors:</th>
+      <td>{{ v.result.errors }}</td>
+    </tr>
+    {% endif %}
+    {% if v.result.notices %}
+    <tr>
+      <th>Notices:</th>
+      <td>{{ v.result.notices }}</td>
+    </tr>
+    {% endif %}
+    {% if v.result.warnings %}
+    <tr>
+      <th>Warnings:</th>
+      <td>{{ v.result.warnings }}</td>
+    </tr>
+    {% endif %}
+    {% if v.result.fatalErrors %}
+    <tr>
+      <th>Fatal Errors:</th>
+      <td>{{ v.result.fatalErrors }}</td>
+    </tr>
+    {% endif %}
+    {% if v.result.informational %}
+    <tr>
+      <th>Informational:</th>
+      <td>{{ v.result.informational }}</td>
+    </tr>
+    {% endif %}
+
+    {% if v.result.host %}
+    <tr>
+      <th>Host:</th>
+      <td>{{ v.result.host }}</td>
+    </tr>
+    {% endif %}
+    {% if v.result.issue %}
+    <tr>
+      <th>Issue:</th>
+      <td>{{ v.result.issue }}</td>
+    </tr>
+    {% endif %}
+    {% if v.result.has_caa is True or v.result.has_caa is False %}
+    <tr>
+      <th>Has CAA:</th>
+      <td>
+        {% if v.result.has_caa is True %}
+        <span class="badge bg-success">{{ v.result.has_caa }}</span>
+        {% else %}
+        <span class="badge bg-danger">{{ v.result.has_caa }}</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    {% if v.result.issuewild %}
+    <tr>
+      <th>Issue Wild:</th>
+      <td>{{ v.result.issuewild }}</td>
+    </tr>
+    {% endif %}
+    {% if v.result.level %}
+    <tr>
+      <th>Level</th>
+      <td>{{ v.result.level }}</td>
+    </tr>
+    {% endif %}
+    {% if v.result.grade %}
+    <tr>
+      <th>Grade:</th>
+      <td>{{ v.result.grade }}</td>
+    </tr>
+    {% endif %}
+    {% if v.result.lettergrade %}
+    <tr>
+      <th>Lettergrade:</th>
+      <td>{{ v.result.lettergrade }}</td>
+    </tr>
+    {% endif %}
+    {% if v.result.failures %}
+    <tr>
+      <th>Failures:</th>
+      <td></td>
+    </tr>
+    {% endif %}
+    {% for k1, v1 in v.result.failures.items %}
+    <tr>
+      <th>{{ k1 }}</th>
+      <td></td>
+    </tr>
+    {% for v2 in v1 %}
+    <tr>
+      <th></th>
+      <td>{{ v2 }}</td>
+    </tr>
+    {% endfor %}
+    {% endfor %}
+    <!-- ANDROID ROWS SECTION -->
+
+    {% for v10 in v.result %}
+
+    {% if v10.name %}
+    <tr class="table-dark">
+      <th></th>
+      <th>Subrow</th>
+    </tr>
+    <tr>
+      <th>Name:</th>
+      <td>{{ v10.name }}</td>
+    </tr>
+    {% endif %}
+    {% if v10.version %}
+    <tr>
+      <th>Version:</th>
+      <td>{{ v10.version }}</td>
+    </tr>
+    {% endif %}
+    {% if v10.curve_code %}
+    <tr>
+      <th>Curve Code:</th>
+      <td>{{ v10.curve_code }}</td>
+    </tr>
+    {% endif %}
+    {% if v10.is_supported is True or v10.is_supported is False %}
+    <tr>
+      <th>Is supported:</th>
+      <td>
+        {% if v10.is_supported is True %}
+        <span class="badge bg-success">{{ v10.is_supported }}</span>
+        {% else %}
+        <span class="badge bg-danger">{{ v10.is_supported }}</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    {% if v10.protocol_code %}
+    <tr>
+      <th>Protocol Code:</th>
+      <td>{{ v10.protocol_code }}</td>
+    </tr>
+    {% endif %}
+    {% if v10.curve %}
+    <tr>
+      <th>Curve:</th>
+      <td>{{ v10.curve }}</td>
+    </tr>
+    {% endif %}
+    {% if v10.platform %}
+    <tr>
+      <th>Platform:</th>
+      <td>{{ v10.platform }}</td>
+    </tr>
+    {% endif %}
+    {% if v10.ciphersuite %}
+    <tr>
+      <th>Ciphersuite:</th>
+      <td>{{ v10.ciphersuite }}</td>
+    </tr>
+    {% endif %}
+    {% if v10.ciphersuite_code %}
+    <tr>
+      <th>Ciphersuite Code:</th>
+      <td>{{ v10.ciphersuite_code }}</td>
+    </tr>
+    {% endif %}
+
+    {% endfor %}
+
+    <!-- SymantecDistrust -->
+    {% if v.result.reasons %}
+    <tr>
+      <th>Reasons:</th>
+      <td></td>
+    </tr>
+    {% for v3 in v.result.reasons%}
+    <tr>
+      <th></th>
+      <td>{{ v3 }}</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+
+    {% if v.result.isDistrusted is True or v.result.isDistrusted is False %}
+    <tr>
+      <th>Is Distrusted:</th>
+      <td>
+        {% if v.result.isDistrusted is True %}
+        <span class="badge bg-success">{{ v.result.isDistrusted }}</span>
+        {% else %}
+        <span class="badge bg-danger">{{ v.result.isDistrusted }}</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+
+
+    <!-- TOP1M -->
+    {% if v.result.target %}
+    <tr>
+      <th>Target:</th>
+      <td></td>
+    </tr>
+    {% for k4,v4 in v.result.target.items %}
+    <tr>
+      <th>{{ k4 }}</th>
+      <td>{{ v4 }}</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+
+    {% if v.result.certificate %}
+    <tr>
+      <th>Certificate:</th>
+      <td></td>
+    </tr>
+    {% for k5,v5 in v.result.certificate.items %}
+    <tr>
+      <th>{{ k5 }}</th>
+      <td>{{ v5 }}</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+
+    {% endfor %}
+  </table>
+</section>
+
+{% endif %}
+
 
 
   <script>
@@ -1162,15 +1258,4 @@
       }
     });
   }
-
-
-
-
-
-
-
-
-
-
   </script>
-</section>

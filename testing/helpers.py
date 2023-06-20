@@ -5,14 +5,17 @@ import re
 import socket
 import subprocess
 import time
+from base64 import b64decode
 from io import BytesIO
 from typing import Any, Dict, List, Union
 
 import dns.message
 import dns.rdatatype
 import dns.resolver
+import nmap3
 import pypandora
 import requests
+from Crypto.PublicKey import RSA
 
 from testing.models import TlsScanHistory
 
@@ -198,10 +201,22 @@ def get_tls_report(target, rescan):
     return fetch_tls
 
 
-def email_check(target: str, rescan: bool) -> Dict[str, Any]:
-    """Parses and validates MX, SPF, and DMARC records,
-    Checks for DNSSEC deployment, Checks for STARTTLS and TLS support."""
+def check_soa_record(target: str) -> bool:
+    """Checks the presence of a SOA record for the Email Systems Testing."""
+    result = False
+    try:
+        answers = dns.resolver.query(target, "SOA")
+        result = 0 != len(answers)
+    except Exception:
+        result = False
+    return result
 
+
+def email_check(target: str) -> Dict[str, Any]:
+    """Parses and validates MX, SPF, and DMARC records,
+    Checks for DNSSEC deployment, Checks for STARTTLS and TLS support.
+    Checks for the validity of the DKIM public key."""
+    result = {}
     env = os.environ.copy()
     cmd = [
         # sys.exec_prefix + "/bin/python",
@@ -210,18 +225,17 @@ def email_check(target: str, rescan: bool) -> Dict[str, Any]:
         "-f",
         "JSON",
     ]
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
-    (stdout, stderr) = p.communicate()
+    (stdout, stderr) = (
+        subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+    ).communicate()
     try:
         result = json.loads(stdout)
-        # result = checkdmarc.check_domains([target])
-        # json_result = checkdmarc.results_to_json(result)
     except Exception:
         result = {}
-    return {
-        "result": result,
-        "domain_name": target,
-    }
+
+    # result["dkim"] = check_dkim_public_key(target, [])
+    print(result)
+    return result
 
 
 def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, Any]:
@@ -250,7 +264,6 @@ def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, An
         status = analysis_result["status"]
         if status != "WAITING":
             break
-        print("Waiting...")
 
         # wait a little
         pass
@@ -276,7 +289,12 @@ def ipv6_check(
     default_resolver = dns.resolver.Resolver().nameservers[0]
     q = dns.message.make_query(domain, dns.rdatatype.NS)
     ns_response = dns.query.udp(q, default_resolver)
-    ns_names = [t.target.to_text() for ans in ns_response.answer for t in ans]
+    ns_names = [
+        t.target.to_text()
+        for ans in ns_response.answer
+        for t in ans
+        if hasattr(t, "target")
+    ]
     results["nameservers"] = {}
 
     for ns_name in ns_names:
@@ -364,31 +382,31 @@ def ipv6_check(
     if counter >= 2:
         nameservers_comments = {
             "grade": "full",
-            "comment": "Your domain has at least 2 name servers with ipv6 records.",
+            "comment": "Your domain has at least 2 name servers with IPv6 records.",
         }
     elif counter == 1:
         nameservers_comments = {
             "grade": "half",
-            "comment": "Your domain has 1 name server with an ipv6 record.",
+            "comment": "Your domain has 1 name server with an IPv6 record.",
         }
     else:
         nameservers_comments = {
             "grade": "null",
-            "comment": "Your domain has no name server with an ipv6 record.",
+            "comment": "Your domain has no name server with an IPv6 record.",
         }
     counter = 0
     for key in results["nameservers"]:
-        if results["nameservers"][key]["ipv6"]["reachable"]:
+        if results["nameservers"][key]["ipv6"].get("reachable", False):
             counter += 1
     if counter == 0:
         nameservers_reachability_comments = {
             "grade": "null",
-            "comment": "Your domain name servers are not reachable over ipv6.",
+            "comment": "Your domain name servers are not reachable over IPv6.",
         }
     else:
         nameservers_reachability_comments = {
             "grade": "full",
-            "comment": "At least one of your domain name servers is reachable over ipv6.",
+            "comment": "At least one of your domain name servers is reachable over IPv6.",
         }
 
     # Check website connectivity (available ips and reachability)
@@ -417,12 +435,12 @@ def ipv6_check(
         if response:
             records_v4_comments = {
                 "grade": "full",
-                "comment": "Your web server is reachable over ipv4.",
+                "comment": "Your server is reachable over IPv4.",
             }
         else:
             records_v4_comments = {
                 "grade": "null",
-                "comment": "Your web server is not reachable over ipv4.",
+                "comment": "Your server is not reachable over IPv4.",
             }
 
     response = False
@@ -435,12 +453,12 @@ def ipv6_check(
         if response:
             records_v6_comments = {
                 "grade": "full",
-                "comment": "Your web server is reachable over ipv6.",
+                "comment": "Your server is reachable over IPv6.",
             }
         else:
             records_v6_comments = {
                 "grade": "null",
-                "comment": "Your web server is not reachable over ipv6.",
+                "comment": "Your server is not reachable over IPv6.",
             }
 
     return {
@@ -451,3 +469,90 @@ def ipv6_check(
         "records_v4_comments": records_v4_comments,
         "records_v6_comments": records_v6_comments,
     }
+
+
+def web_server_check(domain: str):
+    nmap = nmap3.Nmap()
+    service_scans = nmap.nmap_version_detection(
+        domain, args="--script vulners --script-args mincvss+5.0"
+    )
+    # Could be used later for better reporting
+    # runtime = service_scans.pop("runtime")
+    # stats = service_scans.pop("stats")
+    # task_results = service_scans.pop("task_results")
+    services = []
+    vulnerabilities = []
+    ip, service_scans = list(service_scans.items())[0]
+    for port in service_scans["ports"]:
+        if port["state"] != "closed":
+            service = port["service"]
+            vulners = port["scripts"]
+            list_of_vulns = []
+            if vulners:
+                vulners = vulners[0]["data"]
+                for _vuln, vuln_data in vulners.items():
+                    try:
+                        list_of_vulns += vuln_data["children"]
+                    except TypeError:
+                        list_of_vulns = []
+            services.append(service)
+            try:
+                vulnerabilities.append(
+                    {
+                        "service": f'{service["product"]} - {service["name"]}',
+                        "vuln_list": list_of_vulns,
+                    }
+                )
+            except KeyError:
+                pass
+    return {"services": services, "vulnerabilities": vulnerabilities}
+
+
+def tls_version_check(domain: str):
+    nmap = nmap3.Nmap()
+    tls_scans = nmap.nmap_version_detection(domain, args="--script ssl-enum-ciphers")
+    ip, tls_scans = list(tls_scans.items())[0]
+    tls_scans = list(
+        filter(lambda element: element["state"] == "open", tls_scans["ports"])
+    )
+    results = None
+    for port in tls_scans:
+        if port["service"]["name"] == "ssl":
+            for script in port["scripts"]:
+                if script["name"] == "ssl-enum-ciphers":
+                    results = script["data"]
+    least_strength = results.pop("least strength")
+    for k in results.keys():
+        results[k] = results[k]["ciphers"]["children"]
+    results.update({"least_strength": least_strength})
+    return results
+
+
+def check_dkim_public_key(domain: str, selectors: list):
+    """Looks for a DKIM public key in a DNS field and verifies that it can be used to
+    encrypt data."""
+    if len(selectors) == 0:
+        # TODO Check to get proper selector or have a database of selectors
+        selectors = [
+            "selector1",
+            "selector2",
+            "google",
+            "dkim",
+            "k1",
+            "default",
+            "mxvault",
+            "mail",
+        ]
+    for selector in selectors:
+        try:
+            dns_response = (
+                dns.resolver.query(f"{selector}._domainkey.{domain}.", "TXT")
+                .response.answer[1]
+                .to_text()
+            )
+            p = re.search(r"p=([\w\d/+]*)", dns_response).group(1)
+            key = RSA.importKey(b64decode(p))
+            return {"dkim": key.can_encrypt()}
+        except Exception:
+            continue
+    return {"dkim": False}

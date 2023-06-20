@@ -201,7 +201,18 @@ def get_tls_report(target, rescan):
     return fetch_tls
 
 
-def email_check(target: str, rescan: bool) -> Dict[str, Any]:
+def check_soa_record(target: str) -> bool:
+    """Checks the presence of a SOA record for the Email Systems Testing."""
+    result = False
+    try:
+        answers = dns.resolver.query(target, "SOA")
+        result = 0 != len(answers)
+    except Exception:
+        result = False
+    return result
+
+
+def email_check(target: str) -> Dict[str, Any]:
     """Parses and validates MX, SPF, and DMARC records,
     Checks for DNSSEC deployment, Checks for STARTTLS and TLS support.
     Checks for the validity of the DKIM public key."""
@@ -222,12 +233,9 @@ def email_check(target: str, rescan: bool) -> Dict[str, Any]:
     except Exception:
         result = {}
 
-    result["dkim"] = check_dkim_public_key(target, [])
-
-    return {
-        "result": result,
-        "domain_name": target,
-    }
+    # result["dkim"] = check_dkim_public_key(target, [])
+    print(result)
+    return result
 
 
 def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, Any]:
@@ -544,6 +552,7 @@ def check_dkim_public_key(domain: str, selectors: list):
             )
             p = re.search(r"p=([\w\d/+]*)", dns_response).group(1)
             key = RSA.importKey(b64decode(p))
-            return key.can_encrypt()
+            return {"dkim": key.can_encrypt()}
         except Exception:
             continue
+    return {"dkim": False}

@@ -30,6 +30,11 @@ DEBUG = os.environ.get("DEBUG", "1") == "1"
 allowed_hosts = os.environ.get("ALLOWED_HOSTS", "localhost")
 ALLOWED_HOSTS = list(map(str.strip, allowed_hosts.split(",")))
 
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS = ['https://*.srv.office.secin.lu']
+else:
+    CSRF_TRUSTED_ORIGINS = ['https://testing.nc3.lu']
+
 EMAIL_BACKEND = os.environ.get(
     "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
 )

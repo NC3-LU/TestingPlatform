@@ -1,6 +1,5 @@
-from django.urls import path
-from . import views
+from typing import Any, List
 
-urlpatterns = [
+urlpatterns: List[Any] = [
     # path('', views.c3_protocols, name='c3_protocols'),
-    ]
+]

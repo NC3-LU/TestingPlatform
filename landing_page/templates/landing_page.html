@@ -1,63 +1,230 @@
 {% load static %}
-<main class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
-    <img src="{% static 'img/logo-NC3_logos_LOGO_Threat_Platform.png' %}" height="200px">
-    <!--<h1><span style="color:#009fe3;">c</span><span style="color:#ec1e27;">3</span> Testing Platform</h1>-->
-    <section class="container">
-        <p class="lead">
-            The testing platform holds the tools and services that will help organisations to perform basic tests on
-            their most commonly exposed infrastructures, starting with email and web servers. More tools will be added
-            through time to increase the coverage of available tests.
-        </p>
-    </section>
-    <p class="lead">
-        <a href="/signup" class="btn btn-lg btn-secondary fw-bold border-white text-light" style="background-color:#009fe3;">Register now!</a>
-    </p>
+
+<main
+  class="d-flex p-3 flex-column align-items-center text-center">
+  <h1><span style="font-weight: bold;color: #28abe2">NC</span><span
+    style="font-weight: bold;color:#ec1e27;">3</span> Testing Platform</h1>
+  <p class="lead">Modern Internet Standards provide for more reliability and further
+    growth of the Internet. Are you using them?</p>
+  <p class="fs-5 col-lg-7">
+    The NC3 Testing platform offers a range of straightforward and efficient tests
+    designed to assist your organization in evaluating the initial security status of
+    your websites, email systems, and infrastructure. These tests are conducted in a
+    non-invasive manner, focusing on discovery rather than exploiting any identified
+    vulnerabilities.</p>
 </main>
 
-<section class="container">
-    <div class="mt-5">
-        <h3>Welcome on the nc3 Testing Platform!</h3>
-        <div class="mb-5">
-            <h4>Why such a platform?</h4>
-            <p>
-                When implementing a security strategy, one of the core issues is to identify priorities. Budgets are not
-                infinite. Choices have to be made. A fair amount of guidance can be drawn from the traditional risk
-                assessment exercises, but this often leads to abstract decision-making. In particular, how to identify
-                security issues that require immediate investment. The goal of the NC3 Testing Platform is to make it
-                possible to uncover actual security issues in a practical way. It doesn’t intend to be comprehensive,
-                but aim at helping to reduce the surface of exposure by identifying commonly exploited issues.
-            </p>
-        </div>
-        <div class="mb-5">
-            <h4>What is the NC3 Testing Platform?</h4>
-            <p>It’s a set of tools that allow any organisation to start testing its systems in order to identify known
-                weaknesses or vulnerabilities. Some of these tools will require working with security companies of the
-                Luxembourg Cybersecurity Ecosystem and who agreed to partner with the NC3. Other tools are semi-automated
-                and operated directly by the NC3.<br>
-                - The first set of tools is a semi-automated platform that will allow organisations based in Luxembourg
-                to perform easily basic scans of critical parts of their infrastructure. While the manual ones are for
-                free, there are possibilities to get more automated and broadened assessments as paid-for services.<br>
-                - The second set of tools is dedicated to specialized tests, focused on specific categories of systems.
-                The first domain covered is IoT testing, given the high level of exposure that they generate.
-                More tests will be added.<br>
-                - The last set of tools is the NC3 Testing Protocols. These are standard test protocols that will allow
-                organisations to benefit from targeted manual testing conducted by security companies, in a foreseeable
-                time and budget frame. This should permit engaging in a process that will ultimately lead to full-scale
-                penetration testing, but in a way that does take into account budget and resources (time and employees)
-                constraints. It is particularly targeted at SMBs and self-employed individuals. They are currently
-                under development and will soon be available.
-            </p>
-        </div>
+<div class="container-fluid my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-3 col-md-3 mb-2">
+      <div class="h-100 card shadow border border-2">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">Website Application Testing</h5>
+          <p>
+            Assess the security of your website against known
+            vulnerabilities and provides you recommendations.
+          </p>
 
-        <div class="mb-5">
-            <h4>Who can benefit from the Testing Platform?</h4>
-            <p>
-                You have to be an organisation based in Luxembourg in order to access the Testing Platform. If you wish
-                to register, you can follow <a href="/signup">this link</a>.
-                You'll fill a simple form and then be able to chose which services you want to benefit from.
-                Unless you register for a Pro or Business membership through your profile page, some services won't be
-                accessible.
-            </p>
+          <form method="post" action="infra-testing/http-test/">
+            {% csrf_token %}
+            {% if error %}
+            <span class="text-danger">{{ error }}</span>
+            {% endif %}
+            <div class="mb-3">
+              <label class="mb-1">
+                Enter your websites domain name:
+              </label>
+              <input class="form-control" type="text" placeholder="www.domain.lu"
+                     id="target" name="target"
+                     value="{{ form }}" required>
+            </div>
+            <input type="submit" value="Test" class="btn btn-secondary" onclick='openPopup()'>
+          </form>
         </div>
+        <div class="card-footer text-center text-muted"><a
+          href="{% url 'knowledge_base'  %}#tests-website">About the test</a></div>
+      </div>
     </div>
+    <!--<div class="col-lg-3 col-md-3 mb-2">
+      <div class="card shadow h-100 border border-2">
+        <div class="card-body d-flex flex-column ">
+          <h5 class="card-title">IPv6</h5>
+          <p>Assess the reachability of your domain/website setup from a modern internet
+            address (IPv6)</p>
+          <form method="post" action="infra-testing/ipv6-test/" class="">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label>Enter a domain address:</label>
+              <input type="text" placeholder="server.lu" id="target4" name="target"
+                     value="" required>
+            </div>
+            <input type="submit" value="Test" class="btn btn-secondary">
+          </form>
+        </div>
+        <div class="card-footer text-center text-muted"><a href="{% url 'knowledge_base'  %}#tests-ipv6">About the test</a></div>
+      </div>
+    </div>-->
+
+    <div class="col-lg-3 col-md-3 mb-2">
+      <div class="card shadow h-100 border border-2">
+        <div class="card-body d-flex flex-column ">
+          <h5 class="card-title">Infrastructure Testing</h5>
+          <p>Assess the configuration of your web server (if publicly available)</p>
+          <form method="post" action="infra-testing/web-server-test/" class="">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label>Enter a web server hostname / ip address:</label>
+              <input type="text" placeholder="server.lu" id="target5" name="target"
+                     value="" required>
+            </div>
+            <input type="submit" value="Test" class="btn btn-secondary" onclick='openPopup()'>
+          </form>
+        </div>
+        <div class="card-footer text-center text-muted"><a
+          href="{% url 'knowledge_base'  %}#tests-web-server">About the test</a></div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-3 mb-2">
+      <div class="card shadow h-100 border border-2">
+        <div class="card-body d-flex flex-column ">
+          <h5 class="card-title">Email Systems Testing</h5>
+          <p>Assess the security of your email setup.
+            <a href="{% url 'knowledge_base'  %}#standards-dmarc-spf">SPF, DMARC</a>,
+            <a href="{% url 'knowledge_base'  %}#standards-dkim">DKIM</a>
+            DNS records, and deployment of DNSSEC.</p>
+
+          <form method="post" action="infra-testing/email-test/" class="">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label>Enter a server address:</label>
+              <input type="text" placeholder="server.lu" id="target2" name="target"
+                     value="" required>
+
+            </div>
+            <input type="submit" value="Test" class="btn btn-secondary" onclick='openPopup()'>
+          </form>
+        </div>
+        <div class="card-footer text-center text-muted"><a
+          href="{% url 'knowledge_base'  %}#tests-email">About the test</a></div>
+      </div>
+    </div>
+
+    <!-- <div class="col-lg-3 col-md-3 mb-2">
+
+      <div class=" h-100 card shadow border border-2">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">File testing</h5>
+          <p>
+            Discover if a file is suspicious thanks to the Pandora analysis framework.
+          </p>
+
+          <form method="post" action="/infra-testing/file-test/" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if error %}
+            <span class="text-danger">{{ error }}</span>
+            {% endif %}
+            <div class="mb-3">
+              <label class="mb-1">
+                Select the file you want to check.
+              </label>
+              <input class="form-control" type="file" placeholder="Select the file you want to check."
+                id="target3" name="target" required>
+            </div>
+            <input type="submit" value="Test" class="btn btn-secondary">
+          </form>
+        </div>
+        <div class="card-footer text-center text-muted"><a href="{% url 'knowledge_base'  %}#tests-file">About the test</a></div>
+      </div>
+    </div> -->
+
+    <!-- <div class="row justify-content-center">
+      <div class="col-lg-3 mb-2">
+        <div class=" h-100 card border border-2 ">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">Publications</h5>
+            <p>
+              The publications contain lorem ipsum.
+            </p>
+            <a href="">Publication 1 </a>
+            <a href="">Publication 2 </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 mb-2">
+        <div class=" h-100 card border border-2 ">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">Statistics</h5>
+            <p>
+              The publications contain lorem ipsum.
+            </p>
+            <a href="">Publication 1 </a>
+            <a href="">Publication 2 </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 mb-2">
+        <div class=" h-100 card border border-2 ">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">Placeholder</h5>
+            <p>
+              Placeholder as a text.
+            </p>
+            <a href="">Publication 1 </a>
+            <a href="">Publication 2 </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+
+    <div class="container-fluid">
+      <br/>
+      <div
+        class="row d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
+        <div class="col">
+          <p class="lead">By registering to our platform you will have access to
+            various <a
+              href="">services and tools</a>.</p>
+          <p class="lead">
+            <a href="/signup"
+               class="btn btn-lg btn-secondary fw-bold border-white text-light"
+               style="background-color:#009fe3;">Register now!</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="blur-bg" id="blur-bg">
+  <div class="custom-popup-content custom-popup-loading" id="popup-content">
+    While you wait, you can <a href="#" target="_blank">click here</a> to launch other tests if you want to try something else!
+  </div>
+  <div class="loading-wave custom-popup-loading" id="popup-loading">
+    <div class="loading-bar"></div>
+    <div class="loading-bar"></div>
+    <div class="loading-bar"></div>
+    <div class="loading-bar"></div>
+  </div>
 </section>
+
+<script>
+    function openPopup(){
+      let popup_loading = document.getElementById('popup-loading');
+      popup_loading.classList.add("open-popup");
+      let bg = document.getElementById('blur-bg');
+      bg.classList.add("open-popup");
+      let popup_content = document.getElementById('popup-content');
+      popup_content.classList.add("open-popup");
+    }
+    function hidePopup(){
+      let popup = document.getElementById('popup-loading');
+      popup.classList.remove("open-popup");
+      let popup_content = document.getElementById('popup-content');
+      popup_content.classList.remove("open-popup");
+      let bg = document.getElementById('blur-bg');
+      bg.classList.remove("open-popup");
+    }
+    window.onpageshow = hidePopup;
+</script>

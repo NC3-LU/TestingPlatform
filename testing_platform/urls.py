@@ -13,21 +13,22 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-from django.conf.urls.static import static
-from testing_platform import settings
+
 from testing import views
+from testing_platform import settings
 
 urlpatterns = [
-    path('', include('landing_page.urls')),
-    path('', include('authentication.urls')),
-    path('', include('legal_section.urls')),
-    path('infra-testing/', include('testing.urls')),
-    path('c3-protocols/', include('c3_protocols.urls')),
-    path('specialized-testing/', include('specialized_testing.urls')),
-    path('admin/', admin.site.urls),
-    path('contact/', include('contact.urls')),
-    path('test/dmarc-reporter/upload/', views.dmarc_upload, name='dmarc-uploader'),
+    path("", include("landing_page.urls")),
+    path("", include("authentication.urls")),
+    path("", include("legal_section.urls")),
+    path("infra-testing/", include("testing.urls")),
+    path("c3-protocols/", include("c3_protocols.urls")),
+    path("specialized-testing/", include("specialized_testing.urls")),
+    path("admin/", admin.site.urls),
+    path("contact/", include("contact.urls")),
+    path("kb/", include("knowledge_base.urls")),
+    path("test/dmarc-reporter/upload/", views.dmarc_upload, name="dmarc-uploader"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-

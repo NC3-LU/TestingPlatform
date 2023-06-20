@@ -2,31 +2,42 @@
 
 {% block content %}
 
-<main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
-    <h1 class="authForm p-5 d-flex justify-content-center">Website Test:</h1>
-    <form method="post" class="authForm p-5">
-        {% csrf_token %}
-        <div></div>
-        <label>Enter your website domain:</label><br>
-        {% if error %}
-        <span class="text-danger">{{ error }}</span>
-        {% endif %}
-        <input type="text" placeholder="www.domain.com" id="target" name="target" value="{{ form }}"><br>
-        <div class="mb-2">
-            <label class="text-light">Perform a TLS scan:</label>
-            <input type="checkbox" id="tls" name="tls"><br>
-            <label class="text-light">Force a rescan instead of returning cached results:</label>
-            <input type="checkbox" id="rescan" name="rescan">
+<main class="row p-3 flex-column align-items-center">
+  <div class="col-lg-5 col-md-5 mb-2">
+      <div class="h-100 card border border-2 ">
+        <div class="card-body d-flex flex-column">
+          <h3 class="card-title">Website Scanner</h3>
+          <p>
+            The website testing assesses the security of your website against known
+            vulnerabilities, then provides you recommendations to resolve each security
+            weakness identified
+          </p>
+          <form method="post">
+            {% csrf_token %}
+            {% if error %}
+            <span class="text-danger">{{ error }}</span>
+            {% endif %}
+            <div class="mb-3">
+              <label class="mb-1">
+                Enter your websites domain name:
+              </label>
+              <input class="form-control" type="text" placeholder="www.domain.lu"
+                     id="target" name="target"
+                     value="{{ form }}" required>
+            </div>
+            <input type="submit" value="Test" class="btn btn-secondary">
+          </form>
         </div>
-        <small>
-            Loading can take up to 5 minutes. If your tls scan results are empty, please retry and uncheck the
-            'force rescan' option.
-        </small>
-        <input type="submit" value="Test" class="btn btn-primary">
-        <button class="btn btn-secondary mt-2" onclick="window.history.back()">Back</button>
-    </form>
-    {% if result %}
-        {% include "web_report.html" %}
-    {% endif %}
+          <div class="card-footer text-center text-muted">
+            <!-- TODO change href --><a
+          href="{% url 'knowledge_base'  %}#tests-email">About the test</a></div>
+      </div>
+    </div>
 </main>
+<main class="container-fluid d-flex flex-column align-items-center">
+  {% if result %}
+  {% include "web_report.html" %}
+  {% endif %}
+</main>
+<br>
 {% endblock %}

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-python3 manage.py migrate
+python manage.py migrate
 
-python3 manage.py collectstatic --noinput
+python manage.py collectstatic --noinput
 
-python3 manage.py qcluster &
+python manage.py qcluster &
 
-exec python3 manage.py runserver 0.0.0.0:8000
+exec python manage.py runserver 0.0.0.0:8000

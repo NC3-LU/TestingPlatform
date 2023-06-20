@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import PingAutomatedTest, HttpAutomatedTest
 
+from .models import HttpAutomatedTest, PingAutomatedTest
 
 # Register your models here.
 admin.site.register(PingAutomatedTest)

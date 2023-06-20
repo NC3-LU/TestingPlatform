@@ -1,8 +1,8 @@
-from django.urls import path, include
+from django.urls import include, path
+
 from . import views
 
-
 urlpatterns = [
-   path('', views.index, name='spec_test'),
-   path('iot-inspector/', include('iot_inspector.urls')),
+    path("", views.index, name="spec_test"),
+    path("iot-inspector/", include("iot_inspector.urls")),
 ]

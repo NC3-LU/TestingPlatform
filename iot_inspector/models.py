@@ -1,14 +1,11 @@
-from django.db import models
-from authentication.models import User
-from decouple import config
-from .helpers import get_fs_storage
 import datetime
-from django.core.files.storage import FileSystemStorage
-from django.core.signing import Signer
-
+import os
 import secrets
 
-import os
+from django.core.signing import Signer
+from django.db import models
+
+from authentication.models import User
 
 
 def get_upload_path(instance, filename):
@@ -70,21 +67,25 @@ class AnalysisRequest(models.Model):
     status_field = property(status_prop)
 
     def __str__(self):
-        return f'Request {self.request_nb}'
+        return f"Request {self.request_nb}"
 
     def save(self, *args, **kwargs):
         request_date = datetime.date.today()
         if not self.request_nb:
             try:
-                request_id = int(AnalysisRequest.objects.order_by('id').last().request_nb)
+                request_id = int(
+                    AnalysisRequest.objects.order_by("id").last().request_nb
+                )
                 if request_id:
                     self.request_nb = request_id + 1
                 else:
                     pass
-            except:
+            except Exception:
                 request_id = 1
-                self.request_nb = f'{request_date.year}{request_date.month}{(2-len(str(request_date.day)))*"0"}' \
-                                  f'{request_date.day}{(3-len(str(request_id)))*"0"}{request_id}'
+                self.request_nb = (
+                    f'{request_date.year}{request_date.month}{(2-len(str(request_date.day)))*"0"}'
+                    f'{request_date.day}{(3-len(str(request_id)))*"0"}{request_id}'
+                )
 
         self.iot_user = self.user.iotuser
 

@@ -1,30 +1,45 @@
-from django.db import models
-from django_q.models import Schedule
-from django_q.tasks import schedule
-import django.utils.timezone
-
-from authentication.models import User
-from automation.tasks import *
-from testing.models import UserDomain
-
 import uuid
 
-from datetime import datetime
+import django.utils.timezone
+from django.db import models
+from django_q.models import Schedule
+
+from authentication.models import User
+from testing.models import UserDomain
 
 
 # Create your models here.
 class AutomatedTest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    frequency = models.CharField(max_length=20, choices=(('D', 'Dayly'), ('W', 'Weekly'), ('M', 'Monthly')),
-                                 help_text='Choose frequency of tests')
-    time = models.TimeField(help_text='Choose time for test execution', default=django.utils.timezone.now)
-    weekday = models.CharField(max_length=15, choices=(('mo', 'Monday'), ('tu', 'Tuesday'), ('we', 'Wednesday'),
-                                                       ('th', 'Thursday'), ('fr', 'Friday'), ('sa', 'Saturday'),
-                                                       ('su', 'Sunday')), help_text='If weekly, choose day of test',
-                               blank=True, null=True)
-    monthly_test_date = models.IntegerField(choices=tuple([(d, d) for d in range(1, 29)]),
-                                            help_text='If monthly, select day in month up to the 28th',
-                                            blank=True, null=True)
+    frequency = models.CharField(
+        max_length=20,
+        choices=(("D", "Daily"), ("W", "Weekly"), ("M", "Monthly")),
+        help_text="Choose frequency of tests",
+    )
+    time = models.TimeField(
+        help_text="Choose time for test execution", default=django.utils.timezone.now
+    )
+    weekday = models.CharField(
+        max_length=15,
+        choices=(
+            ("mo", "Monday"),
+            ("tu", "Tuesday"),
+            ("we", "Wednesday"),
+            ("th", "Thursday"),
+            ("fr", "Friday"),
+            ("sa", "Saturday"),
+            ("su", "Sunday"),
+        ),
+        help_text="If weekly, choose day of test",
+        blank=True,
+        null=True,
+    )
+    monthly_test_date = models.IntegerField(
+        choices=tuple((d, d) for d in range(1, 29)),
+        help_text="If monthly, select day in month up to the 28th",
+        blank=True,
+        null=True,
+    )
     schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE)
 
     class Meta:
@@ -32,32 +47,32 @@ class AutomatedTest(models.Model):
 
     def schedule_task(self, t_type, func, args, cron):
         return Schedule(
-            name=f'{t_type}_{self.user.username}_{args}_{uuid.uuid4()}',
+            name=f"{t_type}_{self.user.username}_{args}_{uuid.uuid4()}",
             func=func,
             args="'" + args + "'",
             schedule_type=Schedule.CRON,
-            cron=cron
+            cron=cron,
         )
 
     def get_cron_exp(self, time):
         days = {
-            'mo': 1,
-            'tu': 2,
-            'we': 3,
-            'th': 4,
-            'fr': 5,
-            'sa': 6,
-            'su': 7,
+            "mo": 1,
+            "tu": 2,
+            "we": 3,
+            "th": 4,
+            "fr": 5,
+            "sa": 6,
+            "su": 7,
         }
         minutes = time.minute
         hour = time.hour
-        cron = ''
-        if self.frequency == 'D':
-            cron = f'{minutes} {hour} * * *'
-        if self.frequency == 'W':
-            cron = f'{minutes} {hour} * * {days[self.weekday]}'
-        if self.frequency == 'M':
-            cron = f'{minutes} {hour} {self.monthly_test_date} * *'
+        cron = ""
+        if self.frequency == "D":
+            cron = f"{minutes} {hour} * * *"
+        if self.frequency == "W":
+            cron = f"{minutes} {hour} * * {days[self.weekday]}"
+        if self.frequency == "M":
+            cron = f"{minutes} {hour} {self.monthly_test_date} * *"
         return cron
 
 
@@ -66,10 +81,10 @@ class PingAutomatedTest(AutomatedTest):
 
     def save(self, *args, **kwargs):
         self.schedule = super().schedule_task(
-            t_type='ping',
-            func='automation.tasks.ping',
+            t_type="ping",
+            func="automation.tasks.ping",
             args=self.target.domain,
-            cron=super().get_cron_exp(self.time)
+            cron=super().get_cron_exp(self.time),
         )
         self.schedule.save()
         super().save()
@@ -83,10 +98,10 @@ class WhoisAutomatedTest(AutomatedTest):
 
     def save(self, *args, **kwargs):
         self.schedule = super().schedule_task(
-            t_type='whois',
-            func='automation.tasks.whois_lookup',
+            t_type="whois",
+            func="automation.tasks.whois_lookup",
             args=self.target.domain,
-            cron=super().get_cron_exp(self.time)
+            cron=super().get_cron_exp(self.time),
         )
         self.schedule.save()
         super().save()
@@ -100,10 +115,10 @@ class HttpAutomatedTest(AutomatedTest):
 
     def save(self, *args, **kwargs):
         self.schedule = super().schedule_task(
-            t_type='http',
-            func='automation.tasks.http',
+            t_type="http",
+            func="automation.tasks.http",
             args=self.target.domain,
-            cron=super().get_cron_exp(self.time)
+            cron=super().get_cron_exp(self.time),
         )
         self.schedule.save()
         super().save()

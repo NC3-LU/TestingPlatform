@@ -1,12 +1,11 @@
-/* PLEASE CHANGE COLORS HERE */
+   /* PLEASE CHANGE COLORS HERE */
 
 :root {
     /* MAIN BACKGROUND COLOR AND TEXT COLOR */
-    --backgroundTextColor: white;
     --secondBackgroundColor: #2c4261;
     --dBoxColor: #526475;
-    --anchorColor: #BFD0DE;
-    --anchorColorHover: #F2E422;
+    --anchorColor: #2c4261;
+    --anchorColorHover: #3e5d86;
     --gradeAPlus:#0C751D;
     --gradeA:#13C230;
     --gradeAMinus:#63F77B;
@@ -47,6 +46,10 @@
     color:green !important;
 }
 
+.bi-exclamation-circle-fill{
+    color:orange !important;
+}
+
 .bi-x-circle-fill{
     color:red !important;
 }
@@ -57,30 +60,16 @@ html, body {
 }
 
 body{
-  background:var(--backgroundTextColor);
+
   /*font-family: 'Roboto Mono', monospace !important;*/
 }
 
 #content{
-    min-height: 85%;
+   /* min-height: 85%;*/
     height:auto;
 }
 
-a {color: var(--anchorColor) !important; font-weight:bold; text-decoration:none;}
-.anchorBgLight {color: var(--anchorColor) !important;}
-
-a:hover {color: var(--anchorColorHover) !important;}
-
-.btn-primary{
-    background:var(--dBoxColor) !important;
-    border:var(--dBoxColor) solid 1px !important ;
-    transition: 1s;
-}
-
-.btn-primary:hover{
-    background:var(--secondBackgroundColor) !important;
-    transition: 0.5s;
-}
+a { text-decoration:none;}
 
 /* FORMS */
 input[type=text], input[type=placeholder], input[type=submit] {
@@ -98,15 +87,18 @@ input[type=text], input[type=placeholder], input[type=submit] {
     -moz-appearance: none;
     appearance: none;
     border-radius: .25rem;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-}
-.form-control{
-    border: 1px var(--bs-dark) solid;
+
 }
 
-.form-control:hover{
-    border: 1px var(--anchorColorHover) solid;
+input[type=submit]:hover{
+    background: black;
 }
+
+.form-control{
+    border: 1px var(--bs-dark) solid;
+    transition:0.2s;
+}
+
 
 
 /* NAVIGATION */
@@ -114,12 +106,29 @@ input[type=text], input[type=placeholder], input[type=submit] {
 nav{
     min-height: 7%;
     background-color: var(--secondBackgroundColor) !important;
+    color:white !important;
 }
 
 .navbar-nav{
     padding-left: 2rem !important;
 }
 
+.navbar-brand{
+    color:white !important;
+    transition: 0.2s;
+}
+
+.nav-link {
+  color:white !important;
+}
+
+.nav-link:hover {
+  color: #eeeeee !important;
+}
+
+.navbar-brand:hover{
+    color: white !important;
+}
 .dropdown-item:hover{
     background:var(--secondBackgroundColor) !important;
 }
@@ -142,9 +151,7 @@ nav{
 .authForm{
     color: white !important;
 }
-.authForm > div > input, select{
-    background: var(--anchorColor) !important;
-}
+
 .authForm > div > label{
     color:var(--secondBackgroundColor);
     font-weight: bold;
@@ -201,7 +208,7 @@ nav{
     display:flex;
     align-items: center;
     justify-content: center !important;
-    color: black !important;
+    color: white !important;
     font-weight: normal !important;
 
 }
@@ -241,10 +248,102 @@ nav{
   overflow: hidden;
 }
 
+.loading-wave {
+  width: 300px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.loading-bar {
+  width: 20px;
+  height: 10px;
+  margin: 0 5px;
+  background-color: #2c4261;
+  border-radius: 5px;
+  animation: loading-wave-animation 1s ease-in-out infinite;
+}
+
+.loading-bar:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.loading-bar:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.loading-bar:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+@keyframes loading-wave-animation {
+  0% {
+    height: 10px;
+  }
+
+  50% {
+    height: 50px;
+  }
+
+  100% {
+    height: 10px;
+  }
+}
+
+.custom-popup-loading{
+  width: auto;
+  height: 100px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  visibility: hidden;
+}
+
+.custom-popup-content{
+  top: 40%;
+  left: 50%;
+  color: #fff3cd;
+  text-align: left;
+  padding: 0 30px 30px;
+  visibility: hidden;
+}
+
+.custom-popup{
+  width: 400px !important;
+  background: #fff !important;
+  border-radius: 6px !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  text-align: center !important;
+  padding: 0 30px 30px !important;
+  visibility: hidden !important;
+}
+
+.blur-bg{
+  visibility: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+}
+
+.open-popup{
+  visibility: visible;
+}
+
+
 
 /* FOOTER */
 footer{
     color: white;
+    background: #2c4261 !important;
     height:auto;
 }
 
@@ -260,6 +359,3 @@ footer{
        padding-top: .5rem
     }
 }
-
-
-

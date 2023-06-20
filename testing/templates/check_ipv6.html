@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<main class="row p-3 flex-column align-items-center">
+  <div class="col-lg-5 col-md-3 mb-2">
+      <div class="card shadow h-100 border border-2">
+        <div class="card-body d-flex flex-column ">
+          <h5 class="card-title">IPv6 Resr</h5>
+          <p>Assess the configuration of your web server (if publicly available)</p>
+          <form method="post" class="">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label>Enter a web server hostname / ip address:</label>
+              <input type="text" placeholder="server.lu" id="target5" name="target"
+                     value="" required>
+            </div>
+            <input type="submit" value="Test" class="btn btn-secondary">
+          </form>
+        </div>
+        <div class="card-footer text-center text-muted"><a
+          href="{% url 'knowledge_base'  %}#tests-web-server">About the test</a></div>
+      </div>
+    </div>
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4 justify-content-center">
+    <h1 class="text-center">IPv6 Test Results</h1>
+    <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
+      <p>Name Servers:</p>
+      <p>
+        {% if nameservers_comments.grade == "full" %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% elif nameservers_comments.grade == "half" %}
+          <i class="bi bi-exclamation-circle-fill color-warning"></i>
+        {% elif nameservers_comments.grade == "null" %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        {{ nameservers_comments.comment }}
+      </p>
+      <table class="table table-light table-bordered table-striped">
+        <tr>
+          <th>Name</th>
+          <th>Address (v4)</th>
+          <th>Reachable (v4)</th>
+          <th>Address (v6)</th>
+          <th>Reachable (v6)</th>
+        </tr>
+        {% for nameserver, ns in nameservers.items %}
+          <tr>
+            <td>{{ nameserver }}</td>
+            <td>{{ ns.ipv4.address }}</td>
+            <td>
+              {{ ns.ipv4.reachable }}
+              {% if ns.ipv4.reachable %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+              {% else %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+              {% endif %}
+            </td>
+            <td>{{ ns.ipv6.address }}</td>
+            <td>
+              {{ ns.ipv6.reachable }}
+              {% if ns.ipv6.reachable %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+              {% else %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+      <p>
+        {% if nameservers_reachability_comments.grade == "full" %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% elif nameservers_reachability_comments.grade == "null" %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        {{ nameservers_reachability_comments.comment }}
+      </p>
+      <br>
+    <p>Records:</p>
+      {% if records %}
+        <table class="table table-light table-bordered table-striped">
+          <tr>
+            <th>Server</th>
+            <th>IPv4</th>
+            <th>IPv6</th>
+          </tr>
+          {% for record in records %}
+            <tr>
+              <td>{{ record.0 }}</td>
+              <td>{{ record.1 }}</td>
+              <td>{{ record.2 }}</td>
+            </tr>{% if record.2 %}
+          <p>
+            <i class="bi bi-check-circle-fill color-success"></i>
+            Your server has an IPv6 address.
+          </p>
+        {% else %}
+          <p>
+            <i class="bi bi-x-circle-fill color-danger"></i>
+            Your server does not have an IPv6 address.
+          </p>
+        {% endif %}
+
+          {% endfor %}
+        </table>
+      {% endif %}
+      <p>
+        {% if records_v4_comments.grade == "full" %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% elif records_v4_comments.grade == "null" %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        {{ records_v4_comments.comment }}
+      </p>
+      <p>
+        {% if records_v6_comments.grade == "full" %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% elif records_v6_comments.grade == "null" %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        {{ records_v6_comments.comment }}
+      </p>
+    </div>
+  </section>
+</main>
+{% endblock %}

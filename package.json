@@ -1,0 +1,14 @@
+{
+  "name": "testingplatform",
+  "version": "0.0.1",
+  "license": "AGPL-3.0",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "^5.2.3",
+    "bootstrap-icons": "^1.10.2",
+    "popper.js": "^1.16.1"
+  },
+  "scripts": {
+    "postinstall": "node -e \"try { require('fs').symlinkSync(require('path').resolve('node_modules/'), 'static/npm_components', 'junction') } catch (e) { }\""
+  }
+}

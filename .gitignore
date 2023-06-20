@@ -7,3 +7,7 @@ db.sqlite3
 db/db.sqlite3
 static
 files
+node_modules/
+poetry.lock
+poetry.lock*
+docs/_build/

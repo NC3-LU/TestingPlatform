@@ -1,17 +1,29 @@
+import sys
+from typing import Any, Dict
+
+from django.http import JsonResponse
 from django.shortcuts import render
-from django.http import HttpResponse
+
 from authentication.models import User
+from landing_page.tools import check_mail
+from testing_platform.context_processors import get_version
 
 
-# Create your views here.
 def index(request):
-    # Render the HTML template signup.html
-    return render(request, 'index.html')
+    return render(request, "index.html")
 
 
-def healthz(request):
-    count = User.objects.all().count()
-    if count >= 1:
-        return HttpResponse(status=200, content='OK')
-    else:
-        return HttpResponse(status=503, content='NOK')
+def about(request):
+    return render(request, "about.html")
+
+
+def health(request):
+    result: Dict[str, Any] = {
+        "python_version": "{}.{}.{}".format(*sys.version_info[:3]),
+        "database": {},
+    }
+    result.update(get_version(request))
+    result["database"]["SQL"] = True if User.objects.all().count() >= 1 else False
+    result["database"]["kvrocks"] = False
+    result["email"] = check_mail()
+    return JsonResponse(result, safe=False)

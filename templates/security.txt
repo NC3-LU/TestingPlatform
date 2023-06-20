@@ -1,0 +1,8 @@
+# NC3 Security Contact
+Contact: opensource@nc3.lu
+
+# OpenPGP Key
+Encryption: D533 46C5 10C6 D5E9 81B3 1CD8 AB14 3B6C 5BD5 0BD3
+
+# Security Policy
+Policy:

@@ -1,0 +1,5 @@
+# Team
+
+Romain Kieffer <romain.kieffer@nc3.lu>
+Philippe Parage <philippe.parage@nc3.lu>
+Cedric Bonhomme <cedric@cedricbonhomme.org>

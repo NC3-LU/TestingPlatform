@@ -73,6 +73,16 @@ def test_landing(request):
 
 def http_test(request):
     if request.method == "POST":
+        try:
+            nb_tests = int(request.COOKIES["nb_tests"])
+        except KeyError:
+            nb_tests = 0
+        if nb_tests == 4:
+            messages.error(
+                request,
+                "You reached the maximum number of tests. Please create an account.",
+            )
+            return redirect("signup")
         context = {"rescan": False}
         if "rescan" in request.POST:
             context["rescan"] = True
@@ -80,7 +90,10 @@ def http_test(request):
 
         context["tls_results"] = get_tls_report(request.POST["target"], True)
         # context.update(ipv6_check("nc3.lu", None))
-        return render(request, "check_website.html", context)
+        nb_tests += 1
+        response = render(request, "check_website.html", context)
+        response.set_cookie("nb_tests", nb_tests)
+        return response
     else:
         return render(request, "check_website.html")
 
@@ -143,6 +156,16 @@ def web_test(request):
 def email_test(request):
     context = {}
     if request.method == "POST":
+        try:
+            nb_tests = int(request.COOKIES["nb_tests"])
+        except KeyError:
+            nb_tests = 0
+        if nb_tests == 4:
+            messages.error(
+                request,
+                "You reached the maximum number of tests. Please create an account.",
+            )
+            return redirect("signup")
         target = request.POST["target"]
         if not check_soa_record(target):
             context = {"status": False, "statusmessage": "The given domain is invalid!"}
@@ -158,8 +181,10 @@ def email_test(request):
             #    context["tls_mx"] = tls_version_check(
             #        host["hostname"]
             #    )
-        print(context)
-        return render(request, "check_email.html", {"result": context})
+        nb_tests += 1
+        response = render(request, "check_email.html", {"result": context})
+        response.set_cookie("nb_tests", nb_tests)
+        return response
     else:
         return render(request, "check_email.html")
 
@@ -177,18 +202,44 @@ def file_test(request):
 
 def ipv6_test(request):
     if request.method == "POST":
+        try:
+            nb_tests = int(request.COOKIES["nb_tests"])
+        except KeyError:
+            nb_tests = 0
+        if nb_tests == 4:
+            messages.error(
+                request,
+                "You reached the maximum number of tests. Please create an account.",
+            )
+            return redirect("signup")
         context = {}
         context.update(ipv6_check(request.POST["target"], None))
-        return render(request, "check_ipv6.html", context)
+        nb_tests += 1
+        response = render(request, "check_ipv6.html", context)
+        response.set_cookie("nb_tests", nb_tests)
+        return response
     else:
         return render(request, "check_ipv6.html")
 
 
 def web_server_test(request):
     if request.method == "POST":
+        try:
+            nb_tests = int(request.COOKIES["nb_tests"])
+        except KeyError:
+            nb_tests = 0
+        if nb_tests == 4:
+            messages.error(
+                request,
+                "You reached the maximum number of tests. Please create an account.",
+            )
+            return redirect("signup")
         context = {}
         context.update(web_server_check(request.POST["target"]))
-        return render(request, "check_web_server.html", context)
+        nb_tests += 1
+        response = render(request, "check_web_server.html", context)
+        response.set_cookie("nb_tests", nb_tests)
+        return response
     else:
         return render(request, "check_web_server.html")
 

@@ -25,11 +25,10 @@
             vulnerabilities and provides you recommendations.
           </p>
 
-          <form method="post" action="infra-testing/http-test/">
+          <form method="post" action="infra-testing/http-test/" id="http-test">
             {% csrf_token %}
             {% if error %}
             <span class="text-danger">{{ error }}</span>
-            <span class="text-danger">Wow, baaaad.</span>
             {% endif %}
             <div class="mb-3">
               <label class="mb-1">
@@ -39,7 +38,7 @@
                      id="target" name="target"
                      value="{{ form }}" required>
             </div>
-            <input type="submit" value="Test" class="btn btn-secondary" >
+            <input type="submit" value="Test" class="btn btn-secondary" onclick='openPopup("http-test")'>
           </form>
         </div>
         <div class="card-footer text-center text-muted"><a
@@ -71,7 +70,7 @@
         <div class="card-body d-flex flex-column ">
           <h5 class="card-title">Infrastructure Testing</h5>
           <p>Assess the configuration of your web server (if publicly available)</p>
-          <form method="post" action="infra-testing/web-server-test/" class="">
+          <form method="post" action="infra-testing/web-server-test/" id="web-server-test">
             {% csrf_token %}
             <br>
             <div class="mb-3">
@@ -80,7 +79,7 @@
                      value="" required>
 
             </div>
-            <input type="submit" value="Test" class="btn btn-secondary" {% if form.is_valid %}onclick='openPopup()'{% endif %}>
+            <input type="submit" value="Test" class="btn btn-secondary" onclick='openPopup("web-server-test")'>
           </form>
         </div>
         <div class="card-footer text-center text-muted"><a
@@ -96,7 +95,7 @@
             <a href="{% url 'knowledge_base'  %}#standards-dkim">DKIM</a>
             DNS records, and deployment of DNSSEC.</p>
 
-          <form method="post" action="infra-testing/email-test/" class="">
+          <form method="post" action="infra-testing/email-test/" id="email-test">
             {% csrf_token %}
             <div class="mb-3">
               <label>Enter a server address:</label>
@@ -104,7 +103,7 @@
                      value="" required>
 
             </div>
-            <input type="submit" value="Test" class="btn btn-secondary" {% if form.is_valid %}onclick='openPopup()'{% endif %}>
+            <input type="submit" value="Test" class="btn btn-secondary" onclick='openPopup("email-test")'>
           </form>
         </div>
         <div class="card-footer text-center text-muted"><a
@@ -213,13 +212,16 @@
 </section>
 
 <script>
-    function openPopup(){
-      let popup_loading = document.getElementById('popup-loading');
-      popup_loading.classList.add("open-popup");
-      let bg = document.getElementById('blur-bg');
-      bg.classList.add("open-popup");
-      let popup_content = document.getElementById('popup-content');
-      popup_content.classList.add("open-popup");
+    function openPopup(id){
+      let form = document.getElementById(id);
+      if (form.target.value != "") {
+        let popup_loading = document.getElementById('popup-loading');
+        popup_loading.classList.add("open-popup");
+        let bg = document.getElementById('blur-bg');
+        bg.classList.add("open-popup");
+        let popup_content = document.getElementById('popup-content');
+        popup_content.classList.add("open-popup");
+      }
     }
     function hidePopup(){
       let popup_loading = document.getElementById('popup-loading');

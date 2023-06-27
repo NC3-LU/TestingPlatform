@@ -1,0 +1,184 @@
+# Zed Attack Proxy (ZAP) and its related class files.
+#
+# ZAP is an HTTP/HTTPS proxy for assessing web application security.
+#
+# Copyright 2022 the ZAP development team
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""
+This file was automatically generated.
+"""
+
+import six
+
+
+class search(object):
+
+    def __init__(self, zap):
+        self.zap = zap
+
+    def urls_by_url_regex(self, regex, baseurl=None, start=None, count=None):
+        """
+        Returns the URLs of the HTTP messages that match the given regular expression in the URL optionally filtered by URL and paginated with 'start' position and 'count' of messages.
+        """
+        params = {'regex': regex}
+        if baseurl is not None:
+            params['baseurl'] = baseurl
+        if start is not None:
+            params['start'] = start
+        if count is not None:
+            params['count'] = count
+        return six.next(six.itervalues(self.zap._request(self.zap.base + 'search/view/urlsByUrlRegex/', params)))
+
+    def urls_by_request_regex(self, regex, baseurl=None, start=None, count=None):
+        """
+        Returns the URLs of the HTTP messages that match the given regular expression in the request optionally filtered by URL and paginated with 'start' position and 'count' of messages.
+        """
+        params = {'regex': regex}
+        if baseurl is not None:
+            params['baseurl'] = baseurl
+        if start is not None:
+            params['start'] = start
+        if count is not None:
+            params['count'] = count
+        return six.next(six.itervalues(self.zap._request(self.zap.base + 'search/view/urlsByRequestRegex/', params)))
+
+    def urls_by_response_regex(self, regex, baseurl=None, start=None, count=None):
+        """
+        Returns the URLs of the HTTP messages that match the given regular expression in the response optionally filtered by URL and paginated with 'start' position and 'count' of messages.
+        """
+        params = {'regex': regex}
+        if baseurl is not None:
+            params['baseurl'] = baseurl
+        if start is not None:
+            params['start'] = start
+        if count is not None:
+            params['count'] = count
+        return six.next(six.itervalues(self.zap._request(self.zap.base + 'search/view/urlsByResponseRegex/', params)))
+
+    def urls_by_header_regex(self, regex, baseurl=None, start=None, count=None):
+        """
+        Returns the URLs of the HTTP messages that match the given regular expression in the header(s) optionally filtered by URL and paginated with 'start' position and 'count' of messages.
+        """
+        params = {'regex': regex}
+        if baseurl is not None:
+            params['baseurl'] = baseurl
+        if start is not None:
+            params['start'] = start
+        if count is not None:
+            params['count'] = count
+        return six.next(six.itervalues(self.zap._request(self.zap.base + 'search/view/urlsByHeaderRegex/', params)))
+
+    def messages_by_url_regex(self, regex, baseurl=None, start=None, count=None):
+        """
+        Returns the HTTP messages that match the given regular expression in the URL optionally filtered by URL and paginated with 'start' position and 'count' of messages.
+        """
+        params = {'regex': regex}
+        if baseurl is not None:
+            params['baseurl'] = baseurl
+        if start is not None:
+            params['start'] = start
+        if count is not None:
+            params['count'] = count
+        return six.next(six.itervalues(self.zap._request(self.zap.base + 'search/view/messagesByUrlRegex/', params)))
+
+    def messages_by_request_regex(self, regex, baseurl=None, start=None, count=None):
+        """
+        Returns the HTTP messages that match the given regular expression in the request optionally filtered by URL and paginated with 'start' position and 'count' of messages.
+        """
+        params = {'regex': regex}
+        if baseurl is not None:
+            params['baseurl'] = baseurl
+        if start is not None:
+            params['start'] = start
+        if count is not None:
+            params['count'] = count
+        return six.next(six.itervalues(self.zap._request(self.zap.base + 'search/view/messagesByRequestRegex/', params)))
+
+    def messages_by_response_regex(self, regex, baseurl=None, start=None, count=None):
+        """
+        Returns the HTTP messages that match the given regular expression in the response optionally filtered by URL and paginated with 'start' position and 'count' of messages.
+        """
+        params = {'regex': regex}
+        if baseurl is not None:
+            params['baseurl'] = baseurl
+        if start is not None:
+            params['start'] = start
+        if count is not None:
+            params['count'] = count
+        return six.next(six.itervalues(self.zap._request(self.zap.base + 'search/view/messagesByResponseRegex/', params)))
+
+    def messages_by_header_regex(self, regex, baseurl=None, start=None, count=None):
+        """
+        Returns the HTTP messages that match the given regular expression in the header(s) optionally filtered by URL and paginated with 'start' position and 'count' of messages.
+        """
+        params = {'regex': regex}
+        if baseurl is not None:
+            params['baseurl'] = baseurl
+        if start is not None:
+            params['start'] = start
+        if count is not None:
+            params['count'] = count
+        return six.next(six.itervalues(self.zap._request(self.zap.base + 'search/view/messagesByHeaderRegex/', params)))
+
+    def har_by_url_regex(self, regex, baseurl=None, start=None, count=None, apikey=''):
+        """
+        Returns the HTTP messages, in HAR format, that match the given regular expression in the URL optionally filtered by URL and paginated with 'start' position and 'count' of messages.
+        """
+        params = {'regex': regex, 'apikey': apikey}
+        if baseurl is not None:
+            params['baseurl'] = baseurl
+        if start is not None:
+            params['start'] = start
+        if count is not None:
+            params['count'] = count
+        return (self.zap._request_other(self.zap.base_other + 'search/other/harByUrlRegex/', params))
+
+    def har_by_request_regex(self, regex, baseurl=None, start=None, count=None, apikey=''):
+        """
+        Returns the HTTP messages, in HAR format, that match the given regular expression in the request optionally filtered by URL and paginated with 'start' position and 'count' of messages.
+        """
+        params = {'regex': regex, 'apikey': apikey}
+        if baseurl is not None:
+            params['baseurl'] = baseurl
+        if start is not None:
+            params['start'] = start
+        if count is not None:
+            params['count'] = count
+        return (self.zap._request_other(self.zap.base_other + 'search/other/harByRequestRegex/', params))
+
+    def har_by_response_regex(self, regex, baseurl=None, start=None, count=None, apikey=''):
+        """
+        Returns the HTTP messages, in HAR format, that match the given regular expression in the response optionally filtered by URL and paginated with 'start' position and 'count' of messages.
+        """
+        params = {'regex': regex, 'apikey': apikey}
+        if baseurl is not None:
+            params['baseurl'] = baseurl
+        if start is not None:
+            params['start'] = start
+        if count is not None:
+            params['count'] = count
+        return (self.zap._request_other(self.zap.base_other + 'search/other/harByResponseRegex/', params))
+
+    def har_by_header_regex(self, regex, baseurl=None, start=None, count=None, apikey=''):
+        """
+        Returns the HTTP messages, in HAR format, that match the given regular expression in the header(s) optionally filtered by URL and paginated with 'start' position and 'count' of messages.
+        """
+        params = {'regex': regex, 'apikey': apikey}
+        if baseurl is not None:
+            params['baseurl'] = baseurl
+        if start is not None:
+            params['start'] = start
+        if count is not None:
+            params['count'] = count
+        return (self.zap._request_other(self.zap.base_other + 'search/other/harByHeaderRegex/', params))

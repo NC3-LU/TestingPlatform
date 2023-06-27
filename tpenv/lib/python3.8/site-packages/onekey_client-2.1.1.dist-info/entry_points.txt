@@ -1,0 +1,3 @@
+[console_scripts]
+onekey=onekey_client.cli.cli:main
+

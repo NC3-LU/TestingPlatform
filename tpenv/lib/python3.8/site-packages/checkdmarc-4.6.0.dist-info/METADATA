@@ -1,0 +1,42 @@
+Metadata-Version: 2.1
+Name: checkdmarc
+Version: 4.6.0
+Summary: A Python module and command line parser for SPF and DMARC records
+Project-URL: Homepage, https://github.com/domainaware/checkdmarc
+Project-URL: Documentation, https://domainaware.github.io/checkdmarc/
+Project-URL: Issues, https://github.com/domainaware/checkdmarc/issues
+Project-URL: Changelog, https://github.com/domainaware/checkdmarc/blob/master/CHANGELOG.md
+Author-email: Sean Whalen <whalenster@gmail.com>
+License-Expression: Apache-2.0
+License-File: LICENSE
+Keywords: DMARC,DNS,SPF
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Communications :: Email
+Classifier: Topic :: Security
+Requires-Dist: dnspython>=2.0.0
+Requires-Dist: expiringdict>=1.1.4
+Requires-Dist: publicsuffixlist>=0.10.0
+Requires-Dist: pyleri>=1.3.2
+Requires-Dist: requests>=2.25.0
+Requires-Dist: timeout-decorator>=0.4.1
+Description-Content-Type: text/markdown
+
+# checkdmarc
+
+[![Python tests](https://github.com/domainaware/checkdmarc/actions/workflows/python-tests.yaml/badge.svg)](https://github.com/domainaware/checkdmarc/actions/workflows/python-tests.yaml)
+[![PyPI](https://img.shields.io/pypi/v/checkdmarc)](https://pypi.org/project/checkdmarc/)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/checkdmarc?color=blue)](https://pypistats.org/packages/checkdmarc)
+
+A Python module and command line utility for validating SPF and DMARC DNS records
+
+## Features
+
+- API and CLI
+- Can test multiple domains at once
+- CLI output in JSON or CSV format
+- Parses and validates MX, SPF, and DMARC records
+- Checks for DNSSEC deployment
+- Lists name servers
+- Checks for STARTTLS and TLS support on each mail server

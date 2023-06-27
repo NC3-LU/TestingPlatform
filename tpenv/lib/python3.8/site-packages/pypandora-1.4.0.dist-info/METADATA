@@ -1,0 +1,77 @@
+Metadata-Version: 2.1
+Name: pypandora
+Version: 1.4.0
+Summary: Python CLI and module for pandora
+Home-page: https://github.com/pandora-analysis/pypandora
+License: BSD-3-Clause
+Author: Raphaël Vinot
+Author-email: raphael.vinot@circl.lu
+Requires-Python: >=3.8,<4.0
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Telecommunications Industry
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Internet
+Classifier: Topic :: Security
+Provides-Extra: docs
+Requires-Dist: Sphinx (>=6.1.3,<7.0.0) ; extra == "docs"
+Requires-Dist: requests (>=2.28.2,<3.0.0)
+Project-URL: Documentation, https://pypandora.readthedocs.io/en/latest/
+Project-URL: Repository, https://github.com/pandora-analysis/pypandora
+Description-Content-Type: text/markdown
+
+# Python client and module for Pandora
+
+## Installation
+
+```bash
+pip install pypandora
+```
+
+## Usage
+
+### Command line
+
+You can use the `pandora` command to submit a file:
+
+```bash
+$ poetry run pandora -h
+usage: pandora [-h] [--url URL] [--redis_up | -f FILE] [--task_id TASK_ID]
+               [--seed SEED] [--all_workers] [--worker_name WORKER_NAME]
+               [--details]
+
+Submit a file.
+
+options:
+  -h, --help            show this help message and exit
+  --url URL             URL of the instance (defaults to
+                        https://pandora.circl.lu/).
+  --redis_up            Check if redis is up.
+  -f FILE, --file FILE  Path to the file to submit.
+
+getStatus:
+  --task_id TASK_ID     The id of the task you'd like to get the status of
+  --seed SEED           The seed of the task you'd like to get the status of
+  --all_workers         True if you want the status of every workers
+  --worker_name WORKER_NAME
+                        The name of the worker you want to get the report of
+  --details             True if you want the details of the workers
+```
+
+### Library
+
+See [API Reference](https://pypandora.readthedocs.io/en/latest/api_reference.html)
+

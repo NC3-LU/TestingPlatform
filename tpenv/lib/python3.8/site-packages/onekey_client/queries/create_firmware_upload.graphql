@@ -1,0 +1,30 @@
+mutation CreateFirmwareUpload(
+  $firmware: FirmwareUploadMetadataInput!
+  $vendorName: String!
+  $productName: String!
+  $productCategory: String
+  $productGroupID: ID!
+) {
+  createFirmwareUpload(
+    input: {
+      firmware: $firmware
+      product: { name: $productName, category: $productCategory, vendor: $vendorName }
+      productGroup: { id: $productGroupID }
+    }
+  ) {
+    ... on FirmwareUploadMetadata {
+      id
+      uploadUrl
+    }
+    ... on MutationError {
+      count
+      errors {
+        message
+        code
+        ... on ValidationError {
+          fieldPath
+        }
+      }
+    }
+  }
+}

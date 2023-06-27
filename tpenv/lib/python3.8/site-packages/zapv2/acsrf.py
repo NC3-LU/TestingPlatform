@@ -1,0 +1,69 @@
+# Zed Attack Proxy (ZAP) and its related class files.
+#
+# ZAP is an HTTP/HTTPS proxy for assessing web application security.
+#
+# Copyright 2022 the ZAP development team
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""
+This file was automatically generated.
+"""
+
+import six
+
+
+class acsrf(object):
+
+    def __init__(self, zap):
+        self.zap = zap
+
+    @property
+    def option_tokens_names(self):
+        """
+        Lists the names of all anti-CSRF tokens
+        """
+        return six.next(six.itervalues(self.zap._request(self.zap.base + 'acsrf/view/optionTokensNames/')))
+
+    @property
+    def option_partial_matching_enabled(self):
+        """
+        Define if ZAP should detect CSRF tokens by searching for partial matches
+        """
+        return six.next(six.itervalues(self.zap._request(self.zap.base + 'acsrf/view/optionPartialMatchingEnabled/')))
+
+    def add_option_token(self, string, apikey=''):
+        """
+        Adds an anti-CSRF token with the given name, enabled by default
+        """
+        return six.next(six.itervalues(self.zap._request(self.zap.base + 'acsrf/action/addOptionToken/', {'String': string, 'apikey': apikey})))
+
+    def remove_option_token(self, string, apikey=''):
+        """
+        Removes the anti-CSRF token with the given name
+        """
+        return six.next(six.itervalues(self.zap._request(self.zap.base + 'acsrf/action/removeOptionToken/', {'String': string, 'apikey': apikey})))
+
+    def set_option_partial_matching_enabled(self, boolean, apikey=''):
+        """
+        Define if ZAP should detect CSRF tokens by searching for partial matches.
+        """
+        return six.next(six.itervalues(self.zap._request(self.zap.base + 'acsrf/action/setOptionPartialMatchingEnabled/', {'Boolean': boolean, 'apikey': apikey})))
+
+    def gen_form(self, hrefid, actionurl=None, apikey=''):
+        """
+        Generate a form for testing lack of anti-CSRF tokens - typically invoked via ZAP
+        """
+        params = {'hrefId': hrefid, 'apikey': apikey}
+        if actionurl is not None:
+            params['actionUrl'] = actionurl
+        return (self.zap._request_other(self.zap.base_other + 'acsrf/other/genForm/', params))

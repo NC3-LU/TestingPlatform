@@ -90,9 +90,9 @@ def http_test(request):
         context.update(get_http_report(request.POST["target"], context["rescan"]))
         context.update(ipv6_check(request.POST["target"], None))
 
-        context["tls_results"] = tls_version_check(
-            request.POST["target"]
-        )
+       # context["tls_results"] = tls_version_check(
+       #     request.POST["target"]
+       # )
 
         # context.update(ipv6_check("nc3.lu", None))
         nb_tests += 1

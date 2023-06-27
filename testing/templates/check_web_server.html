@@ -8,7 +8,7 @@
           <h5 class="card-title">Web Server Configuration</h5>
           <p>Assess the configuration of your web server (if publicly available)</p>
           <!--<form method="post" action="/infra-testing/web-server-test/" class="">-->
-          <form method="post" action="{% url "web_server_test" %}" class="">
+          <form method="post" action="{% url 'web_server_test' %}" class="">
             {% csrf_token %}
             <div class="mb-3">
               <label>Enter a web server hostname / ip address:</label>

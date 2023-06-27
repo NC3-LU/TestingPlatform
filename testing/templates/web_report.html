@@ -1,6 +1,13 @@
 {% if result %}
 
+<script>
+  let countGood = 0;
+  let countBad = 0;
+  let countWarning = 0;
+  let countTotal = 0;
 
+
+</script>
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
 
   <h1 class="text-center">Overview of {{ domain_name }}</h1>
@@ -114,13 +121,41 @@
           {{ result.x_xss_protection.score_description }}
         </div>
       </div>
+      <div class="row my-1">
+        <div class="col-lg-12 fs-4">
+          {% if nameservers_comments.grade == "full" %}
+          <script> countGood++;countTotal++;</script>
+          <i class="bi bi-check-circle-fill color-success"> </i>
+          {% elif nameservers_comments.grade == "null" %}
+          <script>countBad++;countTotal++;</script>
+          <i class="bi bi-x-circle-fill color-danger"></i>
+          {% endif %}
+          {{ nameservers_comments.comment }} (IPv6)
+        </div>
+      </div>
+      <div class="row my-1">
+        <div class="col-lg-12 fs-4">
+          {% if record.2 %}
+          <script> countGood++;countTotal++;</script>
+          <i class="bi bi-check-circle-fill color-success"></i>
+          Your server has an IPv6 address.
+          {% else %}
+          <script>countBad++;countTotal++;</script>
+          <i class="bi bi-x-circle-fill color-danger"></i>
+          Your server does not have an IPv6 address.
+          {% endif %}
+          (IPv6)
+        </div>
+
+      </div>
       <!-- -- -->
     </div>
     <div class="col-lg-3">
       <h1>Test Discovery</h1>
       <div class="row my-4">
         <div class="col-lg-6 fs-2">Good</div>
-        <div class="col-lg-6"><span id="good-count" class="rounded-circle p-2 fs-4 text-white"
+        <div class="col-lg-6"><span id="good-count"
+                                    class="rounded-circle p-2 fs-4 text-white"
                                     style="background:#71cdba;"></span>
         </div>
       </div>
@@ -148,10 +183,13 @@
   </div>
 </section>
 <script>
-    const result = parseInt({{ scan_summary.tests_quantity }} - 1) - parseInt({{ scan_summary.tests_passed }} - 1);
+    const result = parseInt({{ scan_summary.tests_quantity }} + countTotal - 1) - parseInt({{ scan_summary.tests_passed }} + countGood - 1);
 
      document.getElementById('vulnerable-count').innerHTML = '&nbsp;' + result + '&nbsp;' ;
-     document.getElementById('good-count').innerHTML = '&nbsp;' + parseInt({{ scan_summary.tests_passed }} - 1) + '&nbsp;' ;
+     document.getElementById('good-count').innerHTML = '&nbsp;' + parseInt({{ scan_summary.tests_passed }} + countGood - 1) + '&nbsp;' ;
+
+
+
 </script>
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
   <div class="row">
@@ -190,14 +228,13 @@
       </div>
     </div>
     {% endif %}
-    {% if not result.content_security_policy.pass %}
     <div class="row my-2">
       <button type="button" data-bs-toggle="collapse" data-bs-target="#target2"
               aria-expanded="false" aria-controls="collapseExample"
               class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
         <i
           class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-        General Recommendation
+        How to implement the CSP?
       </button>
 
       <div class="p-0 collapse" id="target2">
@@ -238,7 +275,6 @@
       </div>
     </div>
   </div>
-  {% endif %}
 </section>
 
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
@@ -271,7 +307,8 @@
           <h3>Cookie: {{ cookie_key }}</h3>
           <ul>
             {% for attribute_key, attribute_value in cookie_value.items %}
-            {% if attribute_key == "secure" and not attribute_value or attribute_key == "httponly" and not attribute_value %}
+            {% if attribute_key == "secure" and not attribute_value or attribute_key ==
+            "httponly" and not attribute_value %}
             <li class="text-danger fw-bold">{{ attribute_key }}: {{ attribute_value }}
             </li>
             {% else %}
@@ -286,6 +323,51 @@
     </div>
   </div>
   {% endif %}
+  <div class="row my-2">
+    <button type="button" data-bs-toggle="collapse"
+            data-bs-target="#cookie-recommendation"
+            aria-expanded="false" aria-controls="collapseExample"
+            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+      <i
+        class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+      Recommendation
+    </button>
+
+    <div class="p-0 collapse" id="cookie-recommendation">
+      <div class="p-4 border-bottom border-end border-start">
+        <p>The <b>secure flag</b> in cookies tells the browser that the cookie should
+          only be sent
+          over HTTPS, which is an encrypted connection. This helps to protect the cookie
+          from being intercepted by attackers. If a website never uses HTTPS, the secure
+          flag will not offer any protection.</p>
+
+        <p>The <b>HttpOnly flag</b> tells the browser that the cookie should only be
+          accessible by
+          the server. This helps to mitigate XSS attacks, where an attacker tries to
+          steal
+          cookies by injecting malicious scripts into a web page.</p>
+
+        <p>The <b>SameSite flag</b> controls when cookies are sent. When it is set to
+          Strict, the
+          cookie is only sent if the site for the cookie matches the site currently
+          shown
+          in the browser's URL bar. This helps to mitigate CSRF attacks, where an
+          attacker
+          tricks a user into submitting a malicious form on a trusted site.</p>
+
+        <p>You should also set an <b>expiration date</b> for your cookies. Without one,
+          the cookie
+          will last as long as the browser session does. By setting an expiration date,
+          you can limit how long the cookie persists.</p>
+        <p>Here are some additional tips for securing cookies:</p>
+        <ul>
+          <li>Use short expiration dates for cookies that store sensitive data.</li>
+          <li>Do not store passwords or other sensitive data in cookies.</li>
+          <li>Use a secure cookie storage mechanism.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
@@ -305,6 +387,77 @@
         cross-origin resource, in order to check that the server will permit the actual
         request. In that preflight, the browser sends headers that indicate the HTTP
         method and headers that will be used in the actual request.</p>
+    </div>
+  </div>
+  <div class="row my-2">
+    <button type="button" data-bs-toggle="collapse"
+            data-bs-target="#cors-recommendation"
+            aria-expanded="false" aria-controls="collapseExample"
+            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+      <i
+        class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+      Recommendation
+    </button>
+
+    <div class="p-0 collapse" id="cors-recommendation">
+      <div class="p-4 border-bottom border-end border-start">
+        <b>Specify origins</b>
+
+       <p> Instead of using the wildcard <code>"*"</code>, explicitly specify the allowed origins for
+        cross-origin requests.
+        This can be done by setting the Access-Control-Allow-Origin header to a specific
+        origin, such as <code>https://nc3.lu</code>, or to a list of trusted origins.
+        By explicitly specifying the allowed origins, you can prevent unauthorized
+        access to your resources from untrusted sources.</p>
+
+        <b>Restrict methods and headers</b>
+
+        Use the Access-Control-Allow-Methods and Access-Control-Allow-Headers headers to
+        define the allowed HTTP methods and request headers for cross-origin requests.
+        Only include the necessary methods and headers that your application requires,
+        rather than allowing all methods or headers.
+        This can help to reduce the attack surface of your application and protect it
+        from malicious requests.
+        Validate origin
+
+        Implement server-side validation of the Origin header in the request to ensure
+        that it matches the list of allowed origins.
+        This prevents attackers from spoofing the origin and bypassing CORS
+        restrictions.
+        You can use the nginx web server to implement this validation by adding the
+        following line to your nginx.conf file:
+        <code>
+        add_header Access-Control-Allow-Origin $http_origin;
+        </code>
+
+        Use credentials carefully
+
+        Be cautious when enabling the Access-Control-Allow-Credentials header.
+        Only enable it if your application requires sending and receiving credentials
+        (e.g., cookies, authorization headers) across origins.
+        Make sure to properly handle and validate the credentials on the server-side to
+        prevent unauthorized access.
+        Apply origin whitelisting
+
+        Consider maintaining a whitelist of trusted origins within your application's
+        server-side logic.
+        Validate incoming requests against this whitelist and only allow requests from
+        trusted origins.
+        This can help to further reduce the attack surface of your application and
+        protect it from malicious requests.
+        Set secure CORS headers
+
+        In addition to the CORS headers, ensure that your application implements other
+        security headers, such as Content Security Policy (CSP), Strict Transport
+        Security (HSTS), and X-Frame-Options, to provide a layered security approach.
+        These headers can help to protect your application from a variety of attacks,
+        including cross-site scripting (XSS), clickjacking, and man-in-the-middle (MITM)
+        attacks.
+        The above text is truthful and accurate. It is based on the best practices for
+        implementing CORS headers, as recommended by security experts and industry
+        standards. By following these best practices, you can help to protect your
+        application from cross-origin attacks.
+      </div>
     </div>
   </div>
 </section>
@@ -415,6 +568,42 @@
   </div>
 </section>
 
+<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+  <div class="row">
+    <div class="col-lg-12 fs-1 fw-bold">
+      {% if result.subresource_integrity.pass %}
+      <i class="bi bi-check-circle-fill color-success"> </i>
+      {% else %}
+      <i class="bi bi-x-circle-fill color-danger"></i>
+      {% endif %} {{ result.subresource_integrity.score_description}}
+    </div>
+    <div class="col-lg-12 fs-4">
+      <p>Subresource Integrity (SRI) is a security feature that enables browsers to
+        verify that files they fetch (for example, from a CDN)
+        are delivered without unexpected manipulation. It works by allowing you to
+        provide a cryptographic hash that a fetched file must match.
+      </p>
+    </div>
+  </div>
+  {% if result.subresource_integrity.output.data %}
+  <div class="row my-2">
+    <button type="button" data-bs-toggle="collapse"
+            data-bs-target="#subresource_integrity"
+            aria-expanded="false" aria-controls="collapseExample"
+            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+      <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+      Subresource Integrity (SRI)
+    </button>
+
+    <div class="p-0 collapse" id="subresource_integrity">
+      <div class="p-3 border-bottom border-end border-start">
+
+
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</section>
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
@@ -551,12 +740,18 @@
     options: options2
   });*/
 
+
+
+
+
+
+
 </script>
 <script>
   const total = {{ scan_summary.tests_quantity }} -1;
   const totalGood = {{ scan_summary.tests_passed }} -1;
-  var successPercentage = totalGood / total * 100;
-  var failurePercentage = 100 - successPercentage;
+  let successPercentage = totalGood / total * 100;
+  let failurePercentage = 100 - successPercentage;
 
   var data = [{
     data: [successPercentage, failurePercentage],
@@ -600,650 +795,258 @@
     },
     options: options
   });
+
+
+
+
+
+
+
 </script>
 
-<!--<button class="btn btn-light w-50 collapsible">HTTP Results</button>
-<section class="result-content authForm p-5">
-  <h2>Result for {{ domain_name }}:</h2>
-  <hr>
-  <div id="scan-summary" class="d-flex flex-column">
-    <div class="bg-light text-dark gradeBox">
-      <span>{{ scan_summary.grade }}</span>
-    </div>
-    <span>Start time:  {{ scan_summary.start_time }}</span>
-    <span>End time:  {{ scan_summary.end_time }}</span>
-    <span>Score:  {{ scan_summary.score }}</span>
-    <span>Tests made:  {{ scan_summary.tests_passed }} [Passed] / {{ scan_summary.tests_quantity }} [Total]</span>
-  </div>
-  <hr>
-  <div class="">
-    <h3>Tests:</h3>
-    <table class="table table-light table-striped table-responsive">
-      <tr>
-        <th>Test</th>
-        <th>Pass</th>
-        <th>Reason</th>
-        <th>Score</th>
-      </tr>
-      <tr>
-        <td>Content Security Policy</td>
-        <td>{% if result.content_security_policy.pass %}
-          <i class="bi bi-hand-thumbs-up-fill"></i>
-          {% else %}
-          <i class="bi bi-hand-thumbs-down-fill"></i>
-          {% endif %}
-        </td>
-        <td><code>{{ result.content_security_policy.score_description }}</code></td>
-        <td>{{ result.content_security_policy.score_modifier }}</td>
-      </tr>
-      <tr>
-        <td>Cookies</td>
-        <td>{% if result.cookies.pass %}
-          <i class="bi bi-hand-thumbs-up-fill"></i>
-          {% else %}
-          <i class="bi bi-hand-thumbs-down-fill"></i>
-          {% endif %}
-        </td>
-        <td><code>{{ result.cookies.score_description }}</code></td>
-        <td>{{ result.cookies.score_modifier }}</td>
-      </tr>
-      <tr>
-        <td>Cross-origin Resource Sharing</td>
-        <td>{% if result.cross_origin_resource_sharing.pass %}
-          <i class="bi bi-hand-thumbs-up-fill"></i>
-          {% else %}
-          <i class="bi bi-hand-thumbs-down-fill"></i>
-          {% endif %}
-        </td>
-        <td><code>{{ result.cross_origin_resource_sharing.score_description }}</code>
-        </td>
-        <td>{{ result.cross_origin_resource_sharing.score_modifier }}</td>
-      </tr>
-      <tr>
-        <td>HTTP Public Key Pinning</td>
-        <td>{% if result.public_key_pinning.pass %}
-          <i class="bi bi-hand-thumbs-up-fill"></i>
-          {% else %}
-          <i class="bi bi-hand-thumbs-down-fill"></i>
-          {% endif %}
-        </td>
-        <td><code>{{ result.public_key_pinning.score_description }}</code></td>
-        <td>{{ result.public_key_pinning.score_modifier }}</td>
-      </tr>
-      <tr>
-        <td>Redirection</td>
-        <td>{% if result.redirection.pass %}
-          <i class="bi bi-hand-thumbs-up-fill"></i>
-          {% else %}
-          <i class="bi bi-hand-thumbs-down-fill"></i>
-          {% endif %}
-        </td>
-        <td><code>{{ result.redirection.score_description }}</code></td>
-        <td>{{ result.redirection.score_modifier }}</td>
-      </tr>
-      <tr>
-        <td>Referrer Policy</td>
-        <td>{% if result.referrer_policy.pass %}
-          <i class="bi bi-hand-thumbs-up-fill"></i>
-          {% else %}
-          <i class="bi bi-hand-thumbs-down-fill"></i>
-          {% endif %}
-        </td>
-        <td><code>{{ result.referrer_policy.score_description }}</code></td>
-        <td>{{ result.referrer_policy.score_modifier }}</td>
-      </tr>
-      <tr>
-        <td>HTTP Strict Transport Security</td>
-        <td>{% if result.strict_transport_security.pass %}
-          <i class="bi bi-hand-thumbs-up-fill"></i>
-          {% else %}
-          <i class="bi bi-hand-thumbs-down-fill"></i>
-          {% endif %}
-        </td>
-        <td><code>{{ result.strict_transport_security.score_description }}</code></td>
-        <td>{{ result.strict_transport_security.score_modifier }}</td>
-      </tr>
-      <tr>
-        <td>Subresource Integrity</td>
-        <td>{% if result.subresource_integrity.pass %}
-          <i class="bi bi-hand-thumbs-up-fill"></i>
-          {% else %}
-          <i class="bi bi-hand-thumbs-down-fill"></i>
-          {% endif %}
-        </td>
-        <td><code>{{ result.subresource_integrity.score_description }}</code></td>
-        <td>{{ result.subresource_integrity.score_modifier }}</td>
-      </tr>
-      <tr>
-        <td>X-Content-Type-Options</td>
-        <td>{% if result.x_content_type_options.pass %}
-          <i class="bi bi-hand-thumbs-up-fill"></i>
-          {% else %}
-          <i class="bi bi-hand-thumbs-down-fill"></i>
-          {% endif %}
-        </td>
-        <td><code>{{ result.x_content_type_options.score_description }}</code></td>
-        <td>{{ result.x_content_type_options.score_modifier }}</td>
-      </tr>
-      <tr>
-        <td>X-Frame-Options</td>
-        <td>{% if result.x_frame_options.pass %}
-          <i class="bi bi-hand-thumbs-up-fill"></i>
-          {% else %}
-          <i class="bi bi-hand-thumbs-down-fill"></i>
-          {% endif %}
-        </td>
-        <td><code>{{ result.x_frame_options.score_description }}</code></td>
-        <td>{{ result.x_frame_options.score_modifier }}</td>
-      </tr>
-      <tr>
-        <td>X-XSS-Protection</td>
-        <td>{% if result.x_xss_protection.pass %}
-          <i class="bi bi-hand-thumbs-up-fill"></i>
-          {% else %}
-          <i class="bi bi-hand-thumbs-down-fill"></i>
-          {% endif %}
-        </td>
-        <td><code>{{ result.x_xss_protection.score_description }}</code></td>
-        <td>{{ result.x_xss_protection.score_modifier }}</td>
-      </tr>
-
-    </table>
-  </div>
-
-  <h3>Grade history</h3>
-  <table class="table table-light table-bordered table-striped">
-    <tr>
-      <th>Date</th>
-      <th>Score</th>
-      <th>Grade</th>
-    </tr>
-    {%for v in scan_history%}
-    <tr>
-      <td>{{v.end_time}}</td>
-      <td>{{v.score}}</td>
-      <td>{{v.grade}}</td>
-    </tr>
-    {% endfor %}
-  </table>
-</section>-->
-  {% endif %}
-{{ipv6_results}}
-  <section class="col-lg-11 row my-5 border border-2 rounded p-4 justify-content-center">
-    <h1 class="text-center">IPv6 Test Results</h1>
-    <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
-      <p>Name Servers:</p>
-      <p>
-        {% if nameservers_comments.grade == "full" %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
-        {% elif nameservers_comments.grade == "half" %}
-          <i class="bi bi-exclamation-circle-fill color-warning"></i>
-        {% elif nameservers_comments.grade == "null" %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
-        {% endif %}
-        {{ nameservers_comments.comment }}
-      </p>
-      <table class="table table-light table-bordered table-striped">
-        <tr>
-          <th>Name</th>
-          <th>Address (v4)</th>
-          <th>Reachable (v4)</th>
-          <th>Address (v6)</th>
-          <th>Reachable (v6)</th>
-        </tr>
-        {% for nameserver, ns in nameservers.items %}
-          <tr>
-            <td>{{ nameserver }}</td>
-            <td>{{ ns.ipv4.address }}</td>
-            <td>
-              {{ ns.ipv4.reachable }}
-              {% if ns.ipv4.reachable %}
-                <i class="bi bi-check-circle-fill color-success"> </i>
-              {% else %}
-                <i class="bi bi-x-circle-fill color-danger"></i>
-              {% endif %}
-            </td>
-            <td>{{ ns.ipv6.address }}</td>
-            <td>
-              {{ ns.ipv6.reachable }}
-              {% if ns.ipv6.reachable %}
-                <i class="bi bi-check-circle-fill color-success"> </i>
-              {% else %}
-                <i class="bi bi-x-circle-fill color-danger"></i>
-              {% endif %}
-            </td>
-          </tr>
-        {% endfor %}
-      </table>
-      <p>
-        {% if nameservers_reachability_comments.grade == "full" %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
-        {% elif nameservers_reachability_comments.grade == "null" %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
-        {% endif %}
-        {{ nameservers_reachability_comments.comment }}
-      </p>
-      <br>
-    <p>Records:</p>
-      {% if records %}
-        <table class="table table-light table-bordered table-striped">
-          <tr>
-            <th>Server</th>
-            <th>IPv4</th>
-            <th>IPv6</th>
-          </tr>
-          {% for record in records %}
-            <tr>
-              <td>{{ record.0 }}</td>
-              <td>{{ record.1 }}</td>
-              <td>{{ record.2 }}</td>
-            </tr>{% if record.2 %}
-          <p>
-            <i class="bi bi-check-circle-fill color-success"></i>
-            Your server has an IPv6 address.
-          </p>
-        {% else %}
-          <p>
-            <i class="bi bi-x-circle-fill color-danger"></i>
-            Your server does not have an IPv6 address.
-          </p>
-        {% endif %}
-
-          {% endfor %}
-        </table>
-      {% endif %}
-      <p>
-        {% if records_v4_comments.grade == "full" %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
-        {% elif records_v4_comments.grade == "null" %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
-        {% endif %}
-        {{ records_v4_comments.comment }}
-      </p>
-      <p>
-        {% if records_v6_comments.grade == "full" %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
-        {% elif records_v6_comments.grade == "null" %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
-        {% endif %}
-        {{ records_v6_comments.comment }}
-      </p>
-    </div>
-  </section>
-
-  {% if tls_results %}
+{% endif %}
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
-  <h2>Result for {{ domain_name }}:</h2>
-  <hr>
-  <div id="tls-scan-summary" class="d-flex flex-column mb-4">
-    <span>TLS Scan ID: {{ tls_results.id }}</span>
-    <span>Timestamp: {{ tls_results.timestamp }}</span>
-    <span>Target: {{ tls_results.target }}</span>
-    <span>Replay: {{ tls_results.replay }}</span>
-    <span>Has TLS: {% if tls_results.has_tls is True %}
-                        <span class="badge bg-success">{{ tls_results.has_tls }}</span>
-                        {% else %}
-                        <span class="badge bg-danger">{{ tls_results.has_tls }}</span>
-                        {% endif %}</span>
-    <span>CERT ID: {{ tls_results.cert_id }}</span>
-    <span>TRUST ID: {{ tls_results.trust_id }}</span>
-    <span>Is valid: {% if tls_results.is_valid is True %}
-                        <span class="badge bg-success">{{ tls_results.is_valid }}</span>
-                        {% else %}
-                        <span class="badge bg-danger">{{ tls_results.is_valid }}</span>
-                        {% endif %}</span>
-    <span>Completion perc: {{ tls_results.completion_perc }}</span>
-    <span>Ack: {% if tls_results.ack is True %}
-                        <span class="badge bg-success">{{ tls_results.ack }}</span>
-                        {% else %}
-                        <span class="badge bg-danger">{{ tls_results.ack }}</span>
-                        {% endif %}</span>
-    <span>Attempts: {{ tls_results.attempts }}</span>
+  <div class="row">
+    <div class="col-lg-12 fs-1 fw-bold">
+
+      {% if nameservers_comments.grade == "full" and records_v6_comments.grade == "full"
+      %}
+      <i class="bi bi-check-circle-fill color-success"> </i>
+      {% else %}
+      <i class="bi bi-x-circle-fill color-danger"></i>
+      {% endif %}
+      IPv6
+    </div>
+    <div class="col-lg-12 fs-4">
+      <p>IPv6 is the latest version of the Internet Protocol that assigns unique
+        identifiers to devices on the internet and routes internet traffic. It provides
+        a much larger address space than IPv4, facilitating the connection of more
+        devices to the internet. Benefits of IPv6 include enhanced security, improved
+        routing efficiency, simplified network configuration.</p>
+      <div class="row my-2">
+        {% if nameservers_comments.grade == "full" %}
+        <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
+                aria-expanded="false" aria-controls="collapseExample"
+                class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
+          <i
+            class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+          IPv6 Nameserver Check
+        </button>
+
+        {% elif nameservers_comments.grade == "null" %}
+        <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
+                aria-expanded="false" aria-controls="collapseExample"
+                class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+          <i
+            class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+          IPV6 Nameserver Check
+        </button>
+
+        {% endif %}
+
+        <div class="p-0 collapse" id="ipv6-domain">
+          <div class="p-4 border-bottom border-end border-start">
+            <h1 class="text-center">IPv6 Test Results</h1>
+            <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
+              <p>Name Servers:</p>
+              <p>
+                {% if nameservers_comments.grade == "full"%}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+                {% elif nameservers_comments.grade == "full" %}
+                <i class="bi bi-exclamation-circle-fill color-warning"></i>
+                {% elif nameservers_comments.grade == "null" %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+                {{ nameservers_comments.comment }}
+              </p>
+              <table class="table table-light table-bordered table-striped">
+                <tr>
+                  <th>Name</th>
+                  <th>Address (v4)</th>
+                  <th>Reachable (v4)</th>
+                  <th>Address (v6)</th>
+                  <th>Reachable (v6)</th>
+                </tr>
+                {% for nameserver, ns in nameservers.items %}
+                <tr>
+                  <td>{{ nameserver }}</td>
+                  <td>{{ ns.ipv4.address }}</td>
+                  <td>
+                    {{ ns.ipv4.reachable }}
+                    {% if ns.ipv4.reachable %}
+                    <i class="bi bi-check-circle-fill color-success"> </i>
+                    {% else %}
+                    <i class="bi bi-x-circle-fill color-danger"></i>
+                    {% endif %}
+                  </td>
+                  <td>{{ ns.ipv6.address }}</td>
+                  <td>
+                    {{ ns.ipv6.reachable }}
+                    {% if ns.ipv6.reachable %}
+                    <i class="bi bi-check-circle-fill color-success"> </i>
+                    {% else %}
+                    <i class="bi bi-x-circle-fill color-danger"></i>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </table>
+              <p>
+                {% if nameservers_reachability_comments.grade == "full" %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+                {% elif nameservers_reachability_comments.grade == "null" %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+                {{ nameservers_reachability_comments.comment }}
+              </p>
+
+              <p>
+                {% if records_v6_comments.grade == "full" %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+                {% elif records_v6_comments.grade == "null" %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+                {{ records_v6_comments.comment }}
+              </p>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row my-2">
+        {% if records_v6_comments.grade == "full" %}
+        <button type="button" data-bs-toggle="collapse"
+                data-bs-target="#ipv6-mailserver"
+                aria-expanded="false" aria-controls="collapseExample"
+                class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
+          <i
+            class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+          IPv6 Webserver Check
+        </button>
+
+        {% elif records_v6_comments.grade == "null" %}
+        <button type="button" data-bs-toggle="collapse"
+                data-bs-target="#ipv6-mailserver"
+                aria-expanded="false" aria-controls="collapseExample"
+                class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+          <i
+            class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+          IPV6 Webserver Check
+        </button>
+
+        {% endif %}
+
+        <div class="p-0 collapse" id="ipv6-mailserver">
+          <div class="p-4 border-bottom border-end border-start">
+            <h1 class="text-center">IPv6 Test Results</h1>
+            <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
+
+              <p>Records:</p>
+              {% if records %}
+              <table class="table table-light table-bordered table-striped">
+                <tr>
+                  <th>Server</th>
+                  <th>IPv4</th>
+                  <th>IPv6</th>
+                </tr>
+                {% for record in records %}
+                <tr>
+                  <td>{{ record.0 }}</td>
+                  <td>{{ record.1 }}</td>
+                  <td>{{ record.2 }}</td>
+                </tr>
+              </table>
+              {% if record.2 %}
+              <p>
+                <i class="bi bi-check-circle-fill color-success"></i>
+                Your server has an IPv6 address.
+              </p>
+              {% else %}
+              <p>
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                Your server does not have an IPv6 address.
+              </p>
+              {% endif %}
+
+              {% endfor %}
+              {% endif %}
+              <p>
+                {% if records_v4_comments.grade == "full" %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+                {% elif records_v4_comments.grade == "null" %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+                {{ records_v4_comments.comment }}
+              </p>
+              <p>
+                {% if records_v6_comments.grade == "full" %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+                {% elif records_v6_comments.grade == "null" %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+                {{ records_v6_comments.comment }}
+              </p>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <h3>Connection Info</h3>
-  <table class="table table-light table-striped">
-    <tr>
-      <th>Scan IP</th>
-      <td>{{ tls_results.connection_info.scanIP }}</td>
-    </tr>
-    <tr>
-      <th>Serverside</th>
-      <td>{% if tls_results.connection_info.serverside is True %}
-        <span
-          class="badge bg-success">{{ tls_results.connection_info.serverside }}</span>
-        {% else %}
-        <span
-          class="badge bg-danger">{{ tls_results.connection_info.serverside }}</span>
-        {% endif %}
-      </td>
-    </tr>
-    <tr>
-      <th>Curves Fallback</th>
-      <td>{% if tls_results.connection_info.curvesFallback is True %}
-        <span
-          class="badge bg-success">{{ tls_results.connection_info.curvesFallback }}</span>
-        {% else %}
-        <span
-          class="badge bg-danger">{{ tls_results.connection_info.curvesFallback }}</span>
-        {% endif %}
-      </td>
-    </tr>
-    {% for v in tls_results.connection_info.ciphersuite %}
-    <tr class="table-dark">
-      <th>Row</th>
-      <td></td>
-    </tr>
-    <tr>
-      <th>Cipher</th>
-      <td>{{ v.cipher }}</td>
-    </tr>
-    <tr>
-      <th>Code</th>
-      <td>{{ v.code }}</td>
-    </tr>
-    <tr>
-      <th>Protocols</th>
-      <td>{{ v.protocols }}</td>
-    </tr>
-    <tr>
-      <th>Pubkey</th>
-      <td>{{ v.pubkey }}</td>
-    </tr>
-    <tr>
-      <th>Sigalg</th>
-      <td>{{ v.sigalg }}</td>
-    </tr>
-    <tr>
-      <th>Ticket Hint</th>
-      <td>{{ v.ticket_hint }}</td>
-    </tr>
-    <tr>
-      <th>OCSP Stapling</th>
-      <td>
-        {% if v.ocsp_stapling is True %}
-        <span class="badge bg-success">{{ v.ocsp_stapling }}</span>
-        {% else %}
-        <span class="badge bg-danger">{{ v.ocsp_stapling }}</span>
-        {% endif %}
-      </td>
-    </tr>
-    <tr>
-      <th>PFS</th>
-      <td>{{ v.pfs }}</td>
-    </tr>
-    <tr>
-      <th>Curves</th>
-      <td>{{ v.curves}}</td>
-    </tr>
-    {% endfor %}
-  </table>
-  <h3>Analysis</h3>
-  <table class="table table-light table-striped">
-    {% for v in tls_results.analysis %}
-
-    <tr class="table-dark">
-      <th>Row</th>
-      <td></td>
-    </tr>
-    <tr>
-      <th>ID</th>
-      <td>{{ v.id }}</td>
-    </tr>
-    <tr>
-      <th>Analyzer</th>
-      <td>{{ v.analyzer}}</td>
-    </tr>
-    <tr>
-      <th>Success</th>
-      <td> {% if v.success is True %}
-        <span class="badge bg-success">{{ v.success }}</span>
-        {% else %}
-        <span class="badge bg-danger">{{ v.success }}</span>
-        {% endif %}
-      </td>
-    </tr>
-    <tr>
-      <th>Result:</th>
-      <td></td>
-    </tr>
-    {% if v.result.bugs %}
-    <tr>
-      <th>Bugs:</th>
-      <td>{{ v.result.bugs }}</td>
-    </tr>
-    {% endif %}
-    {% if v.result.errors %}
-    <tr>
-      <th>Errors:</th>
-      <td>{{ v.result.errors }}</td>
-    </tr>
-    {% endif %}
-    {% if v.result.notices %}
-    <tr>
-      <th>Notices:</th>
-      <td>{{ v.result.notices }}</td>
-    </tr>
-    {% endif %}
-    {% if v.result.warnings %}
-    <tr>
-      <th>Warnings:</th>
-      <td>{{ v.result.warnings }}</td>
-    </tr>
-    {% endif %}
-    {% if v.result.fatalErrors %}
-    <tr>
-      <th>Fatal Errors:</th>
-      <td>{{ v.result.fatalErrors }}</td>
-    </tr>
-    {% endif %}
-    {% if v.result.informational %}
-    <tr>
-      <th>Informational:</th>
-      <td>{{ v.result.informational }}</td>
-    </tr>
-    {% endif %}
-
-    {% if v.result.host %}
-    <tr>
-      <th>Host:</th>
-      <td>{{ v.result.host }}</td>
-    </tr>
-    {% endif %}
-    {% if v.result.issue %}
-    <tr>
-      <th>Issue:</th>
-      <td>{{ v.result.issue }}</td>
-    </tr>
-    {% endif %}
-    {% if v.result.has_caa is True or v.result.has_caa is False %}
-    <tr>
-      <th>Has CAA:</th>
-      <td>
-        {% if v.result.has_caa is True %}
-        <span class="badge bg-success">{{ v.result.has_caa }}</span>
-        {% else %}
-        <span class="badge bg-danger">{{ v.result.has_caa }}</span>
-        {% endif %}
-      </td>
-    </tr>
-    {% endif %}
-    {% if v.result.issuewild %}
-    <tr>
-      <th>Issue Wild:</th>
-      <td>{{ v.result.issuewild }}</td>
-    </tr>
-    {% endif %}
-    {% if v.result.level %}
-    <tr>
-      <th>Level</th>
-      <td>{{ v.result.level }}</td>
-    </tr>
-    {% endif %}
-    {% if v.result.grade %}
-    <tr>
-      <th>Grade:</th>
-      <td>{{ v.result.grade }}</td>
-    </tr>
-    {% endif %}
-    {% if v.result.lettergrade %}
-    <tr>
-      <th>Lettergrade:</th>
-      <td>{{ v.result.lettergrade }}</td>
-    </tr>
-    {% endif %}
-    {% if v.result.failures %}
-    <tr>
-      <th>Failures:</th>
-      <td></td>
-    </tr>
-    {% endif %}
-    {% for k1, v1 in v.result.failures.items %}
-    <tr>
-      <th>{{ k1 }}</th>
-      <td></td>
-    </tr>
-    {% for v2 in v1 %}
-    <tr>
-      <th></th>
-      <td>{{ v2 }}</td>
-    </tr>
-    {% endfor %}
-    {% endfor %}
-    <!-- ANDROID ROWS SECTION -->
-
-    {% for v10 in v.result %}
-
-    {% if v10.name %}
-    <tr class="table-dark">
-      <th></th>
-      <th>Subrow</th>
-    </tr>
-    <tr>
-      <th>Name:</th>
-      <td>{{ v10.name }}</td>
-    </tr>
-    {% endif %}
-    {% if v10.version %}
-    <tr>
-      <th>Version:</th>
-      <td>{{ v10.version }}</td>
-    </tr>
-    {% endif %}
-    {% if v10.curve_code %}
-    <tr>
-      <th>Curve Code:</th>
-      <td>{{ v10.curve_code }}</td>
-    </tr>
-    {% endif %}
-    {% if v10.is_supported is True or v10.is_supported is False %}
-    <tr>
-      <th>Is supported:</th>
-      <td>
-        {% if v10.is_supported is True %}
-        <span class="badge bg-success">{{ v10.is_supported }}</span>
-        {% else %}
-        <span class="badge bg-danger">{{ v10.is_supported }}</span>
-        {% endif %}
-      </td>
-    </tr>
-    {% endif %}
-    {% if v10.protocol_code %}
-    <tr>
-      <th>Protocol Code:</th>
-      <td>{{ v10.protocol_code }}</td>
-    </tr>
-    {% endif %}
-    {% if v10.curve %}
-    <tr>
-      <th>Curve:</th>
-      <td>{{ v10.curve }}</td>
-    </tr>
-    {% endif %}
-    {% if v10.platform %}
-    <tr>
-      <th>Platform:</th>
-      <td>{{ v10.platform }}</td>
-    </tr>
-    {% endif %}
-    {% if v10.ciphersuite %}
-    <tr>
-      <th>Ciphersuite:</th>
-      <td>{{ v10.ciphersuite }}</td>
-    </tr>
-    {% endif %}
-    {% if v10.ciphersuite_code %}
-    <tr>
-      <th>Ciphersuite Code:</th>
-      <td>{{ v10.ciphersuite_code }}</td>
-    </tr>
-    {% endif %}
-
-    {% endfor %}
-
-    <!-- SymantecDistrust -->
-    {% if v.result.reasons %}
-    <tr>
-      <th>Reasons:</th>
-      <td></td>
-    </tr>
-    {% for v3 in v.result.reasons%}
-    <tr>
-      <th></th>
-      <td>{{ v3 }}</td>
-    </tr>
-    {% endfor %}
-    {% endif %}
-
-    {% if v.result.isDistrusted is True or v.result.isDistrusted is False %}
-    <tr>
-      <th>Is Distrusted:</th>
-      <td>
-        {% if v.result.isDistrusted is True %}
-        <span class="badge bg-success">{{ v.result.isDistrusted }}</span>
-        {% else %}
-        <span class="badge bg-danger">{{ v.result.isDistrusted }}</span>
-        {% endif %}
-      </td>
-    </tr>
-    {% endif %}
-
-
-    <!-- TOP1M -->
-    {% if v.result.target %}
-    <tr>
-      <th>Target:</th>
-      <td></td>
-    </tr>
-    {% for k4,v4 in v.result.target.items %}
-    <tr>
-      <th>{{ k4 }}</th>
-      <td>{{ v4 }}</td>
-    </tr>
-    {% endfor %}
-    {% endif %}
-
-    {% if v.result.certificate %}
-    <tr>
-      <th>Certificate:</th>
-      <td></td>
-    </tr>
-    {% for k5,v5 in v.result.certificate.items %}
-    <tr>
-      <th>{{ k5 }}</th>
-      <td>{{ v5 }}</td>
-    </tr>
-    {% endfor %}
-    {% endif %}
-
-    {% endfor %}
-  </table>
 </section>
 
-{% endif %}
+<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+  <div class="row">
+    <div class="col-lg-12 fs-1 fw-bold">
+      TLS Results
+    </div>
+    <div class="col-lg-12 fs-4">
+      Transport Layer Security (TLS) is a cryptographic protocol that protects data in
+      transit over a network. It does this by establishing a secure channel between two
+      communicating applications, using a handshake process to agree on the protocol
+      version, cryptographic algorithms, and exchange cryptographic keys. This ensures
+      that the data is confidential, authentic, and integral, protecting against
+      eavesdropping, tampering, or message forgery.
+    </div>
+  </div>
+  {% if tls_results %}
+
+  {% for version, info in tls_results.items %}
+
+  <div class="row my-2">
+    <button type="button" data-bs-toggle="collapse"
+            data-bs-target="#tls-found-{{ forloop.counter }}"
+            aria-expanded="false" aria-controls="collapseExample"
+            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+      <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+      {{ version }}
+    </button>
+
+    <div class="p-0 collapse" id="tls-found-{{ forloop.counter }}">
+      <div class="p-3 border-bottom border-end border-start">
+        {% if version == "least_strength" %}
+        <p>Least Strength: {{ info }}</p>
+        {% else %}
+        <ul>
+          {% for item in info %}
+          <li>
+            <p>Key Exchange Info: {{ item.kex_info }}</p>
+            <p>Name: {{ item.name }}</p>
+            <p>Strength: {{ item.strength }}</p>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% endfor %}
+  {% endif %}
+</section>
 
 
-
-  <script>
+<script>
   var coll = document.getElementsByClassName("collapsible");
   var i;
 
@@ -1258,4 +1061,7 @@
       }
     });
   }
-  </script>
+
+
+
+</script>

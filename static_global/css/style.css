@@ -71,6 +71,13 @@ body{
 
 a { text-decoration:none;}
 
+.dashboard-selection{transition: 0.4s;}
+.dashboard-selection:hover{
+  transition: 0.5s;
+  background: #2c4261  !important;
+  color: white !important;
+}
+
 /* FORMS */
 input[type=text], input[type=placeholder], input[type=submit] {
     display: block;

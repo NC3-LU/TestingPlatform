@@ -29,6 +29,7 @@ from .helpers import (
     get_tls_report,
     ipv6_check,
     web_server_check,
+    tls_version_check,
 )
 from .models import DMARCRecord, DMARCReport, MailDomain
 
@@ -87,8 +88,12 @@ def http_test(request):
         if "rescan" in request.POST:
             context["rescan"] = True
         context.update(get_http_report(request.POST["target"], context["rescan"]))
+        context.update(ipv6_check(request.POST["target"], None))
 
-        context["tls_results"] = get_tls_report(request.POST["target"], True)
+        context["tls_results"] = tls_version_check(
+            request.POST["target"]
+        )
+
         # context.update(ipv6_check("nc3.lu", None))
         nb_tests += 1
         response = render(request, "check_website.html", context)
@@ -401,7 +406,7 @@ def dmarc_dl(request, domain, mailfrom, timestamp):
             headers={
                 "Content-Type": "application/xml",
                 "Content-Disposition": f"attachment; "
-                f'filename="dmarc_{domain}_{mailfrom}_{timestamp}.xml"',
+                                       f'filename="dmarc_{domain}_{mailfrom}_{timestamp}.xml"',
             },
         )
         return response

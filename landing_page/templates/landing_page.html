@@ -72,10 +72,12 @@
           <p>Assess the configuration of your web server (if publicly available)</p>
           <form method="post" action="infra-testing/web-server-test/" class="">
             {% csrf_token %}
+            <br>
             <div class="mb-3">
               <label>Enter a web server hostname / ip address:</label>
               <input type="text" placeholder="server.lu" id="target5" name="target"
                      value="" required>
+
             </div>
             <input type="submit" value="Test" class="btn btn-secondary" onclick='openPopup()'>
           </form>

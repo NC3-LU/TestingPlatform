@@ -11,120 +11,134 @@
 
 </script>
 {% if result.status %}
-  <main class="row p-3 flex-column align-items-center">
-    <div class="col-lg-5 col-md-5 mb-2">
-      <div class="card shadow h-100 border border-2">
-        <div class="card-body d-flex flex-column ">
-          <h3 class="card-title">Email</h3>
-          <p>Assess the security of your email setup
-            (SPF and DMARC DNS records, DNSSEC deployment, etc.)</p>
+<main class="row p-3 flex-column align-items-center">
+  <div class="col-lg-5 col-md-5 mb-2">
+    <div class="card shadow h-100 border border-2">
+      <div class="card-body d-flex flex-column ">
+        <h3 class="card-title">Email</h3>
+        <p>Assess the security of your email setup
+          (SPF and DMARC DNS records, DNSSEC deployment, etc.)</p>
 
-          <form method="post" class="">
-            {% csrf_token %}
-            <div class="mb-3">
-              <label>Enter a server address:</label>
-              <input type="text" placeholder="server.lu" id="target2" name="target"
-                    value="" required>
-            </div>
-            <input type="submit" value="Test" class="btn btn-secondary">
-          </form>
-        </div>
-        <div class="card-footer text-center text-muted"><a
-          href="{% url 'knowledge_base'  %}#tests-email">About the test</a></div>
-      </div>
-    </div>
-    <section class="col-lg-11 row my-5 border border-2 rounded p-4">
-
-      <h1 class="text-center">Overview of {{ domain_name }}</h1>
-      <div class="row justify-content-evenly mb-5">
-        <div class="col-lg-3 d-flex align-items-center">
-          <canvas id="chart1"></canvas>
-        </div>
-        <!--<div class="col-lg-6 d-flex align-items-center">
-          <canvas id="chart2"></canvas>
-        </div>-->
-      </div>
-      <div class="row justify-content-between">
-        <div class="col-lg-7">
-          <div class="row my-1">
-            <div class="col-lg-12 fs-4">
-              {% if result.spf.valid %}
-              <script> countGood++; countTotal++;</script>
-              <i class="bi bi-check-circle-fill color-success"> </i>
-              {% else %}
-              <script>countBad++;countTotal++;</script>
-              <i class="bi bi-x-circle-fill color-danger"></i>
-              {% endif %}
-              SPF record
-            </div>
-            <div class="col-lg-12 fs-4">
-              {% if result.dmarc.valid %}
-              <script> countGood++;countTotal++;</script>
-              <i class="bi bi-check-circle-fill color-success"> </i>
-              {% else %}
-              <script>countBad++;countTotal++;</script>
-              <i class="bi bi-x-circle-fill color-danger"></i>
-              {% endif %}
-              DMARC Record
-            </div>
-            <div class="col-lg-12 fs-4">
-              {% if result.dnssec %}
-              <script> countGood++;countTotal++;</script>
-              <i class="bi bi-check-circle-fill color-success"> </i>
-              {% else %}
-              <script>countBad++;countTotal++;</script>
-              <i class="bi bi-x-circle-fill color-danger"></i>
-              {% endif %}
-              Signed Domain Name (DNSSEC)
-            </div>
-            <div class="col-lg-12 fs-4">
-
-              {% if nameservers_reachability_comments.grade == "full" %}
-              <script> countGood++;countTotal++;</script>
-              <i class="bi bi-check-circle-fill color-success"> </i>
-              {% elif nameservers_reachability_comments.grade == "null" %}
-              <script>countBad++;countTotal++;</script>
-              <i class="bi bi-x-circle-fill color-danger"></i>
-              {% endif %}
-              {{ nameservers_reachability_comments.comment }} (IPv6)
-            </div>
-            <div class="col-lg-12 fs-4">
-              {% if record.2 %}
-              <script> countGood++;countTotal++;</script>
-              <i class="bi bi-check-circle-fill color-success"></i>
-              Your server has an IPv6 address.
-              {% else %}
-              <script>countBad++;countTotal++;</script>
-              <i class="bi bi-x-circle-fill color-danger"></i>
-              Your server does not have an IPv6 address.
-              {% endif %}
-              (IPv6)
-            </div>
-            <div class="col-lg-12 fs-4">
-              {% if result.dkim %}
-              <script> countGood++;countTotal++;</script>
-              <i class="bi bi-check-circle-fill color-success"></i>
-              {% elif result.dkim is None %}
-              <script> countWarning++;countTotal++;</script>
-              <i class="bi bi-x-circle-fill text-warning"></i>
-              {% else %}
-              <script>countBad++;countTotal++;</script>
-              <i class="bi bi-x-circle-fill color-danger"></i>
-              {% endif %}
-              DKIM Record
-            </div>
+        <form method="post" class="">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label>Enter a server address:</label>
+            <input type="text" placeholder="server.lu" id="target2" name="target"
+                   value="" required>
           </div>
+          <input type="submit" value="Test" class="btn btn-secondary">
+        </form>
+      </div>
+      <div class="card-footer text-center text-muted"><a
+        href="{% url 'knowledge_base'  %}#tests-email">About the test</a></div>
+    </div>
+  </div>
+  {% if result %}
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
 
-          <!-- -- -->
+
+    <h1 class="text-center">Overview of {{ domain_name }}</h1>
+    <div class="row justify-content-evenly mb-5">
+      <div class="col-lg-3 d-flex align-items-center">
+        <canvas id="chart1"></canvas>
+      </div>
+      <!--<div class="col-lg-6 d-flex align-items-center">
+        <canvas id="chart2"></canvas>
+      </div>-->
+    </div>
+    <div class="row justify-content-between">
+      <div class="col-lg-7">
+        <div class="row my-1">
+          <div class="col-lg-12 fs-4">
+            {% if result.spf.valid %}
+            <script> countGood++; countTotal++;</script>
+            <i class="bi bi-check-circle-fill color-success"> </i>
+            {% else %}
+            <script>countBad++;countTotal++;</script>
+            <i class="bi bi-x-circle-fill color-danger"></i>
+            {% endif %}
+            SPF record
+          </div>
+          <div class="col-lg-12 fs-4">
+            {% if result.dmarc.valid %}
+            <script> countGood++;countTotal++;</script>
+            <i class="bi bi-check-circle-fill color-success"> </i>
+            {% else %}
+            <script>countBad++;countTotal++;</script>
+            <i class="bi bi-x-circle-fill color-danger"></i>
+            {% endif %}
+            DMARC Record
+          </div>
+          <div class="col-lg-12 fs-4">
+            {% if result.dnssec %}
+            <script> countGood++;countTotal++;</script>
+            <i class="bi bi-check-circle-fill color-success"> </i>
+            {% else %}
+            <script>countBad++;countTotal++;</script>
+            <i class="bi bi-x-circle-fill color-danger"></i>
+            {% endif %}
+            Signed Domain Name (DNSSEC)
+          </div>
+          <div class="col-lg-12 fs-4">
+
+            {% if nameservers_reachability_comments.grade == "full" %}
+            <script> countGood++;countTotal++;</script>
+            <i class="bi bi-check-circle-fill color-success"> </i>
+            {% elif nameservers_reachability_comments.grade == "null" %}
+            <script>countBad++;countTotal++;</script>
+            <i class="bi bi-x-circle-fill color-danger"></i>
+            {% endif %}
+            {{ nameservers_reachability_comments.comment }} (IPv6)
+          </div>
+          <div class="col-lg-12 fs-4">
+            {% if record.2 %}
+            <script> countGood++;countTotal++;</script>
+            <i class="bi bi-check-circle-fill color-success"></i>
+            Your server has an IPv6 address.
+            {% else %}
+            <script>countBad++;countTotal++;</script>
+            <i class="bi bi-x-circle-fill color-danger"></i>
+            Your server does not have an IPv6 address.
+            {% endif %}
+            (IPv6)
+          </div>
+          <div class="col-lg-12 fs-4">
+            {% if result.dkim %}
+            <script> countGood++;countTotal++;</script>
+            <i class="bi bi-check-circle-fill color-success"></i>
+            {% elif result.dkim is None %}
+            <script> countWarning++;countTotal++;</script>
+            <i class="bi bi-x-circle-fill text-warning"></i>
+            {% else %}
+            <script>countBad++;countTotal++;</script>
+            <i class="bi bi-x-circle-fill color-danger"></i>
+            {% endif %}
+            DKIM Record
+          </div>
         </div>
-        <div class="col-lg-3">
-          <h1>Test Discovery</h1>
-          <div class="row my-4">
-            <div class="col-lg-6 fs-2">Good</div>
-            <div class="col-lg-6"><span id="good-count"
-                                        class="rounded-circle p-2 fs-4 text-white"
-                                        style="background:#71cdba;"></span>
-            </div>
+        <<<<<<< Updated upstream
+
+        <!-- -- -->
+      </div>
+      <div class="col-lg-3">
+        <h1>Test Discovery</h1>
+        <div class="row my-4">
+          <div class="col-lg-6 fs-2">Good</div>
+          <div class="col-lg-6"><span id="good-count"
+                                      class="rounded-circle p-2 fs-4 text-white"
+                                      style="background:#71cdba;"></span>
+          </div>
+          =======
+          <div class="col-lg-12 fs-4">
+            {% if nameservers_reachability_comments.grade == "full" %}
+            <script> countGood++;countTotal++;</script>
+            <i class="bi bi-check-circle-fill color-success"> </i>
+            {% elif nameservers_reachability_comments.grade == "null" %}
+            <script>countBad++;countTotal++;</script>
+            <i class="bi bi-x-circle-fill color-danger"></i>
+            {% endif %}
+            {{ nameservers_reachability_comments.comment }} (IPv6)
+            >>>>>>> Stashed changes
           </div>
           <div class="row my-4">
             <div class="col-lg-6 fs-2">Vulnerable</div>
@@ -149,434 +163,191 @@
           </div>-->
         </div>
       </div>
-    </section>
-    <!-- SPF RECORD -->
-    <section class="col-lg-11 row my-5 border border-2 rounded p-4">
-      <div class="row">
-        <div class="col-lg-12 fs-1 fw-bold">
+  </section>
+  <!-- SPF RECORD -->
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
+    <div class="row">
+      <div class="col-lg-12 fs-1 fw-bold">
+        {% if result.spf.valid %}
+        <i class="bi bi-check-circle-fill color-success"> </i>
+        {% else %}
+        <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        SPF Record
+      </div>
+      <div class="col-lg-12 fs-4">
+        <p>The Sender Policy Framework (SPF) is an email validation protocol that helps
+          detect and block email spoofing. Email spoofing is a common technique used in
+          phishing and spam emails. SPF allows the receiving mail server to verify that
+          incoming mail from a domain comes from a host authorized by that domain’s
+          administrators. The list of authorized sending hosts for a domain is published
+          in the Domain Name System (DNS) records.</p>
+        <div class="row my-2">
           {% if result.spf.valid %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#records"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            SPF Record
+          </button>
           {% else %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#records"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            SPF Record
+          </button>
           {% endif %}
-          SPF Record
-        </div>
-        <div class="col-lg-12 fs-4">
-          <p>The Sender Policy Framework (SPF) is an email validation protocol that helps
-            detect and block email spoofing. Email spoofing is a common technique used in
-            phishing and spam emails. SPF allows the receiving mail server to verify that
-            incoming mail from a domain comes from a host authorized by that domain’s
-            administrators. The list of authorized sending hosts for a domain is published
-            in the Domain Name System (DNS) records.</p>
-          <div class="row my-2">
-            {% if result.spf.valid %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#records"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              SPF Record
-            </button>
-            {% else %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#records"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              SPF Record
-            </button>
-            {% endif %}
 
 
-            <div class="p-0 collapse" id="records">
-              <div class="p-4 border-bottom border-end border-start">
-                <h2>SPF Record</h2>
-                <code>{{ result.spf.record }}</code>
-                <p>Valid:
-                  {% if result.spf.valid %}
-                  <i class="bi bi-check-circle-fill color-success"> </i>
-                  {% else %}
-                  <i class="bi bi-x-circle-fill color-danger"></i>
-                  {% endif %}
-                </p>
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </section>
-    <!-- DMARC RECORD-->
-    <section class="col-lg-11 row my-5 border border-2 rounded p-4">
-      <div class="row">
-        <div class="col-lg-12 fs-1 fw-bold">
-          {% if result.dmarc.valid %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
-          {% else %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
-          {% endif %}
-          DMARC Record
-        </div>
-        <div class="col-lg-12 fs-4">
-          <p>DMARC (Domain-based Message Authentication, Reporting, and Conformance) is an
-            email authentication protocol that provides additional protection against
-            email spoofing and phishing attacks. It uses the Sender Policy Framework (SPF)
-            and DomainKeys Identified Mail (DKIM) standards. DMARC enables a domain owner
-            to specify how mail servers should handle messages from their domain that
-            don’t pass SPF or DKIM checks. This adds an extra layer of security</p>
-          <div class="row my-2">
-            {% if result.dmarc.valid %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              DMARC Record
-            </button>
-            {% else %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              DMARC Record
-            </button>
-            {% endif %}
-
-
-            <div class="p-0 collapse" id="d_record">
-              <div class="p-4 border-bottom border-end border-start">
-                <h2>DMARC Record</h2>
-                <code>{{ result.dmarc.record }}</code>
-                <p>Valid:
-                  {% if result.dmarc.valid %}
-                  <i class="bi bi-check-circle-fill color-success"> </i>
-                  {% else %}
-                  <i class="bi bi-x-circle-fill color-danger"></i>
-                  {% endif %}
-                </p>
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </section>
-    <!-- DKIM RECORD-->
-    <section class="col-lg-11 row my-5 border border-2 rounded p-4">
-      <div class="row">
-        <div class="col-lg-12 fs-1 fw-bold">
-          {% if result.dkim %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
-          {% elif result.dkim is None %}
-          <i class="bi bi-x-circle-fill text-warning"></i>
-          {% else %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
-          {% endif %}
-          DKIM Record
-        </div>
-        <div class="col-lg-12 fs-4">
-          <p>
-          </p>
-          <div class="row my-2">
-            {% if result.dkim %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              DKIM Record
-            </button>
-            {% elif result.dkim is None %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-warning">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              DKIM Record
-            </button>
-            {% else %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              DKIM Record
-            </button>
-            {% endif %}
-
-
-            <div class="p-0 collapse" id="dkim_record">
-              <div class="p-4 border-bottom border-end border-start">
-                <h2>DKIM Record</h2>
-                {% if result.dkim %}
-                  <p>DKIM public key found and can be used to encrypt data.</p>
+          <div class="p-0 collapse" id="records">
+            <div class="p-4 border-bottom border-end border-start">
+              <h2>SPF Record</h2>
+              <code>{{ result.spf.record }}</code>
+              <p>Valid:
+                {% if result.spf.valid %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
                 {% else %}
-                  <p>No suitable DKIM public key found.</p>
+                <i class="bi bi-x-circle-fill color-danger"></i>
                 {% endif %}
-                <h3>General Best Practices</h3>
-              </div>
+              </p>
+
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-    </section>
-    <!-- DNSSEC -->
-    <section class="col-lg-11 row my-5 border border-2 rounded p-4">
-      <div class="row">
-        <div class="col-lg-12 fs-1 fw-bold">
-          {% if result.dnssec %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
+  </section>
+  <!-- DMARC RECORD-->
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
+    <div class="row">
+      <div class="col-lg-12 fs-1 fw-bold">
+        {% if result.dmarc.valid %}
+        <i class="bi bi-check-circle-fill color-success"> </i>
+        {% else %}
+        <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        DMARC Record
+      </div>
+      <div class="col-lg-12 fs-4">
+        <p>DMARC (Domain-based Message Authentication, Reporting, and Conformance) is an
+          email authentication protocol that provides additional protection against
+          email spoofing and phishing attacks. It uses the Sender Policy Framework (SPF)
+          and DomainKeys Identified Mail (DKIM) standards. DMARC enables a domain owner
+          to specify how mail servers should handle messages from their domain that
+          don’t pass SPF or DKIM checks. This adds an extra layer of security</p>
+        <div class="row my-2">
+          {% if result.dmarc.valid %}
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            DMARC Record
+          </button>
           {% else %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            DMARC Record
+          </button>
           {% endif %}
-          Signed Domain Name (DNSSEC)
-        </div>
-        <div class="col-lg-12 fs-4">
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-            quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-            consequat.</p>
-          <div class="row my-2">
-            {% if result.dnssec %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              DNSSEC Status
-            </button>
-
-            {% else %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              DNSSEC Status
-            </button>
-
-            {% endif %}
 
 
-            <div class="p-0 collapse" id="dnssec">
-              <div class="p-4 border-bottom border-end border-start">
-                <p>Determine what types of resources your site should load: Before
-                  implementing
-                  CSP, it is important to identify which types of resources your site
-                  needs to
-                  load such as scripts, stylesheets, images, and fonts.</p>
-              </div>
+          <div class="p-0 collapse" id="d_record">
+            <div class="p-4 border-bottom border-end border-start">
+              <h2>DMARC Record</h2>
+              <code>{{ result.dmarc.record }}</code>
+              <p>Valid:
+                {% if result.dmarc.valid %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+                {% else %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+              </p>
+
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-    </section>
-    <!-- IPV6 -->
-    <section class="col-lg-11 row my-5 border border-2 rounded p-4">
-      <div class="row">
-        <div class="col-lg-12 fs-1 fw-bold">
-          {% if result.dnssec %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
+  </section>
+  <!-- DKIM RECORD-->
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
+    <div class="row">
+      <div class="col-lg-12 fs-1 fw-bold">
+        {% if result.dkim %}
+        <i class="bi bi-check-circle-fill color-success"> </i>
+        {% elif result.dkim is None %}
+        <i class="bi bi-x-circle-fill text-warning"></i>
+        {% else %}
+        <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        DKIM Record
+      </div>
+      <div class="col-lg-12 fs-4">
+        <p>
+        </p>
+        <div class="row my-2">
+          {% if result.dkim %}
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            DKIM Record
+          </button>
+          {% elif result.dkim is None %}
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-warning">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            DKIM Record
+          </button>
           {% else %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            DKIM Record
+          </button>
           {% endif %}
-          IPv6
-        </div>
-        <div class="col-lg-12 fs-4">
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-            quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-            consequat.</p>
-          <div class="row my-2">
-            {% if nameservers_reachability_comments.grade == "full" %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              IPv6 Domain Check
-            </button>
 
-            {% elif nameservers_reachability_comments.grade == "null" %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              IPV6 Domain Check
-            </button>
 
-            {% endif %}
-
-            <div class="p-0 collapse" id="ipv6-domain">
-              <div class="p-4 border-bottom border-end border-start">
-                <h1 class="text-center">IPv6 Test Results</h1>
-                <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
-                  <p>Name Servers:</p>
-                  <p>
-                    {% if nameservers_comments.grade == "full" %}
-                    <i class="bi bi-check-circle-fill color-success"> </i>
-                    {% elif nameservers_comments.grade == "half" %}
-                    <i class="bi bi-exclamation-circle-fill color-warning"></i>
-                    {% elif nameservers_comments.grade == "null" %}
-                    <i class="bi bi-x-circle-fill color-danger"></i>
-                    {% endif %}
-                    {{ nameservers_comments.comment }}
-                  </p>
-                  <table class="table table-light table-bordered table-striped">
-                    <tr>
-                      <th>Name</th>
-                      <th>Address (v4)</th>
-                      <th>Reachable (v4)</th>
-                      <th>Address (v6)</th>
-                      <th>Reachable (v6)</th>
-                    </tr>
-                    {% for nameserver, ns in nameservers.items %}
-                    <tr>
-                      <td>{{ nameserver }}</td>
-                      <td>{{ ns.ipv4.address }}</td>
-                      <td>
-                        {{ ns.ipv4.reachable }}
-                        {% if ns.ipv4.reachable %}
-                        <i class="bi bi-check-circle-fill color-success"> </i>
-                        {% else %}
-                        <i class="bi bi-x-circle-fill color-danger"></i>
-                        {% endif %}
-                      </td>
-                      <td>{{ ns.ipv6.address }}</td>
-                      <td>
-                        {{ ns.ipv6.reachable }}
-                        {% if ns.ipv6.reachable %}
-                        <i class="bi bi-check-circle-fill color-success"> </i>
-                        {% else %}
-                        <i class="bi bi-x-circle-fill color-danger"></i>
-                        {% endif %}
-                      </td>
-                    </tr>
-                    {% endfor %}
-                  </table>
-                  <p>
-                    {% if nameservers_reachability_comments.grade == "full" %}
-                    <i class="bi bi-check-circle-fill color-success"> </i>
-                    {% elif nameservers_reachability_comments.grade == "null" %}
-                    <i class="bi bi-x-circle-fill color-danger"></i>
-                    {% endif %}
-                    {{ nameservers_reachability_comments.comment }}
-                  </p>
-
-                  <p>
-                    {% if records_v6_comments.grade == "full" %}
-                    <i class="bi bi-check-circle-fill color-success"> </i>
-                    {% elif records_v6_comments.grade == "null" %}
-                    <i class="bi bi-x-circle-fill color-danger"></i>
-                    {% endif %}
-                    {{ records_v6_comments.comment }}
-                  </p>
-
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row my-2">
-            {% if nameservers_comments.grade == "full" %}
-            <button type="button" data-bs-toggle="collapse"
-                    data-bs-target="#ipv6-mailserver"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              IPv6 Mailserver Check
-            </button>
-            {% elif nameservers_comments.grade == "half" %}
-            <button type="button" data-bs-toggle="collapse"
-                    data-bs-target="#ipv6-mailserver"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-warning">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              IPv6 Mailserver Check
-            </button>
-            {% elif nameservers_comments.grade == "null" %}
-            <button type="button" data-bs-toggle="collapse"
-                    data-bs-target="#ipv6-mailserver"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-              <i
-                class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-              IPV6 Mailserver Check
-            </button>
-
-            {% endif %}
-
-            <div class="p-0 collapse" id="ipv6-mailserver">
-              <div class="p-4 border-bottom border-end border-start">
-                <h1 class="text-center">IPv6 Test Results</h1>
-                <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
-
-                  <p>Records:</p>
-                  {% if records %}
-                  <table class="table table-light table-bordered table-striped">
-                    <tr>
-                      <th>Server</th>
-                      <th>IPv4</th>
-                      <th>IPv6</th>
-                    </tr>
-                    {% for record in records %}
-                    <tr>
-                      <td>{{ record.0 }}</td>
-                      <td>{{ record.1 }}</td>
-                      <td>{{ record.2 }}</td>
-                    </tr>
-                  </table>
-                  {% if record.2 %}
-                  <p>
-                    <i class="bi bi-check-circle-fill color-success"></i>
-                    Your server has an IPv6 address.
-                  </p>
-                  {% else %}
-                  <p>
-                    <i class="bi bi-x-circle-fill color-danger"></i>
-                    Your server does not have an IPv6 address.
-                  </p>
-                  {% endif %}
-
-                  {% endfor %}
-                  {% endif %}
-                  <p>
-                    {% if records_v4_comments.grade == "full" %}
-                    <i class="bi bi-check-circle-fill color-success"> </i>
-                    {% elif records_v4_comments.grade == "null" %}
-                    <i class="bi bi-x-circle-fill color-danger"></i>
-                    {% endif %}
-                    {{ records_v4_comments.comment }}
-                  </p>
-                  <p>
-                    {% if records_v6_comments.grade == "full" %}
-                    <i class="bi bi-check-circle-fill color-success"> </i>
-                    {% elif records_v6_comments.grade == "null" %}
-                    <i class="bi bi-x-circle-fill color-danger"></i>
-                    {% endif %}
-                    {{ records_v6_comments.comment }}
-                  </p>
-
-                </div>
-              </div>
+          <div class="p-0 collapse" id="dkim_record">
+            <div class="p-4 border-bottom border-end border-start">
+              <h2>DKIM Record</h2>
+              {% if result.dkim %}
+              <p>DKIM public key found and can be used to encrypt data.</p>
+              {% else %}
+              <p>No suitable DKIM public key found.</p>
+              {% endif %}
+              <h3>General Best Practices</h3>
             </div>
           </div>
         </div>
       </div>
-    </section>
-    <!-- Mail Exchanger (MX) -->
-    <section class="col-lg-11 row my-5 border border-2 rounded p-4">
-      <div class="row">
-        <div class="col-lg-12 fs-1 fw-bold">
-          TLS
-        </div>
+    </div>
+
+  </section>
+  <!-- DNSSEC -->
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
+    <div class="row">
+      <div class="col-lg-12 fs-1 fw-bold">
+        {% if result.dnssec %}
+        <i class="bi bi-check-circle-fill color-success"> </i>
+        {% else %}
+        <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        Signed Domain Name (DNSSEC)
       </div>
       <div class="col-lg-12 fs-4">
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
@@ -585,7 +356,7 @@
           consequat.</p>
         <div class="row my-2">
           {% if result.dnssec %}
-          <button type="button" data-bs-toggle="collapse" data-bs-target="#tls"
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec"
                   aria-expanded="false" aria-controls="collapseExample"
                   class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
             <i
@@ -594,7 +365,7 @@
           </button>
 
           {% else %}
-          <button type="button" data-bs-toggle="collapse" data-bs-target="#tls"
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec"
                   aria-expanded="false" aria-controls="collapseExample"
                   class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
             <i
@@ -603,7 +374,9 @@
           </button>
 
           {% endif %}
-          <div class="p-0 collapse" id="tls">
+
+
+          <div class="p-0 collapse" id="dnssec">
             <div class="p-4 border-bottom border-end border-start">
               <p>Determine what types of resources your site should load: Before
                 implementing
@@ -614,76 +387,418 @@
           </div>
         </div>
       </div>
+    </div>
 
+  </section>
+  <!-- IPV6 -->
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
+    <div class="row">
+      <div class="col-lg-12 fs-1 fw-bold">
+        {% if result.dnssec %}
+        <i class="bi bi-check-circle-fill color-success"> </i>
+        {% else %}
+        <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        IPv6
+      </div>
+      <div class="col-lg-12 fs-4">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+          consequat.</p>
+        <div class="row my-2">
+          {% if nameservers_reachability_comments.grade == "full" %}
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            IPv6 Domain Check
+          </button>
 
-    </section>
-    <section class="col-lg-11 row my-5 border border-2 rounded p-4">
-      <div class="row">
-        <div class="col-lg-12 fs-1 fw-bold">
-          Mail Exchanger (MX) Records
+          {% elif nameservers_reachability_comments.grade == "null" %}
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            IPV6 Domain Check
+          </button>
+
+          {% endif %}
+
+          <div class="p-0 collapse" id="ipv6-domain">
+            <div class="p-4 border-bottom border-end border-start">
+              <h1 class="text-center">IPv6 Test Results</h1>
+              <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
+                <p>Name Servers:</p>
+                <p>
+                  {% if nameservers_comments.grade == "full" %}
+                  <i class="bi bi-check-circle-fill color-success"> </i>
+                  {% elif nameservers_comments.grade == "half" %}
+                  <i class="bi bi-exclamation-circle-fill color-warning"></i>
+                  {% elif nameservers_comments.grade == "null" %}
+                  <i class="bi bi-x-circle-fill color-danger"></i>
+                  {% endif %}
+                  {{ nameservers_comments.comment }}
+                </p>
+                <table class="table table-light table-bordered table-striped">
+                  <tr>
+                    <th>Name</th>
+                    <th>Address (v4)</th>
+                    <th>Reachable (v4)</th>
+                    <th>Address (v6)</th>
+                    <th>Reachable (v6)</th>
+                  </tr>
+                  {% for nameserver, ns in nameservers.items %}
+                  <tr>
+                    <td>{{ nameserver }}</td>
+                    <td>{{ ns.ipv4.address }}</td>
+                    <td>
+                      {{ ns.ipv4.reachable }}
+                      {% if ns.ipv4.reachable %}
+                      <i class="bi bi-check-circle-fill color-success"> </i>
+                      {% else %}
+                      <i class="bi bi-x-circle-fill color-danger"></i>
+                      {% endif %}
+                    </td>
+                    <td>{{ ns.ipv6.address }}</td>
+                    <td>
+                      {{ ns.ipv6.reachable }}
+                      {% if ns.ipv6.reachable %}
+                      <i class="bi bi-check-circle-fill color-success"> </i>
+                      {% else %}
+                      <i class="bi bi-x-circle-fill color-danger"></i>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </table>
+                <p>
+                  {% if nameservers_reachability_comments.grade == "full" %}
+                  <i class="bi bi-check-circle-fill color-success"> </i>
+                  {% elif nameservers_reachability_comments.grade == "null" %}
+                  <i class="bi bi-x-circle-fill color-danger"></i>
+                  {% endif %}
+                  {{ nameservers_reachability_comments.comment }}
+                </p>
+
+                <p>
+                  {% if records_v6_comments.grade == "full" %}
+                  <i class="bi bi-check-circle-fill color-success"> </i>
+                  {% elif records_v6_comments.grade == "null" %}
+                  <i class="bi bi-x-circle-fill color-danger"></i>
+                  {% endif %}
+                  {{ records_v6_comments.comment }}
+                </p>
+
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="col-lg-12 fs-4">
+        <div class="row my-2">
+          {% if nameservers_comments.grade == "full" %}
+          <button type="button" data-bs-toggle="collapse"
+                  data-bs-target="#ipv6-mailserver"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            IPv6 Mailserver Check
+          </button>
+          {% elif nameservers_comments.grade == "half" %}
+          <button type="button" data-bs-toggle="collapse"
+                  data-bs-target="#ipv6-mailserver"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-warning">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            IPv6 Mailserver Check
+          </button>
+          {% elif nameservers_comments.grade == "null" %}
+          <button type="button" data-bs-toggle="collapse"
+                  data-bs-target="#ipv6-mailserver"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            IPV6 Mailserver Check
+          </button>
 
-          {% for host in result.mx.hosts %}
-          <h3>{{ host.hostname }}</h3>
-          <ul>
-            <li>Preference: {{ host.preference }}</li>
-            <li>StartTLS: {{ host.starttls }}</li>
-            <li>TLS: {{ host.tls }}</li>
-            <li>Addresses:</li>
-            <li class="list-unstyled">
-              <ul>
-                {% if result.host.addresses %}
-                {% for address in result.host.addresses %}
-                <li>{{ address }}</li>
-                {% endfor %}
+          {% endif %}
+
+          <div class="p-0 collapse" id="ipv6-mailserver">
+            <div class="p-4 border-bottom border-end border-start">
+              <h1 class="text-center">IPv6 Test Results</h1>
+              <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
+
+                <p>Records:</p>
+                {% if records %}
+                <table class="table table-light table-bordered table-striped">
+                  <tr>
+                    <th>Server</th>
+                    <th>IPv4</th>
+                    <th>IPv6</th>
+                  </tr>
+                  {% for record in records %}
+                  <tr>
+                    <td>{{ record.0 }}</td>
+                    <td>{{ record.1 }}</td>
+                    <td>{{ record.2 }}</td>
+                  </tr>
+                </table>
+                {% if record.2 %}
+                <p>
+                  <i class="bi bi-check-circle-fill color-success"></i>
+                  Your server has an IPv6 address.
+                </p>
                 {% else %}
-                <li>No addresses available</li>
+                <p>
+                  <i class="bi bi-x-circle-fill color-danger"></i>
+                  Your server does not have an IPv6 address.
+                </p>
                 {% endif %}
 
-              </ul>
-            </li>
-          </ul>
+                {% endfor %}
+                {% endif %}
+                <p>
+                  {% if records_v4_comments.grade == "full" %}
+                  <i class="bi bi-check-circle-fill color-success"> </i>
+                  {% elif records_v4_comments.grade == "null" %}
+                  <i class="bi bi-x-circle-fill color-danger"></i>
+                  {% endif %}
+                  {{ records_v4_comments.comment }}
+                </p>
+                <p>
+                  {% if records_v6_comments.grade == "full" %}
+                  <i class="bi bi-check-circle-fill color-success"> </i>
+                  {% elif records_v6_comments.grade == "null" %}
+                  <i class="bi bi-x-circle-fill color-danger"></i>
+                  {% endif %}
+                  {{ records_v6_comments.comment }}
+                </p>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Mail Exchanger (MX) -->
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
+    <div class="row">
+      <div class="col-lg-12 fs-1 fw-bold">
+        TLS
+      </div>
+    </div>
+    <div class="col-lg-12 fs-4">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+        consequat.</p>
+      <div class="row my-2">
+        {% if result.dnssec %}
+        <button type="button" data-bs-toggle="collapse" data-bs-target="#tls"
+                aria-expanded="false" aria-controls="collapseExample"
+                class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
+          <i
+            class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+          DNSSEC Status
+        </button>
+
+        {% else %}
+        <button type="button" data-bs-toggle="collapse" data-bs-target="#tls"
+                aria-expanded="false" aria-controls="collapseExample"
+                class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+          <i
+            class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+          DNSSEC Status
+        </button>
+
+        {% endif %}
+        <div class="p-0 collapse" id="tls">
+          <div class="p-4 border-bottom border-end border-start">
+            <p>Determine what types of resources your site should load: Before
+              implementing
+              CSP, it is important to identify which types of resources your site
+              needs to
+              load such as scripts, stylesheets, images, and fonts.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <<<<<<< Updated upstream
+    =======
+    </div>
+
+  </section>
+  <!-- IPV6 -->
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
+    <div class="row">
+      <div class="col-lg-12 fs-1 fw-bold">
+        {% if result.dnssec %}
+        <i class="bi bi-check-circle-fill color-success"> </i>
+        {% else %}
+        <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        IPv6
+      </div>
+      <div class="col-lg-12 fs-4">
+        <p>IPv6 is the latest version of the Internet Protocol that assigns unique
+          identifiers to devices on the internet and routes internet traffic. It
+          provides
+          a much larger address space than IPv4, facilitating the connection of more
+          devices to the internet. Benefits of IPv6 include enhanced security, improved
+          routing efficiency, simplified network configuration.</p>
+        <div class="row my-2">
+          {% if nameservers_reachability_comments.grade == "full" %}
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            IPv6 Domain Check
+          </button>
+
+          {% elif nameservers_reachability_comments.grade == "null" %}
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+            <i
+              class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            IPV6 Domain Check
+          </button>
+
+          {% endif %}
+
+          <div class="p-0 collapse" id="ipv6-domain">
+            <div class="p-4 border-bottom border-end border-start">
+              <h1 class="text-center">IPv6 Test Results</h1>
+              <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
+                <p>Name Servers:</p>
+                <p>
+                  {% if nameservers_comments.grade == "full" %}
+                  <i class="bi bi-check-circle-fill color-success"> </i>
+                  {% elif nameservers_comments.grade == "half" %}
+                  <i class="bi bi-exclamation-circle-fill color-warning"></i>
+                  {% elif nameservers_comments.grade == "null" %}
+                  <i class="bi bi-x-circle-fill color-danger"></i>
+                  {% endif %}
+                  {{ nameservers_comments.comment }}
+                </p>
+                <table class="table table-light table-bordered table-striped">
+                  <tr>
+                    <th>Name</th>
+                    <th>Address (v4)</th>
+                    <th>Reachable (v4)</th>
+                    <th>Address (v6)</th>
+                    <th>Reachable (v6)</th>
+                  </tr>
+                  {% for nameserver, ns in nameservers.items %}
+                  <tr>
+                    <td>{{ nameserver }}</td>
+                    <td>{{ ns.ipv4.address }}</td>
+                    <td>
+                      {{ ns.ipv4.reachable }}
+                      {% if ns.ipv4.reachable %}
+                      <i class="bi bi-check-circle-fill color-success"> </i>
+                      {% else %}
+                      <i class="bi bi-x-circle-fill color-danger"></i>
+                      {% endif %}
+                    </td>
+                    <td>{{ ns.ipv6.address }}</td>
+                    <td>
+                      {{ ns.ipv6.reachable }}
+                      {% if ns.ipv6.reachable %}
+                      <i class="bi bi-check-circle-fill color-success"> </i>
+                      {% else %}
+                      <i class="bi bi-x-circle-fill color-danger"></i>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </table>
+                <p>
+                  {% if nameservers_reachability_comments.grade == "full" %}
+                  <i class="bi bi-check-circle-fill color-success"> </i>
+                  {% elif nameservers_reachability_comments.grade == "null" %}
+                  <i class="bi bi-x-circle-fill color-danger"></i>
+                  {% endif %}
+                  {{ nameservers_reachability_comments.comment }}
+                </p>
+                >>>>>>> Stashed changes
+
+
+  </section>
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
+    <div class="row">
+      <div class="col-lg-12 fs-1 fw-bold">
+        Mail Exchanger (MX) Records
+      </div>
+      <div class="col-lg-12 fs-4">
+
+        {% for host in result.mx.hosts %}
+        <h3>{{ host.hostname }}</h3>
+        <ul>
+          <li>Preference: {{ host.preference }}</li>
+          <li>StartTLS: {{ host.starttls }}</li>
+          <li>TLS: {{ host.tls }}</li>
+          <li>Addresses:</li>
+          <li class="list-unstyled">
+            <ul>
+              {% if result.host.addresses %}
+              {% for address in result.host.addresses %}
+              <li>{{ address }}</li>
+              {% endfor %}
+              {% else %}
+              <li>No addresses available</li>
+              {% endif %}
+
+            </ul>
+          </li>
+        </ul>
+        {% endfor %}
+
+      </div>
+    </div>
+  </section>
+  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
+    <div class="row">
+      <div class="col-lg-12 fs-1 fw-bold">
+        Mailserver settings test for: {{ result.domain }}
+      </div>
+      <div class="col-lg-12 fs-4">
+
+        <p>Base Domain: {{ result.base_domain }}</p>
+
+        <h2>Name Servers</h2>
+        <ul>
+          {% for hostname in result.ns.hostnames %}
+          <li>{{ hostname }}</li>
           {% endfor %}
-
-        </div>
+        </ul>
       </div>
-    </section>
-    <section class="col-lg-11 row my-5 border border-2 rounded p-4">
-      <div class="row">
-        <div class="col-lg-12 fs-1 fw-bold">
-          Mailserver settings test for: {{ result.domain }}
-        </div>
-        <div class="col-lg-12 fs-4">
+    </div>
+  </section>
 
-          <p>Base Domain: {{ result.base_domain }}</p>
-
-          <h2>Name Servers</h2>
-          <ul>
-            {% for hostname in result.ns.hostnames %}
-            <li>{{ hostname }}</li>
-            {% endfor %}
-          </ul>
-        </div>
-      </div>
-    </section>
-
-  </main>
+</main>
 {% else %}
 <main class="d-flex p-3 flex-column align-items-center text-center">
-    {{ result.statusmessage  }}
+  {{ result.statusmessage }}
 </main>
 {% endif %}
 
 <script>
   var successPercentage = countGood / countTotal * 100;
-  var failurePercentage = 100 - successPercentage;
-
+  let failurePercentage = countBad / countTotal * 100;
+  let informationalPercentage = countWarning / countTotal * 100;
   var data = [{
-    data: [successPercentage, failurePercentage],
+    data: [successPercentage, failurePercentage, informationalPercentage],
     backgroundColor: [
       "#4ecb71",
       "#ff5c5c",
+      "#f5e230",
     ],
     borderColor: "#fff"
   }];
@@ -725,15 +840,13 @@
 
 
 
+
 </script>
 <script>
      document.getElementById('vulnerable-count').innerHTML = countBad ;
     document.getElementById('good-count').innerHTML = countGood ;
     document.getElementById('warning-count').innerHTML = countWarning ;
 
-
-
-
 </script>
-
+{% endif %}
 {% endblock %}

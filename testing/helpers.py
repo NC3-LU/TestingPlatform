@@ -5,6 +5,7 @@ import re
 import socket
 import subprocess
 import time
+import pandas
 from base64 import b64decode
 from io import BytesIO
 from typing import Any, Dict, List, Union
@@ -17,7 +18,11 @@ import pypandora
 import requests
 from Crypto.PublicKey import RSA
 
+from .cipher_scoring import load_cipher_info
+
 from testing.models import TlsScanHistory
+
+from testing_platform.settings import BASE_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -515,16 +520,37 @@ def tls_version_check(domain: str):
     tls_scans = list(
         filter(lambda element: element["state"] == "open", tls_scans["ports"])
     )
+
     results = None
+
     for port in tls_scans:
         if port["service"]["name"] == "ssl":
             for script in port["scripts"]:
                 if script["name"] == "ssl-enum-ciphers":
                     results = script["data"]
     least_strength = results.pop("least strength")
+
     for k in results.keys():
         results[k] = results[k]["ciphers"]["children"]
-    results.update({"least_strength": least_strength})
+
+    rfc_ciphersuites = pandas.read_csv(BASE_DIR / "db/tls-parameters.csv")
+    recommended_ciphersuites = rfc_ciphersuites[rfc_ciphersuites["Recommended"] == "Y"]["Description"].values
+    for tls_version in results:
+        for ciphersuite in results[tls_version]:
+            if ciphersuite["name"] in recommended_ciphersuites:
+                ciphersuite["iana_recommendation"] = "Recommended"
+            else:
+                ciphersuite["iana_recommendation"] = "Not recommended"
+            ciphersuite.pop("strength")
+            cipher_info = json.loads(
+                requests.get(f"https://ciphersuite.info/api/cs/{ciphersuite['name']}").text
+            )[ciphersuite["name"]]
+            for key in ["gnutls_name", "openssl_name", "hex_byte_1", "hex_byte_2"]:
+                cipher_info.pop(key)
+            cipher_info["tls_version"] = tls_version
+            ciphersuite.update(cipher_info)
+        results[tls_version] = load_cipher_info(results[tls_version])
+
     return results
 
 

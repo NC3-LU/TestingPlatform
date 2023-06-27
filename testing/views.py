@@ -77,7 +77,7 @@ def http_test(request):
             nb_tests = int(request.COOKIES["nb_tests"])
         except KeyError:
             nb_tests = 0
-        if nb_tests == 4:
+        if nb_tests == 4 and not request.user.is_authenticated:
             messages.error(
                 request,
                 "You reached the maximum number of tests. Please create an account.",
@@ -160,7 +160,7 @@ def email_test(request):
             nb_tests = int(request.COOKIES["nb_tests"])
         except KeyError:
             nb_tests = 0
-        if nb_tests == 4:
+        if nb_tests == 4 and not request.user.is_authenticated:
             messages.error(
                 request,
                 "You reached the maximum number of tests. Please create an account.",
@@ -206,7 +206,7 @@ def ipv6_test(request):
             nb_tests = int(request.COOKIES["nb_tests"])
         except KeyError:
             nb_tests = 0
-        if nb_tests == 4:
+        if nb_tests == 4 and not request.user.is_authenticated:
             messages.error(
                 request,
                 "You reached the maximum number of tests. Please create an account.",
@@ -228,7 +228,7 @@ def web_server_test(request):
             nb_tests = int(request.COOKIES["nb_tests"])
         except KeyError:
             nb_tests = 0
-        if nb_tests == 4:
+        if nb_tests == 4 and not request.user.is_authenticated:
             messages.error(
                 request,
                 "You reached the maximum number of tests. Please create an account.",

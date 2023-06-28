@@ -544,8 +544,7 @@ def tls_version_check(domain: str):
                 ciphersuite["iana_recommendation"] = "Not recommended"
             ciphersuite.pop("strength")
             cipher_info = json.loads(
-                requests.get(f"https://ciphersuite.info/api/cs/{ciphersuite['name']}").text
-            )[ciphersuite["name"]]
+                requests.get(f"https://ciphersuite.info/api/cs/{ciphersuite['name']}").text)[ciphersuite["name"]]
             for key in ["gnutls_name", "openssl_name", "hex_byte_1", "hex_byte_2"]:
                 cipher_info.pop(key)
             cipher_info["tls_version"] = tls_version

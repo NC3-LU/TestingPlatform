@@ -124,14 +124,14 @@
       </div>
       <div class="row my-1">
         <div class="col-lg-12 fs-4">
-          {% if nameservers_comments.grade == "full" %}
+          {% if nameservers_reachability_comments.grade == "full" %}
           <script> countGood++;countTotal++;</script>
           <i class="bi bi-check-circle-fill color-success"> </i>
-          {% elif nameservers_comments.grade == "null" %}
+          {% elif nameservers_reachability_comments.grade == "null" %}
           <script>countBad++;countTotal++;</script>
           <i class="bi bi-x-circle-fill color-danger"></i>
           {% endif %}
-          {{ nameservers_comments.comment }} (IPv6)
+          {{ nameservers_reachability_comments.comment }} (IPv6)
         </div>
       </div>
       <div class="row my-1">
@@ -412,15 +412,16 @@
 
         <b>Restrict methods and headers</b>
 
-        Use the Access-Control-Allow-Methods and Access-Control-Allow-Headers headers to
+        <p>Use the Access-Control-Allow-Methods and Access-Control-Allow-Headers headers to
         define the allowed HTTP methods and request headers for cross-origin requests.
         Only include the necessary methods and headers that your application requires,
         rather than allowing all methods or headers.
         This can help to reduce the attack surface of your application and protect it
-        from malicious requests.
-        Validate origin
+        from malicious requests.</p>
 
-        Implement server-side validation of the Origin header in the request to ensure
+        <b>Validate origin</b>
+
+        <p>Implement server-side validation of the Origin header in the request to ensure
         that it matches the list of allowed origins.
         This prevents attackers from spoofing the origin and bypassing CORS
         restrictions.
@@ -429,38 +430,36 @@
         <code>
         add_header Access-Control-Allow-Origin $http_origin;
         </code>
+        </p>
+        <b>Use credentials carefully</b>
 
-        Use credentials carefully
-
-        Be cautious when enabling the Access-Control-Allow-Credentials header.
+        <p>Be cautious when enabling the Access-Control-Allow-Credentials header.
         Only enable it if your application requires sending and receiving credentials
         (e.g., cookies, authorization headers) across origins.
         Make sure to properly handle and validate the credentials on the server-side to
-        prevent unauthorized access.
-        Apply origin whitelisting
+        prevent unauthorized access.</p>
+        <b>Apply origin whitelisting</b>
 
-        Consider maintaining a whitelist of trusted origins within your application's
+        <p>Consider maintaining a whitelist of trusted origins within your application's
         server-side logic.
         Validate incoming requests against this whitelist and only allow requests from
         trusted origins.
         This can help to further reduce the attack surface of your application and
-        protect it from malicious requests.
-        Set secure CORS headers
+        protect it from malicious requests.</p>
+        <b>Set secure CORS headers</b>
 
-        In addition to the CORS headers, ensure that your application implements other
+        <p>In addition to the CORS headers, ensure that your application implements other
         security headers, such as Content Security Policy (CSP), Strict Transport
         Security (HSTS), and X-Frame-Options, to provide a layered security approach.
         These headers can help to protect your application from a variety of attacks,
         including cross-site scripting (XSS), clickjacking, and man-in-the-middle (MITM)
-        attacks.
-        The above text is truthful and accurate. It is based on the best practices for
-        implementing CORS headers, as recommended by security experts and industry
-        standards. By following these best practices, you can help to protect your
-        application from cross-origin attacks.
+        attacks.</p>
+
       </div>
     </div>
   </div>
 </section>
+
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
@@ -473,6 +472,32 @@
     <div class="col-lg-12 fs-4">
       <p>Properly configured redirections from HTTP to HTTPS allow browsers to correctly
         apply HTTP Strict Transport Security (HSTS) settings.</p>
+    </div>
+  </div>
+  <div class="row my-2">
+    <button type="button" data-bs-toggle="collapse"
+            data-bs-target="#redirection-recommendation"
+            aria-expanded="false" aria-controls="collapseExample"
+            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+      <i
+        class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+      Recommendation
+    </button>
+
+    <div class="p-0 collapse" id="redirection-recommendation">
+      <div class="p-4 border-bottom border-end border-start">
+       <p>Use HTTPS for all websites and APIs. This is the most important security recommendation,
+         as it encrypts all communication between the client and the server, making it much more difficult
+         for attackers to intercept and steal data.</p>
+        <p>Use 301 redirects to redirect HTTP requests to HTTPS. This ensures that users are always redirected to the secure
+        version of the site, even if they type in the HTTP URL.</p>
+        <p>Enable HSTS. HSTS (HTTP Strict Transport Security) is a security feature that tells browsers
+        to always connect to your site over HTTPS, even if the user types in the HTTP URL.
+        This helps to prevent attackers from tricking users into connecting to your site over HTTP.</p>
+        <p>Do not redirect from HTTP to HTTPS on a different host. This can prevent HSTS from being set.</p>
+        <p>Keep your SSL/TLS certificate up to date. This helps to protect your site from attacks that exploit expired or
+          misconfigured certificates.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -604,89 +629,7 @@
   </div>
   {% endif %}
 </section>
-<section class="col-lg-11 row my-5 border border-2 rounded p-4">
-  <div class="row">
-    <div class="col-lg-12 fs-1 fw-bold">
-      <i class="bi bi-database-fill-gear text-warning"></i> Server Headers
-    </div>
-  </div>
-  <div class="row my-2">
-    <table class="table table-light table-bordered table-striped">
-      <tr>
-        <th>Header</th>
-        <th>Value</th>
-      </tr>
-      <tr>
-        <td>Accept-Ranges</td>
-        <td>{{ headers.Accept_Ranges }}</td>
-      </tr>
-      <tr>
-        <td>Connection</td>
-        <td>{{ headers.Connection }}</td>
-      </tr>
-      <tr>
-        <td>Content-Encoding</td>
-        <td>{{ headers.Content_Encoding }}</td>
-      </tr>
-      <tr>
-        <td>Content-Length</td>
-        <td>{{ headers.Content_Length}}</td>
-      </tr>
-      <tr>
-        <td>Content-Security-Policy</td>
-        {% if headers.Content_Security_Policy %}
-        <td>{{ headers.Content_Security_Policy}}</td>
-        {% else %}
-        <td class="bg-danger fw-bold">Not implemented</td>
-        {% endif %}
-      </tr>
-      <tr>
-        <td>Content-Type</td>
-        <td>{{ headers.Content_Type}}</td>
-      </tr>
-      <tr>
-        <td>Date</td>
-        <td>{{ headers.Date}}</td>
-      </tr>
-      <tr>
-        <td>ETag</td>
-        <td>{{ headers.ETag}}</td>
-      </tr>
-      <tr>
-        <td>Keep-Alive</td>
-        <td>{{ headers.Keep_Alive}}</td>
-      </tr>
-      <tr>
-        <td>Last-Modified</td>
-        <td>{{ headers.Last_Modified}}</td>
-      </tr>
-      <tr>
-        <td>Permissions-Policy</td>
-        <td>{{ headers.Permissions_Policy}}</td>
-      </tr>
-      <tr>
-        <td>Referrer-Policy</td>
-        <td>{{ headers.Referrer_Policy}}</td>
-      </tr>
-      <tr>
-        <td>Server</td>
-        <td>{{ headers.Server}}</td>
-      </tr>
-      <tr>
-        <td>Strict-Transport-Security</td>
-        <td>{{ headers.Strict_Transport_Security}}</td>
-      </tr>
-      <tr>
-        <td>Vary</td>
-        <td>{{ headers.Vary}}</td>
-      </tr>
-      <tr>
-        <td>X-Content-Type-Options</td>
-        <td>{{ headers.X_Content_Type_Options}}</td>
-      </tr>
-    </table>
-  </div>
-</section>
+
 
 <script>
   /*const ctx2 = document.getElementById('chart2').getContext('2d');
@@ -794,7 +737,6 @@
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
-
       {% if nameservers_comments.grade == "full" and records_v6_comments.grade == "full" %}
       <i class="bi bi-check-circle-fill color-success"> </i>
       {% else %}
@@ -809,7 +751,8 @@
         devices to the internet. Benefits of IPv6 include enhanced security, improved
         routing efficiency, simplified network configuration.</p>
       <div class="row my-2">
-        {% if nameservers_comments.grade == "full" %}
+
+        {% if nameservers_reachability_comments.grade == "full" %}
         <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
                 aria-expanded="false" aria-controls="collapseExample"
                 class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
@@ -818,7 +761,7 @@
           IPv6 Nameserver Check
         </button>
 
-        {% elif nameservers_comments.grade == "null" %}
+        {% elif nameservers_reachability_comments.grade == "null" %}
         <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
                 aria-expanded="false" aria-controls="collapseExample"
                 class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
@@ -835,10 +778,8 @@
             <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
               <p>Name Servers:</p>
               <p>
-                {% if nameservers_comments.grade == "full"%}
+                {% if nameservers_reachability_comments.grade %}
                 <i class="bi bi-check-circle-fill color-success"> </i>
-                {% elif nameservers_comments.grade == "full" %}
-                <i class="bi bi-exclamation-circle-fill color-warning"></i>
                 {% elif nameservers_comments.grade == "null" %}
                 <i class="bi bi-x-circle-fill color-danger"></i>
                 {% endif %}
@@ -884,16 +825,6 @@
                 {% endif %}
                 {{ nameservers_reachability_comments.comment }}
               </p>
-
-              <p>
-                {% if records_v6_comments.grade == "full" %}
-                <i class="bi bi-check-circle-fill color-success"> </i>
-                {% elif records_v6_comments.grade == "null" %}
-                <i class="bi bi-x-circle-fill color-danger"></i>
-                {% endif %}
-                {{ records_v6_comments.comment }}
-              </p>
-
             </div>
           </div>
         </div>

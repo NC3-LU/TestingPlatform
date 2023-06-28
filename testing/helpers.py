@@ -533,15 +533,9 @@ def tls_version_check(domain: str):
     for k in results.keys():
         results[k] = results[k]["ciphers"]["children"]
 
-    rfc_ciphersuites = pandas.read_csv(BASE_DIR / "db/tls-parameters.csv")
-    recommended_ciphersuites = rfc_ciphersuites[rfc_ciphersuites["Recommended"] == "Y"]["Description"].values
     lowest_sec_level = {}
     for tls_version in results:
         for ciphersuite in results[tls_version]:
-            if ciphersuite["name"] in recommended_ciphersuites:
-                ciphersuite["iana_recommendation"] = "Recommended"
-            else:
-                ciphersuite["iana_recommendation"] = "Not recommended"
             ciphersuite.pop("strength")
             cipher_info = json.loads(
                 requests.get(f"https://ciphersuite.info/api/cs/{ciphersuite['name']}").text)[ciphersuite["name"]]

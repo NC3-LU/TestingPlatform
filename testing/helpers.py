@@ -535,6 +535,7 @@ def tls_version_check(domain: str):
 
     rfc_ciphersuites = pandas.read_csv(BASE_DIR / "db/tls-parameters.csv")
     recommended_ciphersuites = rfc_ciphersuites[rfc_ciphersuites["Recommended"] == "Y"]["Description"].values
+    lowest_sec_level = {}
     for tls_version in results:
         for ciphersuite in results[tls_version]:
             if ciphersuite["name"] in recommended_ciphersuites:
@@ -549,9 +550,10 @@ def tls_version_check(domain: str):
                 cipher_info.pop(key)
             cipher_info["tls_version"] = tls_version
             ciphersuite.update(cipher_info)
-        results[tls_version] = load_cipher_info(results[tls_version])
-
-    return results
+        ci = load_cipher_info(results[tls_version])
+        results[tls_version] = ci["result"]
+        lowest_sec_level.update({f"{tls_version}": ci["lowest_sec_level"]})
+    return {"result": results, "lowest_sec_level": lowest_sec_level}
 
 
 def check_dkim_public_key(domain: str, selectors: list):

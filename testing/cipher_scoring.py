@@ -1,4 +1,6 @@
-import re
+# Largely inspired by NL Labs' tls checks for Internet.nl
+
+
 from collections import OrderedDict
 from enum import Enum
 from math import log, pow
@@ -207,10 +209,13 @@ def load_cipher_info(ciphersuites: list):
 
     result = dict()
     for ciphersuite in ciphersuites:
+        lowest_sec_level = 3
         if ciphersuite["name"] not in result:
             ci = CipherInfo(ciphersuite)
             sec_level = CipherScoreAndSecLevel.determine_appendix_c_sec_level(ci)
             ci.sec_level = {"level": sec_level.name,
                             "score": sec_level.value}
             result[ciphersuite["name"]] = ci.__dict__()
-    return result
+            if sec_level.value < lowest_sec_level:
+                lowest_sec_level = sec_level.value
+    return {"result": result, "lowest_sec_level": str(SecLevel(lowest_sec_level)).split(".")[1]}

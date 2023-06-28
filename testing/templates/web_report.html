@@ -1,3 +1,4 @@
+{%  load tags %}
 {% if result %}
 
 <script>
@@ -5,9 +6,9 @@
   let countBad = 0;
   let countWarning = 0;
   let countTotal = 0;
-
-
 </script>
+
+
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
 
   <h1 class="text-center">Overview of {{ domain_name }}</h1>
@@ -307,9 +308,8 @@
           <h3>Cookie: {{ cookie_key }}</h3>
           <ul>
             {% for attribute_key, attribute_value in cookie_value.items %}
-            {% if attribute_key == "secure" and not attribute_value or attribute_key ==
-            "httponly" and not attribute_value %}
-            <li class="text-danger fw-bold">{{ attribute_key }}: {{ attribute_value }}
+            {% if attribute_key == "secure" and not attribute_value or attribute_key == "httponly" and not attribute_value %}
+            <li class="text-danger fw-bold">{{ attribute_key }}: {{ attribute_value }}>
             </li>
             {% else %}
             <li>{{ attribute_key }}: {{ attribute_value }}</li>
@@ -739,13 +739,6 @@
     data: data2,
     options: options2
   });*/
-
-
-
-
-
-
-
 </script>
 <script>
   const total = {{ scan_summary.tests_quantity }} -1;
@@ -795,13 +788,6 @@
     },
     options: options
   });
-
-
-
-
-
-
-
 </script>
 
 {% endif %}
@@ -809,8 +795,7 @@
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
 
-      {% if nameservers_comments.grade == "full" and records_v6_comments.grade == "full"
-      %}
+      {% if nameservers_comments.grade == "full" and records_v6_comments.grade == "full" %}
       <i class="bi bi-check-circle-fill color-success"> </i>
       {% else %}
       <i class="bi bi-x-circle-fill color-danger"></i>
@@ -1010,38 +995,51 @@
     </div>
   </div>
   {% if tls_results %}
+    {% for version, suites in tls_results.items %}
+      <div class="row my-2">
+        <button type="button" data-bs-toggle="collapse"
+                data-bs-target="#tls-found-{{ forloop.counter }}"
+                aria-expanded="false" aria-controls="collapseExample"
+                class="btn p-3 fs-2 fw-bold text-start text-light
+                {% if tls_lowest_sec_level|get:version == "GOOD" or tls_lowest_sec_level|get:version == "SUFFICIENT" %}
+                  bg-info
+                {% elif tls_lowest_sec_level|get:version == "PHASE_OUT" %}
+                  bg-warning
+                {% elif tls_lowest_sec_level|get:version == "INSUFFICIENT" %}
+                  bg-danger
+                {% endif %}">
+          <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+          {{ version }}
+        </button>
 
-  {% for version, info in tls_results.items %}
-
-  <div class="row my-2">
-    <button type="button" data-bs-toggle="collapse"
-            data-bs-target="#tls-found-{{ forloop.counter }}"
-            aria-expanded="false" aria-controls="collapseExample"
-            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
-      <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-      {{ version }}
-    </button>
-
-    <div class="p-0 collapse" id="tls-found-{{ forloop.counter }}">
-      <div class="p-3 border-bottom border-end border-start">
-        {% if version == "least_strength" %}
-        <p>Least Strength: {{ info }}</p>
-        {% else %}
-        <ul>
-          {% for item in info %}
-          <li>
-            <p>Key Exchange Info: {{ item.kex_info }}</p>
-            <p>Name: {{ item.name }}</p>
-            <p>Strength: {{ item.strength }}</p>
-          </li>
-          {% endfor %}
-        </ul>
-        {% endif %}
+        <div class="p-0 collapse" id="tls-found-{{ forloop.counter }}">
+            <div class="p-3 border-bottom border-end border-start">
+              <table class="table table-light table-bordered table-striped">
+                <tr>
+                  <th>Ciphersuite</th>
+                  <th>Security level</th>
+                </tr>
+                {% for name, info in suites.items %}
+                  <tr>
+                    <td>{{ name }}</td>
+                    <td>
+                      {% if info.sec_level.level == "GOOD" or info.sec_level.level == "SUFFICIENT" %}
+                        <i class="bi bi-check-circle-fill color-success"> </i>
+                      {% elif info.sec_level.level == "PHASE_OUT" %}
+                        <i class="bi bi-exclamation-circle-fill text-warning"> </i>
+                      {% elif info.sec_level.level == "INSUFFICIENT" %}
+                        <i class="bi bi-x-circle-fill color-danger"> </i>
+                      {% endif %}
+                      {{ info.sec_level.level }}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </table>
+            </div>
+          </div>
       </div>
-    </div>
-  </div>
 
-  {% endfor %}
+    {% endfor %}
   {% endif %}
 </section>
 
@@ -1061,7 +1059,4 @@
       }
     });
   }
-
-
-
 </script>

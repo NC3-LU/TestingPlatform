@@ -53,3 +53,8 @@ def get_asn(address):
 @register.filter("split")
 def split(value, delimiter):
     return value.split(delimiter)
+
+
+@register.filter("get")
+def get(dictionary, key):
+    return dictionary.get(key)

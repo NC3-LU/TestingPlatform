@@ -85,9 +85,10 @@ def http_test(request):
             )
             return redirect("signup")
         context = {"rescan": False}
-        if "rescan" in request.POST:
-            context["rescan"] = True
-        context.update(get_http_report(request.POST["target"], context["rescan"]))
+        # if "rescan" in request.POST:
+          #  context["rescan"] = True
+
+        context.update(get_http_report(request.POST["target"], False))
         context.update(ipv6_check(request.POST["target"], None))
 
         tls_results = tls_version_check(request.POST["target"])
@@ -174,10 +175,15 @@ def email_test(request):
         if not check_soa_record(target):
             context = {"status": False, "statusmessage": "The given domain is invalid!"}
         else:
-            context.update(email_check(target))
+            email_result = email_check(target)
+
+            context.update(email_result)
             context.update(check_dkim_public_key(target, []))
             context.update(ipv6_check(target, None))
-            context.update({"status": True})
+            # tls_results = tls_version_check(request.POST["target"])
+            # context["tls_results"] = tls_results["result"]
+            # context["tls_lowest_sec_level"] = tls_results["lowest_sec_level"]
+            # context.update({"status": True})
             # for host in email_results['result']['mx']['hosts']:
             # context["ipv6_mx"] = ipv6_check(
             #        host["hostname"], None
@@ -241,11 +247,11 @@ def web_server_test(request):
         context = {}
         context.update(web_server_check(request.POST["target"]))
         nb_tests += 1
-        response = render(request, "check_web_server.html", context)
+        response = render(request, "check_infra.html", context)
         response.set_cookie("nb_tests", nb_tests)
         return response
     else:
-        return render(request, "check_web_server.html")
+        return render(request, "check_infra.html")
 
 
 @login_required

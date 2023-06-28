@@ -1,4 +1,4 @@
-{%  load tags %}
+{% load tags %}
 {% if result %}
 
 <script>
@@ -6,14 +6,15 @@
   let countBad = 0;
   let countWarning = 0;
   let countTotal = 0;
+
 </script>
 
 
-<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+<section class="col-lg-11 row my-5 border border-2 rounded p-lg-4 p-md-4">
 
   <h1 class="text-center">Overview of {{ domain_name }}</h1>
   <div class="row justify-content-evenly mb-5">
-    <div class="col-lg-3 d-flex align-items-center">
+    <div class="col-lg-3 d-flex align-items-center justify-content-center">
       <canvas id="chart1"></canvas>
     </div>
     <!--<div class="col-lg-6 d-flex align-items-center">
@@ -23,7 +24,7 @@
   <div class="row justify-content-between">
     <div class="col-lg-7">
       <div class="row my-1">
-        <div class="col-lg-12 fs-4">
+        <div class="col-lg-12 fs-4 ">
           {% if result.content_security_policy.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
           {% else %}
@@ -147,34 +148,55 @@
           {% endif %}
           (IPv6)
         </div>
-
       </div>
+      {% if tls_results %}
+      {% for version, suites in tls_results.items %}
+      <div class="row my-1">
+        <div class="col-lg-12 fs-4">
+
+          {% if tls_lowest_sec_level|get:version == 'GOOD' or tls_lowest_sec_level|get:version == 'SUFFICIENT' %}
+          <script> countGood++;countTotal++; console.log('tlsgood'+ countGood)</script>
+          <i class="bi bi-check-circle-fill color-success"></i>
+          {% elif tls_lowest_sec_level|get:version == 'PHASE_OUT' %}
+          <i class="bi bi-exclamation-circle-fill text-warning"> </i>
+          <script>
+             countWarning++;countTotal++; console.log('tlswarning'+ countWarning)
+          </script>
+          {% elif tls_lowest_sec_level|get:version == 'INSUFFICIENT' %}
+          <i class="bi bi-check-circle-fill color-danger"></i>
+          <script>countBad++;countTotal++;console.log('tlsbad'+ countBad)</script>
+          {% endif %}
+          {{ version }}
+        </div>
+      </div>
+      {% endfor %}
+      {% endif %}
       <!-- -- -->
     </div>
     <div class="col-lg-3">
       <h1>Test Discovery</h1>
-      <div class="row my-4">
-        <div class="col-lg-6 fs-2">Good</div>
+      <div class="row mb-4">
+        <div class="col-lg-6 fs-2 mb-1">Good</div>
         <div class="col-lg-6"><span id="good-count"
-                                    class="rounded-circle p-2 fs-4 text-white"
-                                    style="background:#71cdba;"></span>
+                                    class="rounded-circle p-2 fs-4 text-white bg-success"
+        ></span>
         </div>
       </div>
       <div class="row my-4">
-        <div class="col-lg-6 fs-2">Vulnerable</div>
+        <div class="col-lg-6 fs-2 mb-1">Vulnerable</div>
         <div class="col-lg-6"><span id="vulnerable-count"
-                                    class="rounded-circle p-2 fs-4 text-white"
-                                    style=" background:#ff5c5c;">
+                                    class="rounded-circle p-2 fs-4 text-white bg-danger">
         </span>
         </div>
       </div>
-      <!--<div class="row my-4">
+      <div class="row my-4">
         <div class="col-lg-6 fs-2">Warning</div>
-        <div class="col-lg-6"><span class="rounded-circle p-2 fs-4 text-black"
-                                    style="background:#f5e230;">10</span>
+        <div class="col-lg-6"><span id="warning-count"
+                                    class="rounded-circle p-2 fs-4 text-black"
+                                    style="background:#f5e230;"></span>
         </div>
       </div>
-      <div class="row my-4">
+      <!--<div class="row my-4">
         <div class="col-lg-6 fs-2">Informational</div>
         <div class="col-lg-6"><span class="rounded-circle p-2 fs-4 text-white"
                                     style="background:#2475e8;">10</span>
@@ -184,15 +206,16 @@
   </div>
 </section>
 <script>
-    const result = parseInt({{ scan_summary.tests_quantity }} + countTotal - 1) - parseInt({{ scan_summary.tests_passed }} + countGood - 1);
+
+    const result = parseInt({{ scan_summary.tests_quantity }} + countTotal) - parseInt({{ scan_summary.tests_passed }} + countGood + countWarning);
 
      document.getElementById('vulnerable-count').innerHTML = '&nbsp;' + result + '&nbsp;' ;
-     document.getElementById('good-count').innerHTML = '&nbsp;' + parseInt({{ scan_summary.tests_passed }} + countGood - 1) + '&nbsp;' ;
-
+     document.getElementById('good-count').innerHTML = '&nbsp;' + parseInt({{ scan_summary.tests_passed }} + countGood - 2) + '&nbsp;' ;
+     document.getElementById('warning-count').innerHTML = '&nbsp;' + countWarning + '&nbsp;' ;
 
 
 </script>
-<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+<section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
       {% if result.content_security_policy.pass %}
@@ -278,7 +301,7 @@
   </div>
 </section>
 
-<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+<section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
       {% if result.cookies.pass %}
@@ -309,7 +332,7 @@
           <ul>
             {% for attribute_key, attribute_value in cookie_value.items %}
             {% if attribute_key == "secure" and not attribute_value or attribute_key == "httponly" and not attribute_value %}
-            <li class="text-danger fw-bold">{{ attribute_key }}: {{ attribute_value }}>
+            <li class="text-danger fw-bold">{{ attribute_key }}: {{ attribute_value }}
             </li>
             {% else %}
             <li>{{ attribute_key }}: {{ attribute_value }}</li>
@@ -370,7 +393,7 @@
   </div>
 </section>
 
-<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+<section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
       {% if result.cross_origin_resource_sharing.pass %}
@@ -403,64 +426,71 @@
       <div class="p-4 border-bottom border-end border-start">
         <b>Specify origins</b>
 
-       <p> Instead of using the wildcard <code>"*"</code>, explicitly specify the allowed origins for
-        cross-origin requests.
-        This can be done by setting the Access-Control-Allow-Origin header to a specific
-        origin, such as <code>https://nc3.lu</code>, or to a list of trusted origins.
-        By explicitly specifying the allowed origins, you can prevent unauthorized
-        access to your resources from untrusted sources.</p>
+        <p> Instead of using the wildcard <code>"*"</code>, explicitly specify the
+          allowed origins for
+          cross-origin requests.
+          This can be done by setting the Access-Control-Allow-Origin header to a
+          specific
+          origin, such as <code>https://nc3.lu</code>, or to a list of trusted origins.
+          By explicitly specifying the allowed origins, you can prevent unauthorized
+          access to your resources from untrusted sources.</p>
 
         <b>Restrict methods and headers</b>
 
-        <p>Use the Access-Control-Allow-Methods and Access-Control-Allow-Headers headers to
-        define the allowed HTTP methods and request headers for cross-origin requests.
-        Only include the necessary methods and headers that your application requires,
-        rather than allowing all methods or headers.
-        This can help to reduce the attack surface of your application and protect it
-        from malicious requests.</p>
+        <p>Use the Access-Control-Allow-Methods and Access-Control-Allow-Headers headers
+          to
+          define the allowed HTTP methods and request headers for cross-origin requests.
+          Only include the necessary methods and headers that your application requires,
+          rather than allowing all methods or headers.
+          This can help to reduce the attack surface of your application and protect it
+          from malicious requests.</p>
 
         <b>Validate origin</b>
 
-        <p>Implement server-side validation of the Origin header in the request to ensure
-        that it matches the list of allowed origins.
-        This prevents attackers from spoofing the origin and bypassing CORS
-        restrictions.
-        You can use the nginx web server to implement this validation by adding the
-        following line to your nginx.conf file:
-        <code>
-        add_header Access-Control-Allow-Origin $http_origin;
-        </code>
+        <p>Implement server-side validation of the Origin header in the request to
+          ensure
+          that it matches the list of allowed origins.
+          This prevents attackers from spoofing the origin and bypassing CORS
+          restrictions.
+          You can use the nginx web server to implement this validation by adding the
+          following line to your nginx.conf file:
+          <code>
+            add_header Access-Control-Allow-Origin $http_origin;
+          </code>
         </p>
         <b>Use credentials carefully</b>
 
         <p>Be cautious when enabling the Access-Control-Allow-Credentials header.
-        Only enable it if your application requires sending and receiving credentials
-        (e.g., cookies, authorization headers) across origins.
-        Make sure to properly handle and validate the credentials on the server-side to
-        prevent unauthorized access.</p>
+          Only enable it if your application requires sending and receiving credentials
+          (e.g., cookies, authorization headers) across origins.
+          Make sure to properly handle and validate the credentials on the server-side
+          to
+          prevent unauthorized access.</p>
         <b>Apply origin whitelisting</b>
 
         <p>Consider maintaining a whitelist of trusted origins within your application's
-        server-side logic.
-        Validate incoming requests against this whitelist and only allow requests from
-        trusted origins.
-        This can help to further reduce the attack surface of your application and
-        protect it from malicious requests.</p>
+          server-side logic.
+          Validate incoming requests against this whitelist and only allow requests from
+          trusted origins.
+          This can help to further reduce the attack surface of your application and
+          protect it from malicious requests.</p>
         <b>Set secure CORS headers</b>
 
-        <p>In addition to the CORS headers, ensure that your application implements other
-        security headers, such as Content Security Policy (CSP), Strict Transport
-        Security (HSTS), and X-Frame-Options, to provide a layered security approach.
-        These headers can help to protect your application from a variety of attacks,
-        including cross-site scripting (XSS), clickjacking, and man-in-the-middle (MITM)
-        attacks.</p>
+        <p>In addition to the CORS headers, ensure that your application implements
+          other
+          security headers, such as Content Security Policy (CSP), Strict Transport
+          Security (HSTS), and X-Frame-Options, to provide a layered security approach.
+          These headers can help to protect your application from a variety of attacks,
+          including cross-site scripting (XSS), clickjacking, and man-in-the-middle
+          (MITM)
+          attacks.</p>
 
       </div>
     </div>
   </div>
 </section>
 
-<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+<section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
       {% if result.redirection.pass %}
@@ -486,23 +516,31 @@
 
     <div class="p-0 collapse" id="redirection-recommendation">
       <div class="p-4 border-bottom border-end border-start">
-       <p>Use HTTPS for all websites and APIs. This is the most important security recommendation,
-         as it encrypts all communication between the client and the server, making it much more difficult
-         for attackers to intercept and steal data.</p>
-        <p>Use 301 redirects to redirect HTTP requests to HTTPS. This ensures that users are always redirected to the secure
-        version of the site, even if they type in the HTTP URL.</p>
-        <p>Enable HSTS. HSTS (HTTP Strict Transport Security) is a security feature that tells browsers
-        to always connect to your site over HTTPS, even if the user types in the HTTP URL.
-        This helps to prevent attackers from tricking users into connecting to your site over HTTP.</p>
-        <p>Do not redirect from HTTP to HTTPS on a different host. This can prevent HSTS from being set.</p>
-        <p>Keep your SSL/TLS certificate up to date. This helps to protect your site from attacks that exploit expired or
+        <p>Use HTTPS for all websites and APIs. This is the most important security
+          recommendation,
+          as it encrypts all communication between the client and the server, making it
+          much more difficult
+          for attackers to intercept and steal data.</p>
+        <p>Use 301 redirects to redirect HTTP requests to HTTPS. This ensures that users
+          are always redirected to the secure
+          version of the site, even if they type in the HTTP URL.</p>
+        <p>Enable HSTS. HSTS (HTTP Strict Transport Security) is a security feature that
+          tells browsers
+          to always connect to your site over HTTPS, even if the user types in the HTTP
+          URL.
+          This helps to prevent attackers from tricking users into connecting to your
+          site over HTTP.</p>
+        <p>Do not redirect from HTTP to HTTPS on a different host. This can prevent HSTS
+          from being set.</p>
+        <p>Keep your SSL/TLS certificate up to date. This helps to protect your site
+          from attacks that exploit expired or
           misconfigured certificates.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+<section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
       {% if result.referrer_policy.pass %}
@@ -515,85 +553,86 @@
       <p>Referrer Policy can protect the privacy of your users by restricting the
         contents of the HTTP Referer header.</p>
     </div>
-    <div class="row my-2">
-      <button type="button" data-bs-toggle="collapse" data-bs-target="#referrer-policy"
-              aria-expanded="false" aria-controls="collapseExample"
-              class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
-        <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-        How to set the referrer policy and what to set?
-      </button>
+  </div>
+  <div class="row my-2">
+    <button type="button" data-bs-toggle="collapse" data-bs-target="#referrer-policy"
+            aria-expanded="false" aria-controls="collapseExample"
+            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+      <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+      How to set the referrer policy and what to set?
+    </button>
 
-      <div class="p-0 collapse" id="referrer-policy">
-        <div class=" p-3 border-bottom border-end border-start">
-          <p>You can set the header in an apache configuration file or in a
-            root web directory over an <code>.htaccess</code> file.</p>
+    <div class="p-0 collapse" id="referrer-policy">
+      <div class=" p-3 border-bottom border-end border-start">
+        <p>You can set the header in an apache configuration file or in a
+          root web directory over an <code>.htaccess</code> file.</p>
 
-          <p>You need to add:<br>
-            <code>Header set Referrer-Policy <b>"replace-with-the-policy-you-want-to-use"</b></code>
-          </p>
-          <div class="col-lg-6">
-            <h4>What policies do exist?</h4>
-            <ul>
-              <li><b>"no-referrer"</b>- Do not send the referrer header.</li>
-              <li><b>"no-referrer-when-downgrade"</b> - Send the referrer header only
-                when
-                the referring page is using HTTPS.
-              </li>
-              <li><b>"same-origin"</b>- Send the referrer header only when the referring
-                page is from the same origin (same domain and protocol).
-              </li>
-              <li><b>"strict-origin"</b> - Send the referrer header only when the
-                referring page is from the same origin, and only include the origin, not
-                the full URL.
-              </li>
-              <li><b>"strict-origin-when-cross-origin"</b> - Send the referrer header
-                only
-                when the referring page is from the same origin, and only include the
-                origin when the referring page is from a different origin.
-              </li>
-              <li><b>"unsafe-url"</b> - Always send the full URL in the referrer header,
-                even when the referring page is from a different origin.
-              </li>
-            </ul>
-            <h4>Which one to use?</h4>
-            <p>
-              If your website doesn't need to send any referrer information to other
-              domains, you can use the <code>"no-referrer"</code> directive. This will
-              prevent the
-              browser from sending any referrer information in the HTTP header.</p>
+        <p>You need to add:<br>
+          <code>Header set Referrer-Policy
+            <b>"replace-with-the-policy-you-want-to-use"</b></code>
+        </p>
+        <div class="col-lg-6">
+          <h4>What policies do exist?</h4>
+          <ul>
+            <li><b>"no-referrer"</b>- Do not send the referrer header.</li>
+            <li><b>"no-referrer-when-downgrade"</b> - Send the referrer header only
+              when
+              the referring page is using HTTPS.
+            </li>
+            <li><b>"same-origin"</b>- Send the referrer header only when the referring
+              page is from the same origin (same domain and protocol).
+            </li>
+            <li><b>"strict-origin"</b> - Send the referrer header only when the
+              referring page is from the same origin, and only include the origin, not
+              the full URL.
+            </li>
+            <li><b>"strict-origin-when-cross-origin"</b> - Send the referrer header
+              only
+              when the referring page is from the same origin, and only include the
+              origin when the referring page is from a different origin.
+            </li>
+            <li><b>"unsafe-url"</b> - Always send the full URL in the referrer header,
+              even when the referring page is from a different origin.
+            </li>
+          </ul>
+          <h4>Which one to use?</h4>
+          <p>
+            If your website doesn't need to send any referrer information to other
+            domains, you can use the <code>"no-referrer"</code> directive. This will
+            prevent the
+            browser from sending any referrer information in the HTTP header.</p>
 
-            <p>If your website needs to send referrer information only when the user is
-              navigating within your own domain, you can use the
-              <code>"same-origin"</code> directive.
-              This will prevent the browser from sending referrer information when the
-              user navigates to a different domain.</p>
+          <p>If your website needs to send referrer information only when the user is
+            navigating within your own domain, you can use the
+            <code>"same-origin"</code> directive.
+            This will prevent the browser from sending referrer information when the
+            user navigates to a different domain.</p>
 
-            <p>If your website needs to send referrer information to other domains, but
-              you
-              don't want to leak sensitive information, you can use the
-              <code>"strict-origin-when-cross-origin"</code> directive. This will send
-              the referrer
-              information only when the referring page is from the same origin, and will
-              only include the origin (not the full URL) when the referring page is from
-              a
-              different origin.</p>
+          <p>If your website needs to send referrer information to other domains, but
+            you
+            don't want to leak sensitive information, you can use the
+            <code>"strict-origin-when-cross-origin"</code> directive. This will send
+            the referrer
+            information only when the referring page is from the same origin, and will
+            only include the origin (not the full URL) when the referring page is from
+            a
+            different origin.</p>
 
-            <p>If your website needs to send referrer information to other domains, and
-              you
-              don't need to hide the URL of the referring page, you can use the "origin"
-              or <code>"unsafe-url"</code> directive. The <code>"origin"</code>
-              directive will send only the origin
-              (not the full URL) in the referrer header, while the
-              <code>"unsafe-url"</code> directive
-              will send the full URL of the referring page.</p>
-          </div>
+          <p>If your website needs to send referrer information to other domains, and
+            you
+            don't need to hide the URL of the referring page, you can use the "origin"
+            or <code>"unsafe-url"</code> directive. The <code>"origin"</code>
+            directive will send only the origin
+            (not the full URL) in the referrer header, while the
+            <code>"unsafe-url"</code> directive
+            will send the full URL of the referring page.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+<section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
       {% if result.subresource_integrity.pass %}
@@ -632,68 +671,19 @@
 
 
 <script>
-  /*const ctx2 = document.getElementById('chart2').getContext('2d');
 
-  const data2 = {
-    datasets: [{
-      label: 'Blue Dataset',
-      data: [
-        {x: 1, y: 3},
-        {x: 2, y: 7},
-        {x: 3, y: 5},
-      ],
-      backgroundColor: 'rgba(75, 192, 192, 0.5)',
-      borderColor: 'rgba(75, 192, 192, 1)',
-      borderWidth: 1,
-    }, {
-      label: 'Red Dataset',
-      data: [
-        {x: 4, y: 8},
-        {x: 5, y: 2},
-        {x: 6, y: 1},
-      ],
-      backgroundColor: 'rgba(255, 99, 132, 0.5)',
-      borderColor: 'rgba(255, 99, 132, 1)',
-      borderWidth: 1,
-    }, {
-      label: 'Orange Dataset',
-      data: [
-        {x: 7, y: 6},
-        {x: 8, y: 9},
-        {x: 9, y: 4},
-      ],
-      backgroundColor: 'rgba(255, 159, 64, 0.5)',
-      borderColor: 'rgba(255, 159, 64, 1)',
-      borderWidth: 1,
-    }]
-  };
-
-  const options2 = {
-    scales: {
-      x: {
-        type: 'linear',
-        position: 'bottom',
-      }
-    }
-  };
-
-  const myChart2 = new Chart(ctx2, {
-    type: 'scatter',
-    data: data2,
-    options: options2
-  });*/
-</script>
-<script>
-  const total = {{ scan_summary.tests_quantity }} -1;
-  const totalGood = {{ scan_summary.tests_passed }} -1;
+  const totalGood = parseInt({{ scan_summary.tests_passed }} + countGood - 2);
+  const totalBad =  parseInt({{ scan_summary.tests_quantity }} + countTotal) - parseInt({{ scan_summary.tests_passed }} + countGood + countWarning);
+ const total = totalGood + totalBad + countWarning;
   let successPercentage = totalGood / total * 100;
-  let failurePercentage = 100 - successPercentage;
-
+  let failurePercentage = totalBad / total * 100;
+  let warningPercentage = countWarning / total * 100;
   var data = [{
-    data: [successPercentage, failurePercentage],
+    data: [successPercentage, failurePercentage,warningPercentage],
     backgroundColor: [
-      "#4ecb71",
-      "#ff5c5c",
+      "#198754",
+      "#dc3545",
+      "#ffc107",
     ],
     borderColor: "#fff"
   }];
@@ -731,6 +721,7 @@
     },
     options: options
   });
+
 </script>
 
 {% endif %}
@@ -767,7 +758,7 @@
                 class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
           <i
             class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-          IPV6 Nameserver Check
+          IPv6 Nameserver Check
         </button>
 
         {% endif %}
@@ -847,7 +838,7 @@
                 class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
           <i
             class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-          IPV6 Webserver Check
+          IPv6 Webserver Check
         </button>
 
         {% endif %}
@@ -907,6 +898,61 @@
           </div>
         </div>
       </div>
+      <div class="row my-2">
+        <button type="button" data-bs-toggle="collapse"
+                data-bs-target="#ipv6-recommendation"
+                aria-expanded="false" aria-controls="collapseExample"
+                class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+          <i
+            class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+          Why you should enable IPv6
+        </button>
+
+       <div class="p-0 collapse" id="ipv6-recommendation">
+      <div class="p-3 border-bottom border-end border-start table-responsive">
+            <p>
+              IPv6 is the next generation of the Internet Protocol, and it offers a
+              number of advantages over IPv4, the current version of the protocol.
+            </p>
+            <ul>
+              <li>
+                Address exhaustion: IPv4 is running out of available addresses due to
+                the rapid growth of connected devices. IPv6 provides a significantly
+                larger address space, ensuring that there are enough unique IP addresses
+                to accommodate the expanding number of devices and services.
+              </li>
+              <li>
+                Future-proofing: As the industry shifts towards IPv6, enabling IPv6
+                support ensures compatibility and seamless communication with the
+                growing number of IPv6-enabled networks and devices. It future-proofs
+                your infrastructure, avoiding potential connectivity issues and the need
+                for costly workarounds.
+              </li>
+              <li>
+                Enhanced functionality: IPv6 offers improvements in areas such as
+                auto-configuration, mobility, and quality of service, allowing for more
+                efficient and advanced network operations. Enabling IPv6 unlocks these
+                enhanced functionalities, promoting a better user experience and
+                enabling innovative applications and services.
+              </li>
+              <li>
+                Global reachability: With IPv6, your services can reach a larger global
+                audience, including regions and networks that primarily use IPv6. By
+                enabling IPv6, you expand your online presence and increase
+                accessibility to your web services.
+              </li>
+              <li>
+                Security advancements: IPv6 includes built-in security features, such as
+                IPsec (Internet Protocol Security), which provides native encryption,
+                authentication, and data integrity. Enabling IPv6 allows you to leverage
+                these security enhancements, improving the confidentiality and integrity
+                of your network traffic.
+              </li>
+            </ul>
+
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -926,52 +972,122 @@
     </div>
   </div>
   {% if tls_results %}
-    {% for version, suites in tls_results.items %}
-      <div class="row my-2">
-        <button type="button" data-bs-toggle="collapse"
-                data-bs-target="#tls-found-{{ forloop.counter }}"
-                aria-expanded="false" aria-controls="collapseExample"
-                class="btn p-3 fs-2 fw-bold text-start text-light
-                {% if tls_lowest_sec_level|get:version == "GOOD" or tls_lowest_sec_level|get:version == "SUFFICIENT" %}
+  {% for version, suites in tls_results.items %}
+  <div class="row my-2">
+    <button type="button" data-bs-toggle="collapse"
+            data-bs-target="#tls-found-{{ forloop.counter }}"
+            aria-expanded="false" aria-controls="collapseExample"
+            class="btn p-3 fs-2 fw-bold text-start text-light
+                {% if tls_lowest_sec_level|get:version == 'GOOD' or tls_lowest_sec_level|get:version == 'SUFFICIENT' %}
                   bg-info
-                {% elif tls_lowest_sec_level|get:version == "PHASE_OUT" %}
+                {% elif tls_lowest_sec_level|get:version == 'PHASE_OUT' %}
                   bg-warning
-                {% elif tls_lowest_sec_level|get:version == "INSUFFICIENT" %}
+                {% elif tls_lowest_sec_level|get:version == 'INSUFFICIENT' %}
                   bg-danger
                 {% endif %}">
-          <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
-          {{ version }}
-        </button>
+      <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+      {{ version }}
+    </button>
 
-        <div class="p-0 collapse" id="tls-found-{{ forloop.counter }}">
-            <div class="p-3 border-bottom border-end border-start">
-              <table class="table table-light table-bordered table-striped">
-                <tr>
-                  <th>Ciphersuite</th>
-                  <th>Security level</th>
-                </tr>
-                {% for name, info in suites.items %}
-                  <tr>
-                    <td>{{ name }}</td>
-                    <td>
-                      {% if info.sec_level.level == "GOOD" or info.sec_level.level == "SUFFICIENT" %}
-                        <i class="bi bi-check-circle-fill color-success"> </i>
-                      {% elif info.sec_level.level == "PHASE_OUT" %}
-                        <i class="bi bi-exclamation-circle-fill text-warning"> </i>
-                      {% elif info.sec_level.level == "INSUFFICIENT" %}
-                        <i class="bi bi-x-circle-fill color-danger"> </i>
-                      {% endif %}
-                      {{ info.sec_level.level }}
-                    </td>
-                  </tr>
-                {% endfor %}
-              </table>
-            </div>
-          </div>
+    <div class="p-0 collapse" id="tls-found-{{ forloop.counter }}">
+      <div class="p-3 border-bottom border-end border-start table-responsive">
+        <table class="table table-light table-bordered table-striped">
+          <tr>
+            <th>Ciphersuite</th>
+            <th>Security level</th>
+          </tr>
+          {% for name, info in suites.items %}
+          <tr>
+            <td>{{ name }}</td>
+            <td>
+              {% if info.sec_level.level == "GOOD" or info.sec_level.level == "SUFFICIENT" %}
+              <i class="bi bi-check-circle-fill color-success"> </i>
+              {% elif info.sec_level.level == "PHASE_OUT" %}
+              <i class="bi bi-exclamation-circle-fill text-warning"> </i>
+              {% elif info.sec_level.level == "INSUFFICIENT" %}
+              <i class="bi bi-x-circle-fill color-danger"> </i>
+              {% endif %}
+              {{ info.sec_level.level }}
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
       </div>
+    </div>
+  </div>
 
-    {% endfor %}
+  {% endfor %}
   {% endif %}
+  <div class="row my-2">
+    <button type="button" data-bs-toggle="collapse"
+            data-bs-target="#tls-recommendation"
+            aria-expanded="false" aria-controls="collapseExample"
+            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+      <i
+        class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+      Recommendation
+    </button>
+
+    <div class="p-0 collapse" id="tls-recommendation">
+      <div class="p-4 border-bottom border-end border-start">
+
+        Stay Updated:
+        <ul>
+          <li>Always use the latest TLS versions to benefit from improved security
+            features.
+          </li>
+          <li>Disable outdated and vulnerable protocols like SSL to prevent potential
+            attacks.
+          </li>
+          <li>Prioritize strong cipher suites to ensure robust encryption and
+            authentication.
+          </li>
+        </ul>
+        Manage Certificates:
+        <ul>
+          <li>Obtain certificates from trusted Certificate Authorities (CAs) to
+            establish trust with your users.
+          </li>
+          <li>Regularly check and monitor for any certificate revocations to maintain
+            the integrity of your certificates.
+          </li>
+          <li>Implement certificate pinning to protect against fraudulent or compromised
+            certificates.
+          </li>
+        </ul>
+        Implement Perfect Forward Secrecy (PFS):
+        <ul>
+          <li>Enable Perfect Forward Secrecy to ensure that past communications remain
+            secure even if private keys are compromised.
+          </li>
+          <li>By generating unique session keys, PFS adds an extra layer of
+            confidentiality to your data.
+          </li>
+        </ul>
+
+        Use Strong Cryptography:
+        <ul>
+          <li>Employ strong cryptographic algorithms for encryption, key exchange, and
+            hashing.
+          </li>
+          <li>Regularly update your cryptographic libraries to address any emerging
+            vulnerabilities and ensure optimal security.
+          </li>
+        </ul>
+
+        Disable Vulnerable Features:
+        <ul>
+          <li>Disable insecure protocols such as SSLv2, SSLv3, and outdated TLS versions
+            (e.g., TLS 1.0, TLS 1.1).
+          </li>
+          <li>Remove weak ciphers, like those using the RC4 encryption algorithm or
+            outdated key sizes, to eliminate potential security risks.
+          </li>
+        </ul>
+
+      </div>
+    </div>
+  </div>
 </section>
 
 
@@ -990,4 +1106,6 @@
       }
     });
   }
+
 </script>
+

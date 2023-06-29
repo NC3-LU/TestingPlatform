@@ -72,7 +72,10 @@ def get_http_report(target, rescan):
     if rescan:
         http_url += "&rescan=true"
 
-    json_object = requests.post(http_url).json()
+    data = requests.post(http_url)
+    if data.status_code == 503:
+        return {}
+    json_object = data.json()
 
     headers = {}
     use = True

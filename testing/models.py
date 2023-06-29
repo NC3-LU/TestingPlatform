@@ -1,5 +1,3 @@
-import urllib
-
 from django.db import models
 
 from authentication.models import User
@@ -67,8 +65,8 @@ class DMARCRecord(models.Model):
 
     def save(self, *args, **kwargs):
         domain = self.domain.domain.replace("www.", "")
-        orga = self.user.company_name.replace(" ", "_")
-        self.mailto = f"report+{urllib.parse.quote_plus(orga)}-{domain}@test-dmarc.lu"
+        # orga = self.user.company_name.replace(" ", "_")
+        # self.mailto = f"report+{urllib.parse.quote_plus(orga)}-{domain}@test-dmarc.lu"
 
         self.txt_record = f"_dmarc.{domain}"
 

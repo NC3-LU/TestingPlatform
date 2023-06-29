@@ -6,7 +6,7 @@ from .models import DMARCRecord, MailDomain
 class DMARCRecordForm(forms.ModelForm):
     class Meta:
         model = DMARCRecord
-        fields = ["domain", "policy", "spf_policy", "dkim_policy"]
+        fields = ["domain", "policy", "spf_policy", "dkim_policy", "mailto"]
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)

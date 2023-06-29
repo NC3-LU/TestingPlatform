@@ -44,6 +44,8 @@
             SPF Alignment:
             {% elif field.name == 'dkim_policy' %}
             DKIM Alignment
+            {% elif field.name == 'mailto' %}
+            Mail to
             {% endif %}
             {% if field.help_text %}
             <small>{{ field.help_text }}</small>

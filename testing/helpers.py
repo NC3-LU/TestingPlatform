@@ -72,9 +72,8 @@ def get_http_report(target, rescan):
     if rescan:
         http_url += "&rescan=true"
 
-    do_scan = requests.post(http_url).text
+    json_object = requests.post(http_url).json()
 
-    json_object = json.loads(do_scan)
     headers = {}
     use = True
 
@@ -524,12 +523,15 @@ def tls_version_check(domain: str):
     results = None
 
     for port in tls_scans:
-        if port["service"]["name"] == "ssl":
+        if (
+            (port.get("service").get("name") == "ssl") or
+            (port.get("portid") == "443" and port.get("service").get("name") == "http") or
+            (port.get("service").get("name") == "https")
+        ):
             for script in port["scripts"]:
-                if script["name"] == "ssl-enum-ciphers":
+                if script.get("name") == "ssl-enum-ciphers":
                     results = script["data"]
-    least_strength = results.pop("least strength")
-
+    results.pop("least strength", None)
     for k in results.keys():
         results[k] = results[k]["ciphers"]["children"]
 

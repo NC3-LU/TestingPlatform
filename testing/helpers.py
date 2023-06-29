@@ -512,8 +512,9 @@ def web_server_check(domain: str):
     return {"services": services, "vulnerabilities": vulnerabilities}
 
 
-def tls_version_check(domain: str):
+def tls_version_check(domain: str, service):
     nmap = nmap3.Nmap()
+    print(f"Scanning host/domain {domain}")
     tls_scans = nmap.nmap_version_detection(domain, args="--script ssl-enum-ciphers")
     ip, tls_scans = list(tls_scans.items())[0]
     tls_scans = list(
@@ -523,14 +524,23 @@ def tls_version_check(domain: str):
     results = None
 
     for port in tls_scans:
-        if (
-            (port.get("service").get("name") == "ssl") or
-            (port.get("portid") == "443" and port.get("service").get("name") == "http") or
-            (port.get("service").get("name") == "https")
-        ):
-            for script in port["scripts"]:
-                if script.get("name") == "ssl-enum-ciphers":
-                    results = script["data"]
+        if service == "web":
+            if (
+                (port.get("service").get("name") == "ssl") or
+                (port.get("portid") == "443" and port.get("service").get("name") == "http") or
+                (port.get("service").get("name") == "https")
+            ):
+                for script in port["scripts"]:
+                    if script.get("name") == "ssl-enum-ciphers":
+                        results = script["data"]
+        elif service == "mail":
+            if (
+                (port.get("portid") == "25")
+            ):
+                for script in port["scripts"]:
+                    if script.get("name") == "ssl-enum-ciphers":
+                        results = script["data"]
+
     results.pop("least strength", None)
     for k in results.keys():
         results[k] = results[k]["ciphers"]["children"]

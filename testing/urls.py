@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import path
 
 from . import views
 
@@ -17,12 +17,12 @@ urlpatterns = [
     #     "dmarc-reporter/<str:domain>/<mailfrom>/<timestamp>/",
     #    views.dmarc_shower,
     #    name="dmarc-shower",
-    #),
+    # ),
     # path(
     #   "dmarc-reporter/<str:domain>/<mailfrom>/<timestamp>/download/",
     #   views.dmarc_dl,
     #   name="dmarc-dl",
-    #),
+    # ),
     # path('dmarc-reporter/upload/', views.dmarc_upload, name='dmarc-uploader'),
     # path("automation/", include("automation.urls")),
 ]

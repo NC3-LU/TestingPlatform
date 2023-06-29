@@ -72,8 +72,8 @@
       <div class="card shadow h-100 border border-2">
         <div class="card-body d-flex flex-column ">
           <h5 class="card-title">Infrastructure Testing</h5>
-          <p>Assess the configuration of your web server (if publicly available)</p>
-          <form method="post" action="infra-testing/web-server-test/" id="web-server-test">
+          <p>Assess the configuration of your web server (if publicly available).</p>
+          <form method="post" action="infra-testing/infra-test/" id="web-server-test">
             {% csrf_token %}
             <br>
             <div class="mb-3">
@@ -93,10 +93,10 @@
       <div class="card shadow h-100 border border-2">
         <div class="card-body d-flex flex-column ">
           <h5 class="card-title">Email Systems Testing</h5>
-          <p>Assess the security of your email setup.
-            <a href="{% url 'knowledge_base'  %}#standards-dmarc-spf">SPF, DMARC</a>,
+          <p>Assess the security of your email setup
+            (<a href="{% url 'knowledge_base'  %}#standards-dmarc-spf">SPF, DMARC</a>,
             <a href="{% url 'knowledge_base'  %}#standards-dkim">DKIM</a>
-            DNS records, and deployment of DNSSEC.</p>
+            DNS records, and deployment of DNSSEC).</p>
 
           <form method="post" action="infra-testing/email-test/" id="email-test">
             {% csrf_token %}

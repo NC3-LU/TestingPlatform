@@ -90,7 +90,7 @@ def http_test(request):
         context.update(get_http_report(request.POST["target"], False))
         context.update(ipv6_check(request.POST["target"], None))
 
-        tls_results = tls_version_check(request.POST["target"])
+        tls_results = tls_version_check(request.POST["target"], "web")
         context["tls_results"] = tls_results["result"]
         context["tls_lowest_sec_level"] = tls_results["lowest_sec_level"]
 
@@ -175,16 +175,22 @@ def email_test(request):
             context = {"status": False, "statusmessage": "The given domain is invalid!"}
         else:
             email_result = email_check(target)
-
             context.update(email_result)
+            # messages.info(request, "Analyzed SPF/DMARC config")
             context.update(check_dkim_public_key(target, []))
+            # messages.info(request, "Analyzed DKIM config")
             context.update(ipv6_check(target, None))
-            # tls_results = tls_version_check(request.POST["target"])
-            # context["tls_results"] = tls_results["result"]
-            # context["tls_lowest_sec_level"] = tls_results["lowest_sec_level"]
+            # messages.info(request, "Analyzed IPv6 configuration")
+            context["tls_result"] = {}
+            context["tls_lowest_sec_level"] = {}
+            # messages.info(request, f"Found {len(email_result['mx']['hosts'])} MX hosts.")
+            for host in email_result['mx']['hosts']:
+                tls_result = tls_version_check(host["hostname"], "mail")
+                context["tls_result"][host["hostname"]] = tls_result["result"]
+                context["tls_lowest_sec_level"][host["hostname"]] = tls_result["lowest_sec_level"]
+                # messages.info(request, f"MX host scanned.")
+
             # context.update({"status": True})
-            # for host in email_results['result']['mx']['hosts']:
-            # context["ipv6_mx"] = ipv6_check(
             #        host["hostname"], None
             #    )
             #    context["tls_mx"] = tls_version_check(

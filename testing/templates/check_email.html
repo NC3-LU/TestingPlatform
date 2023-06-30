@@ -88,13 +88,13 @@
               {% if result.record.2 %}
                 <script> countGood++;countTotal++;</script>
                 <i class="bi bi-check-circle-fill color-success"></i>
-                Your server has an IPv6 address.
+                Your server has an IPv6 address.(IPv6)
               {% else %}
                 <script>countBad++;countTotal++;</script>
                 <i class="bi bi-x-circle-fill color-danger"></i>
-                Your server does not have an IPv6 address.
+                Your server does not have an IPv6 address. (IPv6)
               {% endif %}
-              (IPv6)
+
             </div>
             <div class="col-lg-12 fs-4">
               {% if result.dkim %}
@@ -152,7 +152,7 @@
           {% endif %}
           SPF Record
         </div>
-        v
+
         <div class="col-lg-12 fs-4">
           <p>The Sender Policy Framework (SPF) is an email validation protocol that helps
             detect and block email spoofing. Email spoofing is a common technique used in
@@ -924,9 +924,10 @@
 
 </script>
 <script>
-     document.getElementById('vulnerable-count').innerHTML = '&nbsp;'+ countBad '&nbsp;' ;
-    document.getElementById('good-count').innerHTML = '&nbsp;' + countGood + '&nbsp;' ;
-    document.getElementById('warning-count').innerHTML = '&nbsp;' + countWarning + '&nbsp;';
+
+    document.getElementById('vulnerable-count').innerHTML = countBad;
+    document.getElementById('good-count').innerHTML = countGood;
+    document.getElementById('warning-count').innerHTML = countWarning;
 </script>
 
 {% endblock %}

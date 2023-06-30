@@ -73,8 +73,6 @@ def get_http_report(target, rescan):
         http_url += "&rescan=true"
 
     data = requests.post(http_url)
-    if data.status_code == 503:
-        return {}
     json_object = data.json()
 
     headers = {}
@@ -318,7 +316,7 @@ def ipv6_check(
                 if answer.rdtype == dns.rdatatype.A
             ]
             for nameserver_ip in nameserver_ips:
-                q = dns.message.make_query("example.com", dns.rdatatype.A)
+                q = dns.message.make_query("https://example.com", dns.rdatatype.A)
                 try:
                     udp_response = dns.query.udp(q, nameserver_ip)  # noqa: F841
                     supports_udp_v4 = True
@@ -353,7 +351,7 @@ def ipv6_check(
                 if answer.rdtype == dns.rdatatype.AAAA
             ]
             for nameserver_ip in nameserver_ips:
-                q = dns.message.make_query("example.com", dns.rdatatype.AAAA)
+                q = dns.message.make_query("https://example.com", dns.rdatatype.AAAA)
                 connect_udp = True
                 connect_tcp = True
                 try:

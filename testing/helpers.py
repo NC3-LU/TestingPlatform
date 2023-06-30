@@ -5,7 +5,6 @@ import re
 import socket
 import subprocess
 import time
-import pandas
 from base64 import b64decode
 from io import BytesIO
 from typing import Any, Dict, List, Union
@@ -18,11 +17,9 @@ import pypandora
 import requests
 from Crypto.PublicKey import RSA
 
-from .cipher_scoring import load_cipher_info
-
 from testing.models import TlsScanHistory
 
-from testing_platform.settings import BASE_DIR
+from .cipher_scoring import load_cipher_info
 
 logger = logging.getLogger(__name__)
 
@@ -527,17 +524,18 @@ def tls_version_check(domain: str, service):
     for port in tls_scans:
         if service == "web":
             if (
-                (port.get("service").get("name") == "ssl") or
-                (port.get("portid") == "443" and port.get("service").get("name") == "http") or
-                (port.get("service").get("name") == "https")
+                (port.get("service").get("name") == "ssl")
+                or (
+                    port.get("portid") == "443"
+                    and port.get("service").get("name") == "http"
+                )
+                or (port.get("service").get("name") == "https")
             ):
                 for script in port["scripts"]:
                     if script.get("name") == "ssl-enum-ciphers":
                         results = script["data"]
         elif service == "mail":
-            if (
-                (port.get("portid") == "25")
-            ):
+            if port.get("portid") == "25":
                 for script in port["scripts"]:
                     if script.get("name") == "ssl-enum-ciphers":
                         results = script["data"]
@@ -551,7 +549,10 @@ def tls_version_check(domain: str, service):
         for ciphersuite in results[tls_version]:
             ciphersuite.pop("strength")
             cipher_info = json.loads(
-                requests.get(f"https://ciphersuite.info/api/cs/{ciphersuite['name']}").text)[ciphersuite["name"]]
+                requests.get(
+                    f"https://ciphersuite.info/api/cs/{ciphersuite['name']}"
+                ).text
+            )[ciphersuite["name"]]
             for key in ["gnutls_name", "openssl_name", "hex_byte_1", "hex_byte_2"]:
                 cipher_info.pop(key)
             cipher_info["tls_version"] = tls_version

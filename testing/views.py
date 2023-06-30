@@ -26,10 +26,9 @@ from .helpers import (
     email_check,
     file_check,
     get_http_report,
-    get_tls_report,
     ipv6_check,
-    web_server_check,
     tls_version_check,
+    web_server_check,
 )
 from .models import DMARCRecord, DMARCReport, MailDomain
 
@@ -86,7 +85,7 @@ def http_test(request):
             return redirect("signup")
         context = {"rescan": False}
         # if "rescan" in request.POST:
-          #  context["rescan"] = True
+        #  context["rescan"] = True
 
         context.update(get_http_report(request.POST["target"], False))
         context.update(ipv6_check(request.POST["target"], None))
@@ -185,10 +184,12 @@ def email_test(request):
             context["tls_result"] = {}
             context["tls_lowest_sec_level"] = {}
             # messages.info(request, f"Found {len(email_result['mx']['hosts'])} MX hosts.")
-            for host in email_result['mx']['hosts']:
+            for host in email_result["mx"]["hosts"]:
                 tls_result = tls_version_check(host["hostname"], "mail")
                 context["tls_result"][host["hostname"]] = tls_result["result"]
-                context["tls_lowest_sec_level"][host["hostname"]] = tls_result["lowest_sec_level"]
+                context["tls_lowest_sec_level"][host["hostname"]] = tls_result[
+                    "lowest_sec_level"
+                ]
                 # messages.info(request, f"MX host scanned.")
 
             # context.update({"status": True})
@@ -324,6 +325,7 @@ def dmarc_generator(request):
                 policy=data["policy"],
                 spf_policy=data["spf_policy"],
                 dkim_policy=data["dkim_policy"],
+                mailto=data["mailto"],
             )
             report.save()
             context = {
@@ -417,7 +419,7 @@ def dmarc_dl(request, domain, mailfrom, timestamp):
             headers={
                 "Content-Type": "application/xml",
                 "Content-Disposition": f"attachment; "
-                                       f'filename="dmarc_{domain}_{mailfrom}_{timestamp}.xml"',
+                f'filename="dmarc_{domain}_{mailfrom}_{timestamp}.xml"',
             },
         )
         return response

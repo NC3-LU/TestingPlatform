@@ -15,7 +15,6 @@ class SecLevel(Enum):
 
 
 class CipherScoreAndSecLevel:
-
     @staticmethod
     def get_score_header():
         return "DHEAERKKKKKKKKKKKKKKKKHHHHHHHHHHHHHHHHAC"
@@ -25,10 +24,9 @@ class CipherScoreAndSecLevel:
         if ci.tls_version == "TLSv1.3":
             return 1, SecLevel.GOOD
         else:
-            return {
-                "ECDSA": (2, SecLevel.GOOD),
-                "RSA": (1, SecLevel.GOOD)
-            }.get(ci.auth_algorithm, (0, SecLevel.INSUFFICIENT))
+            return {"ECDSA": (2, SecLevel.GOOD), "RSA": (1, SecLevel.GOOD)}.get(
+                ci.auth_algorithm, (0, SecLevel.INSUFFICIENT)
+            )
 
     @staticmethod
     def get_subscore_mac_alg(ci):
@@ -161,6 +159,7 @@ class CipherScoreAndSecLevel:
     def get_violated_rule_number(score1, score2):
         def get_highest_set_bit(n):
             return -1 if n == 0 else int(log(n, 2))
+
         if score1 == score2:
             raise ValueError
         highestbit = None
@@ -204,7 +203,7 @@ def load_cipher_info(ciphersuites: list):
                 "auth_algorithm": self.auth_algorithm,
                 "enc_algorithm": self.enc_algorithm,
                 "hash_algorithm": self.hash_algorithm,
-                "sec_level": self.sec_level
+                "sec_level": self.sec_level,
             }
 
     result = dict()
@@ -213,9 +212,11 @@ def load_cipher_info(ciphersuites: list):
         if ciphersuite["name"] not in result:
             ci = CipherInfo(ciphersuite)
             sec_level = CipherScoreAndSecLevel.determine_appendix_c_sec_level(ci)
-            ci.sec_level = {"level": sec_level.name,
-                            "score": sec_level.value}
+            ci.sec_level = {"level": sec_level.name, "score": sec_level.value}
             result[ciphersuite["name"]] = ci.__dict__()
             if sec_level.value < lowest_sec_level:
                 lowest_sec_level = sec_level.value
-    return {"result": result, "lowest_sec_level": str(SecLevel(lowest_sec_level)).split(".")[1]}
+    return {
+        "result": result,
+        "lowest_sec_level": str(SecLevel(lowest_sec_level)).split(".")[1],
+    }

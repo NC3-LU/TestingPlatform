@@ -140,6 +140,7 @@ def get_http_report(target, rescan):
         if counter == 5 and state != "FINISHED":
             logger.warning("http scan: not finished after 5 times, skipping")
 
+        logger.info(f"http scan: Done!")
         return {
             "result": response,
             "domain_name": target,
@@ -285,10 +286,12 @@ def ipv6_check(
     domain: str, port=None
 ) -> Dict[str, Union[Dict[Any, Any], List[Union[str, int]], List[Any]]]:
 
+    logger.info(f"ipv6 scan: scanning domain {domain}")
     results = {}
 
     # Check Name Servers connectivity:
     default_resolver = dns.resolver.Resolver().nameservers[0]
+    logger.info(f"ipv6 scan: default resolver is {default_resolver}")
     q = dns.message.make_query(domain, dns.rdatatype.NS)
     ns_response = dns.query.udp(q, default_resolver)
     ns_names = [
@@ -313,7 +316,9 @@ def ipv6_check(
                 if answer.rdtype == dns.rdatatype.A
             ]
             for nameserver_ip in nameserver_ips:
-                q = dns.message.make_query("https://example.com", dns.rdatatype.A)
+
+                logger.info(f"ipv6 scan: found NS at ip {nameserver_ip}")
+                q = dns.message.make_query("https://ciphersuite.info", dns.rdatatype.A)
                 try:
                     udp_response = dns.query.udp(q, nameserver_ip)  # noqa: F841
                     supports_udp_v4 = True
@@ -348,7 +353,8 @@ def ipv6_check(
                 if answer.rdtype == dns.rdatatype.AAAA
             ]
             for nameserver_ip in nameserver_ips:
-                q = dns.message.make_query("https://example.com", dns.rdatatype.AAAA)
+                logger.info(f"ipv6 scan: found NS at ip {nameserver_ip}")
+                q = dns.message.make_query("https://ciphersuite.info", dns.rdatatype.AAAA)
                 connect_udp = True
                 connect_tcp = True
                 try:
@@ -378,6 +384,8 @@ def ipv6_check(
 
     # Grading results
     counter = 0
+
+    logger.info(f"ipv6 scan: grading results")
     for key in results["nameservers"]:
         if results["nameservers"][key]["ipv6"]["address"]:
             counter += 1
@@ -463,6 +471,7 @@ def ipv6_check(
                 "comment": "Your server is not reachable over IPv6.",
             }
 
+    logger.info(f"ipv6 scan: Done!")
     return {
         "nameservers": results["nameservers"],
         "nameservers_comments": nameservers_comments,
@@ -475,6 +484,7 @@ def ipv6_check(
 
 def web_server_check(domain: str):
     nmap = nmap3.Nmap()
+    logger.info(f"server scan: testing {domain}")
     service_scans = nmap.nmap_version_detection(
         domain, args="--script vulners --script-args mincvss+5.0"
     )
@@ -507,12 +517,13 @@ def web_server_check(domain: str):
                 )
             except KeyError:
                 pass
+    logger.info(f"server scan: Done!")
     return {"services": services, "vulnerabilities": vulnerabilities}
 
 
 def tls_version_check(domain: str, service):
     nmap = nmap3.Nmap()
-    print(f"Scanning host/domain {domain}")
+    logger.info(f"tls scan: Scanning host/domain {domain}")
     tls_scans = nmap.nmap_version_detection(domain, args="--script ssl-enum-ciphers")
     ip, tls_scans = list(tls_scans.items())[0]
     tls_scans = list(
@@ -522,6 +533,7 @@ def tls_version_check(domain: str, service):
     results = None
 
     for port in tls_scans:
+        logger.info(f"tls scan: Testing port {port.get('portid')}")
         if service == "web":
             if (
                 (port.get("service").get("name") == "ssl")
@@ -560,6 +572,7 @@ def tls_version_check(domain: str, service):
         ci = load_cipher_info(results[tls_version])
         results[tls_version] = ci["result"]
         lowest_sec_level.update({f"{tls_version}": ci["lowest_sec_level"]})
+    logger.info(f"server scan: Done!")
     return {"result": results, "lowest_sec_level": lowest_sec_level}
 
 

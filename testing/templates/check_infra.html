@@ -114,55 +114,55 @@
         </div>
       </div>
     </div>
+    <div>
       <br>
       {% for vulnerability in vulnerabilities %}
-      <h3>{{ vulnerability.service }}</h3>
-      {% if vulnerability.vuln_list %}
-
-      <div class="table-responsive">
-        <table class="table table-light table-bordered table-striped">
-          <tr>
-            <th>ID</th>
-            <th>CVSS</th>
-            <th>Type</th>
-            <th>Exploit status</th>
-          </tr>
-          {% for vuln in vulnerability.vuln_list %}
-          <tr>
-            <td>{{ vuln.id }}</td>
-            <td>{{ vuln.cvss }}</td>
-            <td>{{ vuln.type }}</td>
-            <td>
-              {% if vuln.is_exploit == 'true' %}
-              <a onclick='openPopup("popup-{{ vuln.id }}")' href="#vulnerabilities">
-                <i class="bi bi-exclamation-circle-fill text-warning"></i>
-              </a>
-              <div class="custom-popup shadow bg-light" id="popup-{{ vuln.id }}">
-                <h4>{{ vuln.id }}</h4>
-                <p>This vulnerability is exploitable by adversaries.</p>
-                <p>A few interesting links with info on the exploit and how to mitigate
-                  it:</p>
-                <a href="https://vulners.com/{{ vuln.type }}/{{ vuln.id }}"
-                   target="_blank">Vulners info page</a>
-                <input type="submit" value="Close" class="btn btn-secondary"
-                       onclick='hidePopup("popup-{{ vuln.id }}")'>
-              </div>
-              {% else %}
-              <i class="bi bi-check-circle-fill color-success"></i>
-              {% endif %}
-              {% if vuln.type == 'cve' %}
-              <a href="https://cvepremium.circl.lu/cve/{{ vuln.id }}" target="_blank">
-                <i class="bi bi-search"></i>
-              </a>
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-          {% else %}
-          No vulnerabilities found for this service.
-        </table>
-      </div>
-      {% endif %}
+        <h3>{{ vulnerability.service }}</h3>
+        {% if vulnerability.vuln_list %}
+          <div class="table-responsive">
+            <table class="table table-light table-bordered table-striped">
+              <tr>
+                <th>ID</th>
+                <th>CVSS</th>
+                <th>Type</th>
+                <th>Exploit status</th>
+              </tr>
+              {% for vuln in vulnerability.vuln_list %}
+                <tr>
+                  <td>{{ vuln.id }}</td>
+                  <td>{{ vuln.cvss }}</td>
+                  <td>{{ vuln.type }}</td>
+                  <td>
+                    {% if vuln.is_exploit == 'true' %}
+                      <a onclick='openPopup("popup-{{ vuln.id }}")' href="#vulnerabilities">
+                        <i class="bi bi-exclamation-circle-fill text-warning"></i>
+                      </a>
+                      <div class="custom-popup shadow bg-light" id="popup-{{ vuln.id }}">
+                        <h4>{{ vuln.id }}</h4>
+                        <p>This vulnerability is exploitable by adversaries.</p>
+                        <p>A few interesting links with info on the exploit and how to mitigate
+                          it:</p>
+                        <a href="https://vulners.com/{{ vuln.type }}/{{ vuln.id }}"
+                           target="_blank">Vulners info page</a>
+                        <input type="submit" value="Close" class="btn btn-secondary"
+                               onclick='hidePopup("popup-{{ vuln.id }}")'>
+                      </div>
+                    {% else %}
+                      <i class="bi bi-check-circle-fill color-success"></i>
+                    {% endif %}
+                    {% if vuln.type == 'cve' %}
+                      <a href="https://cvepremium.circl.lu/cve/{{ vuln.id }}" target="_blank">
+                        <i class="bi bi-search"></i>
+                      </a>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% else %}
+          <p>No vulnerabilities found for this service.</p>
+        {% endif %}
       {% endfor %}
 
     </div>

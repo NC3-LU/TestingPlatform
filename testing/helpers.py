@@ -504,7 +504,7 @@ def web_server_check(domain: str):
                 vulners = vulners[0]["data"]
                 for _vuln, vuln_data in vulners.items():
                     try:
-                        list_of_vulns += vuln_data["children"]
+                        list_of_vulns += vuln_data.get("children")
                     except TypeError:
                         list_of_vulns = []
             services.append(service)
@@ -552,7 +552,10 @@ def tls_version_check(domain: str, service):
                     if script.get("name") == "ssl-enum-ciphers":
                         results = script["data"]
 
-    results.pop("least strength", None)
+    try:
+        results.pop("least strength", None)
+    except AttributeError:
+        pass
     for k in results.keys():
         results[k] = results[k]["ciphers"]["children"]
 

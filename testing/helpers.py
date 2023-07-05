@@ -521,6 +521,7 @@ def web_server_check(domain: str):
             except KeyError:
                 pass
     logger.info(f"server scan: Done!")
+    logger.info(vulnerabilities)
     return {"services": services, "vulnerabilities": vulnerabilities}
 
 

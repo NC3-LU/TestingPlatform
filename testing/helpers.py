@@ -237,7 +237,6 @@ def email_check(target: str) -> Dict[str, Any]:
         result = {}
 
     # result["dkim"] = check_dkim_public_key(target, [])
-    print(result)
     return result
 
 
@@ -354,7 +353,9 @@ def ipv6_check(
             ]
             for nameserver_ip in nameserver_ips:
                 logger.info(f"ipv6 scan: found NS at ip {nameserver_ip}")
-                q = dns.message.make_query("https://ciphersuite.info", dns.rdatatype.AAAA)
+                q = dns.message.make_query(
+                    "https://ciphersuite.info", dns.rdatatype.AAAA
+                )
                 connect_udp = True
                 connect_tcp = True
                 try:
@@ -507,6 +508,8 @@ def web_server_check(domain: str):
                         list_of_vulns += vuln_data.get("children")
                     except TypeError:
                         list_of_vulns = []
+                    except AttributeError:
+                        list_of_vulns = []
             services.append(service)
             try:
                 vulnerabilities.append(
@@ -563,11 +566,14 @@ def tls_version_check(domain: str, service):
     for tls_version in results:
         for ciphersuite in results[tls_version]:
             ciphersuite.pop("strength")
-            cipher_info = json.loads(
-                requests.get(
-                    f"https://ciphersuite.info/api/cs/{ciphersuite['name']}"
-                ).text
-            )[ciphersuite["name"]]
+            try:
+                cipher_info = json.loads(
+                    requests.get(
+                        f"https://ciphersuite.info/api/cs/{ciphersuite['name']}"
+                    ).text
+                )[ciphersuite["name"]]
+            except Exception:
+                continue
             for key in ["gnutls_name", "openssl_name", "hex_byte_1", "hex_byte_2"]:
                 cipher_info.pop(key)
             cipher_info["tls_version"] = tls_version

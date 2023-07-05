@@ -90,9 +90,12 @@ def http_test(request):
         context.update(get_http_report(request.POST["target"], False))
         # context.update(ipv6_check(request.POST["target"], None))
 
-        tls_results = tls_version_check(request.POST["target"], "web")
-        context["tls_results"] = tls_results["result"]
-        context["tls_lowest_sec_level"] = tls_results["lowest_sec_level"]
+        try:
+            tls_results = tls_version_check(request.POST["target"], "web")
+            context["tls_results"] = tls_results["result"]
+            context["tls_lowest_sec_level"] = tls_results["lowest_sec_level"]
+        except Exception:
+            pass
 
         nb_tests += 1
         response = render(request, "check_website.html", context)
@@ -185,11 +188,14 @@ def email_test(request):
             context["tls_lowest_sec_level"] = {}
             # messages.info(request, f"Found {len(email_result['mx']['hosts'])} MX hosts.")
             for host in email_result["mx"]["hosts"]:
-                tls_result = tls_version_check(host["hostname"], "mail")
-                context["tls_result"][host["hostname"]] = tls_result["result"]
-                context["tls_lowest_sec_level"][host["hostname"]] = tls_result[
-                    "lowest_sec_level"
-                ]
+                try:
+                    tls_result = tls_version_check(host["hostname"], "mail")
+                    context["tls_result"][host["hostname"]] = tls_result["result"]
+                    context["tls_lowest_sec_level"][host["hostname"]] = tls_result[
+                        "lowest_sec_level"
+                    ]
+                except Exception:
+                    continue
                 # messages.info(request, f"MX host scanned.")
 
             # context.update({"status": True})

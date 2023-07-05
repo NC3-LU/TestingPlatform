@@ -507,9 +507,9 @@ def web_server_check(domain: str):
                     try:
                         list_of_vulns += vuln_data.get("children")
                     except TypeError:
-                        list_of_vulns = []
+                        continue
                     except AttributeError:
-                        list_of_vulns = []
+                        continue
             services.append(service)
             try:
                 vulnerabilities.append(

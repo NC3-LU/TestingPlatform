@@ -561,8 +561,12 @@ def web_server_check(hostname):
                             else:
                                 info['link'] = f"https://vulners.com/{info['type']}/{info['id']}"
                             vuln_list.append(info)
+            try:
+                service_name = f"{port['service'].get('product', 'Unknown')} - {port['service']['name']}"
+            except KeyError:
+                service_name = f"{port['service']['name']}"
             vulnerabilities.append({
-                "service": f"{port['service']['product']} - {port['service']['name']}",
+                "service": service_name,
                 "vuln_list": vuln_list
             })
     return {

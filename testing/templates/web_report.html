@@ -6,20 +6,14 @@
   let countBad = 0;
   let countWarning = 0;
   let countTotal = 0;
-
 </script>
 
-
 <section class="col-lg-11 row my-5 border border-2 rounded p-lg-4 p-md-4">
-
   <h1 class="text-center">Overview of {{ domain_name }}</h1>
   <div class="row justify-content-evenly mb-5">
     <div class="col-lg-3 d-flex align-items-center justify-content-center">
       <canvas id="chart1"></canvas>
     </div>
-    <!--<div class="col-lg-6 d-flex align-items-center">
-      <canvas id="chart2"></canvas>
-    </div>-->
   </div>
   <div class="row justify-content-between">
     <div class="col-lg-7">
@@ -123,18 +117,18 @@
           {{ result.x_xss_protection.score_description }}
         </div>
       </div>
-      <div class="row my-1">
+    <!--  TODO Check if readd nameserver check<div class="row my-1">
         <div class="col-lg-12 fs-4">
-          {% if nameservers_reachability_comments.grade == "full" %}
+          {% if result.nameservers_reachability_comments.grade == "full" %}
           <script> countGood++;countTotal++;</script>
           <i class="bi bi-check-circle-fill color-success"> </i>
-          {% elif nameservers_reachability_comments.grade == "null" %}
+          {% elif result.nameservers_reachability_comments.grade == "null" %}
           <script>countBad++;countTotal++;</script>
           <i class="bi bi-x-circle-fill color-danger"></i>
           {% endif %}
-          {{ nameservers_reachability_comments.comment }} (IPv6)
+          {{ result.nameservers_reachability_comments.comment }} (IPv6)
         </div>
-      </div>
+      </div>-->
       <div class="row my-1">
         <div class="col-lg-12 fs-4">
           {% if record.2 %}
@@ -155,14 +149,16 @@
         <div class="col-lg-12 fs-4">
 
           {% if tls_lowest_sec_level|get:version == 'GOOD' or tls_lowest_sec_level|get:version == 'SUFFICIENT' %}
-            <script>countGood++;countTotal++; console.log('tlsgood'+ countGood)</script>
-            <i class="bi bi-check-circle-fill color-success"></i>
+          <script>countGood++;countTotal++; console.log('tlsgood'+ countGood)</script>
+          <i class="bi bi-check-circle-fill color-success"></i>
           {% elif tls_lowest_sec_level|get:version == 'PHASE_OUT' %}
-            <i class="bi bi-exclamation-circle-fill text-warning"> </i>
-            <script>countWarning++;countTotal++; console.log('tlswarning'+ countWarning)</script>
+          <i class="bi bi-exclamation-circle-fill text-warning"> </i>
+          <script>countWarning++;countTotal++; console.log('tlswarning'+ countWarning)
+
+          </script>
           {% elif tls_lowest_sec_level|get:version == 'INSUFFICIENT' %}
-            <script>countBad++;countTotal++;console.log('tlsbad'+ countBad)</script>
-            <i class="bi bi-check-circle-fill color-danger"></i>
+          <script>countBad++;countTotal++;console.log('tlsbad'+ countBad)</script>
+          <i class="bi bi-check-circle-fill color-danger"></i>
           {% endif %}
           {{ version }}
         </div>
@@ -171,25 +167,27 @@
       {% endif %}
       <!-- -- -->
     </div>
-    <div class="col-lg-3">
-      <h1>Test Discovery</h1>
-      <div class="row mb-4">
-        <div class="col-lg-6 fs-2 mb-1">Good</div>
-        <div class="col-lg-6"><span id="good-count"
+    <div class="col-lg-5">
+      <h2>Vulnerabilities</h2>
+      <div class="row mb-4 justify-content-evenly">
+        <div class="col-lg-6 col-md-8 fs-2 mb-1 ">Good</div>
+        <div class="col-lg-6 col-md-8 "><span id="good-count"
                                     class="rounded-circle p-2 fs-4 text-white bg-success"
         ></span>
         </div>
       </div>
       <div class="row my-4">
-        <div class="col-lg-6 fs-2 mb-1">Vulnerable</div>
-        <div class="col-lg-6"><span id="vulnerable-count"
-                                    class="rounded-circle p-2 fs-4 text-white bg-danger">
+        <div class="col-lg-6 col-md-8 fs-2 mb-1 ">Vulnerable</div>
+        <div class="col-lg-6 col-md-8 ">
+ <span id="vulnerable-count"
+       class="rounded-circle p-2 fs-4  bg-danger text-white">
         </span>
         </div>
+
       </div>
       <div class="row my-4">
-        <div class="col-lg-6 fs-2">Warning</div>
-        <div class="col-lg-6"><span id="warning-count"
+        <div class="col-lg-6 col-md-8 fs-2">Warning</div>
+        <div class="col-lg-6 col-md-8"><span id="warning-count"
                                     class="rounded-circle p-2 fs-4 text-black"
                                     style="background:#f5e230;"></span>
         </div>
@@ -210,7 +208,6 @@
      document.getElementById('vulnerable-count').innerHTML = '&nbsp;' + result + '&nbsp;' ;
      document.getElementById('good-count').innerHTML = '&nbsp;' + parseInt({{ scan_summary.tests_passed }} + countGood - 2) + '&nbsp;' ;
      document.getElementById('warning-count').innerHTML = '&nbsp;' + countWarning + '&nbsp;' ;
-
 
 </script>
 <section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
@@ -234,9 +231,9 @@
     <div class="row my-2">
       <button type="button" data-bs-toggle="collapse" data-bs-target="#target1"
               aria-expanded="false" aria-controls="collapseExample"
-              class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
-        <i style="color: #4ecb71 !important;"
-           class="p-2 rounded-circle bi bi-chevron-right bg-white me-3"></i>
+              class="collapse-button btn p-3 fs-2 fw-bold text-start text-light bg-info rte">
+        <i id="collapse-icon" style="color: #4ecb71 !important;"
+           class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 icon-flipped"></i>
         Current CSP
       </button>
 
@@ -253,7 +250,7 @@
     <div class="row my-2">
       <button type="button" data-bs-toggle="collapse" data-bs-target="#target2"
               aria-expanded="false" aria-controls="collapseExample"
-              class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+              class="collapse-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
         <i
           class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
         How to implement the CSP?
@@ -317,7 +314,7 @@
   <div class="row my-2">
     <button type="button" data-bs-toggle="collapse" data-bs-target="#cookies-found"
             aria-expanded="false" aria-controls="collapseExample"
-            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+            class="collapse-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
       <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
       Cookies found
     </button>
@@ -348,7 +345,7 @@
     <button type="button" data-bs-toggle="collapse"
             data-bs-target="#cookie-recommendation"
             aria-expanded="false" aria-controls="collapseExample"
-            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+            class="collapse-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
       <i
         class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
       Recommendation
@@ -414,7 +411,7 @@
     <button type="button" data-bs-toggle="collapse"
             data-bs-target="#cors-recommendation"
             aria-expanded="false" aria-controls="collapseExample"
-            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+            class="collapse-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
       <i
         class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
       Recommendation
@@ -508,7 +505,7 @@
             aria-expanded="false" aria-controls="collapseExample"
             class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
       <i
-        class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+        class="collapse-button p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
       Recommendation
     </button>
 
@@ -555,7 +552,7 @@
   <div class="row my-2">
     <button type="button" data-bs-toggle="collapse" data-bs-target="#referrer-policy"
             aria-expanded="false" aria-controls="collapseExample"
-            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+            class="collapse-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
       <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
       How to set the referrer policy and what to set?
     </button>
@@ -652,7 +649,7 @@
     <button type="button" data-bs-toggle="collapse"
             data-bs-target="#subresource_integrity"
             aria-expanded="false" aria-controls="collapseExample"
-            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+            class=" collapse-buttonbtn p-3 fs-2 fw-bold text-start text-light bg-info">
       <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
       Subresource Integrity (SRI)
     </button>
@@ -719,6 +716,8 @@
     },
     options: options
   });
+
+
 
 </script>
 {% endif %}
@@ -977,7 +976,7 @@
     <button type="button" data-bs-toggle="collapse"
             data-bs-target="#tls-found-{{ forloop.counter }}"
             aria-expanded="false" aria-controls="collapseExample"
-            class="btn p-3 fs-2 fw-bold text-start text-light
+            class="collapse-button btn p-3 fs-2 fw-bold text-start text-light
                 {% if tls_lowest_sec_level|get:version == 'GOOD' or tls_lowest_sec_level|get:version == 'SUFFICIENT' %}
                   bg-success
                 {% elif tls_lowest_sec_level|get:version == 'PHASE_OUT' %}
@@ -1022,7 +1021,7 @@
     <button type="button" data-bs-toggle="collapse"
             data-bs-target="#tls-recommendation"
             aria-expanded="false" aria-controls="collapseExample"
-            class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+            class="collapse-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
       <i
         class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
       Recommendation
@@ -1107,4 +1106,7 @@
     });
   }
 
+
+
 </script>
+

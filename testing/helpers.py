@@ -58,8 +58,6 @@ def get_http_report(target, rescan):
     # HTTP SCAN Mozilla Observatory
     ################################
     response = {}
-    scan_summary = ""
-    scan_history = ""
 
     logger.info(f"http scan: scanning {target}, with rescan set to {rescan}")
 
@@ -73,7 +71,6 @@ def get_http_report(target, rescan):
     json_object = data.json()
 
     headers = {}
-    use = True
 
     if "error" in json_object:
         if json_object["error"] == "invalid-hostname":
@@ -89,6 +86,22 @@ def get_http_report(target, rescan):
         scan_summary = json_object
         state = ""
         counter = 0
+
+        if json_object["state"] == "ABORTED":
+            result_obj = json.loads(
+                requests.get(
+                    "https://http-observatory.security.mozilla.org/api/v1/getScanResults?scan="
+                    + str(scan_history[-1]['scan_id'])
+                ).text
+            )
+            response = {k.replace("-", "_"): v for k, v in result_obj.items()}
+            return {
+                "result": response,
+                "domain_name": target,
+                "scan_summary": scan_summary,
+                "headers": headers,
+                "scan_history": scan_history,
+            }
 
         while json_object["state"] not in ("ABORTED", "FAILED") and counter < 5:
             get_scan = requests.get(
@@ -562,7 +575,7 @@ def web_server_check(hostname):
                                 info['link'] = f"https://vulners.com/{info['type']}/{info['id']}"
                             vuln_list.append(info)
             try:
-                service_name = f"{port['service'].get('product', 'Unknown')} - {port['service']['name']}"
+                service_name = f"{port['service']['product']} - {port['service']['name']}"
             except KeyError:
                 service_name = f"{port['service']['name']}"
             vulnerabilities.append({

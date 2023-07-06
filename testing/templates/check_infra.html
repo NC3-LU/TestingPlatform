@@ -65,17 +65,13 @@
     </div>
     <div class="col-lg-12 mb-2 text-left fs-5 " id="vulnerabilities">
       <ul>
-        <li>Listing of all the potential vulnerabilities found on your system, when
-          applicable.
+        <li>
+          Listing of all the potential vulnerabilities found on your system,
+          per software, when applicable.
         </li>
-        <li>Click on the <i class="bi bi-exclamation-circle-fill text-warning"></i> icon
-          to
-          see more details on the exploitable vulnerabilities.
-        </li>
-        <li>Click on the <i class="bi bi-search"></i> icon for more details on CVEs
-          (powered by CIRCL CVE Search).
-        </li>
-        <li>Check out the <a href="#general-recommendations-infra">general
+        <li>Click on the <i class="bi bi-search"></i> icon for more details.</li>
+        <li>
+          Check out the <a href="#general-recommendations-infra">general
           recommendations</a>
           below for more details.
         </li>
@@ -125,7 +121,7 @@
                 <th>ID</th>
                 <th>CVSS</th>
                 <th>Type</th>
-                <th>Exploit status</th>
+                <th>External link</th>
               </tr>
               {% for vuln in vulnerability.vuln_list %}
                 <tr>
@@ -133,25 +129,9 @@
                   <td>{{ vuln.cvss }}</td>
                   <td>{{ vuln.type }}</td>
                   <td>
-                    {% if vuln.is_exploit == 'true' %}
-                      <a onclick='openPopup("popup-{{ vuln.id }}")' href="#vulnerabilities">
-                        <i class="bi bi-exclamation-circle-fill text-warning"></i>
-                      </a>
-                      <div class="custom-popup shadow bg-light" id="popup-{{ vuln.id }}">
-                        <h4>{{ vuln.id }}</h4>
-                        <p>This vulnerability is exploitable by adversaries.</p>
-                        <p>A few interesting links with info on the exploit and how to mitigate
-                          it:</p>
-                        <a href="https://vulners.com/{{ vuln.type }}/{{ vuln.id }}"
-                           target="_blank">Vulners info page</a>
-                        <input type="submit" value="Close" class="btn btn-secondary"
-                               onclick='hidePopup("popup-{{ vuln.id }}")'>
-                      </div>
-                    {% else %}
-                      <i class="bi bi-check-circle-fill color-success"></i>
-                    {% endif %}
-                    {% if vuln.type == 'cve' %}
-                      <a href="https://cvepremium.circl.lu/cve/{{ vuln.id }}" target="_blank">
+                    {% if vuln.link %}
+                      <a href="https://vulners.com/{{ vuln.type }}/{{ vuln.id }}"
+                         target="_blank">
                         <i class="bi bi-search"></i>
                       </a>
                     {% endif %}

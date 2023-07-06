@@ -483,7 +483,7 @@ def ipv6_check(
     }
 
 
-def web_server_check(domain: str):
+def web_server_check_old(domain: str):
     nmap = nmap3.Nmap()
     logger.info(f"server scan: testing {domain}")
     service_scans = nmap.nmap_version_detection(
@@ -523,6 +523,52 @@ def web_server_check(domain: str):
     logger.info(f"server scan: Done!")
     logger.info(vulnerabilities)
     return {"services": services, "vulnerabilities": vulnerabilities}
+
+
+def web_server_check(hostname):
+    api_endpoint = "https://vulners.com/api/v3/burp/software/"
+    header = {'User-Agent': f'Vulners NMAP Plugin 1.7',
+              'Accept-Encoding': 'gzip, deflate'}
+    version_re = ":([d.-_]+)([^:]*)$"
+    nmap = nmap3.Nmap()
+    service_scans = nmap.nmap_version_detection(hostname)
+    services = []
+    vulnerabilities = []
+    ip, service_scans = list(service_scans.items())[0]
+    for port in service_scans["ports"]:
+        if port["state"] != "closed":
+            services.append(port["service"])
+            cpe_list = port["cpe"]
+            vuln_list = []
+            for item in cpe_list:
+                cpe = item['cpe']
+                version_match = re.search(version_re, cpe)
+                if version_match:
+                    version, patch = version_match.groups()
+                    print(f'Querying vulns for {cpe}, version {version}, of type cpe')
+                    query_url = api_endpoint + f'?software={cpe}&version={version}&type=cpe'
+                    response = requests.get(query_url, headers=header)
+                    if response:
+                        data = response.json()['data']['search']
+                        for search_result in data:
+                            info = {
+                                "id": search_result['id'],
+                                "cvss": search_result['_source']['cvss']['score'],
+                                "type": search_result['_source']['type']
+                            }
+                            if info['type'] == "cve":
+                                info['link'] = f"https://cvepremium.circl.lu/cve/{info['id']}"
+                            else:
+                                info['link'] = f"https://vulners.com/{info['type']}/{info['id']}"
+                            vuln_list.append(info)
+            vulnerabilities.append({
+                "service": f"{port['service']['product']} - {port['service']['name']}",
+                "vuln_list": vuln_list
+            })
+    return {
+        'services': services,
+        'vulnerabilities': vulnerabilities
+    }
 
 
 def tls_version_check(domain: str, service):

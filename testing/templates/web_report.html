@@ -21,8 +21,10 @@
         <div class="col-lg-12 fs-4 ">
           {% if result.content_security_policy.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
+          <script>countGood++;countTotal++;</script>
           {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
+           <script>countBad++;countTotal++;</script>
           {% endif %}
           {{ result.content_security_policy.score_description }}
         </div>
@@ -31,8 +33,10 @@
         <div class="col-lg-12 fs-4">
           {% if result.cookies.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
+          <script>countGood++;countTotal++;</script>
           {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
+            <script>countBad++;countTotal++;</script>
           {% endif %}
           {{ result.cookies.score_description }}
         </div>
@@ -41,8 +45,10 @@
         <div class="col-lg-12 fs-4">
           {% if result.cross_origin_resource_sharing.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
+          <script>countGood++;countTotal++;</script>
           {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
+            <script>countBad++;countTotal++;</script>
           {% endif %}
           {{ result.cross_origin_resource_sharing.score_description }}
         </div>
@@ -51,8 +57,10 @@
         <div class="col-lg-12 fs-4">
           {% if result.redirection.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
+          <script>countGood++;countTotal++;</script>
           {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
+            <script>countBad++;countTotal++;</script>
           {% endif %}
           {{ result.redirection.score_description }}
         </div>
@@ -61,8 +69,10 @@
         <div class="col-lg-12 fs-4">
           {% if result.referrer_policy.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
+          <script>countGood++;countTotal++;</script>
           {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
+            <script>countBad++;countTotal++;</script>
           {% endif %}
           {{ result.referrer_policy.score_description }} (optional)
         </div>
@@ -71,8 +81,10 @@
         <div class="col-lg-12 fs-4">
           {% if result.strict_transport_security.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
+          <script>countGood++;countTotal++;</script>
           {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
+            <script>countBad++;countTotal++;</script>
           {% endif %}
           {{ result.strict_transport_security.score_description }}
         </div>
@@ -81,8 +93,10 @@
         <div class="col-lg-12 fs-4">
           {% if result.subresource_integrity.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
+          <script>countGood++;countTotal++;</script>
           {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
+            <script>countBad++;countTotal++;</script>
           {% endif %}
           {{ result.subresource_integrity.score_description }}
         </div>
@@ -91,8 +105,10 @@
         <div class="col-lg-12 fs-4">
           {% if result.x_content_type_options.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
+          <script>countGood++;countTotal++;</script>
           {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
+            <script>countBad++;countTotal++;</script>
           {% endif %}
           {{ result.x_content_type_options.score_description }}
         </div>
@@ -101,8 +117,10 @@
         <div class="col-lg-12 fs-4">
           {% if result.x_frame_options.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
+          <script>countGood++;countTotal++;</script>
           {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
+            <script>countBad++;countTotal++;</script>
           {% endif %}
           {{ result.x_frame_options.score_description }}
         </div>
@@ -111,8 +129,10 @@
         <div class="col-lg-12 fs-4">
           {% if result.x_xss_protection.pass %}
           <i class="bi bi-check-circle-fill color-success"> </i>
+           <script>countGood++;countTotal++;</script>
           {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
+           <script>countBad++;countTotal++;</script>
           {% endif %}
           {{ result.x_xss_protection.score_description }}
         </div>
@@ -173,9 +193,8 @@
       <h2>Vulnerabilities</h2>
       <div class="row mb-4 justify-content-evenly">
         <div class="col-lg-6 col-md-8 fs-2 mb-1 ">Good</div>
-        <div class="col-lg-6 col-md-8 "><span id="good-count"
-                                    class="circle p-2 fs-4 text-white bg-success"
-        ></span>
+        <div class="col-lg-6 col-md-8 ">
+          <span id="good-count" class="circle p-2 fs-4 text-white bg-success"></span>
         </div>
       </div>
       <div class="row my-4">
@@ -205,10 +224,8 @@
 </section>
 <script>
 
-    const result = parseInt({{ scan_summary.tests_quantity }} + countTotal) - parseInt({{ scan_summary.tests_passed }} + countGood + countWarning);
-
-     document.getElementById('vulnerable-count').innerHTML = '&nbsp;' + result + '&nbsp;' ;
-     document.getElementById('good-count').innerHTML = '&nbsp;' + parseInt({{ scan_summary.tests_passed }} + countGood - 2) + '&nbsp;' ;
+     document.getElementById('vulnerable-count').innerHTML = '&nbsp;' + countBad + '&nbsp;' ;
+     document.getElementById('good-count').innerHTML = '&nbsp;' + countGood + '&nbsp;' ;
      document.getElementById('warning-count').innerHTML = '&nbsp;' + countWarning + '&nbsp;' ;
 
 </script>
@@ -668,12 +685,9 @@
 
 
 <script>
-
-  const totalGood = parseInt({{ scan_summary.tests_passed }} + countGood - 2);
-  const totalBad =  parseInt({{ scan_summary.tests_quantity }} + countTotal) - parseInt({{ scan_summary.tests_passed }} + countGood + countWarning);
- const total = totalGood + totalBad + countWarning;
-  let successPercentage = totalGood / total * 100;
-  let failurePercentage = totalBad / total * 100;
+ const total = countGood + countBad + countWarning;
+  let successPercentage = countGood / total * 100;
+  let failurePercentage = countBad / total * 100;
   let warningPercentage = countWarning / total * 100;
   var data = [{
     data: [successPercentage, failurePercentage,warningPercentage],

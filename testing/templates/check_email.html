@@ -74,7 +74,7 @@
               {% endif %}
               Signed Domain Name (DNSSEC)
             </div>
-            <div class="col-lg-12 fs-4">
+           <!-- <div class="col-lg-12 fs-4">
               {% if result.nameservers_reachability_comments.grade == "full" %}
                 <script> countGood++;countTotal++;</script>
                 <i class="bi bi-check-circle-fill color-success"> </i>
@@ -95,7 +95,7 @@
                 Your server does not have an IPv6 address. (IPv6)
               {% endif %}
 
-            </div>
+            </div>-->
             <div class="col-lg-12 fs-4">
               {% if result.dkim %}
                 <script> countGood++;countTotal++;</script>
@@ -112,24 +112,24 @@
             <!-- TODO add TLS overview check as in web report -->
           </div>
         </div>
-        <div class="col-lg-3">
-          <h1>Test Discovery</h1>
+        <div class="col-lg-5">
+          <h1>Vulnerability</h1>
           <div class="row mb-4">
-            <div class="col-lg-6 fs-2 mb-1">Good</div>
+            <div class="col-lg-6 col-md-8 fs-2 mb-1">Good</div>
             <div class="col-lg-6">
-              <span id="good-count" class="rounded-circle p-2 fs-4 text-white bg-success"></span>
+              <span id="good-count" class="circle fs-4 text-white bg-success"></span>
             </div>
           </div>
           <div class="row my-4">
-            <div class="col-lg-6 fs-2 mb-1">Vulnerable</div>
+            <div class="col-lg-6 col-md-8 fs-2 mb-1">Vulnerable</div>
             <div class="col-lg-6">
-              <span id="vulnerable-count" class="rounded-circle p-2 fs-4 text-white bg-danger"></span>
+              <span id="vulnerable-count" class="circle fs-4 text-white bg-danger"></span>
             </div>
           </div>
           <div class="row my-4">
-            <div class="col-lg-6 fs-2">Warning</div>
-            <div class="col-lg-6">
-              <span id="warning-count" class="rounded-circle p-2 fs-4 text-black" style="background:#f5e230;"></span>
+            <div class="col-lg-6 col-md-8 fs-2">Warning</div>
+            <div class="col-lg-6 col-md-8">
+              <span id="warning-count" class="circle fs-4 text-black" style="background:#f5e230 !important;"></span>
             </div>
             <!--<div class="row my-4">
               <div class="col-lg-6 fs-2">Informational</div>
@@ -164,15 +164,15 @@
             {% if result.spf.valid %}
               <button type="button" data-bs-toggle="collapse" data-bs-target="#records"
                       aria-expanded="false" aria-controls="collapseExample"
-                      class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-                <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+                <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
                 SPF Record
               </button>
             {% else %}
               <button type="button" data-bs-toggle="collapse" data-bs-target="#records"
                       aria-expanded="false" aria-controls="collapseExample"
-                      class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-                <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+                <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
                 SPF Record
               </button>
             {% endif %}
@@ -194,8 +194,8 @@
             <button type="button" data-bs-toggle="collapse"
                     data-bs-target="#spf_recommendation"
                     aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
-              <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                    class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
+              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
               Recommendations
             </button>
             <div class="p-0 collapse" id="spf_recommendation">
@@ -213,8 +213,7 @@
                   This helps prevent unauthorized sources from sending emails on behalf of
                   your domain.</p>
                 <p>Consider implementing SPF alignment mechanisms, such as DMARC
-                  (Domain-based Message A
-                  uthentication, Reporting, and Conformance),
+                  (Domain-based Message Authentication, Reporting, and Conformance),
                   to further strengthen email authentication and protect against domain
                   spoofing.</p>
               </div>
@@ -245,15 +244,15 @@
             {% if result.dmarc.valid %}
               <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record"
                       aria-expanded="false" aria-controls="collapseExample"
-                      class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-                <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+                <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
                 DMARC Record
             </button>
             {% else %}
               <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record"
                       aria-expanded="false" aria-controls="collapseExample"
-                      class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-                <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+                <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
                 DMARC Record
               </button>
             {% endif %}
@@ -287,6 +286,8 @@
           {% endif %}
           DKIM Record
         </div>
+      </div>
+     <div class="col-lg-12 fs-4">
         <p>DomainKeys Identified Mail (DKIM) is an email authentication method that helps
           to verify the authenticity and integrity of email messages. It adds a digital
           signature to the email headers, which allows the receiving email server to
@@ -297,22 +298,22 @@
           {% if result.dkim %}
             <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record"
                     aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-              <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                    class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
               DKIM Record
             </button>
           {% elif result.dkim is None %}
             <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record"
                     aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-warning">
-              <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                    class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-warning">
+              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
               DKIM Record
             </button>
           {% else %}
             <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record"
                     aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-              <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                    class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
               DKIM Record
             </button>
           {% endif %}
@@ -331,8 +332,8 @@
           <button type="button" data-bs-toggle="collapse"
                   data-bs-target="#dkim_recommendation"
                   aria-expanded="false" aria-controls="collapseExample"
-                  class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
-            <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                  class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
+            <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
             Recommendations
           </button>
           <div class="p-0 collapse" id="dkim_recommendation">
@@ -376,15 +377,15 @@
             {% if result.dnssec %}
               <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec"
                       aria-expanded="false" aria-controls="collapseExample"
-                      class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-                <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+                <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
                 DNSSEC Status
               </button>
             {% else %}
               <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec"
                       aria-expanded="false" aria-controls="collapseExample"
-                      class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-                <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+                <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
                 DNSSEC Status
               </button>
             {% endif %}
@@ -399,8 +400,8 @@
           <button type="button" data-bs-toggle="collapse"
                   data-bs-target="#dnssec-recommendation"
                   aria-expanded="false" aria-controls="collapseExample"
-                  class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
-            <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                  class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
+            <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
             Recommendations
           </button>
           <div class="p-0 collapse" id="dnssec-recommendation">
@@ -427,7 +428,7 @@
                 </li>
                 <li>
                   Enhanced functionality: IPv6 offers improvements in areas such as
-                  auto-configuration, mobility, and quality of service, allowing for
+                  autoconfiguration, mobility, and quality of service, allowing for
                   more
                   efficient and advanced network operations. Enabling IPv6 unlocks these
                   enhanced functionalities, promoting a better user experience and
@@ -477,7 +478,7 @@
                   <button type="button" data-bs-toggle="collapse"
                           data-bs-target="#tls-found-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
                           aria-expanded="false" aria-controls="collapseExample"
-                          class="btn p-3 fs-2 fw-bold text-start text-light
+                          class="accordion-button btn p-3 fs-2 fw-bold text-start text-light
                               {% if result.tls_lowest_sec_level|get:host|get:version == 'GOOD' or result.tls_lowest_sec_level|get:host|get:version == 'SUFFICIENT' %}
                                 bg-success
                               {% elif result.tls_lowest_sec_level|get:host|get:version == 'PHASE_OUT' %}
@@ -485,7 +486,7 @@
                               {% elif result.tls_lowest_sec_level|get:host|get:version == 'INSUFFICIENT' %}
                                 bg-danger
                               {% endif %}">
-                    <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                    <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
                     {{ version }}
                   </button>
                 </div>
@@ -521,8 +522,8 @@
       </div>
       <button type="button" data-bs-toggle="collapse" data-bs-target="#tls"
               aria-expanded="false" aria-controls="collapseExample"
-              class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
-        <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+              class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
+        <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
         Recommendations
       </button>
       <div class="p-0 collapse" id="tls">
@@ -604,15 +605,15 @@
             {% if result.nameservers_reachability_comments.grade == "full" %}
               <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
                       aria-expanded="false" aria-controls="collapseExample"
-                      class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-                <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+                <i class="p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
                 IPv6 Nameserver Check
               </button>
             {% elif result.nameservers_reachability_comments.grade == "null" %}
               <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
                       aria-expanded="false" aria-controls="collapseExample"
-                      class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-                <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+                <i class="p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
                 IPV6 Nameserver Check
               </button>
             {% endif %}
@@ -678,16 +679,16 @@
               <button type="button" data-bs-toggle="collapse"
                       data-bs-target="#ipv6-mailserver"
                       aria-expanded="false" aria-controls="collapseExample"
-                      class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-                <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+                <i class="p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
                 IPv6 Domain Check
               </button>
             {% elif result.records_v6_comments.grade == "null" %}
               <button type="button" data-bs-toggle="collapse"
                       data-bs-target="#ipv6-mailserver"
                       aria-expanded="false" aria-controls="collapseExample"
-                      class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-                <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+                <i class="p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
                 IPV6 Domain Check
               </button>
             {% endif %}
@@ -747,8 +748,8 @@
             <button type="button" data-bs-toggle="collapse"
                     data-bs-target="#ipv6-recommendation"
                     aria-expanded="false" aria-controls="collapseExample"
-                    class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
-              <i class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                    class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
+              <i class="p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
               Why you should enable IPv6
             </button>
 
@@ -930,6 +931,9 @@
     document.getElementById('vulnerable-count').innerHTML = countBad;
     document.getElementById('good-count').innerHTML = countGood;
     document.getElementById('warning-count').innerHTML = countWarning;
+    $('.accordion-button').click(function () {
+  $(this).find('.bi').toggleClass('rotate');
+});
 </script>
 
 {% endblock %}

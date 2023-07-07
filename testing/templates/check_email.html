@@ -459,6 +459,7 @@
       </div>
     </section>
     <!-- TLS Check -->
+    <!--
     <section class="col-lg-11 row my-5 border border-2 rounded p-4">
       <div class="row">
         <div class="col-lg-12 fs-1 fw-bold">
@@ -582,6 +583,7 @@
         </div>
       </div>
     </section>
+    -->
     <!-- IPV6 -->
     <!--
     <section class="col-lg-11 row my-5 border border-2 rounded p-4">
@@ -826,14 +828,14 @@
               <li>StartTLS:
                 {% if host.starttls %}
                   <i class="bi bi-check-circle-fill color-success"></i>
-                {% elif not host.starttls%}}
+                {% elif not host.starttls %}
                   <i class="bi bi-x-circle-fill color-danger"></i>
-                {%endif%}
+                {% endif %}
               </li>
               <li>TLS:
                 {% if host.tls %}
                   <i class="bi bi-check-circle-fill color-success"></i>
-                {% elif not host.tls%}
+                {% elif not host.tls %}
                   <i class="bi bi-x-circle-fill color-danger"></i>
                 {%endif%}
               </li>

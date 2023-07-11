@@ -196,7 +196,7 @@ def email_test(request):
             #        ]
             #    except Exception:
             #        continue
-                # messages.info(request, f"MX host scanned.")
+            # messages.info(request, f"MX host scanned.")
 
             # context.update({"status": True})
             #        host["hostname"], None

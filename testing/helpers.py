@@ -91,7 +91,7 @@ def get_http_report(target, rescan):
             result_obj = json.loads(
                 requests.get(
                     "https://http-observatory.security.mozilla.org/api/v1/getScanResults?scan="
-                    + str(scan_history[-1]['scan_id'])
+                    + str(scan_history[-1]["scan_id"])
                 ).text
             )
             response = {k.replace("-", "_"): v for k, v in result_obj.items()}
@@ -153,7 +153,7 @@ def get_http_report(target, rescan):
         if counter == 5 and state != "FINISHED":
             logger.warning("http scan: not finished after 5 times, skipping")
 
-        logger.info(f"http scan: Done!")
+        logger.info("http scan: Done!")
         return {
             "result": response,
             "domain_name": target,
@@ -399,7 +399,7 @@ def ipv6_check(
     # Grading results
     counter = 0
 
-    logger.info(f"ipv6 scan: grading results")
+    logger.info("ipv6 scan: grading results")
     for key in results["nameservers"]:
         if results["nameservers"][key]["ipv6"]["address"]:
             counter += 1
@@ -485,7 +485,7 @@ def ipv6_check(
                 "comment": "Your server is not reachable over IPv6.",
             }
 
-    logger.info(f"ipv6 scan: Done!")
+    logger.info("ipv6 scan: Done!")
     return {
         "nameservers": results["nameservers"],
         "nameservers_comments": nameservers_comments,
@@ -533,15 +533,17 @@ def web_server_check_old(domain: str):
                 )
             except KeyError:
                 pass
-    logger.info(f"server scan: Done!")
+    logger.info("server scan: Done!")
     logger.info(vulnerabilities)
     return {"services": services, "vulnerabilities": vulnerabilities}
 
 
 def web_server_check(hostname):
     api_endpoint = "https://vulners.com/api/v3/burp/software/"
-    header = {'User-Agent': f'Vulners NMAP Plugin 1.7',
-              'Accept-Encoding': 'gzip, deflate'}
+    header = {
+        "User-Agent": "Vulners NMAP Plugin 1.7",
+        "Accept-Encoding": "gzip, deflate",
+    }
     version_re = ":([d.-_]+)([^:]*)$"
     nmap = nmap3.Nmap()
     service_scans = nmap.nmap_version_detection(hostname)
@@ -554,38 +556,40 @@ def web_server_check(hostname):
             cpe_list = port["cpe"]
             vuln_list = []
             for item in cpe_list:
-                cpe = item['cpe']
+                cpe = item["cpe"]
                 version_match = re.search(version_re, cpe)
                 if version_match:
                     version, patch = version_match.groups()
-                    print(f'Querying vulns for {cpe}, version {version}, of type cpe')
-                    query_url = api_endpoint + f'?software={cpe}&version={version}&type=cpe'
+                    print(f"Querying vulns for {cpe}, version {version}, of type cpe")
+                    query_url = (
+                        api_endpoint + f"?software={cpe}&version={version}&type=cpe"
+                    )
                     response = requests.get(query_url, headers=header)
                     if response:
-                        data = response.json()['data']['search']
+                        data = response.json()["data"]["search"]
                         for search_result in data:
                             info = {
-                                "id": search_result['id'],
-                                "cvss": search_result['_source']['cvss']['score'],
-                                "type": search_result['_source']['type']
+                                "id": search_result["id"],
+                                "cvss": search_result["_source"]["cvss"]["score"],
+                                "type": search_result["_source"]["type"],
                             }
-                            if info['type'] == "cve":
-                                info['link'] = f"https://cvepremium.circl.lu/cve/{info['id']}"
+                            if info["type"] == "cve":
+                                info[
+                                    "link"
+                                ] = f"https://cvepremium.circl.lu/cve/{info['id']}"
                             else:
-                                info['link'] = f"https://vulners.com/{info['type']}/{info['id']}"
+                                info[
+                                    "link"
+                                ] = f"https://vulners.com/{info['type']}/{info['id']}"
                             vuln_list.append(info)
             try:
-                service_name = f"{port['service']['product']} - {port['service']['name']}"
+                service_name = (
+                    f"{port['service']['product']} - {port['service']['name']}"
+                )
             except KeyError:
                 service_name = f"{port['service']['name']}"
-            vulnerabilities.append({
-                "service": service_name,
-                "vuln_list": vuln_list
-            })
-    return {
-        'services': services,
-        'vulnerabilities': vulnerabilities
-    }
+            vulnerabilities.append({"service": service_name, "vuln_list": vuln_list})
+    return {"services": services, "vulnerabilities": vulnerabilities}
 
 
 def tls_version_check(domain: str, service):
@@ -645,7 +649,7 @@ def tls_version_check(domain: str, service):
         ci = load_cipher_info(results[tls_version])
         results[tls_version] = ci["result"]
         lowest_sec_level.update({f"{tls_version}": ci["lowest_sec_level"]})
-    logger.info(f"server scan: Done!")
+    logger.info("server scan: Done!")
     return {"result": results, "lowest_sec_level": lowest_sec_level}
 
 

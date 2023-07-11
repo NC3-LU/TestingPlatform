@@ -166,26 +166,23 @@
       </div>
       -->
       {% if tls_results %}
-      {% for version, suites in tls_results.items %}
-      <div class="row my-1">
-        <div class="col-lg-12 fs-4">
-
-          {% if tls_lowest_sec_level|get:version == 'GOOD' or tls_lowest_sec_level|get:version == 'SUFFICIENT' %}
-          <script>countGood++;countTotal++; console.log('tlsgood'+ countGood)</script>
-          <i class="bi bi-check-circle-fill color-success"></i>
-          {% elif tls_lowest_sec_level|get:version == 'PHASE_OUT' %}
-          <i class="bi bi-exclamation-circle-fill text-warning"> </i>
-          <script>countWarning++;countTotal++; console.log('tlswarning'+ countWarning)
-
-          </script>
-          {% elif tls_lowest_sec_level|get:version == 'INSUFFICIENT' %}
-          <script>countBad++;countTotal++;console.log('tlsbad'+ countBad)</script>
-          <i class="bi bi-check-circle-fill color-danger"></i>
-          {% endif %}
-          {{ version }}
-        </div>
-      </div>
-      {% endfor %}
+        {% for version, suites in tls_results.items %}
+          <div class="row my-1">
+            <div class="col-lg-12 fs-4">
+              {% if tls_lowest_sec_level|get:version == 'GOOD' or tls_lowest_sec_level|get:version == 'SUFFICIENT' %}
+                <script>countGood++;countTotal++; console.log('tlsgood'+ countGood)</script>
+                <i class="bi bi-check-circle-fill color-success"></i>
+              {% elif tls_lowest_sec_level|get:version == 'PHASE_OUT' %}
+                <i class="bi bi-exclamation-circle-fill text-warning"> </i>
+                <script>countWarning++;countTotal++; console.log('tlswarning'+ countWarning)</script>
+              {% elif tls_lowest_sec_level|get:version == 'INSUFFICIENT' %}
+                <script>countBad++;countTotal++;console.log('tlsbad'+ countBad)</script>
+                <i class="bi bi-x-circle-fill color-danger"></i>
+              {% endif %}
+              {{ version }}
+            </div>
+          </div>
+        {% endfor %}
       {% endif %}
       <!-- -- -->
     </div>
@@ -653,7 +650,8 @@
       <i class="bi bi-check-circle-fill color-success"> </i>
       {% else %}
       <i class="bi bi-x-circle-fill color-danger"></i>
-      {% endif %} {{ result.subresource_integrity.score_description}}
+      {% endif %}
+      {{ result.subresource_integrity.score_description}}
     </div>
     <div class="col-lg-12 fs-4">
       <p>Subresource Integrity (SRI) is a security feature that enables browsers to
@@ -665,10 +663,11 @@
   </div>
   {% if result.subresource_integrity.output.data %}
   <div class="row my-2">
+
     <button type="button" data-bs-toggle="collapse"
             data-bs-target="#subresource_integrity"
             aria-expanded="false" aria-controls="collapseExample"
-            class=" accordion-buttonbtn p-3 fs-2 fw-bold text-start text-light bg-info">
+            class=" accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
       <i class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
       Subresource Integrity (SRI)
     </button>
@@ -738,14 +737,13 @@
 </script>
 {% endif %}
 
-<!--
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
       {% if nameservers_comments.grade == "full" and records_v6_comments.grade == "full" %}
-      <i class="bi bi-check-circle-fill color-success"> </i>
+        <i class="bi bi-check-circle-fill color-success"> </i>
       {% else %}
-      <i class="bi bi-x-circle-fill color-danger"></i>
+        <i class="bi bi-x-circle-fill color-danger"></i>
       {% endif %}
       IPv6
     </div>
@@ -758,23 +756,21 @@
       <div class="row my-2">
 
         {% if nameservers_reachability_comments.grade == "full" %}
-        <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
-                aria-expanded="false" aria-controls="collapseExample"
-                class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-          <i
-            class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
-          IPv6 Nameserver Check
-        </button>
-
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+            <i
+              class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            IPv6 Nameserver Check
+          </button>
         {% elif nameservers_reachability_comments.grade == "null" %}
-        <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
-                aria-expanded="false" aria-controls="collapseExample"
-                class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-          <i
-            class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
-          IPv6 Nameserver Check
-        </button>
-
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+            <i
+              class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            IPv6 Nameserver Check
+          </button>
         {% endif %}
 
         <div class="p-0 collapse" id="ipv6-domain">
@@ -784,11 +780,11 @@
               <p>Name Servers:</p>
               <p>
                 {% if nameservers_reachability_comments.grade %}
-                <i class="bi bi-check-circle-fill color-success"> </i>
+                  <i class="bi bi-check-circle-fill color-success"> </i>
                 {% elif nameservers_comments.grade == "null" %}
-                <i class="bi bi-x-circle-fill color-danger"></i>
+                  <i class="bi bi-x-circle-fill color-danger"></i>
                 {% endif %}
-                {{ nameservers_comments.comment }}
+                  {{ nameservers_comments.comment }}
               </p>
               <table class="table table-light table-bordered table-striped">
                 <tr>
@@ -799,34 +795,34 @@
                   <th>Reachable (v6)</th>
                 </tr>
                 {% for nameserver, ns in nameservers.items %}
-                <tr>
-                  <td>{{ nameserver }}</td>
-                  <td>{{ ns.ipv4.address }}</td>
-                  <td>
-                    {{ ns.ipv4.reachable }}
-                    {% if ns.ipv4.reachable %}
-                    <i class="bi bi-check-circle-fill color-success"> </i>
-                    {% else %}
-                    <i class="bi bi-x-circle-fill color-danger"></i>
-                    {% endif %}
-                  </td>
-                  <td>{{ ns.ipv6.address }}</td>
-                  <td>
-                    {{ ns.ipv6.reachable }}
-                    {% if ns.ipv6.reachable %}
-                    <i class="bi bi-check-circle-fill color-success"> </i>
-                    {% else %}
-                    <i class="bi bi-x-circle-fill color-danger"></i>
-                    {% endif %}
-                  </td>
-                </tr>
+                  <tr>
+                    <td>{{ nameserver }}</td>
+                    <td>{{ ns.ipv4.address }}</td>
+                    <td>
+                      {{ ns.ipv4.reachable }}
+                      {% if ns.ipv4.reachable %}
+                        <i class="bi bi-check-circle-fill color-success"> </i>
+                      {% else %}
+                        <i class="bi bi-x-circle-fill color-danger"></i>
+                      {% endif %}
+                    </td>
+                    <td>{{ ns.ipv6.address }}</td>
+                    <td>
+                      {{ ns.ipv6.reachable }}
+                      {% if ns.ipv6.reachable %}
+                        <i class="bi bi-check-circle-fill color-success"> </i>
+                      {% else %}
+                        <i class="bi bi-x-circle-fill color-danger"></i>
+                      {% endif %}
+                    </td>
+                  </tr>
                 {% endfor %}
               </table>
               <p>
                 {% if nameservers_reachability_comments.grade == "full" %}
-                <i class="bi bi-check-circle-fill color-success"> </i>
+                  <i class="bi bi-check-circle-fill color-success"> </i>
                 {% elif nameservers_reachability_comments.grade == "null" %}
-                <i class="bi bi-x-circle-fill color-danger"></i>
+                  <i class="bi bi-x-circle-fill color-danger"></i>
                 {% endif %}
                 {{ nameservers_reachability_comments.comment }}
               </p>
@@ -836,24 +832,22 @@
       </div>
       <div class="row my-2">
         {% if records_v6_comments.grade == "full" %}
-        <button type="button" data-bs-toggle="collapse"
-                data-bs-target="#ipv6-mailserver"
-                aria-expanded="false" aria-controls="collapseExample"
-                class="btn p-3 fs-2 fw-bold text-start text-light bg-success">
-          <i
-            class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
-          IPv6 Webserver Check
-        </button>
+          <button type="button" data-bs-toggle="collapse"
+                  data-bs-target="#ipv6-mailserver"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+            <i class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            IPv6 Webserver Check
+          </button>
 
         {% elif records_v6_comments.grade == "null" %}
-        <button type="button" data-bs-toggle="collapse"
-                data-bs-target="#ipv6-mailserver"
-                aria-expanded="false" aria-controls="collapseExample"
-                class="btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-          <i
-            class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
-          IPv6 Webserver Check
-        </button>
+          <button type="button" data-bs-toggle="collapse"
+                  data-bs-target="#ipv6-mailserver"
+                  aria-expanded="false" aria-controls="collapseExample"
+                  class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+            <i class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
+            IPv6 Webserver Check
+          </button>
 
         {% endif %}
 
@@ -864,24 +858,24 @@
 
               <p>Records:</p>
               {% if records %}
-              <table class="table table-light table-bordered table-striped">
-                <tr>
-                  <th>Server</th>
-                  <th>IPv4</th>
-                  <th>IPv6</th>
-                </tr>
-                {% for record in records %}
-                <tr>
-                  <td>{{ record.0 }}</td>
-                  <td>{{ record.1 }}</td>
-                  <td>{{ record.2 }}</td>
-                </tr>
-              </table>
+                <table class="table table-light table-bordered table-striped">
+                  <tr>
+                    <th>Server</th>
+                    <th>IPv4</th>
+                    <th>IPv6</th>
+                  </tr>
+                  {% for record in records %}
+                  <tr>
+                    <td>{{ record.0 }}</td>
+                    <td>{{ record.1 }}</td>
+                    <td>{{ record.2 }}</td>
+                  </tr>
+                </table>
               {% if record.2 %}
-              <p>
-                <i class="bi bi-check-circle-fill color-success"></i>
-                Your server has an IPv6 address.
-              </p>
+                <p>
+                  <i class="bi bi-check-circle-fill color-success"></i>
+                  Your server has an IPv6 address.
+                </p>
               {% else %}
               <p>
                 <i class="bi bi-x-circle-fill color-danger"></i>
@@ -893,17 +887,17 @@
               {% endif %}
               <p>
                 {% if records_v4_comments.grade == "full" %}
-                <i class="bi bi-check-circle-fill color-success"> </i>
+                  <i class="bi bi-check-circle-fill color-success"> </i>
                 {% elif records_v4_comments.grade == "null" %}
-                <i class="bi bi-x-circle-fill color-danger"></i>
+                  <i class="bi bi-x-circle-fill color-danger"></i>
                 {% endif %}
                 {{ records_v4_comments.comment }}
               </p>
               <p>
                 {% if records_v6_comments.grade == "full" %}
-                <i class="bi bi-check-circle-fill color-success"> </i>
+                  <i class="bi bi-check-circle-fill color-success"> </i>
                 {% elif records_v6_comments.grade == "null" %}
-                <i class="bi bi-x-circle-fill color-danger"></i>
+                  <i class="bi bi-x-circle-fill color-danger"></i>
                 {% endif %}
                 {{ records_v6_comments.comment }}
               </p>
@@ -916,7 +910,7 @@
         <button type="button" data-bs-toggle="collapse"
                 data-bs-target="#ipv6-recommendation"
                 aria-expanded="false" aria-controls="collapseExample"
-                class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
+                class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
           <i
             class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
           Why you should enable IPv6
@@ -970,7 +964,6 @@
     </div>
   </div>
 </section>
--->
 
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
   <div class="row">

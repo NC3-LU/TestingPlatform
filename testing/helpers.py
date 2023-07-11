@@ -67,6 +67,7 @@ def get_http_report(target, rescan):
     if rescan:
         http_url += "&rescan=true"
 
+    logger.info(f"http scan: requesting scan at {http_url}")
     data = requests.post(http_url)
     json_object = data.json()
 
@@ -496,7 +497,7 @@ def ipv6_check(
     }
 
 
-def web_server_check_old(domain: str):
+def web_server_check(domain: str):
     nmap = nmap3.Nmap()
     logger.info(f"server scan: testing {domain}")
     service_scans = nmap.nmap_version_detection(
@@ -538,7 +539,7 @@ def web_server_check_old(domain: str):
     return {"services": services, "vulnerabilities": vulnerabilities}
 
 
-def web_server_check(hostname):
+def web_server_check_no_raw_socket(hostname):
     api_endpoint = "https://vulners.com/api/v3/burp/software/"
     header = {'User-Agent': f'Vulners NMAP Plugin 1.7',
               'Accept-Encoding': 'gzip, deflate'}

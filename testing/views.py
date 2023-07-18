@@ -88,7 +88,7 @@ def http_test(request):
         #  context["rescan"] = True
 
         context.update(get_http_report(request.POST["target"], False))
-        context.update(ipv6_check(request.POST["target"], None))
+        # context.update(ipv6_check(request.POST["target"], None))
 
         try:
             tls_results = tls_version_check(request.POST["target"], "web")
@@ -182,7 +182,7 @@ def email_test(request):
             # messages.info(request, "Analyzed SPF/DMARC config")
             context.update(check_dkim_public_key(target, []))
             # messages.info(request, "Analyzed DKIM config")
-            context.update(ipv6_check(target, None))
+            # context.update(ipv6_check(target, None))
             # messages.info(request, "Analyzed IPv6 configuration")
             context["tls_result"] = {}
             context["tls_lowest_sec_level"] = {}

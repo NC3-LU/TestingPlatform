@@ -22,9 +22,7 @@
 {% endfor %}
 {% endif %}
 
-<main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
-
-
+<main class="d-flex w-100 h-100 p-3 flex-column align-items-center justify-content-center">
     {% if user.is_authenticated %}
     <p class="errornote">
         {% blocktranslate trimmed %}
@@ -36,7 +34,7 @@
 
     <h1>Login</h1>
     <hr class="w-25 text-dark">
-    <form class="p-5 authForm" action="{{ app_path }}" method="post" id="login-form">
+    <form class="col-lg-3 p-5 border border-1 bg-light" action="{{ app_path }}" method="post" id="login-form">
         {% csrf_token %}
 
         {% for field in form %}

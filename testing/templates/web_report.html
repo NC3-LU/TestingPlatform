@@ -966,7 +966,7 @@
     </div>
   </div>
 </section>
--->
+--> {% if tls_results %}
 <section class="col-lg-11 row my-5 border border-2 rounded p-4">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
@@ -981,7 +981,7 @@
       eavesdropping, tampering, or message forgery.
     </div>
   </div>
-  {% if tls_results %}
+
   {% for version, suites in tls_results.items %}
   <div class="row my-2">
     <button type="button" data-bs-toggle="collapse"
@@ -1027,7 +1027,7 @@
   </div>
 
   {% endfor %}
-  {% endif %}
+
   <div class="row my-2">
     <button type="button" data-bs-toggle="collapse"
             data-bs-target="#tls-recommendation"
@@ -1100,7 +1100,7 @@
     </div>
   </div>
 </section>
-
+{% endif %}
 
 <script>
   var coll = document.getElementsByClassName("collapsible");

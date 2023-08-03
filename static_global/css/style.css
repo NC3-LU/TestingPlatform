@@ -16,6 +16,13 @@
 
 /*  GENERAL */
 
+.square{
+width:250px !important;
+height:250px !important;
+text-align:center !important;
+margin:auto;
+}
+
 .circle{
  border-radius: 50%;
   width: 50px;
@@ -30,6 +37,7 @@
 .bi{
  transition: transform 0.3s ease-in-out;
 }
+
 .rotate {
   transition: transform 0.3s ease-in-out;
   transform: rotate(90deg);
@@ -74,18 +82,16 @@
     color:red !important;
 }
 
-
 html, body {
   height: 100%;
 }
 
 body{
-
   /*font-family: 'Roboto Mono', monospace !important;*/
 }
 
 #content{
-   /* min-height: 85%;*/
+    min-height: 85%;
     height:auto;
 }
 
@@ -97,8 +103,6 @@ a { text-decoration:none !important;}
   background: #2c4261  !important;
   color: white !important;
 }
-
-
 
 /* FORMS */
 input[type=text], input[type=placeholder], input[type=submit] {
@@ -116,7 +120,6 @@ input[type=text], input[type=placeholder], input[type=submit] {
     -moz-appearance: none;
     appearance: none;
     border-radius: .25rem;
-
 }
 
 input[type=submit]:hover{
@@ -127,8 +130,6 @@ input[type=submit]:hover{
     border: 1px var(--bs-dark) solid;
     transition:0.2s;
 }
-
-
 
 /* NAVIGATION */
 
@@ -158,7 +159,12 @@ nav{
 .navbar-brand:hover{
     color: white !important;
 }
+.dropdown-item{
+  transition: 0.2s;
+  color:black !important;
+}
 .dropdown-item:hover{
+
     background:var(--secondBackgroundColor) !important;
 }
 

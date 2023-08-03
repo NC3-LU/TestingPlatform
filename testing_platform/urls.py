@@ -31,4 +31,7 @@ urlpatterns = [
     path("contact/", include("contact.urls")),
     path("kb/", include("knowledge_base.urls")),
     path("test/dmarc-reporter/upload/", views.dmarc_upload, name="dmarc-uploader"),
+    # API
+    path("api-auth/", include("rest_framework.urls")),
+    path("api/v1/", include("testing.api.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

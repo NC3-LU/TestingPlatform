@@ -7,7 +7,7 @@
 <main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
     <h1>Profile</h1>
     <hr class="w-25 text-dark">
-    <form class="authForm p-5 mb-5" method="post" enctype="multipart/form-data">
+    <form class="col-lg-4 p-5 border border-1" method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
         {% for field in form %}
@@ -28,7 +28,7 @@
 
     <h1>My company domains</h1>
     <hr class="w-25 text-dark">
-    <section class="authForm p-5 mb-5">
+    <section class="col-lg-4 p-5 border border-1 mb-2">
         <p class="lead mb-5">
             <a href="domains/add" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
                 Add a company domain
@@ -58,7 +58,7 @@
 
     <h1>My company mail domains</h1>
     <hr class="w-25 text-dark">
-    <section id="company-mail" class="authForm p-5">
+    <section id="company-mail" class="col-lg-4 p-5 border border-1">
         <p class="lead mb-5">
             <a href="mail-domains/add" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
                 Add a mail domain

@@ -43,6 +43,9 @@ python3-nmap = "^1.6.0"
 python-owasp-zap-v2-4 = "^0.0.21"
 pycryptodome = "^3.18.0"
 pandas = "^2.0.2"
+djangorestframework = "^3.14.0"
+drf-spectacular = "^0.26.4"
+drf-spectacular-sidecar = "^2023.7.1"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^5.0.4"

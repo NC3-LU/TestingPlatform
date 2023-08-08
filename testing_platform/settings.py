@@ -25,13 +25,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "secret")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "1") == "0"
+DEBUG = os.environ.get("DEBUG", "1") == "1"
 
 allowed_hosts = os.environ.get("ALLOWED_HOSTS", "localhost")
 ALLOWED_HOSTS = list(map(str.strip, allowed_hosts.split(",")))
 
 if DEBUG:
-    CSRF_TRUSTED_ORIGINS = ["https://*.srv.office.secin.lu"]
+    CSRF_TRUSTED_ORIGINS = ["https://*.srv.office.lhc.lu"]
 else:
     CSRF_TRUSTED_ORIGINS = ["https://testing.nc3.lu"]
 

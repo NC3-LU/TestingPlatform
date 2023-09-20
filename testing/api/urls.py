@@ -9,6 +9,8 @@ from .views import (
     AutomatedFailedApiView,
     AutomatedScheduledApiView,
     AutomatedSuccessApiView,
+    AutomatedTestHTTPApiView,
+    AutomatedTestPingApiView,
     TlsScanHistoryApiView,
 )
 
@@ -24,4 +26,6 @@ urlpatterns = [
     path("AutomatedTasks/Success/", AutomatedSuccessApiView.as_view()),
     path("AutomatedTasks/Scheduled/", AutomatedScheduledApiView.as_view()),
     path("AutomatedTasks/Failed/", AutomatedFailedApiView.as_view()),
+    path("AutomatedTests/HTTP/", AutomatedTestHTTPApiView.as_view()),
+    path("AutomatedTests/Ping/", AutomatedTestPingApiView.as_view()),
 ]

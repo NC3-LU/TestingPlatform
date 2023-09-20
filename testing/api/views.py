@@ -6,14 +6,50 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from automation.models import HttpAutomatedTest, PingAutomatedTest
 from testing.models import TlsScanHistory
 
 from .serializers import (
     AutomatedFailedSerializer,
     AutomatedScheduledSerializer,
     AutomatedSuccessSerializer,
+    AutomatedTestHTTPSerializer,
+    AutomatedTestPingSerializer,
     TlsScanHistorySerializer,
 )
+
+
+#
+# Model: AutomatedTest
+#
+class AutomatedTestHTTPApiView(APIView):
+    # add permission to check if user is authenticated
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    @extend_schema(request=None, responses=AutomatedTestHTTPSerializer)
+    def get(self, request, *args, **kwargs):
+        """
+        List all the external tokens.
+        """
+        objects = HttpAutomatedTest.objects.all()
+        serializer = AutomatedTestHTTPSerializer(objects, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AutomatedTestPingApiView(APIView):
+    # add permission to check if user is authenticated
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    @extend_schema(request=None, responses=AutomatedTestPingSerializer)
+    def get(self, request, *args, **kwargs):
+        """
+        List all the external tokens.
+        """
+        objects = PingAutomatedTest.objects.all()
+        serializer = AutomatedTestPingSerializer(objects, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 #
@@ -34,6 +70,9 @@ class TlsScanHistoryApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+#
+# Model: q_models
+#
 class AutomatedSuccessApiView(APIView):
     # add permission to check if user is authenticated
     authentication_classes = [SessionAuthentication, BasicAuthentication]

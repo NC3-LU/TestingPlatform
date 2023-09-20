@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from testing.models import TlsScanHistory
 
 from .serializers import (
+    AutomatedFailedSerializer,
     AutomatedScheduledSerializer,
     AutomatedSuccessSerializer,
     TlsScanHistorySerializer,
@@ -60,4 +61,19 @@ class AutomatedScheduledApiView(APIView):
         """
         objects = q_models.Schedule.objects.all()
         serializer = AutomatedScheduledSerializer(objects, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AutomatedFailedApiView(APIView):
+    # add permission to check if user is authenticated
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    @extend_schema(request=None, responses=AutomatedFailedSerializer)
+    def get(self, request, *args, **kwargs):
+        """
+        List the failed Django Q tasks.
+        """
+        objects = q_models.Failure.objects.all()
+        serializer = AutomatedFailedSerializer(objects, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

@@ -13,10 +13,16 @@ class TlsScanHistorySerializer(serializers.ModelSerializer):
 class AutomatedSuccessSerializer(serializers.ModelSerializer):
     class Meta:
         model = q_models.Success
-        fields = ["name", "func", "args", "started", "stopped", "result"]
+        fields = ["id", "name", "func", "args", "started", "stopped", "result"]
 
 
 class AutomatedScheduledSerializer(serializers.ModelSerializer):
     class Meta:
         model = q_models.Schedule
-        fields = ["name", "func", "schedule_type", "next_run", "last_run"]
+        fields = ["id", "name", "func", "schedule_type", "next_run"]
+
+
+class AutomatedFailedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = q_models.Failure
+        fields = ["id", "name", "func", "started", "stopped"]

@@ -6,6 +6,7 @@ from drf_spectacular.views import (
 )
 
 from .views import (
+    AutomatedFailedApiView,
     AutomatedScheduledApiView,
     AutomatedSuccessApiView,
     TlsScanHistoryApiView,
@@ -22,4 +23,5 @@ urlpatterns = [
     path("TlsScanHistory/", TlsScanHistoryApiView.as_view()),
     path("AutomatedTasks/Success/", AutomatedSuccessApiView.as_view()),
     path("AutomatedTasks/Scheduled/", AutomatedScheduledApiView.as_view()),
+    path("AutomatedTasks/Failed/", AutomatedFailedApiView.as_view()),
 ]

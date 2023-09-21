@@ -28,8 +28,8 @@ release = "1.0.4"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx_autodoc_typehints",
-    "sphinx_multiversion",
+    # "sphinx_autodoc_typehints",
+    # "sphinx_multiversion",
     # "sphinxcontrib.mermaid",
     # "sphinxcontrib.bibtex",
 ]

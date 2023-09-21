@@ -2,12 +2,25 @@ Architecture
 ============
 
 
+Models
+------
+
+.. figure:: _static/app-models.png
+   :alt: Apllication models
+   :target: _static/app-models.png
+
+   Business related models.
+
+
 High level architecture
 -----------------------
 
 
-.. image:: _static/architecture-platform.png
-   :alt: Organization level
+.. figure:: _static/architecture-platform.png
+   :alt: High level architecture
+   :target: _static/app-models.png
+
+   High level architecture.
 
 
 Kvrocks

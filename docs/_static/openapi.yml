@@ -1,0 +1,608 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0
+paths:
+  /api/v1/AutomatedTasks/Failed/:
+    get:
+      operationId: AutomatedTasks_Failed_retrieve
+      description: List the failed Django Q tasks.
+      tags:
+      - AutomatedTasks
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomatedFailed'
+          description: ''
+  /api/v1/AutomatedTasks/Scheduled/:
+    get:
+      operationId: AutomatedTasks_Scheduled_retrieve
+      description: List the scheduled Django Q tasks.
+      tags:
+      - AutomatedTasks
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomatedScheduled'
+          description: ''
+  /api/v1/AutomatedTasks/Success/:
+    get:
+      operationId: AutomatedTasks_Success_retrieve
+      description: List the successfull Django Q tasks.
+      tags:
+      - AutomatedTasks
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomatedSuccess'
+          description: ''
+  /api/v1/AutomatedTests/HTTP/:
+    get:
+      operationId: AutomatedTests_HTTP_retrieve
+      description: List all the external tokens.
+      tags:
+      - AutomatedTests
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomatedTestHTTP'
+          description: ''
+  /api/v1/AutomatedTests/Ping/:
+    get:
+      operationId: AutomatedTests_Ping_retrieve
+      description: List all the external tokens.
+      tags:
+      - AutomatedTests
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomatedTestPing'
+          description: ''
+  /api/v1/TlsScanHistory/:
+    get:
+      operationId: TlsScanHistory_retrieve
+      description: List all the external tokens.
+      tags:
+      - TlsScanHistory
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TlsScanHistory'
+          description: ''
+  /api/v1/schema/:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - schema
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+components:
+  schemas:
+    AutomatedFailed:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        func:
+          type: string
+          maxLength: 256
+        started:
+          type: string
+          format: date-time
+          readOnly: true
+        stopped:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - func
+      - id
+      - name
+      - started
+      - stopped
+    AutomatedScheduled:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          nullable: true
+          maxLength: 100
+        func:
+          type: string
+          description: e.g. module.tasks.function
+          maxLength: 256
+        schedule_type:
+          $ref: '#/components/schemas/ScheduleTypeEnum'
+        next_run:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - func
+      - id
+    AutomatedSuccess:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        func:
+          type: string
+          maxLength: 256
+        args:
+          type: string
+          readOnly: true
+          nullable: true
+        started:
+          type: string
+          format: date-time
+          readOnly: true
+        stopped:
+          type: string
+          format: date-time
+          readOnly: true
+        result:
+          type: string
+          readOnly: true
+          nullable: true
+      required:
+      - args
+      - func
+      - id
+      - name
+      - result
+      - started
+      - stopped
+    AutomatedTestHTTP:
+      type: object
+      properties:
+        frequency:
+          allOf:
+          - $ref: '#/components/schemas/FrequencyEnum'
+          description: |-
+            Choose frequency of tests
+
+            * `D` - Daily
+            * `W` - Weekly
+            * `M` - Monthly
+        time:
+          type: string
+          format: time
+          description: Choose time for test execution
+        weekday:
+          nullable: true
+          description: |-
+            If weekly, choose day of test
+
+            * `mo` - Monday
+            * `tu` - Tuesday
+            * `we` - Wednesday
+            * `th` - Thursday
+            * `fr` - Friday
+            * `sa` - Saturday
+            * `su` - Sunday
+          oneOf:
+          - $ref: '#/components/schemas/WeekdayEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        monthly_test_date:
+          nullable: true
+          description: |-
+            If monthly, select day in month up to the 28th
+
+            * `1` - 1
+            * `2` - 2
+            * `3` - 3
+            * `4` - 4
+            * `5` - 5
+            * `6` - 6
+            * `7` - 7
+            * `8` - 8
+            * `9` - 9
+            * `10` - 10
+            * `11` - 11
+            * `12` - 12
+            * `13` - 13
+            * `14` - 14
+            * `15` - 15
+            * `16` - 16
+            * `17` - 17
+            * `18` - 18
+            * `19` - 19
+            * `20` - 20
+            * `21` - 21
+            * `22` - 22
+            * `23` - 23
+            * `24` - 24
+            * `25` - 25
+            * `26` - 26
+            * `27` - 27
+            * `28` - 28
+          oneOf:
+          - $ref: '#/components/schemas/MonthlyTestDateEnum'
+          - $ref: '#/components/schemas/NullEnum'
+      required:
+      - frequency
+    AutomatedTestPing:
+      type: object
+      properties:
+        frequency:
+          allOf:
+          - $ref: '#/components/schemas/FrequencyEnum'
+          description: |-
+            Choose frequency of tests
+
+            * `D` - Daily
+            * `W` - Weekly
+            * `M` - Monthly
+        time:
+          type: string
+          format: time
+          description: Choose time for test execution
+        weekday:
+          nullable: true
+          description: |-
+            If weekly, choose day of test
+
+            * `mo` - Monday
+            * `tu` - Tuesday
+            * `we` - Wednesday
+            * `th` - Thursday
+            * `fr` - Friday
+            * `sa` - Saturday
+            * `su` - Sunday
+          oneOf:
+          - $ref: '#/components/schemas/WeekdayEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        monthly_test_date:
+          nullable: true
+          description: |-
+            If monthly, select day in month up to the 28th
+
+            * `1` - 1
+            * `2` - 2
+            * `3` - 3
+            * `4` - 4
+            * `5` - 5
+            * `6` - 6
+            * `7` - 7
+            * `8` - 8
+            * `9` - 9
+            * `10` - 10
+            * `11` - 11
+            * `12` - 12
+            * `13` - 13
+            * `14` - 14
+            * `15` - 15
+            * `16` - 16
+            * `17` - 17
+            * `18` - 18
+            * `19` - 19
+            * `20` - 20
+            * `21` - 21
+            * `22` - 22
+            * `23` - 23
+            * `24` - 24
+            * `25` - 25
+            * `26` - 26
+            * `27` - 27
+            * `28` - 28
+          oneOf:
+          - $ref: '#/components/schemas/MonthlyTestDateEnum'
+          - $ref: '#/components/schemas/NullEnum'
+      required:
+      - frequency
+    BlankEnum:
+      enum:
+      - ''
+    FrequencyEnum:
+      enum:
+      - D
+      - W
+      - M
+      type: string
+      description: |-
+        * `D` - Daily
+        * `W` - Weekly
+        * `M` - Monthly
+    MonthlyTestDateEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 11
+      - 12
+      - 13
+      - 14
+      - 15
+      - 16
+      - 17
+      - 18
+      - 19
+      - 20
+      - 21
+      - 22
+      - 23
+      - 24
+      - 25
+      - 26
+      - 27
+      - 28
+      type: integer
+      description: |-
+        * `1` - 1
+        * `2` - 2
+        * `3` - 3
+        * `4` - 4
+        * `5` - 5
+        * `6` - 6
+        * `7` - 7
+        * `8` - 8
+        * `9` - 9
+        * `10` - 10
+        * `11` - 11
+        * `12` - 12
+        * `13` - 13
+        * `14` - 14
+        * `15` - 15
+        * `16` - 16
+        * `17` - 17
+        * `18` - 18
+        * `19` - 19
+        * `20` - 20
+        * `21` - 21
+        * `22` - 22
+        * `23` - 23
+        * `24` - 24
+        * `25` - 25
+        * `26` - 26
+        * `27` - 27
+        * `28` - 28
+    NullEnum:
+      enum:
+      - null
+    ScheduleTypeEnum:
+      enum:
+      - O
+      - I
+      - H
+      - D
+      - W
+      - M
+      - Q
+      - Y
+      - C
+      type: string
+      description: |-
+        * `O` - Once
+        * `I` - Minutes
+        * `H` - Hourly
+        * `D` - Daily
+        * `W` - Weekly
+        * `M` - Monthly
+        * `Q` - Quarterly
+        * `Y` - Yearly
+        * `C` - Cron
+    TlsScanHistory:
+      type: object
+      properties:
+        scan_id:
+          type: integer
+        domain:
+          type: string
+          maxLength: 255
+      required:
+      - domain
+      - scan_id
+    WeekdayEnum:
+      enum:
+      - mo
+      - tu
+      - we
+      - th
+      - fr
+      - sa
+      - su
+      type: string
+      description: |-
+        * `mo` - Monday
+        * `tu` - Tuesday
+        * `we` - Wednesday
+        * `th` - Thursday
+        * `fr` - Friday
+        * `sa` - Saturday
+        * `su` - Sunday
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

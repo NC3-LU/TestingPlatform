@@ -12,6 +12,7 @@ from .views import (
     AutomatedTestHTTPApiView,
     AutomatedTestPingApiView,
     TlsScanHistoryApiView,
+    UserApiView,
 )
 
 urlpatterns = [
@@ -22,6 +23,7 @@ urlpatterns = [
         name="swagger-ui",
     ),
     path("redoc/", SpectacularRedocView.as_view(url_name="testing"), name="redoc"),
+    path("User/", UserApiView.as_view()),
     path("TlsScanHistory/", TlsScanHistoryApiView.as_view()),
     path("AutomatedTasks/Success/", AutomatedSuccessApiView.as_view()),
     path("AutomatedTasks/Scheduled/", AutomatedScheduledApiView.as_view()),

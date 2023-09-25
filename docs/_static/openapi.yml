@@ -99,6 +99,49 @@ paths:
               schema:
                 $ref: '#/components/schemas/TlsScanHistory'
           description: ''
+  /api/v1/User/:
+    get:
+      operationId: User_retrieve
+      description: List the users.
+      tags:
+      - User
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    post:
+      operationId: User_create
+      description: Create a new user.
+      tags:
+      - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
   /api/v1/schema/:
     get:
       operationId: schema_retrieve
@@ -580,6 +623,61 @@ components:
       required:
       - domain
       - scan_id
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        company_name:
+          type: string
+          maxLength: 200
+      required:
+      - company_name
+      - id
+      - username
+    UserInput:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 200
+        email:
+          type: string
+          maxLength: 200
+        password:
+          type: string
+          maxLength: 200
+        company_name:
+          type: string
+          maxLength: 200
+        address:
+          type: string
+          maxLength: 200
+        post_code:
+          type: string
+          maxLength: 200
+        city:
+          type: string
+          maxLength: 200
+        vat_number:
+          type: string
+          maxLength: 200
+      required:
+      - address
+      - city
+      - company_name
+      - email
+      - password
+      - post_code
+      - username
+      - vat_number
     WeekdayEnum:
       enum:
       - mo

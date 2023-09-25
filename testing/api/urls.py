@@ -13,6 +13,7 @@ from .views import (
     AutomatedTestPingApiView,
     TlsScanHistoryApiView,
     UserApiView,
+    UserElementApiView,
 )
 
 urlpatterns = [
@@ -24,6 +25,7 @@ urlpatterns = [
     ),
     path("redoc/", SpectacularRedocView.as_view(url_name="testing"), name="redoc"),
     path("User/", UserApiView.as_view()),
+    path("User/<int:id>", UserElementApiView.as_view()),
     path("TlsScanHistory/", TlsScanHistoryApiView.as_view()),
     path("AutomatedTasks/Success/", AutomatedSuccessApiView.as_view()),
     path("AutomatedTasks/Scheduled/", AutomatedScheduledApiView.as_view()),

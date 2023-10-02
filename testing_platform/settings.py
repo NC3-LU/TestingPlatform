@@ -87,6 +87,15 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "NC3-LU Testing Platform",
+    "DESCRIPTION": "API for the "
+    '<a href="https://github.com/NC3-LU/TestingPlatform" rel="noopener noreferrer" target="_blank">'
+    "Testing Platform</a> by NC3-LU.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": True,
+}
+
 GRAPH_MODELS = {
     "all_applications": True,
     "group_models": True,

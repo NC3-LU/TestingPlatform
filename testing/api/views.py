@@ -59,6 +59,19 @@ class UserElementApiView(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = UserSerializer
 
+    @extend_schema(request=UserInputSerializer, responses=UserSerializer)
+    def put(self, request, id=None):
+        """
+        Update an existing user.
+        """
+        user = User.objects.get(id=id)
+        password = request.data.get("password", None)
+        if password:
+            user.set_password(password)
+        user.save()
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def delete(self, request, id=None):
         """
         Delete a user.

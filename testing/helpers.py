@@ -16,6 +16,8 @@ import nmap3
 import pypandora
 import requests
 from Crypto.PublicKey import RSA
+from django.template.loader import render_to_string
+from weasyprint import CSS, HTML
 
 from testing.models import TlsScanHistory
 
@@ -682,3 +684,21 @@ def check_dkim_public_key(domain: str, selectors: list):
         except Exception:
             continue
     return {"dkim": False}
+
+
+def get_pdf_report():
+
+    # Render the HTML file
+    output_from_parsed_template = render_to_string(
+        "report/template.html",
+        {},
+    )
+
+    base_url = os.path.abspath("")
+    htmldoc = HTML(string=output_from_parsed_template, base_url=base_url)
+
+    stylesheets = [
+        CSS(os.path.join(base_url, "css/custom.css")),
+    ]
+
+    return htmldoc.write_pdf(stylesheets=stylesheets)

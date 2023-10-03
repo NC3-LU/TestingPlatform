@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "django_q",
     "widget_tweaks",
     "django_bootstrap5",
+    "api",
     "landing_page",
     "legal_section",
     "authentication",

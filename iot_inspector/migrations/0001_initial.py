@@ -7,7 +7,6 @@ import iot_inspector.models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [

@@ -16,7 +16,7 @@ repos:
     hooks:
       - id: isort
   - repo: https://github.com/psf/black
-    rev: 22.3.0
+    rev: 23.9.1
     hooks:
       - id: black
   - repo: https://github.com/asottile/blacken-docs
@@ -24,7 +24,7 @@ repos:
     hooks:
       - id: blacken-docs
   - repo: https://github.com/PyCQA/flake8
-    rev: 4.0.1
+    rev: 6.1.0
     hooks:
       - id: flake8
         additional_dependencies:
@@ -32,12 +32,12 @@ repos:
           - flake8-implicit-str-concat
         args: ["--max-line-length=125"]
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v4.4.0
     hooks:
       - id: fix-byte-order-marker
       - id: trailing-whitespace
       - id: end-of-file-fixer
-  - repo: https://github.com/trailofbits/pip-audit
+  - repo: https://github.com/pypa/pip-audit
     rev: v2.6.1
     hooks:
       -   id: pip-audit

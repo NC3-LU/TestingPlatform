@@ -300,7 +300,6 @@ def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, An
 def ipv6_check(
     domain: str, port=None
 ) -> Dict[str, Union[Dict[Any, Any], List[Union[str, int]], List[Any]]]:
-
     logger.info(f"ipv6 scan: scanning domain {domain}")
     results = {}
 
@@ -331,7 +330,6 @@ def ipv6_check(
                 if answer.rdtype == dns.rdatatype.A
             ]
             for nameserver_ip in nameserver_ips:
-
                 logger.info(f"ipv6 scan: found NS at ip {nameserver_ip}")
                 q = dns.message.make_query("https://ciphersuite.info", dns.rdatatype.A)
                 try:
@@ -687,7 +685,6 @@ def check_dkim_public_key(domain: str, selectors: list):
 
 
 def get_pdf_report():
-
     # Render the HTML file
     output_from_parsed_template = render_to_string(
         "report/template.html",

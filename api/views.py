@@ -2,7 +2,7 @@ from django_q import models as q_models
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -20,6 +20,11 @@ from .serializers import (
     UserInputSerializer,
     UserSerializer,
 )
+
+
+class UnauthenticatedPost(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in ["POST"]
 
 
 #

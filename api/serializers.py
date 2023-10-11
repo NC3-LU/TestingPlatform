@@ -9,6 +9,19 @@ from testing.models import TlsScanHistory
 #
 # Model: User
 #
+
+class UserInputLoginSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=200, required=True)
+    password = serializers.CharField(max_length=200, required=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+        ]
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

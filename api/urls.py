@@ -1,4 +1,6 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
@@ -14,9 +16,17 @@ from .views import (
     TlsScanHistoryApiView,
     UserApiView,
     UserElementApiView,
+    LoginApiView,
+    CheckAuthApiView,
+    LogoutView
+
 )
 
 urlpatterns = [
+    path('check-auth/', CheckAuthApiView.as_view(), name='token_obtain_pair'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('token/', LoginApiView.as_view(), name='login'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path("schema/", SpectacularAPIView.as_view(), name="testing"),
     path(
         "swagger-ui/",

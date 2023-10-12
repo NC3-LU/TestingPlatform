@@ -48,6 +48,8 @@ drf-spectacular = "^0.26.4"
 drf-spectacular-sidecar = "^2023.7.1"
 django-extensions = "^3.2.3"
 weasyprint = "^60.1"
+django-cors-headers = "^4.3.0"
+djangorestframework-simplejwt = "^5.3.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.1.0"

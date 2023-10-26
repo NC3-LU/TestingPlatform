@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 
-from iot_inspector.models import IOTUser
 from testing.models import MailDomain, UserDomain
 
 from .forms import (
@@ -30,8 +29,6 @@ def signup(request):
             user = authenticate(username=username, password=raw_password)
             login(request, user)
             messages.success(request, "Your signed up successfully!")
-            iotuser = IOTUser(user=user, login=clean_form.get("email"))
-            iotuser.save()
             return redirect("/")
     else:
         form = SignUpForm()

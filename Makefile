@@ -19,3 +19,23 @@ run:
 			-v$(PWD)/db:/app/db \
 			-v$(PWD)/files:/app/files \
 			$(IMAGE_NAME)
+
+models:
+	python manage.py graph_models --pydot -a -g -o docs/_static/app-models.png
+
+openapi:
+	python manage.py spectacular --format openapi > docs/_static/openapi.yml
+
+generatepot:
+	python manage.py makemessages -a --keep-pot
+
+update:
+	npm ci
+	poetry install --only main
+	python manage.py collectstatic
+	python manage.py compilemessages
+	python manage.py migrate
+
+clean:
+	find . -type f -name "*.py[co]" -delete
+	find . -type d -name "__pycache__" -delete

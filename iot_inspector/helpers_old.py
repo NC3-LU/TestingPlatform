@@ -84,7 +84,6 @@ def get_product_group_id(client):
 
 
 def client_login(iot_user):
-
     client = Client(api_url=settings.IOT_API_URL)
     signer = Signer()
     try:

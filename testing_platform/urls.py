@@ -34,5 +34,5 @@ urlpatterns = [
     path("test/dmarc-reporter/upload/", views.dmarc_upload, name="dmarc-uploader"),
     # API
     path("api-auth/", include("rest_framework.urls")),
-    path("api/v1/", include("testing.api.urls")),
+    path("api/v1/", include("api.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

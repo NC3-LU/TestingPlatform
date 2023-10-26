@@ -18,7 +18,7 @@ documentation = "https://testingplatform.readthedocs.io"
 keywords = ["test", "security", "internet-standard"]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4.0"
+python = ">=3.9,<4.0"
 django = "^4.1.7"
 django-bootstrap5 = "^22.1"
 django-icons = "^22.1"
@@ -35,7 +35,7 @@ xmltodict = "^0.13.0"
 ipwhois = "^1.2.0"
 onekey-client = "^2.0.2"
 psutil = "^5.9.4"
-certifi = "^2022.12.7"
+certifi = "^2023.7.22"
 django-enumfields = "^2.1.1"
 pypandora = "^1.4.0"
 checkdmarc = "^4.5.2"
@@ -46,35 +46,41 @@ pandas = "^2.0.2"
 djangorestframework = "^3.14.0"
 drf-spectacular = "^0.26.4"
 drf-spectacular-sidecar = "^2023.7.1"
+django-extensions = "^3.2.3"
+weasyprint = "^60.1"
+django-cors-headers = "^4.3.0"
+djangorestframework-simplejwt = "^5.3.0"
 
 [tool.poetry.group.dev.dependencies]
-flake8 = "^5.0.4"
-pre-commit = "^3.3.1"
-black = "^22.10.0"
-pyupgrade = "^3.2.2"
-autoflake = "^1.7.7"
-mypy = "^0.991"
-types-requests = "^2.28.11.5"
-pip-audit = "^2.5.5"
+flake8 = "^6.1.0"
+pre-commit = "^3.4.0"
+black = "^23.9.1"
+pyupgrade = "^3.14.0"
+autoflake = "^2.2.1"
+mypy = "^1.5.1"
+types-requests = "^2.31.0.7"
+pip-audit = "^2.6.1"
 isort = "^5.12.0"
+
 
 [tool.poetry.group.docs]
 optional = true
 
 [tool.poetry.group.docs.dependencies]
-sphinx = "^5.0.0"
-sphinx-book-theme = "0.4.0rc1"
+sphinx-book-theme = "^1.0.1"
 sphinx-multiversion = "^0.2.4"
 sphinx-autodoc-typehints = "^1.20.1"
 sphinxcontrib-mermaid = "^0.7.1"
 sphinxcontrib-bibtex = "^2.5.0"
+sphinxcontrib-openapi = "^0.8.1"
+pydot = "^1.4.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 check_untyped_defs = true
 ignore_errors = false
 ignore_missing_imports = true

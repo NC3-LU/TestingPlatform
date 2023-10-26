@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 
 @admin.register(AnalysisRequest)
 class AnalysisRequestAdmin(admin.ModelAdmin):
-
     actions = [
         "validate_status",
         "decline_status",
@@ -116,7 +115,6 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
 
 @admin.register(IOTUser)
 class IOTUserAdmin(admin.ModelAdmin):
-
     readonly_fields = ("password",)
     actions = ["activate_iot", "get_login"]
     list_display = ["__str__", "activated"]

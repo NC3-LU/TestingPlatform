@@ -12,10 +12,10 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 import sys
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -54,10 +54,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_extensions",
     "django_icons",
     "django_q",
     "widget_tweaks",
     "django_bootstrap5",
+    "api",
     "landing_page",
     "legal_section",
     "authentication",
@@ -73,6 +75,9 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "drf_spectacular_sidecar",  # required for Django collectstatic discovery
+    "corsheaders",
+    'rest_framework_simplejwt.token_blacklist',
+
 ]
 
 REST_FRAMEWORK = {
@@ -81,10 +86,34 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "NC3-LU Testing Platform",
+    "DESCRIPTION": "API for the "
+                   '<a href="https://github.com/NC3-LU/TestingPlatform" rel="noopener noreferrer" target="_blank">'
+                   "Testing Platform</a> by NC3-LU.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": True,
+}
+
+GRAPH_MODELS = {
+    "all_applications": True,
+    "group_models": True,
 }
 
 MIDDLEWARE = [
@@ -95,8 +124,19 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
+]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
+
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CORS_ALLOW_CREDENTIALS = True
 Q_CLUSTER = {"name": "scheduler", "orm": "default", "timeout": 300, "retry": 330}
 
 ROOT_URLCONF = "testing_platform.urls"
@@ -119,7 +159,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "testing_platform.wsgi.application"
-
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -149,19 +188,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
-
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -228,7 +261,6 @@ LOGGING = {
 STATIC_DIR = BASE_DIR / "static"
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-
 BOOTSTRAP5 = {
     "css_url": {
         "url": "/static/npm_components/bootstrap/dist/css/bootstrap.min.css",
@@ -240,7 +272,6 @@ BOOTSTRAP5 = {
         "crossorigin": "anonymous",
     },
 }
-
 
 if not DEBUG and SECRET_KEY == "secret":
     print("FATAL: the secret key in the config has not yet been configured. Quitting.")

@@ -13,6 +13,7 @@ Testing Platform documentation
 
    installation
    architecture
+   api-v1
 
 
 Modules

@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("testing", "0002_tlsscanhistory"),
         ("django_q", "0014_schedule_cluster"),

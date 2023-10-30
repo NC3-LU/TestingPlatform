@@ -13,7 +13,7 @@ from rest_framework_simplejwt.tokens import AccessToken, OutstandingToken, Refre
 
 from authentication.models import User
 from automation.models import HttpAutomatedTest, PingAutomatedTest
-from testing.helpers import file_check, ipv6_check
+from testing.helpers import email_check, file_check, ipv6_check
 from testing.models import TlsScanHistory
 
 from .serializers import (
@@ -23,6 +23,7 @@ from .serializers import (
     AutomatedTestHTTPSerializer,
     AutomatedTestPingSerializer,
     FileInputSerializer,
+    InfraTestingDomainNameSerializer,
     InfraTestingIPv6Serializer,
     TlsScanHistorySerializer,
     UserInputSerializer,
@@ -323,9 +324,13 @@ class AutomatedFailedApiView(APIView):
 # InfraTesting
 #
 class InfraTestingEmailApiView(ViewSet):
-    def get(self, request, *args, **kwargs):
+    serializer_class = InfraTestingDomainNameSerializer
+
+    def create(self, request, *args, **kwargs):
         """ """
-        return Response({}, status=status.HTTP_200_OK)
+        domain_name = request.data.get("domain_name", None)
+        result = email_check(domain_name)
+        return Response(result, status=status.HTTP_200_OK)
 
 
 class InfraTestingFileApiView(ViewSet):

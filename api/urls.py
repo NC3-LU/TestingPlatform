@@ -1,11 +1,10 @@
 from django.urls import path
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
     AutomatedFailedApiView,
@@ -13,20 +12,22 @@ from .views import (
     AutomatedSuccessApiView,
     AutomatedTestHTTPApiView,
     AutomatedTestPingApiView,
+    CheckAuthApiView,
+    InfraTestingEmailApiView,
+    InfraTestingFileApiView,
+    InfraTestingIPv6ApiView,
+    LoginApiView,
+    LogoutView,
     TlsScanHistoryApiView,
     UserApiView,
     UserElementApiView,
-    LoginApiView,
-    CheckAuthApiView,
-    LogoutView
-
 )
 
 urlpatterns = [
-    path('check-auth/', CheckAuthApiView.as_view(), name='token_obtain_pair'),
-    path('logout/', LogoutView.as_view(), name='logout'),
-    path('token/', LoginApiView.as_view(), name='login'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path("check-auth/", CheckAuthApiView.as_view(), name="token_obtain_pair"),
+    path("logout/", LogoutView.as_view(), name="logout"),
+    path("token/", LoginApiView.as_view(), name="login"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("schema/", SpectacularAPIView.as_view(), name="testing"),
     path(
         "swagger-ui/",
@@ -42,4 +43,7 @@ urlpatterns = [
     path("AutomatedTasks/Failed/", AutomatedFailedApiView.as_view()),
     path("AutomatedTests/HTTP/", AutomatedTestHTTPApiView.as_view()),
     path("AutomatedTests/Ping/", AutomatedTestPingApiView.as_view()),
+    path("InfraTesting/email/", InfraTestingEmailApiView.as_view({"get": "get"})),
+    path("InfraTesting/file/", InfraTestingFileApiView.as_view({"post": "create"})),
+    path("InfraTesting/ipv6/", InfraTestingIPv6ApiView.as_view({"post": "create"})),
 ]

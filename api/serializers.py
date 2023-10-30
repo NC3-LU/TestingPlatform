@@ -5,10 +5,10 @@ from authentication.models import User
 from automation.models import HttpAutomatedTest, PingAutomatedTest
 from testing.models import TlsScanHistory
 
-
 #
 # Model: User
 #
+
 
 class UserInputLoginSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=200, required=True)
@@ -95,3 +95,20 @@ class AutomatedFailedSerializer(serializers.ModelSerializer):
     class Meta:
         model = q_models.Failure
         fields = ["id", "name", "func", "started", "stopped"]
+
+
+#
+# InfraTesting
+#
+class FileInputSerializer(serializers.Serializer):
+    file_uploaded = serializers.FileField()
+
+    class Meta:
+        fields = ["file_uploaded"]
+
+
+class InfraTestingIPv6Serializer(serializers.Serializer):
+    ip_v6 = serializers.CharField(max_length=200, required=True)
+
+    class Meta:
+        fields = ["ip_v6"]

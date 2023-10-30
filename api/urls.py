@@ -43,7 +43,7 @@ urlpatterns = [
     path("AutomatedTasks/Failed/", AutomatedFailedApiView.as_view()),
     path("AutomatedTests/HTTP/", AutomatedTestHTTPApiView.as_view()),
     path("AutomatedTests/Ping/", AutomatedTestPingApiView.as_view()),
-    path("InfraTesting/email/", InfraTestingEmailApiView.as_view({"get": "get"})),
+    path("InfraTesting/email/", InfraTestingEmailApiView.as_view({"post": "create"})),
     path("InfraTesting/file/", InfraTestingFileApiView.as_view({"post": "create"})),
     path("InfraTesting/ipv6/", InfraTestingIPv6ApiView.as_view({"post": "create"})),
 ]

@@ -112,3 +112,10 @@ class InfraTestingIPv6Serializer(serializers.Serializer):
 
     class Meta:
         fields = ["ip_v6"]
+
+
+class InfraTestingDomainNameSerializer(serializers.Serializer):
+    domain_name = serializers.CharField(max_length=200, required=True)
+
+    class Meta:
+        fields = ["domain_name"]

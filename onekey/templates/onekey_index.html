@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block content %}
+
+<main class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
+    <section class="container">
+        <div class="p-5">
+            <h1>ONEKEY IoT firmware analysis</h1>
+            <div class="p-5">
+                <p class="lead mb-5">
+                    In order to design proper security controls adapted to your specific environment, you need to know
+                    what are the intrinsic vulnerabilities of the IoT devices you are using. To do so, we have
+                    partnered with ONEKEY GmbH whose solution is particularly advanced and comprehensive,
+                    and generates detailed firmware analysis reports.
+                </p>
+                <hr class="mb-5">
+                <p class="lead mb-5">
+                    Here you can upload firmware images from your IoT devices to have them analyzed and receive a
+                    detailed report of the found vulnerabilities, compliance with major IoT standards, and more.
+                </p>
+            </div>
+            <p class="lead">
+                <a href="request/" class="btn btn-lg btn-secondary fw-bold border-white bg-dark text-white">
+                    Request Firmware Analysis
+                </a>
+            </p>
+        </div>
+    </section>
+    <section class="authForm p-5">
+        <h3>My ongoing requests</h3>
+        <div class="d-flex">
+            {% if requests %}
+                <table class="table table-light table-striped">
+                    <tr>
+                        <th>Request number</th>
+                        <th>Request name</th>
+                        <th>Request status</th>
+                        <th>Firmware UUID</th>
+                        <th>Link to the report</th>
+                    </tr>
+                {% for request in requests %}
+                    <tr>
+                        <td>{{ request.request_nb }}</td>
+                        <td>{{ request.firmware_name }}</td>
+                        <td>{{ request.status_field }}</td>
+                        <td>{{ request.firmware_uuid }}</td>
+                        {% if request.report_link %}
+                          <td>{{ request.report_link }}</td>
+                        {% elif not request.report_uuid %}
+                          <td>No report available yet. <a href="generate_report/firmware={{ request.firmware_uuid }}">Generate a report</a></td>
+                        {% elif request.report_uuid and not request.report_link %}
+                          <td>Report available. <a href="generate_link/report={{ request.report_uuid }}">Generate a report link</a></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </table>
+            {% else %}
+                <span>No request registered</span>
+            {% endif %}
+        </div>
+    </section>
+
+</main>
+
+{% endblock %}

@@ -27,6 +27,7 @@ urlpatterns = [
     path("infra-testing/", include("testing.urls")),
     path("c3-protocols/", include("c3_protocols.urls")),
     path("specialized-testing/", include("specialized_testing.urls")),
+    path("iot-testing/", include("onekey.urls")),
     path("admin/", admin.site.urls),
     path("contact/", include("contact.urls")),
     path("kb/", include("knowledge_base.urls")),

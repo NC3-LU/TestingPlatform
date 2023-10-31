@@ -16,6 +16,7 @@ from .views import (
     InfraTestingEmailApiView,
     InfraTestingFileApiView,
     InfraTestingIPv6ApiView,
+    InfraTestingSOAApiView,
     LoginApiView,
     LogoutView,
     TlsScanHistoryApiView,
@@ -46,4 +47,5 @@ urlpatterns = [
     path("InfraTesting/email/", InfraTestingEmailApiView.as_view({"post": "create"})),
     path("InfraTesting/file/", InfraTestingFileApiView.as_view({"post": "create"})),
     path("InfraTesting/ipv6/", InfraTestingIPv6ApiView.as_view({"post": "create"})),
+    path("InfraTesting/soa/", InfraTestingSOAApiView.as_view({"post": "create"})),
 ]

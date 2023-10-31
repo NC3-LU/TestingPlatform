@@ -37,20 +37,24 @@
                         <th>Request name</th>
                         <th>Request status</th>
                         <th>Firmware UUID</th>
+                        <th>Report status</th>
                         <th>Link to the report</th>
                     </tr>
-                {% for request in requests %}
+                {% for request, status in requests %}
                     <tr>
                         <td>{{ request.request_nb }}</td>
                         <td>{{ request.firmware_name }}</td>
                         <td>{{ request.status_field }}</td>
                         <td>{{ request.firmware_uuid }}</td>
-                        {% if request.report_link %}
-                          <td>{{ request.report_link }}</td>
+                        <td>{{ status }}</td>
+                        {% if status == "Finished" and request.report_link %}
+                          <td><a href="download/report={{ request.report_uuid }}">Download report</a></td>
                         {% elif not request.report_uuid %}
                           <td>No report available yet. <a href="generate_report/firmware={{ request.firmware_uuid }}">Generate a report</a></td>
-                        {% elif request.report_uuid and not request.report_link %}
-                          <td>Report available. <a href="generate_link/report={{ request.report_uuid }}">Generate a report link</a></td>
+                        {% elif status == "Finished" and not request.report_link %}
+                          <td>Report available. <a href="generate_link/report={{ request.report_uuid }}">Generate a download link</a></td>
+                        {% elif status == "Generating" %}
+                          <td>Report is generating</td>
                         {% endif %}
                     </tr>
                 {% endfor %}
@@ -60,6 +64,10 @@
             {% endif %}
         </div>
     </section>
+
+  <script>
+
+  </script>
 
 </main>
 

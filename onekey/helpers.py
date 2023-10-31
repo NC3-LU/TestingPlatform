@@ -42,9 +42,9 @@ def get_default_product_group(client):
 
 def client_upload_firmware(client, firmware_analysis_request, default_product_group):
     metadata = FirmwareMetadata(
-        name=firmware_analysis_request.name,
-        vendor_name=firmware_analysis_request.vendor_name,
-        product_name=firmware_analysis_request.product_name,
+        name=firmware_analysis_request.firmware_name,
+        vendor_name=firmware_analysis_request.firmware_vendor_name,
+        product_name=firmware_analysis_request.firmware_product_name,
         product_group_id=default_product_group["id"],
     )
     firmware_path = Path(firmware_analysis_request.firmware_file.path)
@@ -61,9 +61,14 @@ def client_get_or_generate_report_config(client):
     GENERATE_REPORT_CONFIG = """
     mutation {
       createReportConfiguration(input: {
-        name: "Default Report",
+        name: "TP Report",
         issueSeverities: [CRITICAL, HIGH, MEDIUM, INFORMATIONAL, LOW],
-        complianceGuidelineIds: ["f3463279-0234-46d0-9f02-68c941b8b107"],
+        complianceGuidelineIds: ["f3463279-0234-46d0-9f02-68c941b8b107",
+                                 "d74e4b79-7613-4e13-bc20-d88f3bfe6b4b",
+                                 "9f09232a-f66b-4046-9f2a-3ca44e776deb",
+                                 "af2c4a04-42bd-437b-9982-e98e46dddc30",
+                                 "6956638d-428f-44d0-85c7-459c1544436c",
+                                 "45f2094e-904b-47c8-8042-0964b1d09f7e"],
         analysisTechniqueDetails: true,
         includeComments: true
       }) {
@@ -89,7 +94,7 @@ def client_get_or_generate_report_config(client):
         report_config = next(
             cfg
             for cfg in res["allReportConfigurations"]
-            if cfg["name"] == "Default Report"
+            if cfg["name"] == "TP Report"
         )
     except StopIteration:
         report_config = None
@@ -102,7 +107,7 @@ def client_get_or_generate_report_config(client):
         report_config = next(
             cfg
             for cfg in res["allReportConfigurations"]
-            if cfg["name"] == "Default Report"
+            if cfg["name"] == "TP Report"
         )
         return report_config
 
@@ -123,7 +128,6 @@ def client_generate_report(client, firmware_uuid, report_title):
         ... on Report {{
         id,
         title,
-        classification,
         generatedTime,
         downloadUrl,
         size,
@@ -179,3 +183,22 @@ def client_request_link(client, report_uuid):
     )
     res = client.query(GENERATE_REPORT_LINK)
     return res["createReportLink"]
+
+
+def client_get_all_reports_states(client, analysis_requests):
+    GET_ALL_REPORTS = """
+        query {
+          allReports { id, state }
+        }
+        """
+    res = client.query(GET_ALL_REPORTS)
+    states = []
+    for req in analysis_requests:
+        if req.report_uuid:
+            state = next(
+                rep for rep in res["allReports"] if rep["id"] == str(req.report_uuid)
+            )["state"]
+        else:
+            state = "Pending"
+        states.append(state.capitalize())
+    return zip(analysis_requests, states)

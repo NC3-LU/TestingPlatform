@@ -100,21 +100,21 @@ class AutomatedFailedSerializer(serializers.ModelSerializer):
 #
 # InfraTesting
 #
-class FileInputSerializer(serializers.Serializer):
+class FileSerializer(serializers.Serializer):
     file_uploaded = serializers.FileField()
 
     class Meta:
         fields = ["file_uploaded"]
 
 
-class InfraTestingIPv6Serializer(serializers.Serializer):
+class IPv6Serializer(serializers.Serializer):
     ip_v6 = serializers.CharField(max_length=200, required=True)
 
     class Meta:
         fields = ["ip_v6"]
 
 
-class InfraTestingDomainNameSerializer(serializers.Serializer):
+class DomainNameSerializer(serializers.Serializer):
     domain_name = serializers.CharField(max_length=200, required=True)
 
     class Meta:

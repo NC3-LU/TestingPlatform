@@ -13,7 +13,7 @@ from rest_framework_simplejwt.tokens import AccessToken, OutstandingToken, Refre
 
 from authentication.models import User
 from automation.models import HttpAutomatedTest, PingAutomatedTest
-from testing.helpers import email_check, file_check, ipv6_check
+from testing.helpers import check_soa_record, email_check, file_check, ipv6_check
 from testing.models import TlsScanHistory
 
 from .serializers import (
@@ -354,4 +354,14 @@ class InfraTestingIPv6ApiView(ViewSet):
         """
         ipv6 = request.data.get("ip_v6", None)
         result = ipv6_check(ipv6)
+        return Response(result, status=status.HTTP_200_OK)
+
+
+class InfraTestingSOAApiView(ViewSet):
+    serializer_class = DomainNameSerializer
+
+    def create(self, request, *args, **kwargs):
+        """ """
+        domain_name = request.data.get("domain_name", None)
+        result = check_soa_record(domain_name)
         return Response(result, status=status.HTTP_200_OK)

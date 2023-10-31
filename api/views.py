@@ -22,9 +22,9 @@ from .serializers import (
     AutomatedSuccessSerializer,
     AutomatedTestHTTPSerializer,
     AutomatedTestPingSerializer,
-    FileInputSerializer,
-    InfraTestingDomainNameSerializer,
-    InfraTestingIPv6Serializer,
+    DomainNameSerializer,
+    FileSerializer,
+    IPv6Serializer,
     TlsScanHistorySerializer,
     UserInputSerializer,
     UserSerializer,
@@ -324,7 +324,7 @@ class AutomatedFailedApiView(APIView):
 # InfraTesting
 #
 class InfraTestingEmailApiView(ViewSet):
-    serializer_class = InfraTestingDomainNameSerializer
+    serializer_class = DomainNameSerializer
 
     def create(self, request, *args, **kwargs):
         """ """
@@ -334,7 +334,7 @@ class InfraTestingEmailApiView(ViewSet):
 
 
 class InfraTestingFileApiView(ViewSet):
-    serializer_class = FileInputSerializer
+    serializer_class = FileSerializer
 
     def create(self, request):
         """
@@ -346,7 +346,7 @@ class InfraTestingFileApiView(ViewSet):
 
 
 class InfraTestingIPv6ApiView(ViewSet):
-    serializer_class = InfraTestingIPv6Serializer
+    serializer_class = IPv6Serializer
 
     def create(self, request, *args, **kwargs):
         """

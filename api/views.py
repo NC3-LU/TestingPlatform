@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django_q import models as q_models
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -5,13 +6,15 @@ from rest_framework.authentication import BasicAuthentication, SessionAuthentica
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import AccessToken, OutstandingToken, RefreshToken
+
 from authentication.models import User
 from automation.models import HttpAutomatedTest, PingAutomatedTest
+from testing.helpers import check_soa_record, email_check, file_check, ipv6_check
 from testing.models import TlsScanHistory
-from django.contrib.auth import authenticate
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken, OutstandingToken
-from rest_framework_simplejwt.exceptions import TokenError
 
 from .serializers import (
     AutomatedFailedSerializer,
@@ -19,10 +22,12 @@ from .serializers import (
     AutomatedSuccessSerializer,
     AutomatedTestHTTPSerializer,
     AutomatedTestPingSerializer,
+    DomainNameSerializer,
+    FileSerializer,
+    IPv6Serializer,
     TlsScanHistorySerializer,
     UserInputSerializer,
     UserSerializer,
-    UserInputLoginSerializer
 )
 
 
@@ -30,29 +35,30 @@ class LoginApiView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
+        username = request.data.get("username")
+        password = request.data.get("password")
         user = authenticate(username=username, password=password)
 
         if user is not None:
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
             refresh_token = str(refresh)
-            response = Response({"detail": "Logged in successfully."},
-                                status=status.HTTP_200_OK)
+            response = Response(
+                {"detail": "Logged in successfully."}, status=status.HTTP_200_OK
+            )
             response.set_cookie(
-                key='access_token',
+                key="access_token",
                 value=access_token,
                 httponly=True,
-                samesite='None',
+                samesite="None",
                 secure=True,  # Set to true for prod
             )
 
             response.set_cookie(
-                key='refresh_token',
+                key="refresh_token",
                 value=refresh_token,
                 httponly=True,
-                samesite='None',
+                samesite="None",
                 secure=True,  # Set to true for prod
             )
 
@@ -68,10 +74,10 @@ class LogoutView(APIView):
         # Clear the access token cookie
         response = Response()
 
-        response.delete_cookie('access_token')
+        response.delete_cookie("access_token")
         # Clear the refresh token cookie
-        refresh_token = request.COOKIES.get('refresh_token')
-        response.delete_cookie('refresh_token')
+        refresh_token = request.COOKIES.get("refresh_token")
+        response.delete_cookie("refresh_token")
 
         # Invalidate the refresh token on the server side
         if refresh_token:
@@ -79,7 +85,7 @@ class LogoutView(APIView):
                 # Try to remove the refresh token (OutstandingToken) for the given user
 
                 OutstandingToken.objects.filter(token=refresh_token).delete()
-            except OutstandingToken.DoesNotExist:
+            except OutstandingToken.DoesNotExist as e:
                 response.data = {"detail": f"Error: {str(e)}"}
                 response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
                 return response
@@ -95,8 +101,8 @@ class CheckAuthApiView(APIView):
 
     def get(self, request):
         # Check if there's an access token in the cookies
-        access_token = request.COOKIES.get('access_token')
-        refresh_token = request.COOKIES.get('refresh_token')
+        access_token = request.COOKIES.get("access_token")
+        refresh_token = request.COOKIES.get("refresh_token")
 
         # If access token is present and valid
         if access_token:
@@ -112,17 +118,20 @@ class CheckAuthApiView(APIView):
                 refresh = RefreshToken(refresh_token)
                 new_access_token = str(refresh.access_token)
                 # Optionally, set the new access token in the cookie
-                response = Response({"detail": "Logged in. Token refreshed."},
-                                    status=status.HTTP_200_OK)
-                response.set_cookie(key='access_token', value=new_access_token,
-                                    httponly=True)
+                response = Response(
+                    {"detail": "Logged in. Token refreshed."}, status=status.HTTP_200_OK
+                )
+                response.set_cookie(
+                    key="access_token", value=new_access_token, httponly=True
+                )
                 return response
             except TokenError:
                 pass
 
         # If none of the above conditions are met, the user is not logged in
-        return Response({"detail": "You are not logged in."},
-                        status=status.HTTP_401_UNAUTHORIZED)
+        return Response(
+            {"detail": "You are not logged in."}, status=status.HTTP_401_UNAUTHORIZED
+        )
 
 
 #
@@ -130,8 +139,11 @@ class CheckAuthApiView(APIView):
 # I
 class UserApiView(APIView):
     # add permission to check if user is authenticated
-    authentication_classes = [SessionAuthentication, BasicAuthentication,
-                              JWTAuthentication]
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     @extend_schema(request=None, responses=UserSerializer)
@@ -159,8 +171,11 @@ class UserApiView(APIView):
 
 class UserElementApiView(APIView):
     # add permission to check if user is authenticated
-    authentication_classes = [SessionAuthentication, BasicAuthentication,
-                              JWTAuthentication]
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
     permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = UserSerializer
 
@@ -191,8 +206,11 @@ class UserElementApiView(APIView):
 #
 class AutomatedTestHTTPApiView(APIView):
     # add permission to check if user is authenticated
-    authentication_classes = [SessionAuthentication, BasicAuthentication,
-                              JWTAuthentication]
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     @extend_schema(request=None, responses=AutomatedTestHTTPSerializer)
@@ -207,8 +225,11 @@ class AutomatedTestHTTPApiView(APIView):
 
 class AutomatedTestPingApiView(APIView):
     # add permission to check if user is authenticated
-    authentication_classes = [SessionAuthentication, BasicAuthentication,
-                              JWTAuthentication]
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     @extend_schema(request=None, responses=AutomatedTestPingSerializer)
@@ -226,8 +247,11 @@ class AutomatedTestPingApiView(APIView):
 #
 class TlsScanHistoryApiView(APIView):
     # add permission to check if user is authenticated
-    authentication_classes = [SessionAuthentication, BasicAuthentication,
-                              JWTAuthentication]
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     @extend_schema(request=None, responses=TlsScanHistorySerializer)
@@ -260,8 +284,11 @@ class AutomatedSuccessApiView(APIView):
 
 class AutomatedScheduledApiView(APIView):
     # add permission to check if user is authenticated
-    authentication_classes = [SessionAuthentication, BasicAuthentication,
-                              JWTAuthentication]
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     @extend_schema(request=None, responses=AutomatedScheduledSerializer)
@@ -276,8 +303,11 @@ class AutomatedScheduledApiView(APIView):
 
 class AutomatedFailedApiView(APIView):
     # add permission to check if user is authenticated
-    authentication_classes = [SessionAuthentication, BasicAuthentication,
-                              JWTAuthentication]
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     @extend_schema(request=None, responses=AutomatedFailedSerializer)
@@ -288,3 +318,50 @@ class AutomatedFailedApiView(APIView):
         objects = q_models.Failure.objects.all()
         serializer = AutomatedFailedSerializer(objects, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+#
+# InfraTesting
+#
+class InfraTestingEmailApiView(ViewSet):
+    serializer_class = DomainNameSerializer
+
+    def create(self, request, *args, **kwargs):
+        """ """
+        domain_name = request.data.get("domain_name", None)
+        result = email_check(domain_name)
+        return Response(result, status=status.HTTP_200_OK)
+
+
+class InfraTestingFileApiView(ViewSet):
+    serializer_class = FileSerializer
+
+    def create(self, request):
+        """
+        Submit a file to a Pandora instance.
+        """
+        file_uploaded = request.FILES.get("file_uploaded")
+        result = file_check(file_uploaded.read(), file_uploaded.name)
+        return Response(result, status=status.HTTP_200_OK)
+
+
+class InfraTestingIPv6ApiView(ViewSet):
+    serializer_class = IPv6Serializer
+
+    def create(self, request, *args, **kwargs):
+        """
+        Triggers the IPv6 scan.
+        """
+        ipv6 = request.data.get("ip_v6", None)
+        result = ipv6_check(ipv6)
+        return Response(result, status=status.HTTP_200_OK)
+
+
+class InfraTestingSOAApiView(ViewSet):
+    serializer_class = DomainNameSerializer
+
+    def create(self, request, *args, **kwargs):
+        """ """
+        domain_name = request.data.get("domain_name", None)
+        result = check_soa_record(domain_name)
+        return Response(result, status=status.HTTP_200_OK)

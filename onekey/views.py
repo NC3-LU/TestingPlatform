@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import redirect, render
 
-from .helpers import api_login, client_generate_report, client_request_link
+from .helpers import api_login, client_generate_report, client_request_link, client_get_all_reports_states
 from .models import FirmwareAnalysisRequest
 from .forms import FirmwareAnalysisRequestForm
 
@@ -13,7 +13,8 @@ from .forms import FirmwareAnalysisRequestForm
 def index(request):
     client = api_login()
     reqs = FirmwareAnalysisRequest.objects.filter(user=request.user.id)
-    context = {"requests": reqs}
+    reqs_status = client_get_all_reports_states(client, reqs)
+    context = {"requests": reqs_status}
     return render(request, "onekey_index.html", context=context)
 
 
@@ -45,6 +46,8 @@ def generate_report(request, firmware_uuid):
     firmware_analysis_request = FirmwareAnalysisRequest.objects.get(firmware_uuid=firmware_uuid)
     client = api_login()
     request = client_generate_report(client, firmware_uuid, str(firmware_analysis_request.request_nb))
+    firmware_analysis_request.report_uuid = request['id']
+    firmware_analysis_request.save()
     return redirect("iot_index")
 
 
@@ -55,3 +58,15 @@ def generate_link(request, report_uuid):
     firmware_analysis_request.report_link = res["downloadUrl"]
     firmware_analysis_request.save()
     return redirect("iot_index")
+
+
+def download_report(request, report_uuid):
+    firmware_analysis_request = FirmwareAnalysisRequest.objects.get(report_uuid=report_uuid)
+    link = firmware_analysis_request.report_link
+    firmware_analysis_request.report_link = None
+    firmware_analysis_request.save()
+    return redirect(link)
+
+
+def test(request):
+    return redirect("https://stackoverflow.com")

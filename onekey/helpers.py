@@ -17,7 +17,7 @@ def api_login():
     signer = Signer()
     try:
         client.login(settings.ONEKEY_API_EMAIL, settings.ONEKEY_API_PASSWORD)
-        tenant = client.get_tenant('Luxembourg House of Cybersecurity')
+        tenant = client.get_tenant("Luxembourg House of Cybersecurity")
         client.use_tenant(tenant)
     except Exception as e:
         raise e
@@ -142,9 +142,7 @@ def client_generate_report(client, firmware_uuid, report_title):
       }}
     }}
     """.format(
-        report_config,
-        firmware_uuid,
-        report_title
+        report_config, firmware_uuid, report_title
     )
     res = client.query(GENERATE_REPORT)
     report = res["generateReport"]

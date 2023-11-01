@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 import sys
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -76,8 +76,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "drf_spectacular_sidecar",  # required for Django collectstatic discovery
     "corsheaders",
-    'rest_framework_simplejwt.token_blacklist',
-
+    "rest_framework_simplejwt.token_blacklist",
 ]
 
 REST_FRAMEWORK = {
@@ -86,7 +85,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
@@ -94,19 +93,19 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
-    'VERIFYING_KEY': None,
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=120),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "NC3-LU Testing Platform",
     "DESCRIPTION": "API for the "
-                   '<a href="https://github.com/NC3-LU/TestingPlatform" rel="noopener noreferrer" target="_blank">'
-                   "Testing Platform</a> by NC3-LU.",
+    '<a href="https://github.com/NC3-LU/TestingPlatform" rel="noopener noreferrer" target="_blank">'
+    "Testing Platform</a> by NC3-LU.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": True,
 }
@@ -124,7 +123,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
 ]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -132,8 +131,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 
-CSRF_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CORS_ALLOW_CREDENTIALS = True
@@ -222,9 +221,9 @@ IOT_CLIENT_ID = os.environ.get("IOT_CLIENT_ID", "")
 IOT_API_EMAIL = os.environ.get("IOT_API_EMAIL", "")
 IOT_API_PASSWORD = os.environ.get("IOT_API_PASSWORD", "")
 
-ONEKEY_API_URL = 'https://app.eu.onekey.com/api'
-ONEKEY_API_EMAIL = 'romain.kieffer@nc3.lu'
-ONEKEY_API_PASSWORD = 'testing_platform_1key!'
+ONEKEY_API_URL = "https://app.eu.onekey.com/api"
+ONEKEY_API_EMAIL = "romain.kieffer@nc3.lu"
+ONEKEY_API_PASSWORD = "testing_platform_1key!"
 
 DMARC_API_KEY = os.environ.get("DMARC_API_KEY", "")
 

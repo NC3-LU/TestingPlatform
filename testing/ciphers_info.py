@@ -303,7 +303,9 @@ def load_cipher_info():
 
                     # Pre-calculate the security level as it, currently,
                     # doesn't depend on a current connection.
-                    ci.sec_level = CipherScoreAndSecLevel.determine_appendix_c_sec_level(ci)
+                    ci.sec_level = (
+                        CipherScoreAndSecLevel.determine_appendix_c_sec_level(ci)
+                    )
 
                     # Record the connection class so that we can later use
                     # only supported ciphers with a particular connection

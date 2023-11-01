@@ -1,15 +1,16 @@
 import logging
 from typing import Any, Dict, List, Union
+
 import dns.message
 import dns.rdatatype
 import dns.resolver
+
 logger = logging.getLogger(__name__)
 
 
 def ipv6_check(
     domain: str, port=None
 ) -> Dict[str, Union[Dict[Any, Any], List[Union[str, int]], List[Any]]]:
-
     logger.info(f"ipv6 scan: scanning domain {domain}")
     results = {}
 
@@ -54,7 +55,9 @@ def ipv6_check(
             ns_ip4 = None
 
         if r_aaaa.answer:
-            ns_ip6 = [item.address for answer in r_aaaa.answer for item in answer.items][0]
+            ns_ip6 = [
+                item.address for answer in r_aaaa.answer for item in answer.items
+            ][0]
             q6 = dns.message.make_query("example.com", dns.rdatatype.AAAA)
             logger.info(f"{ns_name} - {ns_ip6}")
             tcp6_response_default = dns.query.tcp(q6, default_resolver, timeout=5)
@@ -75,5 +78,5 @@ def ipv6_check(
         "nameservers_reachability_comments": nameservers_reachability_comments,
         "records": records,
         "records_v4_comments": records_v4_comments,
-        "records_v6_comments": records_v6_comments
+        "records_v6_comments": records_v6_comments,
     }

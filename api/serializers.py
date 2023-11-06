@@ -119,3 +119,11 @@ class DomainNameSerializer(serializers.Serializer):
 
     class Meta:
         fields = ["domain_name"]
+
+
+class DomainNameAndServiceSerializer(serializers.Serializer):
+    domain_name = serializers.CharField(max_length=200, required=True)
+    service = serializers.ChoiceField(["web", "mail"], required=True)
+
+    class Meta:
+        fields = ["domain_name", "service"]

@@ -594,6 +594,9 @@ def web_server_check_no_raw_socket(hostname):
 
 
 def tls_version_check(domain: str, service):
+    """
+    Checks the version of TLS.
+    """
     nmap = nmap3.Nmap()
     logger.info(f"tls scan: Scanning host/domain {domain}")
     tls_scans = nmap.nmap_version_detection(domain, args="--script ssl-enum-ciphers")

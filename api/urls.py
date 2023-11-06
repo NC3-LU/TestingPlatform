@@ -20,6 +20,7 @@ from .views import (
     LoginApiView,
     LogoutView,
     TlsScanHistoryApiView,
+    TLSVersionCheckApiView,
     UserApiView,
     UserElementApiView,
     WebServerCheckApiView,
@@ -52,5 +53,9 @@ urlpatterns = [
     path(
         "InfraTesting/WebServerCheck/",
         WebServerCheckApiView.as_view({"post": "create"}),
+    ),
+    path(
+        "InfraTesting/TLSVersionCheck/",
+        TLSVersionCheckApiView.as_view({"post": "create"}),
     ),
 ]

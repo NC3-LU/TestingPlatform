@@ -18,6 +18,7 @@ from testing.helpers import (
     email_check,
     file_check,
     ipv6_check,
+    tls_version_check,
     web_server_check,
 )
 from testing.models import TlsScanHistory
@@ -28,6 +29,7 @@ from .serializers import (
     AutomatedSuccessSerializer,
     AutomatedTestHTTPSerializer,
     AutomatedTestPingSerializer,
+    DomainNameAndServiceSerializer,
     DomainNameSerializer,
     FileSerializer,
     TlsScanHistorySerializer,
@@ -387,4 +389,17 @@ class WebServerCheckApiView(ViewSet):
         """
         domain_name = request.data.get("domain_name", None)
         result = web_server_check(domain_name)
+        return Response(result, status=status.HTTP_200_OK)
+
+
+class TLSVersionCheckApiView(ViewSet):
+    serializer_class = DomainNameAndServiceSerializer
+
+    def create(self, request, *args, **kwargs):
+        """
+        Checks the version of TLS.
+        """
+        domain_name = request.data.get("domain_name", None)
+        service = request.data.get("service", "web")
+        result = tls_version_check(domain_name, service)
         return Response(result, status=status.HTTP_200_OK)

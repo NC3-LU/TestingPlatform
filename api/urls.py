@@ -22,6 +22,7 @@ from .views import (
     TlsScanHistoryApiView,
     UserApiView,
     UserElementApiView,
+    WebServerCheckApiView,
 )
 
 urlpatterns = [
@@ -48,4 +49,8 @@ urlpatterns = [
     path("InfraTesting/file/", InfraTestingFileApiView.as_view({"post": "create"})),
     path("InfraTesting/ipv6/", InfraTestingIPv6ApiView.as_view({"post": "create"})),
     path("InfraTesting/soa/", InfraTestingSOAApiView.as_view({"post": "create"})),
+    path(
+        "InfraTesting/WebServerCheck/",
+        WebServerCheckApiView.as_view({"post": "create"}),
+    ),
 ]

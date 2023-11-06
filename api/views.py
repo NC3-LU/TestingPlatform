@@ -13,7 +13,13 @@ from rest_framework_simplejwt.tokens import AccessToken, OutstandingToken, Refre
 
 from authentication.models import User
 from automation.models import HttpAutomatedTest, PingAutomatedTest
-from testing.helpers import check_soa_record, email_check, file_check, ipv6_check
+from testing.helpers import (
+    check_soa_record,
+    email_check,
+    file_check,
+    ipv6_check,
+    web_server_check,
+)
 from testing.models import TlsScanHistory
 
 from .serializers import (
@@ -326,7 +332,11 @@ class InfraTestingEmailApiView(ViewSet):
     serializer_class = DomainNameSerializer
 
     def create(self, request, *args, **kwargs):
-        """ """
+        """
+        Parses and validates MX, SPF, and DMARC records,
+        Checks for DNSSEC deployment, Checks for STARTTLS and TLS support.
+        Checks for the validity of the DKIM public key.
+        """
         domain_name = request.data.get("domain_name", None)
         result = email_check(domain_name)
         return Response(result, status=status.HTTP_200_OK)
@@ -360,7 +370,21 @@ class InfraTestingSOAApiView(ViewSet):
     serializer_class = DomainNameSerializer
 
     def create(self, request, *args, **kwargs):
-        """ """
+        """
+        Checks the presence of a SOA record.
+        """
         domain_name = request.data.get("domain_name", None)
         result = check_soa_record(domain_name)
+        return Response(result, status=status.HTTP_200_OK)
+
+
+class WebServerCheckApiView(ViewSet):
+    serializer_class = DomainNameSerializer
+
+    def create(self, request, *args, **kwargs):
+        """
+        Triggers a scan (with nmap) on a web server.
+        """
+        domain_name = request.data.get("domain_name", None)
+        result = web_server_check(domain_name)
         return Response(result, status=status.HTTP_200_OK)

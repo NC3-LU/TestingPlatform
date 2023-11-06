@@ -24,7 +24,6 @@ from .serializers import (
     AutomatedTestPingSerializer,
     DomainNameSerializer,
     FileSerializer,
-    IPv6Serializer,
     TlsScanHistorySerializer,
     UserInputSerializer,
     UserSerializer,
@@ -346,14 +345,14 @@ class InfraTestingFileApiView(ViewSet):
 
 
 class InfraTestingIPv6ApiView(ViewSet):
-    serializer_class = IPv6Serializer
+    serializer_class = DomainNameSerializer
 
     def create(self, request, *args, **kwargs):
         """
-        Triggers the IPv6 scan.
+        Triggers the IPv6 check.
         """
-        ipv6 = request.data.get("ip_v6", None)
-        result = ipv6_check(ipv6)
+        domain_name = request.data.get("domain_name", None)
+        result = ipv6_check(domain_name)
         return Response(result, status=status.HTTP_200_OK)
 
 

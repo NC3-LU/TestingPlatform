@@ -13,10 +13,6 @@ def index(request):
     return render(request, "index.html")
 
 
-def about(request):
-    return render(request, "about.html")
-
-
 def health(request):
     result: Dict[str, Any] = {
         "python_version": "{}.{}.{}".format(*sys.version_info[:3]),

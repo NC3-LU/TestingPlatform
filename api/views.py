@@ -14,6 +14,7 @@ from rest_framework_simplejwt.tokens import AccessToken, OutstandingToken, Refre
 from authentication.models import User
 from automation.models import HttpAutomatedTest, PingAutomatedTest
 from testing.helpers import (
+    check_dkim_public_key,
     check_soa_record,
     email_check,
     file_check,
@@ -351,7 +352,7 @@ class InfraTestingFileApiView(ViewSet):
         """
         Submit a file to a Pandora instance.
         """
-        file_uploaded = request.FILES.get("file_uploaded")
+        file_uploaded = request.FILES.get("file")
         result = file_check(file_uploaded.read(), file_uploaded.name)
         return Response(result, status=status.HTTP_200_OK)
 
@@ -402,4 +403,16 @@ class TLSVersionCheckApiView(ViewSet):
         domain_name = request.data.get("domain_name", None)
         service = request.data.get("service", "web")
         result = tls_version_check(domain_name, service)
+        return Response(result, status=status.HTTP_200_OK)
+
+
+class DKIMPublicKeyCheckApiView(ViewSet):
+    serializer_class = DomainNameSerializer
+
+    def create(self, request, *args, **kwargs):
+        """
+        Triggers a scan (with nmap) on a web server.
+        """
+        domain_name = request.data.get("domain_name", None)
+        result = check_dkim_public_key(domain_name, [])
         return Response(result, status=status.HTTP_200_OK)

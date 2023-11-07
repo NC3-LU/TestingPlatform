@@ -101,30 +101,38 @@ class AutomatedFailedSerializer(serializers.ModelSerializer):
 # InfraTesting
 #
 class FileSerializer(serializers.Serializer):
-    file_uploaded = serializers.FileField()
+    file = serializers.FileField(help_text="File to check.")
 
     class Meta:
-        fields = ["file_uploaded"]
+        fields = ["file"]
 
 
 class IPv6Serializer(serializers.Serializer):
-    ip_v6 = serializers.CharField(max_length=200, required=True)
+    ip_v6 = serializers.CharField(
+        max_length=200, required=True, help_text="Domain name."
+    )
 
     class Meta:
         fields = ["ip_v6"]
 
 
 class DomainNameSerializer(serializers.Serializer):
-    domain_name = serializers.CharField(max_length=200, required=True)
+    domain_name = serializers.CharField(
+        max_length=200, required=True, help_text="Domain name."
+    )
 
     class Meta:
         fields = ["domain_name"]
 
 
 class DomainNameAndServiceSerializer(serializers.Serializer):
-    domain_name = serializers.CharField(max_length=200, required=True)
+    domain_name = serializers.CharField(
+        max_length=200, required=True, help_text="Domain name."
+    )
     service = serializers.ChoiceField(
-        [("web", "Web"), ("mail", "Email")], required=True
+        [("web", "Web"), ("mail", "Email")],
+        required=True,
+        help_text="The service to be checked.",
     )
 
     class Meta:

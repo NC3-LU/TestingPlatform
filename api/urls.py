@@ -13,6 +13,7 @@ from .views import (
     AutomatedTestHTTPApiView,
     AutomatedTestPingApiView,
     CheckAuthApiView,
+    DKIMPublicKeyCheckApiView,
     InfraTestingEmailApiView,
     InfraTestingFileApiView,
     InfraTestingIPv6ApiView,
@@ -46,10 +47,13 @@ urlpatterns = [
     path("AutomatedTasks/Failed/", AutomatedFailedApiView.as_view()),
     path("AutomatedTests/HTTP/", AutomatedTestHTTPApiView.as_view()),
     path("AutomatedTests/Ping/", AutomatedTestPingApiView.as_view()),
-    path("InfraTesting/email/", InfraTestingEmailApiView.as_view({"post": "create"})),
-    path("InfraTesting/file/", InfraTestingFileApiView.as_view({"post": "create"})),
-    path("InfraTesting/ipv6/", InfraTestingIPv6ApiView.as_view({"post": "create"})),
-    path("InfraTesting/soa/", InfraTestingSOAApiView.as_view({"post": "create"})),
+    path("InfraTesting/Email/", InfraTestingEmailApiView.as_view({"post": "create"})),
+    path("InfraTesting/File/", InfraTestingFileApiView.as_view({"post": "create"})),
+    path("InfraTesting/IPv6/", InfraTestingIPv6ApiView.as_view({"post": "create"})),
+    path(
+        "InfraTesting/SOARecordCheck/",
+        InfraTestingSOAApiView.as_view({"post": "create"}),
+    ),
     path(
         "InfraTesting/WebServerCheck/",
         WebServerCheckApiView.as_view({"post": "create"}),
@@ -57,5 +61,9 @@ urlpatterns = [
     path(
         "InfraTesting/TLSVersionCheck/",
         TLSVersionCheckApiView.as_view({"post": "create"}),
+    ),
+    path(
+        "InfraTesting/DKIMPublicKeyCheck/",
+        DKIMPublicKeyCheckApiView.as_view({"post": "create"}),
     ),
 ]

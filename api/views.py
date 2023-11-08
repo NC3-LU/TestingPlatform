@@ -23,6 +23,7 @@ from testing.helpers import (
     web_server_check,
 )
 from testing.models import TlsScanHistory
+from testing_platform import tools
 
 from .serializers import (
     AutomatedFailedSerializer,
@@ -142,9 +143,18 @@ class CheckAuthApiView(APIView):
         )
 
 
+class SystemHealthApiView(APIView):
+    def get(self, request):
+        """
+        Returns informations concerning the health of the application.
+        """
+        result = tools.health()
+        return Response(result)
+
+
 #
 # Model: User
-# I
+#
 class UserApiView(APIView):
     # add permission to check if user is authenticated
     authentication_classes = [

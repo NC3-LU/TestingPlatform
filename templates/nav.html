@@ -2,7 +2,7 @@
 <nav class="navbar navbar-light navbar-expand-xl">
   <div class="container-fluid d-flex flex-row justify-content-around">
 
-    <a class="navbar-brand d-none d-lg-block" href="https://testing.nc3.lu/"><img
+    <a class="navbar-brand d-none d-lg-block" href="{% url 'index' %}"><img
       src="{% static 'img/logo-nc3-web.png' %}" height="65px"> &nbsp;Testing
       Platform</a>
 
@@ -44,19 +44,17 @@
              aria-expanded="false">Testing Platform</a>
 
           <ul class="dropdown-menu" aria-labelledby="dropdown08">
-            <li><a class="dropdown-item"
-                                    href="https://nc3.lu/pages/services/testing-platform.html">About</a>
-            </li>
-             <li><a class="dropdown-item" href="{% url 'knowledge_base'  %}">Knowledge
-              base</a></li>
+            <li><a class="dropdown-item" href="{% url 'knowledge_base' %}">Knowledgebase</a></li>
+            <li><a class="dropdown-item" href="{% url 'swagger-ui' %}">API documentation</a></li>
+            <li class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.nc3.lu/pages/services/testing-platform.html">About</a></li>
           </ul>
         </li>
 
         {% if user.is_authenticated %}
-        {% if user.is_superuser %}
-        <li class="nav-item"><a class="nav-link" href="/admin/">Admin</a></li>
-        {% endif %}
-          {% if user.is_authenticated %}
+          {% if user.is_superuser %}
+            <li class="nav-item"><a class="nav-link" href="/admin/">Admin</a></li>
+          {% endif %}
         <li class="nav-item dropdown">
 
           <a class="nav-link dropdown-toggle" href="#" id="dropdown19"
@@ -71,7 +69,6 @@
             <li><a class="dropdown-item" href="/logout/">Logout</a></li>
           </ul>
         </li>
-          {% endif %}
         {% else %}
         <li class="nav-item"><a class="nav-link" href="/login/">Login</a></li>
         {% endif %}

@@ -103,7 +103,8 @@ SIMPLE_JWT = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "NC3-LU Testing Platform",
-    "DESCRIPTION": "API for the "
+    "DESCRIPTION": 'Back to the <a href="/">home page</a>.'
+    "<br /><br />API for the "
     '<a href="https://github.com/NC3-LU/TestingPlatform" rel="noopener noreferrer" target="_blank">'
     "Testing Platform</a> by NC3-LU.",
     "VERSION": "1.0.0",

@@ -1,7 +1,9 @@
 openapi: 3.0.3
 info:
-  title: ''
-  version: 0.0.0
+  title: NC3-LU Testing Platform
+  version: 1.0.0
+  description: Back to the <a href="/">home page</a>.<br /><br />API for the <a href="https://github.com/NC3-LU/TestingPlatform"
+    rel="noopener noreferrer" target="_blank">Testing Platform</a> by NC3-LU.
 paths:
   /api/v1/AutomatedTasks/Failed/:
     get:
@@ -12,6 +14,7 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
+      - jwtAuth: []
       responses:
         '200':
           content:
@@ -28,6 +31,7 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
+      - jwtAuth: []
       responses:
         '200':
           content:
@@ -60,6 +64,7 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
+      - jwtAuth: []
       responses:
         '200':
           content:
@@ -76,6 +81,7 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
+      - jwtAuth: []
       responses:
         '200':
           content:
@@ -83,6 +89,233 @@ paths:
               schema:
                 $ref: '#/components/schemas/AutomatedTestPing'
           description: ''
+  /api/v1/InfraTesting/DKIMPublicKeyCheck/:
+    post:
+      operationId: InfraTesting_DKIMPublicKeyCheck_create
+      description: Triggers a scan (with nmap) on a web server.
+      tags:
+      - InfraTesting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainName'
+          description: ''
+  /api/v1/InfraTesting/Email/:
+    post:
+      operationId: InfraTesting_Email_create
+      description: |-
+        Parses and validates MX, SPF, and DMARC records,
+        Checks for DNSSEC deployment, Checks for STARTTLS and TLS support.
+        Checks for the validity of the DKIM public key.
+      tags:
+      - InfraTesting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainName'
+          description: ''
+  /api/v1/InfraTesting/File/:
+    post:
+      operationId: InfraTesting_File_create
+      description: Submit a file to a Pandora instance.
+      tags:
+      - InfraTesting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/File'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/File'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/File'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: ''
+  /api/v1/InfraTesting/IPv6/:
+    post:
+      operationId: InfraTesting_IPv6_create
+      description: Triggers the IPv6 check.
+      tags:
+      - InfraTesting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainName'
+          description: ''
+  /api/v1/InfraTesting/SOARecordCheck/:
+    post:
+      operationId: InfraTesting_SOARecordCheck_create
+      description: Checks the presence of a SOA record.
+      tags:
+      - InfraTesting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainName'
+          description: ''
+  /api/v1/InfraTesting/TLSVersionCheck/:
+    post:
+      operationId: InfraTesting_TLSVersionCheck_create
+      description: Checks the version of TLS.
+      tags:
+      - InfraTesting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainNameAndService'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DomainNameAndService'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DomainNameAndService'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainNameAndService'
+          description: ''
+  /api/v1/InfraTesting/WebServerCheck/:
+    post:
+      operationId: InfraTesting_WebServerCheck_create
+      description: Triggers a scan (with nmap) on a web server.
+      tags:
+      - InfraTesting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DomainName'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainName'
+          description: ''
+  /api/v1/System/Health:
+    get:
+      operationId: System_Health_retrieve
+      description: Returns informations concerning the health of the application.
+      tags:
+      - System
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
   /api/v1/TlsScanHistory/:
     get:
       operationId: TlsScanHistory_retrieve
@@ -92,6 +325,7 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
+      - jwtAuth: []
       responses:
         '200':
           content:
@@ -108,6 +342,7 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
+      - jwtAuth: []
       responses:
         '200':
           content:
@@ -135,6 +370,7 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
+      - jwtAuth: []
       responses:
         '200':
           content:
@@ -143,6 +379,40 @@ paths:
                 $ref: '#/components/schemas/User'
           description: ''
   /api/v1/User/{id}:
+    put:
+      operationId: User_update
+      description: Update an existing user.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
     delete:
       operationId: User_destroy
       description: Delete a user.
@@ -157,8 +427,30 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
+      - jwtAuth: []
       responses:
         '204':
+          description: No response body
+  /api/v1/check-auth/:
+    get:
+      operationId: check_auth_retrieve
+      tags:
+      - check-auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/logout/:
+    post:
+      operationId: logout_create
+      tags:
+      - logout
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
           description: No response body
   /api/v1/schema/:
     get:
@@ -284,6 +576,7 @@ paths:
       security:
       - basicAuth: []
       - cookieAuth: []
+      - jwtAuth: []
       - {}
       responses:
         '200':
@@ -304,6 +597,44 @@ paths:
               schema:
                 type: object
                 additionalProperties: {}
+          description: ''
+  /api/v1/token/:
+    post:
+      operationId: token_create
+      tags:
+      - token
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/token/refresh/:
+    post:
+      operationId: token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
           description: ''
 components:
   schemas:
@@ -535,6 +866,42 @@ components:
     BlankEnum:
       enum:
       - ''
+    DomainName:
+      type: object
+      properties:
+        domain_name:
+          type: string
+          description: Domain name.
+          maxLength: 200
+      required:
+      - domain_name
+    DomainNameAndService:
+      type: object
+      properties:
+        domain_name:
+          type: string
+          description: Domain name.
+          maxLength: 200
+        service:
+          allOf:
+          - $ref: '#/components/schemas/ServiceEnum'
+          description: |-
+            The service to be checked.
+
+            * `web` - Web
+            * `mail` - Email
+      required:
+      - domain_name
+      - service
+    File:
+      type: object
+      properties:
+        file:
+          type: string
+          format: uri
+          description: File to check.
+      required:
+      - file
     FrequencyEnum:
       enum:
       - D
@@ -630,6 +997,14 @@ components:
         * `Q` - Quarterly
         * `Y` - Yearly
         * `C` - Cron
+    ServiceEnum:
+      enum:
+      - web
+      - mail
+      type: string
+      description: |-
+        * `web` - Web
+        * `mail` - Email
     TlsScanHistory:
       type: object
       properties:
@@ -641,6 +1016,18 @@ components:
       required:
       - domain
       - scan_id
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
     User:
       type: object
       properties:
@@ -722,3 +1109,7 @@ components:
       type: apiKey
       in: cookie
       name: sessionid
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

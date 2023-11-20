@@ -387,6 +387,7 @@ class InfraTestingSOAApiView(ViewSet):
         Checks the presence of a SOA record.
         """
         domain_name = request.data.get("domain_name", None)
+        DomainNameSerializer(domain_name)
         result = check_soa_record(domain_name)
         return Response(result, status=status.HTTP_200_OK)
 

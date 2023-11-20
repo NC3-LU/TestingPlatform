@@ -20,45 +20,21 @@ from django.template.loader import render_to_string
 from weasyprint import CSS, HTML
 
 from testing.models import TlsScanHistory
+from testing.validators import domain_name, full_domain_validator
 
 from .cipher_scoring import load_cipher_info
 
 logger = logging.getLogger(__name__)
 
 
-def full_domain_validator(hostname):
-    """
-    Fully validates a domain name as compilant with the standard rules:
-        - Composed of series of labels concatenated with dots, as are all domain names.
-        - Each label must be between 1 and 63 characters long.
-        - The entire hostname (including the delimiting dots) has a maximum of 255 characters.
-        - Only characters 'a' through 'z' (in a case-insensitive manner), the digits '0' through '9'.
-        - Labels can't start or end with a hyphen.
-    """
-    HOSTNAME_LABEL_PATTERN = re.compile(r"(?!-)[A-Z\d-]+(?<!-)$", re.IGNORECASE)
-    if not hostname:
-        return
-    if len(hostname) > 255:
-        raise Exception(
-            "The domain name cannot be composed of more than 255 characters."
-        )
-    if hostname[-1:] == ".":
-        hostname = hostname[:-1]  # strip exactly one dot from the right, if present
-    for label in hostname.split("."):
-        if len(label) > 63:
-            raise Exception(
-                "The label '%(label)s' is too long (maximum is 63 characters)."
-                % {"label": label}
-            )
-        if not HOSTNAME_LABEL_PATTERN.match(label):
-            raise Exception(f"Unallowed characters in label '{label}'.")
-    return hostname
-
-
 def get_http_report(target, rescan):
     ################################
     # HTTP SCAN Mozilla Observatory
     ################################
+    try:
+        domain_name(target)
+    except Exception:
+        return {"error": "You entered an invalid hostname!"}
     response = {}
 
     logger.info(f"http scan: scanning {target}, with rescan set to {rescan}")
@@ -220,8 +196,12 @@ def get_tls_report(target, rescan):
     return fetch_tls
 
 
-def check_soa_record(target: str) -> bool:
+def check_soa_record(target: str) -> Union[bool, Dict]:
     """Checks the presence of a SOA record for the Email Systems Testing."""
+    try:
+        domain_name(target)
+    except Exception:
+        return {"status": False, "statusmessage": "The given domain is invalid!"}
     result = False
     try:
         answers = dns.resolver.query(target, "SOA")
@@ -235,6 +215,10 @@ def email_check(target: str) -> Dict[str, Any]:
     """Parses and validates MX, SPF, and DMARC records,
     Checks for DNSSEC deployment, Checks for STARTTLS and TLS support.
     Checks for the validity of the DKIM public key."""
+    try:
+        domain_name(target)
+    except Exception:
+        return {"status": False, "statusmessage": "The given domain is invalid!"}
     result = {}
     env = os.environ.copy()
     cmd = [
@@ -498,6 +482,10 @@ def ipv6_check(
 
 
 def web_server_check(domain: str):
+    try:
+        domain_name(domain)
+    except Exception:
+        return {"status": False, "statusmessage": "The given domain is invalid!"}
     nmap = nmap3.Nmap()
     logger.info(f"server scan: testing {domain}")
     service_scans = nmap.nmap_version_detection(
@@ -540,6 +528,10 @@ def web_server_check(domain: str):
 
 
 def web_server_check_no_raw_socket(hostname):
+    try:
+        domain_name(hostname)
+    except Exception:
+        return {"status": False, "statusmessage": "The given domain is invalid!"}
     api_endpoint = "https://vulners.com/api/v3/burp/software/"
     header = {
         "User-Agent": "Vulners NMAP Plugin 1.7",
@@ -597,6 +589,10 @@ def tls_version_check(domain: str, service):
     """
     Checks the version of TLS.
     """
+    try:
+        domain_name(domain)
+    except Exception:
+        return {"status": False, "statusmessage": "The given domain is invalid!"}
     nmap = nmap3.Nmap()
     logger.info(f"tls scan: Scanning host/domain {domain}")
     tls_scans = nmap.nmap_version_detection(domain, args="--script ssl-enum-ciphers")
@@ -660,6 +656,10 @@ def tls_version_check(domain: str, service):
 def check_dkim_public_key(domain: str, selectors: list):
     """Looks for a DKIM public key in a DNS field and verifies that it can be used to
     encrypt data."""
+    try:
+        domain_name(domain)
+    except Exception:
+        return {"status": False, "statusmessage": "The given domain is invalid!"}
     if len(selectors) == 0:
         # TODO Check to get proper selector or have a database of selectors
         selectors = [

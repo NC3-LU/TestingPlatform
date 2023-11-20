@@ -4,6 +4,7 @@ from rest_framework import serializers
 from authentication.models import User
 from automation.models import HttpAutomatedTest, PingAutomatedTest
 from testing.models import TlsScanHistory
+from testing.validators import domain_name
 
 #
 # Model: User
@@ -118,11 +119,20 @@ class IPv6Serializer(serializers.Serializer):
 
 class DomainNameSerializer(serializers.Serializer):
     domain_name = serializers.CharField(
-        max_length=200, required=True, help_text="Domain name."
+        max_length=200,
+        required=True,
+        help_text="Domain name.",
+        validators=[domain_name],
     )
 
     class Meta:
         fields = ["domain_name"]
+
+    def validate_domain_name(self, value):
+        """
+        Check that value is a valid domain name.
+        """
+        return domain_name(value)
 
 
 class DomainNameAndServiceSerializer(serializers.Serializer):

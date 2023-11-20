@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "testing-platform"
-version = "1.0.9"
+version = "2.1.1"
 description = "NC3 Testing Platform"
 authors = [
     "Romain Kieffer <romain.kieffer@nc3.lu>",

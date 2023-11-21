@@ -1,8 +1,7 @@
 # NC3 Security Contact
+
 Contact: opensource@nc3.lu
 
-# OpenPGP Key
-Encryption:
-
 # Security Policy
-Policy:
+
+https://github.com/NC3-LU/TestingPlatform/security

@@ -23,7 +23,10 @@
 {% endif %}
 
 <main class="d-flex w-100 h-100 p-3 flex-column align-items-center justify-content-center">
-    {% if user.is_authenticated %}
+
+    <h1>Login</h1>
+    <hr class="w-25 text-dark">
+   {% if user.is_authenticated %}
     <p class="errornote">
         {% blocktranslate trimmed %}
         You are authenticated as {{ username }}, but are not authorized to
@@ -31,9 +34,6 @@
         {% endblocktranslate %}
     </p>
     {% endif %}
-
-    <h1>Login</h1>
-    <hr class="w-25 text-dark">
     <form class="col-lg-3 p-5 border border-1 bg-light" action="{{ app_path }}" method="post" id="login-form">
         {% csrf_token %}
 

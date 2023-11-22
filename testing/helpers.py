@@ -4,6 +4,7 @@ import os
 import re
 import socket
 import subprocess
+import sys
 import time
 from base64 import b64decode
 from io import BytesIO
@@ -222,8 +223,7 @@ def email_check(target: str) -> Dict[str, Any]:
     result = {}
     env = os.environ.copy()
     cmd = [
-        # sys.exec_prefix + "/bin/python",
-        "checkdmarc",
+        os.path.join(sys.exec_prefix, "bin/checkdmarc"),
         full_domain_validator(target),
         "-f",
         "JSON",

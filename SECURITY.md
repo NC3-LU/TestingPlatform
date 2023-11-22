@@ -2,14 +2,17 @@
 
 ## Supported Versions
 
-Last stable version of the Testing Platform always provides security updates.
+Last stable version of the NC3-LU Testing Platform always provides security
+updates.
 There will be no security patches for other releases (tagged or not).
 
 ## Reporting a Vulnerability
 
 If you think you have found a potential security issue, do not open
 directly a GitHub issue.
-Please open a GitHub security advisory.  
+Please open a GitHub security advisory:
+https://github.com/NC3-LU/TestingPlatform/security
+
 Or email us:
 [opensource@nc3.lu](mailto:opensource@nc3.lu).
 

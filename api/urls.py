@@ -49,23 +49,23 @@ urlpatterns = [
     path("AutomatedTasks/Failed/", AutomatedFailedApiView.as_view()),
     path("AutomatedTests/HTTP/", AutomatedTestHTTPApiView.as_view()),
     path("AutomatedTests/Ping/", AutomatedTestPingApiView.as_view()),
-    path("InfraTesting/Email/", InfraTestingEmailApiView.as_view({"post": "create"})),
-    path("InfraTesting/File/", InfraTestingFileApiView.as_view({"post": "create"})),
-    path("InfraTesting/IPv6/", InfraTestingIPv6ApiView.as_view({"post": "create"})),
+    path("InfraTesting/Email/", InfraTestingEmailApiView.as_view()),
+    path("InfraTesting/File/", InfraTestingFileApiView.as_view()),
+    path("InfraTesting/IPv6/", InfraTestingIPv6ApiView.as_view()),
     path(
         "InfraTesting/SOARecordCheck/",
-        InfraTestingSOAApiView.as_view({"post": "create"}),
+        InfraTestingSOAApiView.as_view(),
     ),
     path(
         "InfraTesting/WebServerCheck/",
-        WebServerCheckApiView.as_view({"post": "create"}),
+        WebServerCheckApiView.as_view(),
     ),
     path(
         "InfraTesting/TLSVersionCheck/",
-        TLSVersionCheckApiView.as_view({"post": "create"}),
+        TLSVersionCheckApiView.as_view(),
     ),
     path(
         "InfraTesting/DKIMPublicKeyCheck/",
-        DKIMPublicKeyCheckApiView.as_view({"post": "create"}),
+        DKIMPublicKeyCheckApiView.as_view(),
     ),
 ]

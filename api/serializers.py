@@ -1,5 +1,6 @@
 from django_q import models as q_models
 from rest_framework import serializers
+from rest_framework.serializers import ValidationError
 
 from authentication.models import User
 from automation.models import HttpAutomatedTest, PingAutomatedTest
@@ -107,14 +108,13 @@ class FileSerializer(serializers.Serializer):
     class Meta:
         fields = ["file"]
 
-
-class IPv6Serializer(serializers.Serializer):
-    ip_v6 = serializers.CharField(
-        max_length=200, required=True, help_text="Domain name."
-    )
-
-    class Meta:
-        fields = ["ip_v6"]
+    def validate_file(self, data):
+        """
+        Check that the file is not bigger than 5000000 bytes.
+        """
+        if data.size > 5000000:
+            raise ValidationError("The file size can not be more than 5000000 bytes.")
+        return data
 
 
 class DomainNameSerializer(serializers.Serializer):
@@ -122,17 +122,16 @@ class DomainNameSerializer(serializers.Serializer):
         max_length=200,
         required=True,
         help_text="Domain name.",
-        validators=[domain_name],
     )
 
     class Meta:
         fields = ["domain_name"]
 
-    def validate_domain_name(self, value):
+    def validate_domain_name(self, data):
         """
-        Check that value is a valid domain name.
+        Check that data is a valid domain name.
         """
-        return domain_name(value)
+        return domain_name(data)
 
 
 class DomainNameAndServiceSerializer(serializers.Serializer):
@@ -147,3 +146,17 @@ class DomainNameAndServiceSerializer(serializers.Serializer):
 
     class Meta:
         fields = ["domain_name", "service"]
+
+    def validate_service(self, data):
+        """
+        Check that data is a valid service.
+        """
+        if data not in ["web", "email"]:
+            raise ValidationError("Service must be 'web' or 'email'.")
+        return data
+
+    def validate_domain_name(self, data):
+        """
+        Check that data is a valid domain name.
+        """
+        return domain_name(data)

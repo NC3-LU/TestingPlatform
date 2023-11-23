@@ -6,7 +6,6 @@ from rest_framework.authentication import BasicAuthentication, SessionAuthentica
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ViewSet
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import AccessToken, OutstandingToken, RefreshToken
@@ -341,10 +340,11 @@ class AutomatedFailedApiView(APIView):
 #
 # InfraTesting
 #
-class InfraTestingEmailApiView(ViewSet):
+class InfraTestingEmailApiView(APIView):
     serializer_class = DomainNameSerializer
+    serializer = DomainNameSerializer
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request):
         """
         Parses and validates MX, SPF, and DMARC records,
         Checks for DNSSEC deployment, Checks for STARTTLS and TLS support.
@@ -355,75 +355,93 @@ class InfraTestingEmailApiView(ViewSet):
         return Response(result, status=status.HTTP_200_OK)
 
 
-class InfraTestingFileApiView(ViewSet):
+class InfraTestingFileApiView(APIView):
     serializer_class = FileSerializer
+    serializer = FileSerializer
 
-    def create(self, request):
+    def post(self, request):
         """
         Submit a file to a Pandora instance.
         """
+        serializer = self.serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         file_uploaded = request.FILES.get("file")
         result = file_check(file_uploaded.read(), file_uploaded.name)
         return Response(result, status=status.HTTP_200_OK)
 
 
-class InfraTestingIPv6ApiView(ViewSet):
+class InfraTestingIPv6ApiView(APIView):
     serializer_class = DomainNameSerializer
+    serializer = DomainNameSerializer
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request):
         """
         Triggers the IPv6 check.
         """
+        serializer = self.serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         domain_name = request.data.get("domain_name", None)
         result = ipv6_check(domain_name)
         return Response(result, status=status.HTTP_200_OK)
 
 
-class InfraTestingSOAApiView(ViewSet):
+class InfraTestingSOAApiView(APIView):
     serializer_class = DomainNameSerializer
+    serializer = DomainNameSerializer
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request):
         """
         Checks the presence of a SOA record.
         """
+        serializer = self.serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         domain_name = request.data.get("domain_name", None)
         DomainNameSerializer(domain_name)
         result = check_soa_record(domain_name)
         return Response(result, status=status.HTTP_200_OK)
 
 
-class WebServerCheckApiView(ViewSet):
+class WebServerCheckApiView(APIView):
     serializer_class = DomainNameSerializer
+    serializer = DomainNameSerializer
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request):
         """
         Triggers a scan (with nmap) on a web server.
         """
+        serializer = self.serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         domain_name = request.data.get("domain_name", None)
         result = web_server_check(domain_name)
         return Response(result, status=status.HTTP_200_OK)
 
 
-class TLSVersionCheckApiView(ViewSet):
+class TLSVersionCheckApiView(APIView):
     serializer_class = DomainNameAndServiceSerializer
+    serializer = DomainNameAndServiceSerializer
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request):
         """
         Checks the version of TLS.
         """
+        serializer = self.serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         domain_name = request.data.get("domain_name", None)
         service = request.data.get("service", "web")
         result = tls_version_check(domain_name, service)
         return Response(result, status=status.HTTP_200_OK)
 
 
-class DKIMPublicKeyCheckApiView(ViewSet):
+class DKIMPublicKeyCheckApiView(APIView):
     serializer_class = DomainNameSerializer
+    serializer = DomainNameSerializer
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request):
         """
         Triggers a scan (with nmap) on a web server.
         """
+        serializer = self.serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         domain_name = request.data.get("domain_name", None)
         result = check_dkim_public_key(domain_name, [])
         return Response(result, status=status.HTTP_200_OK)

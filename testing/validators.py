@@ -18,7 +18,7 @@ def domain_name(value):
     """
     res = pattern.match(value)
     if res:
-        return True
+        return value
     else:
         raise ValidationError("This field must be a domain name.")
 

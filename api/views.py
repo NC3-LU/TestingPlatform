@@ -33,6 +33,7 @@ from .serializers import (
     DomainNameAndServiceSerializer,
     DomainNameSerializer,
     FileSerializer,
+    HealthSerializer,
     TlsScanHistorySerializer,
     UserInputSerializer,
     UserSerializer,
@@ -143,12 +144,15 @@ class CheckAuthApiView(APIView):
 
 
 class SystemHealthApiView(APIView):
-    def get(self, request):
+    @extend_schema(request=None, responses=HealthSerializer)
+    def get(self, request, *args, **kwargs):
         """
         Returns informations concerning the health of the application.
         """
-        result = tools.health()
-        return Response(result)
+        result = {}
+        result["system_information"] = tools.health()
+        serializer = HealthSerializer(result)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 #

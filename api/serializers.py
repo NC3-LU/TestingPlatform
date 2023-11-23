@@ -99,6 +99,16 @@ class AutomatedFailedSerializer(serializers.ModelSerializer):
 
 
 #
+# JSON serializer for system health information.
+#
+class HealthSerializer(serializers.Serializer):
+    system_information = serializers.DictField()
+
+    class Meta:
+        fields = ["system_information"]
+
+
+#
 # InfraTesting
 #
 class FileSerializer(serializers.Serializer):

@@ -129,7 +129,7 @@ class FileSerializer(serializers.Serializer):
 
     def validate_file(self, data):
         """
-        Check that the file is not bigger than 5000000 bytes.
+        Check that the file size does not exceed the maximum allowed (as defined in settings.py).
         """
         return validators.file_size(data)
 

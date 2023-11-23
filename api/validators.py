@@ -2,6 +2,8 @@ import re
 
 from rest_framework.serializers import ValidationError
 
+from testing_platform.settings import MAX_UPLOAD_FILE_SIZE
+
 pattern = re.compile(
     r"^(([a-zA-Z]{1})|([a-zA-Z]{1}[a-zA-Z]{1})|"
     r"([a-zA-Z]{1}[0-9]{1})|([0-9]{1}[a-zA-Z]{1})|"
@@ -17,8 +19,10 @@ def service(value):
 
 
 def file_size(file):
-    if file.size > 5000000:
-        raise ValidationError("The file size can not be more than 5000000 bytes.")
+    if file.size > MAX_UPLOAD_FILE_SIZE:
+        raise ValidationError(
+            f"The file size can not be more than {MAX_UPLOAD_FILE_SIZE} bytes."
+        )
     return file
 
 

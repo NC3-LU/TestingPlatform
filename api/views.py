@@ -154,6 +154,23 @@ class SystemHealthApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class SystemUpdateApiView(APIView):
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request, *args, **kwargs):
+        """
+        Triggers the update of the software.
+        """
+        cmd = ["./contrib/update.sh"]
+        tools.exec_cmd_no_wait(cmd)
+        return Response({"message": "Update triggered."}, status=status.HTTP_200_OK)
+
+
 #
 # Model: User
 #

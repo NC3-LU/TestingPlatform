@@ -149,8 +149,7 @@ class SystemHealthApiView(APIView):
         """
         Returns informations concerning the health of the application.
         """
-        result = {}
-        result["system_information"] = tools.health()
+        result = tools.health()
         serializer = HealthSerializer(result)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

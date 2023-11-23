@@ -22,6 +22,7 @@ from weasyprint import CSS, HTML
 
 from testing import validators
 from testing.models import TlsScanHistory
+from testing_platform.settings import PANDORA_ROOT_URL
 
 from .cipher_scoring import load_cipher_info
 
@@ -242,8 +243,12 @@ def email_check(target: str) -> Dict[str, Any]:
 
 def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, Any]:
     """Checks a file by submitting it to a Pandora instance."""
-    pandora_root_url = "https://pandora.circl.lu/"
-    pandora_cli = pypandora.PyPandora(root_url=pandora_root_url)
+    try:
+        validators.file_size(file_in_memory)
+    except Exception as e:
+        return {"error": str(e)}
+
+    pandora_cli = pypandora.PyPandora(root_url=PANDORA_ROOT_URL)
     analysis_result: Dict[str, Any] = {}
 
     # Submit the file to Pandora for analysis.

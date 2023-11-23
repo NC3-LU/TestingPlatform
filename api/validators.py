@@ -13,12 +13,18 @@ pattern = re.compile(
 
 
 def service(value):
+    """
+    Checks if value is 'web' or 'email'.
+    """
     if value not in ["web", "email"]:
         raise ValidationError("Service must be 'web' or 'email'.")
     return value
 
 
 def file_size(file):
+    """
+    Validates the size of the file.
+    """
     if file.size > MAX_UPLOAD_FILE_SIZE:
         raise ValidationError(
             f"The file size can not be more than {MAX_UPLOAD_FILE_SIZE} bytes."

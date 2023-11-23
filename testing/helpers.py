@@ -218,7 +218,7 @@ def email_check(target: str) -> Dict[str, Any]:
     Checks for DNSSEC deployment, Checks for STARTTLS and TLS support.
     Checks for the validity of the DKIM public key."""
     try:
-        validators.full_domain_validator(target)
+        target = validators.full_domain_validator(target)
     except Exception:
         return {"error": "You entered an invalid hostname!"}
     result = {}

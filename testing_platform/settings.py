@@ -45,6 +45,9 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "webmaster@localhost")
 
+# Maximum size of the file that can be sent to the API (/api/v1/InfraTesting/File/)
+MAX_UPLOAD_FILE_SIZE = 5000000
+
 # Application definition
 
 INSTALLED_APPS = [

@@ -246,7 +246,7 @@ def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, An
     try:
         validators.file_size(file_in_memory)
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
     pandora_cli = pypandora.PyPandora(root_url=PANDORA_ROOT_URL)
     analysis_result: Dict[str, Any] = {}

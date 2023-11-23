@@ -387,7 +387,13 @@ class InfraTestingFileApiView(APIView):
         serializer = self.serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         file_uploaded = request.FILES.get("file")
-        result = file_check(file_uploaded.read(), file_uploaded.name)
+        try:
+            result = file_check(file_uploaded.read(), file_uploaded.name)
+        except Exception:
+            return Response(
+                {"result": "Payload too large."},
+                status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            )
         return Response(result, status=status.HTTP_200_OK)
 
 

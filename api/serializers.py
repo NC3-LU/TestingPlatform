@@ -102,10 +102,14 @@ class AutomatedFailedSerializer(serializers.ModelSerializer):
 # JSON serializer for system health information.
 #
 class HealthSerializer(serializers.Serializer):
-    system_information = serializers.DictField()
+    python_version = serializers.CharField
+    database = serializers.DictField()
+    app_version = serializers.CharField()
+    version_url = serializers.CharField()
+    email = serializers.BooleanField()
 
     class Meta:
-        fields = ["system_information"]
+        fields = ["python_version", "database", "app_version", "version_url", "email"]
 
 
 #

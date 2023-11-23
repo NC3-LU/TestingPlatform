@@ -220,6 +220,8 @@ AUTH_USER_MODEL = "authentication.User"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
+PANDORA_ROOT_URL = os.environ.get("PANDORA_ROOT_URL", "https://pandora.circl.lu/")
+
 IOT_API_URL = os.environ.get("IOT_API_URL", "")
 IOT_CLIENT_ID = os.environ.get("IOT_CLIENT_ID", "")
 IOT_API_EMAIL = os.environ.get("IOT_API_EMAIL", "")

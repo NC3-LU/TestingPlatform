@@ -3,7 +3,7 @@ import os
 import socket
 import subprocess
 import sys
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from django.core.mail import send_mail
 
@@ -70,3 +70,8 @@ def health():
     # result["database"]["kvrocks"] = False
     result["email"] = check_mail()
     return result
+
+
+def exec_cmd_no_wait(cmd: List) -> None:
+    """Execute a command in a sub process to."""
+    subprocess.Popen(cmd, stdout=subprocess.PIPE, cwd=BASE_DIR)

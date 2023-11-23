@@ -162,6 +162,7 @@ class SystemUpdateApiView(APIView):
     ]
     permission_classes = [IsAuthenticated, IsAdminUser]
 
+    @extend_schema(request=None, responses=None)
     def get(self, request, *args, **kwargs):
         """
         Triggers the update of the software.

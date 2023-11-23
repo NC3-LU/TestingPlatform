@@ -1,11 +1,10 @@
 from django_q import models as q_models
 from rest_framework import serializers
-from rest_framework.serializers import ValidationError
 
+from api import validators
 from authentication.models import User
 from automation.models import HttpAutomatedTest, PingAutomatedTest
 from testing.models import TlsScanHistory
-from testing.validators import domain_name
 
 #
 # Model: User
@@ -112,9 +111,7 @@ class FileSerializer(serializers.Serializer):
         """
         Check that the file is not bigger than 5000000 bytes.
         """
-        if data.size > 5000000:
-            raise ValidationError("The file size can not be more than 5000000 bytes.")
-        return data
+        return validators.file_size(data)
 
 
 class DomainNameSerializer(serializers.Serializer):
@@ -131,7 +128,7 @@ class DomainNameSerializer(serializers.Serializer):
         """
         Check that data is a valid domain name.
         """
-        return domain_name(data)
+        return validators.domain_name(data)
 
 
 class DomainNameAndServiceSerializer(serializers.Serializer):
@@ -151,12 +148,10 @@ class DomainNameAndServiceSerializer(serializers.Serializer):
         """
         Check that data is a valid service.
         """
-        if data not in ["web", "email"]:
-            raise ValidationError("Service must be 'web' or 'email'.")
-        return data
+        return validators.service(data)
 
     def validate_domain_name(self, data):
         """
         Check that data is a valid domain name.
         """
-        return domain_name(data)
+        return validators.domain_name(data)

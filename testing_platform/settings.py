@@ -228,8 +228,8 @@ IOT_API_EMAIL = os.environ.get("IOT_API_EMAIL", "")
 IOT_API_PASSWORD = os.environ.get("IOT_API_PASSWORD", "")
 
 ONEKEY_API_URL = "https://app.eu.onekey.com/api"
-ONEKEY_API_EMAIL = "romain.kieffer@nc3.lu"
-ONEKEY_API_PASSWORD = "testing_platform_1key!"
+ONEKEY_API_EMAIL = os.environ.get("ONEKEY_API_EMAIL", "")
+ONEKEY_API_PASSWORD = os.environ.get("ONEKEY_API_PASSWORD", "")
 
 DMARC_API_KEY = os.environ.get("DMARC_API_KEY", "")
 

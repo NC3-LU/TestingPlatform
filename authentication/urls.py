@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     path("signup/", views.signup, name="signup"),
+    path("signup/<ldih_uuid>", views.signup_ldih, name="signup_ldih"),
     path("login/", views.login_user, name="login"),
     path("logout/", views.logout_user, name="logout"),
     path("settings/", views.edit_profile, name="edit"),

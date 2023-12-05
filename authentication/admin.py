@@ -10,7 +10,7 @@ class UserAdmin(BaseUserAdmin):
         *BaseUserAdmin.fieldsets,
         (
             "Company Data",
-            {"fields": ("company_name", "address", "post_code", "city", "vat_number")},
+            {"fields": ("company_name", "address", "post_code", "city", "vat_number", "ldih_uuid")},
         ),
     )
     list_display = ("username", "email", "company_name")

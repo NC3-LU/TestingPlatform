@@ -8,3 +8,4 @@ class User(AbstractUser):
     post_code = models.CharField(max_length=200)
     city = models.CharField(max_length=200)
     vat_number = models.CharField(max_length=200)
+    ldih_uuid = models.CharField(max_length=200, blank=True, null=True)

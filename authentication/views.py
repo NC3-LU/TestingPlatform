@@ -35,6 +35,25 @@ def signup(request):
     return render(request, "signup.html", {"form": form})
 
 
+def signup_ldih(request, ldih_uuid):
+    if request.method == "POST":
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            clean_form = form.cleaned_data
+            username = clean_form.get("username")
+            raw_password = clean_form.get("password1")
+            user = authenticate(username=username, password=raw_password)
+            user.ldih_uuid = ldih_uuid
+            user.save()
+            login(request, user)
+            messages.success(request, "Your signed up successfully!")
+            return redirect("/")
+    else:
+        form = SignUpForm()
+    return render(request, "signup.html", {"form": form})
+
+
 def login_user(request):
     if request.method == "POST":
         form = LoginForm(data=request.POST)

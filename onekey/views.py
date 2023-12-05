@@ -4,7 +4,7 @@ from django.http import FileResponse, HttpResponse
 from django.shortcuts import redirect, render
 
 from .forms import FirmwareAnalysisRequestForm
-from .helpers import api_login, client_generate_report, client_request_link
+from .helpers import api_login, client_generate_report, client_request_link, client_get_all_reports_states
 from .models import FirmwareAnalysisRequest
 
 

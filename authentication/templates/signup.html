@@ -4,26 +4,31 @@
 
 {% block content %}
 
-<main class="d-flex w-100 h-100 p-3 flex-column align-items-center">
-    <h1>Signup</h1>
-    <hr class="w-25 text-dark">
-    <form class="p-5 col-lg-3 border border-1 bg-light" method="post">
+<main class="container">
+  <div class="d-flex justify-content-center py-5">
+
+    <div class="col-lg-10 box-shadow primary-fadded-blue_border rounded-box-20 p-5">
+      <h1 class="font-weight-800 text-blue-gradient mb-3">Signup</h1>
+      <hr class="w-25 text-dark">
+      <form method="post">
         {% csrf_token %}
         {% for field in form %}
         <div class="form-floating mb-4">
-            {{ field }}
-            {{ field.label_tag }}
-            {% if field.help_text %}
-            <small>{{ field.help_text }}</small>
-            {% endif %}
-            {% for error in field.errors %}
-            <p style="color: red">{{ error }}</p>
-            {% endfor %}
+          {{ field }}
+          {{ field.label_tag }}
+          {% if field.help_text %}
+          <small>{{ field.help_text }}</small>
+          {% endif %}
+          {% for error in field.errors %}
+          <p style="color: red">{{ error }}</p>
+          {% endfor %}
         </div>
         {% endfor %}
-        <input class="btn btn-primary" type="submit" value="Sign Up">
+        <input class="button-text-background border-radius-50 text-white primary-primary-blue_background" type="submit" value="Sign Up">
 
-    </form>
+      </form>
+    </div>
+  </div>
 </main>
 
 

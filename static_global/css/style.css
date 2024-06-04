@@ -195,7 +195,7 @@ a { text-decoration:none !important; color: var(--primary-primary-blue);}
 }
 
 /* FORMS */
-input[type=text], input[type=placeholder], input[type=submit] {
+input[type=text],input[type=password],input[type=number], input[type=placeholder], input[type=submit] {
     display: block;
     width: 100%;
     padding: .375rem .75rem;
@@ -205,19 +205,14 @@ input[type=text], input[type=placeholder], input[type=submit] {
     color: #212529;
     background-color: #fff;
     background-clip: padding-box;
-    border: 1px solid #ced4da;
+    border: 1px solid var(--multi-purpose-gray-200, #EAECF0);
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
     border-radius: .25rem;
 }
 
-input[type=submit]:hover{
-    background: var(--secondBackgroundColor);
-}
-
 .form-control{
-    border: 1px var(--bs-dark) solid;
     transition:0.2s;
 }
 

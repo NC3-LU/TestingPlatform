@@ -62,7 +62,7 @@
 }
 
 .primary-primary-blue_background {
-  background: var(--primary-primary-blue);
+  background: var(--primary-primary-blue) !important;
 }
 
 .primary-fadded-blue_background {
@@ -152,7 +152,7 @@ text-blue-night {
   background: var(--multi-purpose-gray-50);
 }
 .multi-purpose-gray-200_border {
-  border: 1px solid var(--multi-purpose-gray-200, #EAECF0);
+  border: 1px solid var(--multi-purpose-gray-200, #EAECF0) !important;
 }
 .background-icon {
   width: 48px;

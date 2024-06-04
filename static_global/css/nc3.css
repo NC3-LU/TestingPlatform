@@ -136,7 +136,6 @@ text-blue-night {
   opacity: .7;
 }
 
-
 .blue-gradient_background {
   background: var(--gradient-blue);
 }
@@ -151,6 +150,11 @@ text-blue-night {
 .multi-purpose-gray-50_background {
   background: var(--multi-purpose-gray-50);
 }
+.multi-purpose-gray-50_background-hover:hover {
+transition:0.5s;
+  background: var(--multi-purpose-gray-50);
+}
+
 .multi-purpose-gray-200_border {
   border: 1px solid var(--multi-purpose-gray-200, #EAECF0) !important;
 }

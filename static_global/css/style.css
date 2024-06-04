@@ -186,7 +186,11 @@ h3 {
 }
 
 a { text-decoration:none !important; color: var(--primary-primary-blue);}
+a:hover{ color: var(--primary-primary-blue);}
 
+.cursor-pointer{
+  cursor:pointer;
+}
 .dashboard-selection{transition: 0.4s;}
 .dashboard-selection:hover{
   transition: 0.5s;

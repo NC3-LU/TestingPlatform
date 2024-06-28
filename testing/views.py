@@ -361,6 +361,67 @@ def dmarc_generator(request):
 
 
 @login_required
+def record_generator(request):
+    spf_form = SPFRecordForm()
+    dmarc_form = DMARCRecordForm(user=request.user)
+    context = {}
+
+    if request.method == "POST":
+        if 'spf' in request.POST:
+            spf_form = SPFRecordForm(request.POST)
+            if spf_form.is_valid():
+                data = spf_form.cleaned_data
+                record = "v=spf1 mx "
+                hosts = data["hosts"].split(",")
+                for host in hosts:
+                    host = host.strip()
+                    if host:
+                        try:
+                            match_ip = ipaddress.ip_address(host)
+                        except ValueError:
+                            match_ip = None
+                        match_hostname = re.fullmatch(
+                            r"^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$", host
+                        )
+                        if match_ip:
+                            record += f"ip{match_ip.version}:{host} "
+                        elif match_hostname:
+                            record += f"a:{host} "
+                        else:
+                            messages.error(
+                                request,
+                                "One of the specified hosts/IP addresses does not match the expected format. Please correct your entered data."
+                            )
+                            context = {"spf_form": spf_form, "dmarc_form": dmarc_form}
+                            return render(request, "email_policy_generator.html", context)
+                record += data["policy"]
+                context["spf_record"] = record
+
+        elif 'dmarc' in request.POST:
+            dmarc_form = DMARCRecordForm(user=request.user, data=request.POST)
+            if dmarc_form.is_valid():
+                data = dmarc_form.cleaned_data
+                report = DMARCRecord(
+                    user=request.user,
+                    domain=data["domain"],
+                    policy=data["policy"],
+                    spf_policy=data["spf_policy"],
+                    dkim_policy=data["dkim_policy"],
+                    mailto=data["mailto"],
+                )
+                report.save()
+                context = {
+                    "dmarc_form": dmarc_form,
+                    "txt_record": report.txt_record,
+                    "dmarc_record": report.dmarc_record,
+                }
+
+    context["spf_form"] = spf_form
+    context["dmarc_form"] = dmarc_form
+    return render(request, "email_policy_generator.html", context)
+
+
+@login_required
 def dmarc_reporter(request):
     domains = MailDomain.objects.filter(user=request.user)
     records = DMARCRecord.objects.filter(user=request.user)

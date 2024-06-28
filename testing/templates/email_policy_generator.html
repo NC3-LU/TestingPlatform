@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="blue-gradient_background p-4 text-white">
+  <div class="container my-5">
+    <div class="mb-5">
+      <div class="d-flex align-items-center" style="gap: 1.944em">
+        <hr class="hr-h-width bg-white">
+        <h3>Email Policy Generator</h3>
+      </div>
+      <h1 class="font-size-48 font-weight-800 lh-base">Use our variety of tools to
+        strengthen your cybersecurity!</h1>
+    </div>
+    <div>
+      <p>
+        The NC3 Testing Platform proposes a series of simple, quick tests to help your
+        organization assess the initial security posture of your organization's
+        websites,
+        e-mail systems, and external infrastructure.<br> These tests are conducted in a
+        discovery mode without any attempt to exploit potential weakness found.</p>
+    </div>
+  </div>
+</section>
+<main>
+  <div class="container d-flex justify-content-center py-5">
+    <div class="box-shadow primary-fadded-blue_border rounded-box-20 p-5">
+      <form method="post">
+        {% csrf_token %}
+        <div id="spf-form">
+          <h2>Generate SPF Record</h2>
+          {{ spf_form.as_p }}
+          <input
+            class="text-white button-text-background primary-primary-blue_background"
+            type="submit" name="spf" value="Generate SPF Record">
+        </div>
+
+      </form>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mt-5" id="dmarc-form">
+          <h2>Generate DMARC Record</h2>
+          {{ dmarc_form.as_p }}
+          <input
+            class="text-white button-text-background primary-primary-blue_background"
+            type="submit" name="dmarc" value="Generate DMARC Record">
+        </div>
+      </form>
+      {% if spf_record %}
+      <div class="my-4">
+        <h2>Generated SPF Record:</h2>
+        <code>{{ spf_record }}</code>
+       <h3>How to add this</h3>
+        <b>Step 1</b>
+        <p>Access your DNS management console: Log in to your domain registrar or DNS
+          hosting provider where you manage your domain's DNS records.</p>
+        <b>Step 2</b>
+        <p>Add a new TXT record</p>
+        <b>Step 3</b>
+        <ul>
+          <li>Name: <code>@</code></li>
+          <li>Type: Select TXT as the record type.</li>
+          <li>Value: <code>{{ spf_record }}</code></li>
+          <li>(optional) TTL: <code>3600 (1 Hour)</code></li>
+        </ul>
+        <b>Step 4</b>
+        <p>Save the DNS entry and wait for the changes to take effect.</p>
+      </div>
+      {% endif %}
+      {% if dmarc_record %}
+      <div class="my-4">
+        <h2>Generated DMARC Record:</h2>
+        {% if txt_record %}
+        <b>Host:</b><br>
+        <code>{{ txt_record }}</code><br>
+        {% endif %}
+        <b>Value:</b><br>
+        <code>{{ dmarc_record }}</code>
+        <h3>How to add this</h3>
+        <b>Step 1</b>
+        <p>Access your DNS management console: Log in to your domain registrar or DNS
+          hosting provider where you manage your domain's DNS records.</p>
+        <b>Step 2</b>
+        <p>Add a new TXT record</p>
+        <b>Step 3</b>
+        <ul>
+          <li>Name: {% if txt_record %}<code>{{ txt_record }}</code>{% endif %}</li>
+          <li>Type: Select TXT as the record type.</li>
+          <li>Value: <code>{{ dmarc_record }}</code></li>
+          <li>(optional) TTL: <code>3600 (1 Hour)</code></li>
+        </ul>
+        <b>Step 4</b>
+        <p>Save the DNS entry and wait for the changes to take effect.</p>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</main>
+{% endblock %}

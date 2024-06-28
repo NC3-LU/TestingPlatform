@@ -5,20 +5,23 @@
 
 
 {% if form.errors and not form.non_field_errors %}
-<p class="errornote">
-  {% if form.errors.items|length == 1 %}
-  {% translate "Please correct the error below." %}
-  {% else %}
-  {% translate "Please correct the errors below." %}
-  {% endif %}
-</p>
+
+<div class="mt-5 container alert alert-warning alert-dismissible fade show" role="alert">
+    {% if form.errors.items|length == 1 %}
+    {% translate "Please correct the error below." %}
+    {% else %}
+    {% translate "Please correct the errors below." %}
+    {% endif %}
+ <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
 {% endif %}
 
 {% if form.non_field_errors %}
 {% for error in form.non_field_errors %}
-<p class="errornote">
-  {{ error }}
-</p>
+<div class="mt-5 container alert alert-warning alert-dismissible fade show" role="alert">
+    {{ error }}
+ <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
 {% endfor %}
 {% endif %}
 
@@ -63,8 +66,10 @@
           <a href="/signup">Not registered? Click here!</a>
         </div>
 
-        <input class="button-text-background border-radius-50 text-white primary-primary-blue_background" type="submit"
-               value="{% translate 'Log in' %}">
+        <input
+          class="button-text-background border-radius-50 text-white primary-primary-blue_background"
+          type="submit"
+          value="{% translate 'Log in' %}">
       </form>
 
     </div>

@@ -10,7 +10,6 @@ class DMARCRecordForm(forms.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["domain"].queryset = MailDomain.objects.filter(user=user)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"] = "form-control"
 
@@ -25,7 +24,7 @@ class SPFRecordForm(forms.Form):
         help_text="Please write all hosts that are allowed to send mails for your "
         'domain, comma separated (i.e. "1.1.1.1, mx.mydomain.com, '
         '2.2.2.2")',
-        required=False,
+        required=True,
     )
 
     def __init__(self, *args, **kwargs):

@@ -32,10 +32,9 @@ class TlsScanHistory(models.Model):
 
 class DMARCRecord(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    domain = models.OneToOneField(
-        MailDomain,
-        on_delete=models.CASCADE,
-        help_text="Please select the domain name the record should be generated for",
+    domain = models.CharField(
+        max_length=255,
+        help_text="Please enter the domain name the record should be generated for",
     )
     policy = models.CharField(
         max_length=15,
@@ -64,10 +63,7 @@ class DMARCRecord(models.Model):
     mailto = models.EmailField()
 
     def save(self, *args, **kwargs):
-        domain = self.domain.domain.replace("www.", "")
-        # orga = self.user.company_name.replace(" ", "_")
-        # self.mailto = f"report+{urllib.parse.quote_plus(orga)}-{domain}@test-dmarc.lu"
-
+        domain = self.domain.replace("www.", "")
         self.txt_record = f"_dmarc.{domain}"
 
         if self.spf_policy == "relaxed":
@@ -84,10 +80,10 @@ class DMARCRecord(models.Model):
             f"v=DMARC1; p={self.policy}; {spf}{dkim}rua=mailto:{self.mailto};"
         )
 
-        super().save()
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.user.company_name}-{self.domain.domain.replace("www.", "")}'
+        return f'{self.user.company_name}-{self.domain.replace("www.", "")}'
 
 
 class DMARCReport(models.Model):

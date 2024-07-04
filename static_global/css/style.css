@@ -76,6 +76,9 @@ font-size: 3em;
 .container{
   max-width:1200px;
 }
+.container-extended{
+  max-width:1450px;
+}
 .box-shadow {
   box-shadow: 0px 16px 24px 0px rgba(234, 239, 244, 0.64);
 }
@@ -612,3 +615,15 @@ footer .border-top {
     .govbar-more {
         font-weight: 400
     }
+
+    .border-bottom-radius-only{
+     border-radius: 0 0 20px 20px;!important;
+    }
+     .border-top-radius-only{
+     border-radius: 20px 20px 0 0;!important;
+    }
+@media(min-width: 2800px) {
+.container-extended{
+  max-width:1650px;
+}
+}

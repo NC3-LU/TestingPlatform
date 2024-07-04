@@ -7,8 +7,8 @@
   let countWarning = 0;
   let countTotal = 0;
 </script>
-
-<section class="col-lg-11 row my-5 border border-2 rounded p-lg-4 p-md-4">
+ <div class="row d-flex justify-content-center py-5">
+<section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
   <h1 class="text-center">Overview of {{ domain_name }}</h1>
   <div class="row justify-content-evenly mb-5">
     <div class="col-lg-3 d-flex align-items-center justify-content-center">
@@ -219,6 +219,7 @@
     </div>
   </div>
 </section>
+ </div>
 <script>
 
      document.getElementById('vulnerable-count').innerHTML = '&nbsp;' + countBad + '&nbsp;' ;
@@ -226,8 +227,8 @@
      document.getElementById('warning-count').innerHTML = '&nbsp;' + countWarning + '&nbsp;' ;
 
 </script>
-<section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
-  <div class="row">
+ <div class="row d-flex justify-content-center py-5">
+<section class="container-extended box-shadow primary-fadded-blue_border p-5">
     <div class="col-lg-12 fs-1 fw-bold">
       {% if result.content_security_policy.pass %}
       <i class="bi bi-check-circle-fill color-success"> </i>
@@ -309,11 +310,11 @@
         </div>
       </div>
     </div>
-  </div>
-</section>
 
-<section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
-  <div class="row">
+</section>
+ </div>
+ <div class="row d-flex justify-content-center py-5">
+<section class="container-extended box-shadow primary-fadded-blue_border p-5">
     <div class="col-lg-12 fs-1 fw-bold">
       {% if result.cookies.pass %}
       <i class="bi bi-check-circle-fill color-success"> </i>
@@ -325,7 +326,6 @@
       <p>Using cookies attributes such as Secure and HttpOnly can protect users from
         having their personal information stolen.</p>
     </div>
-  </div>
   {% if result.cookies.output.data %}
   <div class="row my-2">
     <button type="button" data-bs-toggle="collapse" data-bs-target="#cookies-found"
@@ -403,9 +403,9 @@
     </div>
   </div>
 </section>
-
-<section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
-  <div class="row">
+ </div>
+ <div class="row d-flex justify-content-center py-5">
+<div class="container-extended box-shadow primary-fadded-blue_border p-5">
     <div class="col-lg-12 fs-1 fw-bold">
       {% if result.cross_origin_resource_sharing.pass %}
       <i class="bi bi-check-circle-fill color-success"> </i>
@@ -422,7 +422,6 @@
         request. In that preflight, the browser sends headers that indicate the HTTP
         method and headers that will be used in the actual request.</p>
     </div>
-  </div>
   <div class="row my-2">
     <button type="button" data-bs-toggle="collapse"
             data-bs-target="#cors-recommendation"
@@ -499,9 +498,11 @@
       </div>
     </div>
   </div>
-</section>
 
-<section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
+</div>
+ </div>
+ <div class="row d-flex justify-content-center py-5">
+<div class="container-extended box-shadow primary-fadded-blue_border p-5">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
       {% if result.redirection.pass %}
@@ -549,9 +550,10 @@
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
+ <div class="row d-flex justify-content-center py-5">
+<div class="container-extended box-shadow primary-fadded-blue_border p-5">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
       {% if result.referrer_policy.pass %}
@@ -641,9 +643,9 @@
       </div>
     </div>
   </div>
-</section>
-
-<section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
+</div>
+   <div class="row d-flex justify-content-center py-5">
+<div class="container-extended box-shadow primary-fadded-blue_border border-bottom-radius-only p-5">
   <div class="row">
     <div class="col-lg-12 fs-1 fw-bold">
       {% if result.subresource_integrity.pass %}
@@ -680,7 +682,7 @@
     </div>
   </div>
   {% endif %}
-</section>
+</div>
 
 
 <script>

@@ -1,6 +1,21 @@
 {% extends "base.html" %}
 {% load tags %}
 {% block content %}
+<section class="blue-gradient_background p-4 text-white">
+  <div class="container my-5">
+    <div class="mb-5">
+      <div class="d-flex align-items-center" style="gap: 1.944em">
+        <hr class="hr-h-width bg-white">
+        <h3>E-Mail Security Checker</h3>
+      </div>
+      <h1 class="font-size-48 font-weight-800 lh-base">Assess the security of your email setup (SPF and DMARC DNS records, DNSSEC deployment, etc.)!</h1>
+    </div>
+    <div>
+      <p>
+       Assess the security of your email setup (SPF and DMARC DNS records, DNSSEC deployment, etc.)</p>
+    </div>
+  </div>
+</section>
 <script>
   let countGood = 0;
   let countBad = 0;
@@ -11,7 +26,6 @@
 <main>
    <div class="container d-flex justify-content-center py-5">
     <div class="w-75 box-shadow primary-fadded-blue_border rounded-box-20 p-5">
-      <h3 class="card-title">Email Security Checker</h3>
       <p>
        Assess the security of your email setup
           (SPF and DMARC DNS records, DNSSEC deployment, etc.)
@@ -39,7 +53,7 @@
   </div>
 
   {% if result %}
- <div class="row d-flex justify-content-center py-5">
+ <div class="gx-0 row d-flex justify-content-center py-5">
 <section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
       <h1 class="text-center">Overview of {{ result.domain }}</h1>
       <div class="row justify-content-evenly mb-5">
@@ -154,7 +168,7 @@
 
 
     <!-- SPF RECORD -->
-    <div class="row d-flex justify-content-center py-5">
+    <div class="gx-0 row d-flex justify-content-center py-5">
 <section class="container-extended box-shadow primary-fadded-blue_border p-5">
         <div class="col-lg-12 fs-1 fw-bold">
           {% if result.spf.valid %}
@@ -237,7 +251,7 @@
 
 
     <!-- DMARC RECORD-->
-    <div class="row d-flex justify-content-center py-5">
+    <div class="gx-0 row d-flex justify-content-center py-5">
 <section class="container-extended box-shadow primary-fadded-blue_border p-5">
         <div class="col-lg-12 fs-1 fw-bold">
           {% if result.dmarc.valid %}
@@ -288,7 +302,7 @@
 
     </section> </div>
     <!-- DKIM RECORD-->
-        <div class="row d-flex justify-content-center py-5">
+        <div class="gx-0 row d-flex justify-content-center py-5">
 <section class="container-extended box-shadow primary-fadded-blue_border p-5">
         <div class="col-lg-12 fs-1 fw-bold">
           {% if result.dkim %}
@@ -365,7 +379,7 @@
     </section>
         </div>
     <!-- DNSSEC -->
-        <div class="row d-flex justify-content-center py-5">
+        <div class="gx-0 row d-flex justify-content-center py-5">
 <section class="container-extended box-shadow primary-fadded-blue_border p-5">
         <div class="col-lg-12 fs-1 fw-bold">
           {% if result.dnssec %}
@@ -824,7 +838,7 @@
       </div>
     </section>
     -->
-            <div class="row d-flex justify-content-center py-5">
+            <div class="gx-0 row d-flex justify-content-center py-5">
 <section class="container-extended box-shadow primary-fadded-blue_border p-5">
         <div class="col-lg-12 fs-1 fw-bold">
           Mail Exchanger (MX) Records
@@ -870,7 +884,7 @@
         </div>
 
     </section></div>
-        <div class="row d-flex justify-content-center py-5">
+        <div class="gx-0 row d-flex justify-content-center py-5">
 <section class="container-extended box-shadow primary-fadded-blue_border border-bottom-radius-only p-5">
         <div class="col-lg-12 fs-1 fw-bold">
           Mailserver settings test for: {{ result.domain }}

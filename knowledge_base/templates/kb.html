@@ -2,19 +2,49 @@
 {% load static %}
 
 {% block content %}
+<section class="blue-gradient_background p-4 text-white">
+  <div class="container my-5">
+    <div class="mb-5">
+      <div class="d-flex align-items-center" style="gap: 1.944em">
+        <hr class="hr-h-width bg-white">
+        <h3>Knowledgebase</h3>
+      </div>
+      <h1 class="font-size-48 font-weight-800 lh-base">Not sure about the meaning of
+        certain words? Look them up!</h1>
+    </div>
+    <div>
+      <p>
+        The knowledge base covers the used words and tests to explain them to you in
+        easy words.</p>
+    </div>
+  </div>
+</section>
 
 
-
-
-
-<div class="container-fluid my-5">
-  <h1 class="text-center"><span style="font-weight: bold;color: #28abe2; ">NC</span><span
-    style="font-weight: bold;color:#ec1e27;">3</span> Knowledge base</h1>
-  <p class="lead"></p>
-  <h2 class="bg-light d-flex p-3 flex-column align-items-center text-center">Tests</h2>
-  <div class="row justify-content-left">
-    <div class="col-lg col-md mb">
-      <h3 id="tests-website">Website Application Testing</h3>
+<main>
+  <div class="container my-5">
+    <div class="mb-5">
+      <div class="d-flex align-items-center justify-content-center gap-4">
+        <hr class="hr-h-width primary-primary-blue_background">
+        <h3 class="text-primary-primary-blue">About Knowledge Base</h3>
+        <hr class="hr-h-width primary-primary-blue_background">
+      </div>
+      <h2 class="font-size-48 font-weight-800 lh-base text-blue-gradient">The Goal</h2>
+      <p class="font-size-20 lh-base">The testing platform holds the tools and
+        services that will help organisations to perform basic tests on their most
+        commonly exposed infrastructures, starting with email and web servers. More
+        tools
+        will be added through time to increase the coverage of available tests.</p>
+      <a class="gap-1 font-weight-600" href="#">Find out more here <i
+        class="bi bi-arrow-right-short"></i></a>
+    </div>
+    <div class="mb-5">
+      <div class="d-flex align-items-center justify-content-center gap-4">
+        <hr class="hr-h-width primary-primary-blue_background">
+        <h3 class="text-primary-primary-blue">Tests</h3>
+        <hr class="hr-h-width primary-primary-blue_background">
+      </div>
+      <h3 id="tests-website" class="text-blue-gradient">Website Application Testing</h3>
       After entering a website's domain name, we will test whether the website supports
       various
       modern Internet standards such as:
@@ -37,17 +67,14 @@
         of your server from a modern internet address (IPv6).</p>
       <p id="tests-web-server">This platform is providing a tool to assess your web
         server configuration, software versions and potential vulnerabilities.</p>
-    </div>
-  </div>
-
-  <div class="row justify-content-left">
-    <div class="col-lg col-md mb">
-      <h3 id="tests-email">Email</h3>
+      <h3 class="text-blue-gradient" id="tests-email">Email</h3>
       Our suite of tools is able to verify a series of standards concerning
       the proper implementation of an email server.
       <ul>
         <li>Parses and validates MX, SPF, and DMARC records</li>
-        <li>Checks the presence and validity of <a href="{% url 'knowledge_base'  %}#standards-dkim">DKIM</a> public key</li>
+        <li>Checks the presence and validity of <a
+          href="{% url 'knowledge_base'  %}#standards-dkim">DKIM</a> public key
+        </li>
         <li>Checks for <a href="https://datatracker.ietf.org/doc/rfc9364/"
                           target="_blank" rel="noopener noreferrer">DNSSEC</a>
           deployment
@@ -55,12 +82,7 @@
         <li>Lists name servers</li>
         <li>Checks for STARTTLS and TLS support on each mail server</li>
       </ul>
-    </div>
-  </div>
-
-  <!--<div class="row justify-content-left">
-    <div class="col-lg col-md mb-2">
-      <h3 id="tests-file">File testing</h3>
+      <h3 class="text-blue-gradient" id="tests-file">File testing</h3>
       The file testing module is relying on the
       <a href="https://github.com/pandora-analysis" target="_blank"
          rel="noopener noreferrer">Pandora Analysis framework</a>.
@@ -75,26 +97,21 @@
                                  target="_blank" rel="noopener noreferrer">official
       Pandora page</a>.
     </div>
-  </div>-->
-
-
-  <h2 class="bg-light d-flex p-3 flex-column align-items-center text-center">
-    Standards</h2>
-  <div class="row justify-content-left">
-    <div class="col-lg col-md mb">
-      <h3 id="standards-https">HTTPS</h3>
+    <div class="mb-5">
+      <div class="d-flex align-items-center justify-content-center gap-4">
+        <hr class="hr-h-width primary-primary-blue_background">
+        <h3 class="text-primary-primary-blue">Standards</h3>
+        <hr class="hr-h-width primary-primary-blue_background">
+      </div>
+      <h3 class="text-blue-gradient" id="standards-https">HTTPS</h3>
       <p><a href="https://developer.mozilla.org/en-US/docs/Glossary/HTTPS"
             target="_blank" rel="noopener noreferrer">HTTPS</a>
         (HyperText Transfer Protocol Secure) is an encrypted version of the HTTP
         protocol.
         It uses SSL or TLS to encrypt all communication between a client and a server.
       </p>
-    </div>
-  </div>
 
-  <div class="row justify-content-left">
-    <div class="col-lg col-md mb">
-      <h3 id="standards-hsts">HSTS</h3>
+      <h3 class="text-blue-gradient" id="standards-hsts">HSTS</h3>
       <p><a href="https://developer.mozilla.org/en-US/docs/Glossary/HSTS"
             target="_blank" rel="noopener noreferrer">HTTP Strict Transport Security</a>
         lets a website inform the browser that it should never load the site using HTTP
@@ -102,12 +119,7 @@
         should automatically convert all attempts to access the site using HTTP to HTTPS
         requests instead. It consists in one HTTP header, Strict-Transport-Security,
         sent by the server with the resource.</p>
-    </div>
-  </div>
-
-  <div class="row justify-content-left">
-    <div class="col-lg col-md mb">
-      <h3 id="standards-dmarc-spf">DMARC and SPF</h3>
+      <h3 class="text-blue-gradient" id="standards-dmarc-spf">DMARC and SPF</h3>
       <p>DMARC and SPF are protections against email phishing.
       <p>DMARC record is a TXT record that contains instructions for how an email server
         should
@@ -117,30 +129,20 @@
       <p>The Sender Policy Framework (SPF) is an email authentication method designed to
         detect
         forging sender addresses during the delivery of an email.</p>
-    </div>
-
-    <div class="row justify-content-left">
-      <div class="col-lg col-md mb">
-        <h3 id="standards-dnssec">Domain signature (DNSSEC)</h3>
-        <p>The Domain Name System Security Extensions
-          are a suite of extension specifications by the Internet Engineering Task Force
-          (IETF)
-          for securing data exchanged in the Domain Name System (DNS).</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="row justify-content-left">
-    <div class="col-lg col-md mb">
-      <h3 id="standards-dkim">DKIM</h3>
-      <p><a href="https://www.rfc-editor.org/info/rfc6376" target="_blank" rel="noopener noreferrer">DomainKeys Identified Mail</a>
+      <h3 class="text-blue-gradient" id="standards-dnssec">Domain signature (DNSSEC)</h3>
+      <p>The Domain Name System Security Extensions
+        are a suite of extension specifications by the Internet Engineering Task Force
+        (IETF)
+        for securing data exchanged in the Domain Name System (DNS).</p>
+      <h3 class="text-blue-gradient" id="standards-dkim">DKIM</h3>
+      <p><a href="https://www.rfc-editor.org/info/rfc6376" target="_blank"
+            rel="noopener noreferrer">DomainKeys Identified Mail</a>
         is an email authentication method designed to
         detect forged sender addresses in email (email spoofing).</p>
       <p>DKIM allows the receiver to check that an email that claimed to have come
         from a specific domain was indeed authorized by the owner of that domain.</p>
     </div>
-  </div>
-</div>
 
-</div>
+  </div>
+</main>
 {% endblock %}

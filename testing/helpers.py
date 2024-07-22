@@ -10,6 +10,11 @@ from base64 import b64decode
 from io import BytesIO
 from typing import Any, Dict, List, Union
 
+import dns.resolver
+import dns.dnssec
+import dns.name
+import ssl
+import socket
 import dns.message
 import dns.rdatatype
 import dns.resolver
@@ -707,3 +712,67 @@ def get_pdf_report():
     ]
 
     return htmldoc.write_pdf(stylesheets=stylesheets)
+
+def check_dnssec(domain):
+    try:
+        dnskey = dns.resolver.resolve(domain, 'DNSKEY')
+        return bool(dnskey)
+    except Exception as e:
+        print(f'Error checking DNSSEC for {domain}: {e}')
+        return False
+
+def check_mx(domain):
+    try:
+        mx_records = dns.resolver.resolve(domain, 'MX')
+        mx_servers = [str(mx.exchange) for mx in mx_records]
+        return mx_servers
+    except Exception as e:
+        print(f'Error checking MX records for {domain}: {e}')
+        return []
+
+def check_spf(domain):
+    try:
+        spf_record = dns.resolver.resolve(domain, 'TXT')
+        for record in spf_record:
+            if 'v=spf1' in str(record):
+                return record.to_text(), True
+        return None, False
+    except Exception as e:
+        print(f'Error checking SPF for {domain}: {e}')
+        return None, False
+
+def check_dmarc(domain):
+    dmarc_domain = f'_dmarc.{domain}'
+    try:
+        dmarc_record = dns.resolver.resolve(dmarc_domain, 'TXT')
+        for record in dmarc_record:
+            if 'v=DMARC1' in str(record):
+                return record.to_text(), True
+        return None, False
+    except Exception as e:
+        print(f'Error checking DMARC for {domain}: {e}')
+        return None, False
+
+def check_tls(mx_servers):
+    tls_results = {}
+    for server in mx_servers:
+        try:
+            context = ssl.create_default_context()
+            with socket.create_connection((server, 25)) as sock:
+                with context.wrap_socket(sock, server_hostname=server) as ssock:
+                    tls_results[server] = True
+        except Exception as e:
+            print(f'TLS is not supported on {server}: {e}')
+            tls_results[server] = False
+    return tls_results
+
+def check_dkim(domain, selector):
+    dkim_domain = f'{selector}._domainkey.{domain}'
+    try:
+        dkim_record = dns.resolver.resolve(dkim_domain, 'TXT')
+        for record in dkim_record:
+            return record.to_text(), True
+        return None, False
+    except Exception as e:
+        print(f'Error checking DKIM for {dkim_domain}: {e}')
+        return None, False

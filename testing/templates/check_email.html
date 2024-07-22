@@ -53,22 +53,19 @@
   </div>
 
   {% if result %}
- <div class="gx-0 row d-flex justify-content-center py-5">
-<section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
+  <div class="gx-0 row d-flex justify-content-center py-5">
+    <section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
       <h1 class="text-center">Overview of {{ result.domain }}</h1>
       <div class="row justify-content-evenly mb-5">
         <div class="col-lg-3 d-flex align-items-center">
           <canvas id="chart1"></canvas>
         </div>
-        <!--<div class="col-lg-6 d-flex align-items-center">
-          <canvas id="chart2"></canvas>
-        </div>-->
       </div>
       <div class="row justify-content-between">
         <div class="col-lg-7">
           <div class="row my-1">
             <div class="col-lg-12 fs-4">
-              {% if result.spf.valid %}
+              {% if result.spf_valid %}
                 <script> countGood++; countTotal++;</script>
                 <i class="bi bi-check-circle-fill color-success"> </i>
               {% else %}
@@ -78,7 +75,7 @@
               SPF record
             </div>
             <div class="col-lg-12 fs-4">
-              {% if result.dmarc.valid %}
+              {% if result.dmarc_valid %}
                 <script> countGood++;countTotal++;</script>
                 <i class="bi bi-check-circle-fill color-success"> </i>
               {% else %}
@@ -97,30 +94,8 @@
               {% endif %}
               Signed Domain Name (DNSSEC)
             </div>
-           <!-- <div class="col-lg-12 fs-4">
-              {% if result.nameservers_reachability_comments.grade == "full" %}
-                <script> countGood++;countTotal++;</script>
-                <i class="bi bi-check-circle-fill color-success"> </i>
-              {% elif result.nameservers_reachability_comments.grade == "null" %}
-                <script>countBad++;countTotal++;</script>
-                <i class="bi bi-x-circle-fill color-danger"></i>
-              {% endif %}
-              {{ result.nameservers_reachability_comments.comment }} (IPv6)
-            </div>
-            <div class="col-lg-12 fs-4">
-              {% if result.record.2 %}
-                <script> countGood++;countTotal++;</script>
-                <i class="bi bi-check-circle-fill color-success"></i>
-                Your server has an IPv6 address.(IPv6)
-              {% else %}
-                <script>countBad++;countTotal++;</script>
-                <i class="bi bi-x-circle-fill color-danger"></i>
-                Your server does not have an IPv6 address. (IPv6)
-              {% endif %}
-
-            </div>-->
-            <div class="col-lg-12 fs-4">
-              {% if result.dkim %}
+            <!--<div class="col-lg-12 fs-4">
+              {% if result.dkim_valid %}
                 <script> countGood++;countTotal++;</script>
                 <i class="bi bi-check-circle-fill color-success"></i>
               {% elif result.dkim is None %}
@@ -131,8 +106,7 @@
                 <i class="bi bi-x-circle-fill color-danger"></i>
               {% endif %}
               DKIM Record
-            </div>
-            <!-- TODO add TLS overview check as in web report -->
+            </div>-->
           </div>
         </div>
         <div class="col-lg-5">
@@ -154,192 +128,134 @@
             <div class="col-lg-6 col-md-8">
               <span id="warning-count" class="circle fs-4 text-black" style="background:#f5e230 !important;"></span>
             </div>
-            <!--<div class="row my-4">
-              <div class="col-lg-6 fs-2">Informational</div>
-              <div class="col-lg-6"><span class="rounded-circle p-2 fs-4 text-white"
-                                          style="background:#2475e8;">10</span>
-              </div>
-            </div>-->
           </div>
         </div>
       </div>
-  </section>
+    </section>
   </div>
 
-
-    <!-- SPF RECORD -->
-    <div class="gx-0 row d-flex justify-content-center py-5">
-<section class="container-extended box-shadow primary-fadded-blue_border p-5">
-        <div class="col-lg-12 fs-1 fw-bold">
-          {% if result.spf.valid %}
-            <i class="bi bi-check-circle-fill color-success"> </i>
-          {% else %}
-            <i class="bi bi-x-circle-fill color-danger"></i>
-          {% endif %}
-          SPF Record
-        </div>
-
-        <div class="col-lg-12 fs-4">
-          <p>The Sender Policy Framework (SPF) is an email validation protocol that helps
-            detect and block email spoofing. Email spoofing is a common technique used in
-            phishing and spam emails. SPF allows the receiving mail server to verify that
-            incoming mail from a domain comes from a host authorized by that domain’s
-            administrators. The list of authorized sending hosts for a domain is published
-            in the Domain Name System (DNS) records.</p>
-          <div class="row my-2">
-            {% if result.spf.valid %}
-              <button type="button" data-bs-toggle="collapse" data-bs-target="#records"
-                      aria-expanded="false" aria-controls="collapseExample"
-                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
-                <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-                SPF Record
-              </button>
-            {% else %}
-              <button type="button" data-bs-toggle="collapse" data-bs-target="#records"
-                      aria-expanded="false" aria-controls="collapseExample"
-                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-                <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-                SPF Record
-              </button>
-            {% endif %}
-            <div class="p-0 collapse" id="records">
-              <div class="p-4 border-bottom border-end border-start">
-                <h2>SPF Record</h2>
-                <code>{{ result.spf.record }}</code>
-                <p>Valid:
-                  {% if result.spf.valid %}
-                    <i class="bi bi-check-circle-fill color-success"> </i>
-                  {% else %}
-                    <i class="bi bi-x-circle-fill color-danger"></i>
-                  {% endif %}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="row my-2">
-            <button type="button" data-bs-toggle="collapse"
-                    data-bs-target="#spf_recommendation"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
-              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-              Recommendations
-            </button>
-            <div class="p-0 collapse" id="spf_recommendation">
-              <div class="p-4 border-bottom border-end border-start">
-                <p>Create and publish an SPF record in your DNS settings for your domain.
-                  The SPF record specifies which email servers are authorized to send
-                  emails
-                  on behalf of your domain.</p>
-                <p>Identify the IP addresses of your legitimate email servers and include
-                  them in your SPF record. This ensures that only authorized servers can
-                  send emails using your domain name.</p>
-                <p>Configure your SPF record with a "hard fail" mechanism (-all) to
-                  explicitly
-                  reject any emails that do not originate from authorized IP addresses.
-                  This helps prevent unauthorized sources from sending emails on behalf of
-                  your domain.</p>
-                <p>Consider implementing SPF alignment mechanisms, such as DMARC
-                  (Domain-based Message Authentication, Reporting, and Conformance),
-                  to further strengthen email authentication and protect against domain
-                  spoofing.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-    </section> </div>
-
-
-    <!-- DMARC RECORD-->
-    <div class="gx-0 row d-flex justify-content-center py-5">
-<section class="container-extended box-shadow primary-fadded-blue_border p-5">
-        <div class="col-lg-12 fs-1 fw-bold">
-          {% if result.dmarc.valid %}
-            <i class="bi bi-check-circle-fill color-success"> </i>
-          {% else %}
-            <i class="bi bi-x-circle-fill color-danger"></i>
-          {% endif %}
-          DMARC Record
-        </div>
-        <div class="col-lg-12 fs-4">
-          <p>DMARC (Domain-based Message Authentication, Reporting, and Conformance) is an
-            email authentication protocol that provides additional protection against
-            email spoofing and phishing attacks. It uses the Sender Policy Framework (SPF)
-            and DomainKeys Identified Mail (DKIM) standards. DMARC enables a domain owner
-            to specify how mail servers should handle messages from their domain that
-            don’t pass SPF or DKIM checks. This adds an extra layer of security</p>
-          <div class="row my-2">
-            {% if result.dmarc.valid %}
-              <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record"
-                      aria-expanded="false" aria-controls="collapseExample"
-                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
-                <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-                DMARC Record
-            </button>
-            {% else %}
-              <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record"
-                      aria-expanded="false" aria-controls="collapseExample"
-                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-                <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-                DMARC Record
-              </button>
-            {% endif %}
-            <div class="p-0 collapse" id="d_record">
-              <div class="p-4 border-bottom border-end border-start">
-                <h2>DMARC Record</h2>
-                <code>{{ result.dmarc.record }}</code>
-                <p>Valid:
-                  {% if result.dmarc.valid %}
-                    <i class="bi bi-check-circle-fill color-success"> </i>
-                  {% else %}
-                    <i class="bi bi-x-circle-fill color-danger"></i>
-                  {% endif %}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-    </section> </div>
-    <!-- DKIM RECORD-->
-        <div class="gx-0 row d-flex justify-content-center py-5">
-<section class="container-extended box-shadow primary-fadded-blue_border p-5">
-        <div class="col-lg-12 fs-1 fw-bold">
-          {% if result.dkim %}
-            <i class="bi bi-check-circle-fill color-success"> </i>
-          {% elif result.dkim is None %}
-            <i class="bi bi-x-circle-fill text-warning"></i>
-          {% else %}
-            <i class="bi bi-x-circle-fill color-danger"></i>
-          {% endif %}
-          DKIM Record
-        </div>
-     <div class="col-lg-12 fs-4">
-        <p>DomainKeys Identified Mail (DKIM) is an email authentication method that helps
-          to verify the authenticity and integrity of email messages. It adds a digital
-          signature to the email headers, which allows the receiving email server to
-          verify
-          that the email has not been tampered with during transit and that it was indeed
-          sent by the claimed domain.</p>
+  <div class="gx-0 row d-flex justify-content-center py-5">
+    <section class="container-extended box-shadow primary-fadded-blue_border p-5">
+      <div class="col-lg-12 fs-1 fw-bold">
+        {% if result.spf_valid %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        SPF Record
+      </div>
+      <div class="col-lg-12 fs-4">
+        <p>The Sender Policy Framework (SPF) is an email validation protocol that helps detect and block email spoofing. Email spoofing is a common technique used in phishing and spam emails. SPF allows the receiving mail server to verify that incoming mail from a domain comes from a host authorized by that domain’s administrators. The list of authorized sending hosts for a domain is published in the Domain Name System (DNS) records.</p>
         <div class="row my-2">
-          {% if result.dkim %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+          {% if result.spf_valid %}
+            <button type="button" data-bs-toggle="collapse" data-bs-target="#records" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+              SPF Record
+            </button>
+          {% else %}
+            <button type="button" data-bs-toggle="collapse" data-bs-target="#records" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+              SPF Record
+            </button>
+          {% endif %}
+          <div class="p-0 collapse" id="records">
+            <div class="p-4 border-bottom border-end border-start">
+              <h2>SPF Record</h2>
+              <code>{{ result.spf }}</code>
+              <p>Valid:
+                {% if result.spf_valid %}
+                  <i class="bi bi-check-circle-fill color-success"> </i>
+                {% else %}
+                  <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="row my-2">
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#spf_recommendation" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
+            <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+            Recommendations
+          </button>
+          <div class="p-0 collapse" id="spf_recommendation">
+            <div class="p-4 border-bottom border-end border-start">
+              <p>Create and publish an SPF record in your DNS settings for your domain. The SPF record specifies which email servers are authorized to send emails on behalf of your domain name. Identify the IP addresses of your legitimate email servers and include them in your SPF record. This ensures that only authorized servers can send emails using your domain name. Configure your SPF record with a "hard fail" mechanism (-all) to explicitly reject any emails that do not originate from authorized IP addresses. This helps prevent unauthorized sources from sending emails on behalf of your domain. Consider implementing SPF alignment mechanisms, such as DMARC (Domain-based Message Authentication, Reporting, and Conformance), to further strengthen email authentication and protect against domain spoofing.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="gx-0 row d-flex justify-content-center py-5">
+    <section class="container-extended box-shadow primary-fadded-blue_border p-5">
+      <div class="col-lg-12 fs-1 fw-bold">
+        {% if result.dmarc_valid %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        DMARC Record
+      </div>
+      <div class="col-lg-12 fs-4">
+        <p>DMARC (Domain-based Message Authentication, Reporting, and Conformance) is an email authentication protocol that provides additional protection against email spoofing and phishing attacks. It uses the Sender Policy Framework (SPF) and DomainKeys Identified Mail (DKIM) standards. DMARC enables a domain owner to specify how mail servers should handle messages from their domain that don’t pass SPF or DKIM checks. This adds an extra layer of security</p>
+        <div class="row my-2">
+          {% if result.dmarc_valid %}
+            <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+              DMARC Record
+            </button>
+          {% else %}
+            <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+              DMARC Record
+            </button>
+          {% endif %}
+          <div class="p-0 collapse" id="d_record">
+            <div class="p-4 border-bottom border-end border-start">
+              <h2>DMARC Record</h2>
+              <code>{{ result.dmarc }}</code>
+              <p>Valid:
+                {% if result.dmarc_valid %}
+                  <i class="bi bi-check-circle-fill color-success"> </i>
+                {% else %}
+                  <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+ <!-- <div class="gx-0 row d-flex justify-content-center py-5">
+    <section class="container-extended box-shadow primary-fadded-blue_border p-5">
+      <div class="col-lg-12 fs-1 fw-bold">
+        {% if result.dkim_valid %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% elif result.dkim is None %}
+          <i class="bi bi-x-circle-fill text-warning"></i>
+        {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        DKIM Record
+      </div>
+      <div class="col-lg-12 fs-4">
+        <p>DomainKeys Identified Mail (DKIM) is an email authentication method that helps to verify the authenticity and integrity of email messages. It adds a digital signature to the email headers, which allows the receiving email server to verify that the email has not been tampered with during transit and that it was indeed sent by the claimed domain.</p>
+        <div class="row my-2">
+          {% if result.dkim_valid %}
+            <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
               <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
               DKIM Record
             </button>
           {% elif result.dkim is None %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-warning">
+            <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-warning">
               <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
               DKIM Record
             </button>
           {% else %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+            <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
               <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
               DKIM Record
             </button>
@@ -356,553 +272,113 @@
           </div>
         </div>
         <div class="row my-2">
-          <button type="button" data-bs-toggle="collapse"
-                  data-bs-target="#dkim_recommendation"
-                  aria-expanded="false" aria-controls="collapseExample"
-                  class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_recommendation" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
             <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
             Recommendations
           </button>
           <div class="p-0 collapse" id="dkim_recommendation">
             <div class="p-4 border-bottom border-end border-start">
-              <p>Use a reliable DKIM key generator to create a pair of cryptographic keys
-                -
-                a private key for signing outgoing emails and a corresponding public key
-                that will be published in your DNS records.</p>
-              <p>Add the DKIM public key to your domain's DNS records as a TXT record.
-                This allows receiving email servers to retrieve and verify the DKIM
-                signature.</p>
+              <p>Use a reliable DKIM key generator to create a pair of cryptographic keys - a private key for signing outgoing emails and a corresponding public key that will be published in your DNS records. Add the DKIM public key to your domain's DNS records as a TXT record. This allows receiving email servers to retrieve and verify the DKIM signature.</p>
             </div>
           </div>
         </div>
       </div>
     </section>
-        </div>
-    <!-- DNSSEC -->
-        <div class="gx-0 row d-flex justify-content-center py-5">
-<section class="container-extended box-shadow primary-fadded-blue_border p-5">
-        <div class="col-lg-12 fs-1 fw-bold">
-          {% if result.dnssec %}
-            <i class="bi bi-check-circle-fill color-success"> </i>
-          {% else %}
-            <i class="bi bi-x-circle-fill color-danger"></i>
-          {% endif %}
-          Signed Domain Name (DNSSEC)
-        </div>
-        <div class="col-lg-12 fs-4">
-          <p>DNSSEC (Domain Name System Security Extensions) is a set of cryptographic
-            protocols
-            and security measures designed to enhance the security of the Domain Name
-            System (DNS). By digitally signing DNS data, DNSSEC ensures data integrity
-            and authenticity, protecting against various forms of DNS attacks like cache
-            poisoning or DNS spoofing. It uses public key cryptography to verify the
-            authenticity
-            of DNS responses and provides a chain of trust from the root DNS
-            servers down to the individual domain names, ensuring that the DNS information
-            received by a user is valid and has not been tampered with during
-            transmission.</p>
-          <div class="row my-2">
-            {% if result.dnssec %}
-              <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec"
-                      aria-expanded="false" aria-controls="collapseExample"
-                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
-                <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-                DNSSEC Status
-              </button>
-            {% else %}
-              <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec"
-                      aria-expanded="false" aria-controls="collapseExample"
-                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-                <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-                DNSSEC Status
-              </button>
-            {% endif %}
-            <div class="p-0 collapse" id="dnssec">
-              <div class="p-4 border-bottom border-end border-start">
-                {{ result.dnssec}}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row my-2">
-          <button type="button" data-bs-toggle="collapse"
-                  data-bs-target="#dnssec-recommendation"
-                  aria-expanded="false" aria-controls="collapseExample"
-                  class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
-            <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-            Recommendations
-          </button>
-          <div class="p-0 collapse" id="dnssec-recommendation">
-            <div class="p-3 border-bottom border-end border-start table-responsive">
-              <p>
-                IPv6 is the next generation of the Internet Protocol, and it offers a
-                number of advantages over IPv4, the current version of the protocol.
-              </p>
-              <ul>
-                <li>
-                  Address exhaustion: IPv4 is running out of available addresses due to
-                  the rapid growth of connected devices. IPv6 provides a significantly
-                  larger address space, ensuring that there are enough unique IP
-                  addresses
-                  to accommodate the expanding number of devices and services.
-                </li>
-                <li>
-                  Future-proofing: As the industry shifts towards IPv6, enabling IPv6
-                  support ensures compatibility and seamless communication with the
-                  growing number of IPv6-enabled networks and devices. It future-proofs
-                  your infrastructure, avoiding potential connectivity issues and the
-                  need
-                  for costly workarounds.
-                </li>
-                <li>
-                  Enhanced functionality: IPv6 offers improvements in areas such as
-                  autoconfiguration, mobility, and quality of service, allowing for
-                  more
-                  efficient and advanced network operations. Enabling IPv6 unlocks these
-                  enhanced functionalities, promoting a better user experience and
-                  enabling innovative applications and services.
-                </li>
-                <li>
-                  Global reachability: With IPv6, your services can reach a larger
-                  global
-                  audience, including regions and networks that primarily use IPv6. By
-                  enabling IPv6, you expand your online presence and increase
-                  accessibility to your web services.
-                </li>
-                <li>
-                  Security advancements: IPv6 includes built-in security features, such
-                  as
-                  IPsec (Internet Protocol Security), which provides native encryption,
-                  authentication, and data integrity. Enabling IPv6 allows you to
-                  leverage
-                  these security enhancements, improving the confidentiality and
-                  integrity
-                  of your network traffic.
-                </li>
-              </ul>
+  </div>-->
 
-            </div>
-          </div>
-        </div>
-
-    </section>  </div>
-    <!-- TLS Check -->
-    <!--
-    <section class="col-lg-11 row my-5 border border-2 rounded p-4">
-      <div class="row">
-        <div class="col-lg-12 fs-1 fw-bold">
-          TLS
-        </div>
+  <div class="gx-0 row d-flex justify-content-center py-5">
+    <section class="container-extended box-shadow primary-fadded-blue_border p-5">
+      <div class="col-lg-12 fs-1 fw-bold">
+        {% if result.dnssec %}
+          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% else %}
+          <i class="bi bi-x-circle-fill color-danger"></i>
+        {% endif %}
+        Signed Domain Name (DNSSEC)
       </div>
       <div class="col-lg-12 fs-4">
-        <p>The TLS (Transport Layer Security) protocol encrypts e-mails to ensure confidentiality.
-          It blocks unauthorized access to your emails while they are being exchanged.
-        </p>
-        {% if result.tls_result %}
-          {% for host, tls in result.tls_result.items %}
-            <h2>{{ host }}</h2>
-            <div class="row my-2">
-              {% for version, suites in tls.items %}
-                <div class="row my-2">
-                  <button type="button" data-bs-toggle="collapse"
-                          data-bs-target="#tls-found-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
-                          aria-expanded="false" aria-controls="collapseExample"
-                          class="accordion-button btn p-3 fs-2 fw-bold text-start text-light
-                              {% if result.tls_lowest_sec_level|get:host|get:version == 'GOOD' or result.tls_lowest_sec_level|get:host|get:version == 'SUFFICIENT' %}
-                                bg-success
-                              {% elif result.tls_lowest_sec_level|get:host|get:version == 'PHASE_OUT' %}
-                                bg-warning
-                              {% elif result.tls_lowest_sec_level|get:host|get:version == 'INSUFFICIENT' %}
-                                bg-danger
-                              {% endif %}">
-                    <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-                    {{ version }}
-                  </button>
-                </div>
-                <div class="p-0 collapse" id="tls-found-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
-                  <div class="p-3 border-bottom border-end border-start table-responsive">
-                    <table class="table table-light table-bordered table-striped">
-                      <tr>
-                        <th>Ciphersuite</th>
-                        <th>Security level</th>
-                      </tr>
-                      {% for name, info in suites.items %}
-                        <tr>
-                          <td>{{ name }}</td>
-                          <td>
-                            {% if info.sec_level.level == "GOOD" or info.sec_level.level == "SUFFICIENT" %}
-                              <i class="bi bi-check-circle-fill color-success"></i>
-                            {% elif info.sec_level.level == "PHASE_OUT" %}
-                              <i class="bi bi-exclamation-circle-fill text-warning"></i>
-                            {% elif info.sec_level.level == "INSUFFICIENT" %}
-                              <i class="bi bi-x-circle-fill color-danger"> </i>
-                            {% endif %}
-                            {{ info.sec_level.level }}
-                          </td>
-                        </tr>
-                      {% endfor %}
-                    </table>
-                  </div>
-                </div>
-              {% endfor %}
-            </div>
-          {% endfor %}
-        {% endif %}
-      </div>
-      <button type="button" data-bs-toggle="collapse" data-bs-target="#tls"
-              aria-expanded="false" aria-controls="collapseExample"
-              class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
-        <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-        Recommendations
-      </button>
-      <div class="p-0 collapse" id="tls">
-        <div class="p-4 border-bottom border-end border-start">
-          Stay Updated:
-          <ul>
-            <li>Always use the latest TLS versions to benefit from improved security
-              features.
-            </li>
-            <li>Disable outdated and vulnerable protocols like SSL to prevent potential
-              attacks.
-            </li>
-            <li>Prioritize strong cipher suites to ensure robust encryption and
-              authentication.
-            </li>
-          </ul>
-          Manage Certificates:
-          <ul>
-            <li>Obtain certificates from trusted Certificate Authorities (CAs) to
-              establish trust with your users.
-            </li>
-            <li>Regularly check and monitor for any certificate revocations to maintain
-              the integrity of your certificates.
-            </li>
-            <li>Implement certificate pinning to protect against fraudulent or compromised
-              certificates.
-            </li>
-          </ul>
-          Implement Perfect Forward Secrecy (PFS):
-          <ul>
-            <li>Enable Perfect Forward Secrecy to ensure that past communications remain
-              secure even if private keys are compromised.
-            </li>
-            <li>By generating unique session keys, PFS adds an extra layer of
-              confidentiality to your data.
-            </li>
-          </ul>
-          Use Strong Cryptography:
-          <ul>
-            <li>Employ strong cryptographic algorithms for encryption, key exchange, and
-              hashing.
-            </li>
-            <li>Regularly update your cryptographic libraries to address any emerging
-              vulnerabilities and ensure optimal security.
-            </li>
-          </ul>
-          Disable Vulnerable Features:
-          <ul>
-            <li>Disable insecure protocols such as SSLv2, SSLv3, and outdated TLS versions
-              (e.g., TLS 1.0, TLS 1.1).
-            </li>
-            <li>Remove weak ciphers, like those using the RC4 encryption algorithm or
-              outdated key sizes, to eliminate potential security risks.
-            </li>
-          </ul>
-        </div>
-      </div>
-    </section>
-    -->
-    <!-- IPV6 -->
-    <!--
-    <section class="col-lg-11 row my-5 border border-2 rounded p-4">
-      <div class="row">
-        <div class="col-lg-12 fs-1 fw-bold">
-          {% if result.nameservers_comments.grade == "full" and result.records_v6_comments.grade == "full" %}
-            <i class="bi bi-check-circle-fill color-success"> </i>
-          {% else %}
-            <i class="bi bi-x-circle-fill color-danger"></i>
-          {% endif %}
-          IPv6
-        </div>
-        <div class="col-lg-12 fs-4">
-          <p>IPv6 is the latest version of the Internet Protocol that assigns unique
-            identifiers to devices on the internet and routes internet traffic. It
-            provides
-            a much larger address space than IPv4, facilitating the connection of more
-            devices to the internet. Benefits of IPv6 include enhanced security, improved
-            routing efficiency, simplified network configuration.</p>
-          <div class="row my-2">
-            {% if result.nameservers_reachability_comments.grade == "full" %}
-              <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
-                      aria-expanded="false" aria-controls="collapseExample"
-                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
-                <i class="p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-                IPv6 Nameserver Check
-              </button>
-            {% elif result.nameservers_reachability_comments.grade == "null" %}
-              <button type="button" data-bs-toggle="collapse" data-bs-target="#ipv6-domain"
-                      aria-expanded="false" aria-controls="collapseExample"
-                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-                <i class="p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-                IPV6 Nameserver Check
-              </button>
-            {% endif %}
-            <div class="p-0 collapse" id="ipv6-domain">
-              <div class="p-4 border-bottom border-end border-start">
-                <h1 class="text-center">IPv6 Test Results</h1>
-                <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
-                  <p>Name Servers:</p>
-                  <p>
-                    {% if result.nameservers_reachability_comments.grade %}
-                      <i class="bi bi-check-circle-fill color-success"> </i>
-                    {% elif result.nameservers_comments.grade == "null" %}
-                      <i class="bi bi-x-circle-fill color-danger"></i>
-                    {% endif %}
-                    {{ result.nameservers_comments.comment }}
-                  </p>
-                  <table class="table table-light table-bordered table-striped">
-                    <tr>
-                      <th>Name</th>
-                      <th>Address (v4)</th>
-                      <th>Reachable (v4)</th>
-                      <th>Address (v6)</th>
-                      <th>Reachable (v6)</th>
-                    </tr>
-                    {% for nameserver, ns in result.nameservers.items %}
-                      <tr>
-                        <td>{{ nameserver }}</td>
-                        <td>{{ ns.ipv4.address }}</td>
-                        <td>
-                          {{ ns.ipv4.reachable }}
-                          {% if ns.ipv4.reachable %}
-                          <i class="bi bi-check-circle-fill color-success"> </i>
-                          {% else %}
-                          <i class="bi bi-x-circle-fill color-danger"></i>
-                          {% endif %}
-                        </td>
-                        <td>{{ ns.ipv6.address }}</td>
-                        <td>
-                          {{ ns.ipv6.reachable }}
-                          {% if ns.ipv6.reachable %}
-                          <i class="bi bi-check-circle-fill color-success"> </i>
-                          {% else %}
-                          <i class="bi bi-x-circle-fill color-danger"></i>
-                          {% endif %}
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  </table>
-                  <p>
-                    {% if nameservers_reachability_comments.grade == "full" %}
-                      <i class="bi bi-check-circle-fill color-success"> </i>
-                    {% elif nameservers_reachability_comments.grade == "null" %}
-                      <i class="bi bi-x-circle-fill color-danger"></i>
-                    {% endif %}
-                    {{ nameservers_reachability_comments.comment }}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row my-2">
-            {% if result.records_v6_comments.grade == "full" %}
-              <button type="button" data-bs-toggle="collapse"
-                      data-bs-target="#ipv6-mailserver"
-                      aria-expanded="false" aria-controls="collapseExample"
-                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
-                <i class="p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-                IPv6 Domain Check
-              </button>
-            {% elif result.records_v6_comments.grade == "null" %}
-              <button type="button" data-bs-toggle="collapse"
-                      data-bs-target="#ipv6-mailserver"
-                      aria-expanded="false" aria-controls="collapseExample"
-                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-                <i class="p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-                IPV6 Domain Check
-              </button>
-            {% endif %}
-            <div class="p-0 collapse" id="ipv6-mailserver">
-              <div class="p-4 border-bottom border-end border-start">
-                <h1 class="text-center">IPv6 Test Results</h1>
-                <div class="col-lg-6 col-md-5 mb-2 text-left fs-5 ">
-                  <p>Records:</p>
-                  {% if result.records %}
-                    <table class="table table-light table-bordered table-striped">
-                      <tr>
-                        <th>Server</th>
-                        <th>IPv4</th>
-                        <th>IPv6</th>
-                      </tr>
-                      {% for record in result.records %}
-                        <tr>
-                          <td>{{ record.0 }}</td>
-                          <td>{{ record.1 }}</td>
-                          <td>{{ record.2 }}</td>
-                        </tr>
-                      {% endfor %}
-                    </table>
-                    {% if result.record.2 %}
-                      <p>
-                        <i class="bi bi-check-circle-fill color-success"></i>
-                        Your server has an IPv6 address.
-                      </p>
-                    {% else %}
-                      <p>
-                        <i class="bi bi-x-circle-fill color-danger"></i>
-                        Your server does not have an IPv6 address.
-                      </p>
-                    {% endif %}
-                  {% endif %}
-                  <p>
-                    {% if result.records_v4_comments.grade == "full" %}
-                      <i class="bi bi-check-circle-fill color-success"> </i>
-                    {% elif records_v4_comments.grade == "null" %}
-                      <i class="bi bi-x-circle-fill color-danger"></i>
-                    {% endif %}
-                    {{ result.records_v4_comments.comment }}
-                  </p>
-                  <p>
-                    {% if result.records_v6_comments.grade == "full" %}
-                      <i class="bi bi-check-circle-fill color-success"> </i>
-                    {% elif result.records_v6_comments.grade == "null" %}
-                      <i class="bi bi-x-circle-fill color-danger"></i>
-                    {% endif %}
-                    {{ result.records_v6_comments.comment }}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row my-2">
-            <button type="button" data-bs-toggle="collapse"
-                    data-bs-target="#ipv6-recommendation"
-                    aria-expanded="false" aria-controls="collapseExample"
-                    class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
-              <i class="p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-              Why you should enable IPv6
+        <p>DNSSEC (Domain Name System Security Extensions) is a set of cryptographic protocols and security measures designed to enhance the security of the Domain Name System (DNS). By digitally signing DNS data, DNSSEC ensures data integrity and authenticity, protecting against various forms of DNS attacks like cache poisoning or DNS spoofing. It uses public key cryptography to verify the authenticity of DNS responses and provides a chain of trust from the root DNS servers down to the individual domain names, ensuring that the DNS information received by a user is valid and has not been tampered with during transmission.</p>
+        <div class="row my-2">
+          {% if result.dnssec %}
+            <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+              DNSSEC Status
             </button>
-
-            <div class="p-0 collapse" id="ipv6-recommendation">
-              <div class="p-3 border-bottom border-end border-start table-responsive">
-                <p>
-                  IPv6 is the next generation of the Internet Protocol, and it offers a
-                  number of advantages over IPv4, the current version of the protocol.
-                </p>
-                <ul>
-                  <li>
-                    Address exhaustion: IPv4 is running out of available addresses due to
-                    the rapid growth of connected devices. IPv6 provides a significantly
-                    larger address space, ensuring that there are enough unique IP
-                    addresses
-                    to accommodate the expanding number of devices and services.
-                  </li>
-                  <li>
-                    Future-proofing: As the industry shifts towards IPv6, enabling IPv6
-                    support ensures compatibility and seamless communication with the
-                    growing number of IPv6-enabled networks and devices. It future-proofs
-                    your infrastructure, avoiding potential connectivity issues and the
-                    need
-                    for costly workarounds.
-                  </li>
-                  <li>
-                    Enhanced functionality: IPv6 offers improvements in areas such as
-                    auto-configuration, mobility, and quality of service, allowing for
-                    more
-                    efficient and advanced network operations. Enabling IPv6 unlocks these
-                    enhanced functionalities, promoting a better user experience and
-                    enabling innovative applications and services.
-                  </li>
-                  <li>
-                    Global reachability: With IPv6, your services can reach a larger
-                    global
-                    audience, including regions and networks that primarily use IPv6. By
-                    enabling IPv6, you expand your online presence and increase
-                    accessibility to your web services.
-                  </li>
-                  <li>
-                    Security advancements: IPv6 includes built-in security features, such
-                    as
-                    IPsec (Internet Protocol Security), which provides native encryption,
-                    authentication, and data integrity. Enabling IPv6 allows you to
-                    leverage
-                    these security enhancements, improving the confidentiality and
-                    integrity
-                    of your network traffic.
-                  </li>
-                </ul>
-              </div>
+          {% else %}
+            <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+              DNSSEC Status
+            </button>
+          {% endif %}
+          <div class="p-0 collapse" id="dnssec">
+            <div class="p-4 border-bottom border-end border-start">
+              {{ result.dnssec }}
             </div>
           </div>
         </div>
       </div>
-    </section>
-    -->
-            <div class="gx-0 row d-flex justify-content-center py-5">
-<section class="container-extended box-shadow primary-fadded-blue_border p-5">
-        <div class="col-lg-12 fs-1 fw-bold">
-          Mail Exchanger (MX) Records
-        </div>
-        <div class="col-lg-12 fs-4">
-          <ul>
-            {% for warning in mx.warnings %}
-              <li>{{ warning }}</li>
-            {% endfor %}
-          </ul>
-          {% for host in result.mx.hosts %}
-            <h3>{{ host.hostname }}</h3>
+      <div class="row my-2">
+        <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec-recommendation" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
+          <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+          Recommendations
+        </button>
+        <div class="p-0 collapse" id="dnssec-recommendation">
+          <div class="p-3 border-bottom border-end border-start table-responsive">
+            <p>
+              IPv6 is the next generation of the Internet Protocol, and it offers a number of advantages over IPv4, the current version of the protocol.
+            </p>
             <ul>
-              <li>Preference: {{ host.preference }}</li>
-              <li>StartTLS:
-                {% if host.starttls %}
-                  <i class="bi bi-check-circle-fill color-success"></i>
-                {% elif not host.starttls %}
-                  <i class="bi bi-x-circle-fill color-danger"></i>
-                {% endif %}
+              <li>
+                Address exhaustion: IPv4 is running out of available addresses due to the rapid growth of connected devices. IPv6 provides a significantly larger address space, ensuring that there are enough unique IP addresses to accommodate the expanding number of devices and services.
               </li>
-              <li>TLS:
-                {% if host.tls %}
-                  <i class="bi bi-check-circle-fill color-success"></i>
-                {% elif not host.tls %}
-                  <i class="bi bi-x-circle-fill color-danger"></i>
-                {%endif%}
+              <li>
+                Future-proofing: As the industry shifts towards IPv6, enabling IPv6 support ensures compatibility and seamless communication with the growing number of IPv6-enabled networks and devices. It future-proofs your infrastructure, avoiding potential connectivity issues and the need for costly workarounds.
               </li>
-              <li>Addresses:</li>
-              <li class="list-unstyled">
-                <ul>
-                  {% if result.host.addresses %}
-                    {% for address in result.host.addresses %}
-                      <li>{{ address }}</li>
-                    {% endfor %}
-                  {% else %}
-                    <li>No addresses available</li>
-                  {% endif %}
-                </ul>
+              <li>
+                Enhanced functionality: IPv6 offers improvements in areas such as auto-configuration, mobility, and quality of service, allowing for more efficient and advanced network operations. Enabling IPv6 unlocks these enhanced functionalities, promoting a better user experience and enabling innovative applications and services.
+              </li>
+              <li>
+                Global reachability: With IPv6, your services can reach a larger global audience, including regions and networks that primarily use IPv6. By enabling IPv6, you expand your online presence and increase accessibility to your web services.
+              </li>
+              <li>
+                Security advancements: IPv6 includes built-in security features, such as IPsec (Internet Protocol Security), which provides native encryption, authentication, and data integrity. Enabling IPv6 allows you to leverage these security enhancements, improving the confidentiality and integrity of your network traffic.
               </li>
             </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="gx-0 row d-flex justify-content-center py-5">
+    <section class="container-extended box-shadow primary-fadded-blue_border p-5">
+      <div class="col-lg-12 fs-1 fw-bold">
+        Mail Exchanger (MX) Records
+      </div>
+      <div class="col-lg-12 fs-4">
+        <ul>
+          {% for warning in result.mx.warnings %}
+            <li>{{ warning }}</li>
           {% endfor %}
-        </div>
-
-    </section></div>
-        <div class="gx-0 row d-flex justify-content-center py-5">
-<section class="container-extended box-shadow primary-fadded-blue_border border-bottom-radius-only p-5">
-        <div class="col-lg-12 fs-1 fw-bold">
-          Mailserver settings test for: {{ result.domain }}
-        </div>
-        <div class="col-lg-12 fs-4">
-          <p>Base Domain: {{ result.base_domain }}</p>
-          <h2>Name Servers</h2>
+        </ul>
+        {% for host in result.mx.servers %}
+          <h3>{{ host }}</h3>
           <ul>
-            {% for hostname in result.ns.hostnames %}
-              <li>{{ hostname }}</li>
-            {% endfor %}
+            <li>TLS:
+              {% if result.mx.tls.host %}
+                <i class="bi bi-check-circle-fill color-success"></i>
+              {% else %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+              {% endif %}
+            </li>
           </ul>
-        </div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
 
-    </section>  </div>
   {% endif %}
 </main>
-
 
 <script>
   var successPercentage = countGood / countTotal * 100;
@@ -923,24 +399,23 @@
       enabled: false
     },
     plugins: {
-       datalabels: {
-            formatter: (value, ctx) => {
-                let sum = 0;
-                let dataArr = ctx.chart.data.datasets[0].data;
-                dataArr.map(data => {
-                    sum += data;
-                });
-                let percentage = (value*100 / sum).toFixed(2)+"%";
-                return percentage;
-            },
-            color: '#fff',
+      datalabels: {
+        formatter: (value, ctx) => {
+          let sum = 0;
+          let dataArr = ctx.chart.data.datasets[0].data;
+          dataArr.map(data => {
+            sum += data;
+          });
+          let percentage = (value * 100 / sum).toFixed(2) + "%";
+          return percentage;
         },
-        title: {
-      display: true,
-      text: 'Score'
-    }
+        color: '#fff',
+      },
+      title: {
+        display: true,
+        text: 'Score'
+      }
     },
-
   };
 
   var ctx = document.getElementById("chart1").getContext('2d');
@@ -952,18 +427,11 @@
     options: options
   });
 
-
-
-
+  document.getElementById('vulnerable-count').innerHTML = countBad;
+  document.getElementById('good-count').innerHTML = countGood;
+  document.getElementById('warning-count').innerHTML = countWarning;
+  $('.accordion-button').click(function () {
+    $(this).find('.bi').toggleClass('rotate');
+  });
 </script>
-<script>
-
-    document.getElementById('vulnerable-count').innerHTML = countBad;
-    document.getElementById('good-count').innerHTML = countGood;
-    document.getElementById('warning-count').innerHTML = countWarning;
-    $('.accordion-button').click(function () {
-  $(this).find('.bi').toggleClass('rotate');
-});
-</script>
-
 {% endblock %}

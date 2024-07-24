@@ -94,3 +94,12 @@ class DMARCReport(models.Model):
 
     def __str__(self):
         return f"{self.dmarc_record}-{self.mail_from}-{self.timestamp}"
+
+
+class TestReport(models.Model):
+    tested_site = models.CharField(max_length=200, blank=True, null=True)
+    test_ran = models.CharField(max_length=200, blank=True, null=True)
+    report = models.JSONField()
+
+    def __str__(self):
+        return f"{self.test_ran}_{self.tested_site.replace('.', '-')}"

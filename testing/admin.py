@@ -7,6 +7,7 @@ from testing.models import (
     MailDomain,
     TlsScanHistory,
     UserDomain,
+    TestReport
 )
 
 
@@ -26,3 +27,4 @@ class DomainAdmin(admin.ModelAdmin):
 admin.site.register(DMARCRecord)
 admin.site.register(DMARCReport)
 admin.site.register(TlsScanHistory)
+admin.site.register(TestReport)

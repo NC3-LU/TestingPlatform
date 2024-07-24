@@ -47,7 +47,7 @@ from .helpers import (
 
 from .zap import zap_scan
 
-from .models import DMARCRecord, DMARCReport, MailDomain
+from .models import DMARCRecord, DMARCReport, MailDomain, TestReport
 
 
 @login_required
@@ -140,8 +140,13 @@ def zap_test(request):
         nb_tests += 1
         context = json_report['site'][0]
         response = render(request, "check_zap.html", context)
+        test_report = TestReport(
+            tested_site=target,
+            test_ran="zap",
+            report=context
+        )
+        test_report.save()
         response.set_cookie("nb_tests", nb_tests)
-        print("wat")
         return response
         # return HttpResponse(html_report)
     else:

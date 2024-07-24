@@ -37,7 +37,12 @@ from .helpers import (
     ipv6_check,
     tls_version_check,
     web_server_check,
-    generate_pdf
+    check_dnssec,
+    check_mx,
+    check_spf,
+    check_dmarc,
+    check_tls,
+    check_dkim
 )
 
 from .zap import zap_scan
@@ -202,10 +207,10 @@ def email_test(request):
     context = {}
     if request.method == "POST":
         try:
-            nb_tests = int(request.COOKIES["nb_tests"])
-        except KeyError:
+            nb_tests = int(request.COOKIES.get("nb_tests", 0))
+        except ValueError:
             nb_tests = 0
-        if nb_tests == 3 and not request.user.is_authenticated:
+        if nb_tests >= 3 and not request.user.is_authenticated:
             messages.error(
                 request,
                 "You reached the maximum number of tests. Please create an account.",
@@ -215,33 +220,16 @@ def email_test(request):
         if not check_soa_record(target):
             context = {"status": False, "statusmessage": "The given domain is invalid!"}
         else:
-            email_result = email_check(target)
-            context.update(email_result)
-            # messages.info(request, "Analyzed SPF/DMARC config")
-            context.update(check_dkim_public_key(target, []))
-            # messages.info(request, "Analyzed DKIM config")
-            # context.update(ipv6_check(target, None))
-            # messages.info(request, "Analyzed IPv6 configuration")
-            context["tls_result"] = {}
-            context["tls_lowest_sec_level"] = {}
-            # messages.info(request, f"Found {len(email_result['mx']['hosts'])} MX hosts.")
-            # for host in email_result["mx"]["hosts"]:
-            #    try:
-            #        tls_result = tls_version_check(host["hostname"], "mail")
-            #        context["tls_result"][host["hostname"]] = tls_result["result"]
-            #        context["tls_lowest_sec_level"][host["hostname"]] = tls_result[
-            #            "lowest_sec_level"
-            #        ]
-            #    except Exception:
-            #        continue
-            # messages.info(request, f"MX host scanned.")
+            dkim_selector = "default"  # You may want to allow user input for this
 
-            # context.update({"status": True})
-            #        host["hostname"], None
-            #    )
-            #    context["tls_mx"] = tls_version_check(
-            #        host["hostname"]
-            #    )
+            context['domain'] = target
+            context['dnssec'] = check_dnssec(target)
+            mx_servers = check_mx(target)
+            context['mx'] = {'servers': mx_servers, 'tls': check_tls(mx_servers)}
+            context['spf'], context['spf_valid'] = check_spf(target)
+            context['dmarc'], context['dmarc_valid'] = check_dmarc(target)
+            context['dkim'], context['dkim_valid'] = check_dkim(target, dkim_selector)
+
         nb_tests += 1
         response = render(request, "check_email.html", {"result": context})
         response.set_cookie("nb_tests", nb_tests)

@@ -282,4 +282,4 @@ if not DEBUG and SECRET_KEY == "secret":
     print("FATAL: the secret key in the config has not yet been configured. Quitting.")
     exit(-1)
 
-ZAP_API_KEY = '+#0@_1&r6w(7b_67)6*c$fbltsa10+oum5l$$ayvmb^)6u#tbj'
+ZAP_API_KEY = os.environ.get("ZAP_API_KEY", "")

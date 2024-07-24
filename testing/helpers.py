@@ -16,6 +16,8 @@ import dns.resolver
 import nmap3
 import pypandora
 import requests
+from django.http import HttpResponse
+from xhtml2pdf import pisa
 from Crypto.PublicKey import RSA
 from django.template.loader import render_to_string
 from weasyprint import CSS, HTML
@@ -25,6 +27,8 @@ from testing.models import TlsScanHistory
 from testing_platform.settings import PANDORA_ROOT_URL
 
 from .cipher_scoring import load_cipher_info
+
+from django.template.loader import get_template
 
 logger = logging.getLogger(__name__)
 
@@ -707,3 +711,14 @@ def get_pdf_report():
     ]
 
     return htmldoc.write_pdf(stylesheets=stylesheets)
+
+
+def generate_pdf(template_file, context):
+    template = get_template(template_file)
+    html = template.render(context)
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.replace('\u2019', "'").encode("ISO-8859-1")), result)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type="application/pdf")
+    return None
+

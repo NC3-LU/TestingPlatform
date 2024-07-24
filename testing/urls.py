@@ -4,6 +4,8 @@ from . import views
 
 urlpatterns = [
     path("http-test/", views.http_test, name="http_test"),
+    path("zap-test/", views.zap_test, name="zap_test"),
+    # path("web-test/", views.web_test, name="web_test"),
     path("email-test/", views.email_test, name="email_test"),
     path("file-test/", views.file_test, name="file_test"),
     path("infra-test/", views.web_server_test, name="infra-test"),
@@ -16,8 +18,6 @@ urlpatterns = [
     # path("web-test/", views.web_test, name="web_test"),
 
     # path("ipv6-test/", views.ipv6_test, name="ipv6_test"),
-
-
     # path("dmarc-reporter/", views.dmarc_reporter, name="dmarc-reporter"),
     # path(
     #     "dmarc-reporter/<str:domain>/<mailfrom>/<timestamp>/",

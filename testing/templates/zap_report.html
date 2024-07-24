@@ -1,0 +1,25 @@
+{% load tags %}
+{% if alerts %}
+  <section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
+    {% for alert in alerts %}
+      <div class="row">
+        <div class="col-lg-12 fs-1 fw-bold">
+          {% if alert.riskcode == "3" %}
+            <span class="background-icon mb-3" style="background-color: var(--redColor); font-size: 18px; vertical-align: middle">HIGH</span>
+          {% elif alert.riskcode == "2" %}
+            <span class="background-icon mb-3" style="background-color: var(--gradeBPlus); font-size: 18px; vertical-align: middle">MEDIUM</span>
+          {% elif alert.riskcode == "1" %}
+            <span class="background-icon mb-3" style="background-color: var(--gradeB); font-size: 18px; vertical-align: middle">LOW</span>
+          {% elif alert.riskcode == "0" %}
+            <span class="background-icon mb-3" style="background-color: var(--grey); font-size: 18px; vertical-align: middle">INFO</span>
+          {% endif %}
+          {{ alert.alert }}
+        </div>
+        <div class="col-lg-12 fs-4">
+          {{ alert.desc }}
+        </div>
+        <br>
+      </div>
+    {% endfor %}
+  </section>
+{% endif %}

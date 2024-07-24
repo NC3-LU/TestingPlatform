@@ -3,10 +3,20 @@ import ipaddress
 import re
 import socket
 import time
+import io
+
+import jinja2
+import xmltodict
+
 from typing import Any, Dict
 from urllib.parse import parse_qs, urlparse
 
-import xmltodict
+import zapv2
+from ipwhois import IPDefinedError, IPWhois
+from zapv2 import ZAPv2
+from reportlab.pdfgen import canvas
+
+from django.http import FileResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
@@ -14,8 +24,6 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from ipwhois import IPDefinedError, IPWhois
-from zapv2 import ZAPv2
 
 from testing_platform import settings
 
@@ -29,7 +37,11 @@ from .helpers import (
     ipv6_check,
     tls_version_check,
     web_server_check,
+    generate_pdf
 )
+
+from .zap import zap_scan
+
 from .models import DMARCRecord, DMARCReport, MailDomain
 
 
@@ -103,6 +115,32 @@ def http_test(request):
         return response
     else:
         return render(request, "check_website.html")
+
+
+def zap_test(request):
+    if request.method == "POST":
+        try:
+            nb_tests = int(request.COOKIES["nb_tests"])
+        except KeyError:
+            nb_tests = 0
+        if nb_tests == 3 and not request.user.is_authenticated:
+            messages.error(
+                request,
+                "You reached the maximum number of tests. Please create an account.",
+            )
+            return redirect("signup")
+        target = request.POST["target"]
+        api_key = settings.ZAP_API_KEY
+        json_report, html_report = zap_scan(target, api_key)
+        nb_tests += 1
+        context = json_report['site'][0]
+        response = render(request, "check_zap.html", context)
+        response.set_cookie("nb_tests", nb_tests)
+        print("wat")
+        return response
+        # return HttpResponse(html_report)
+    else:
+        return render(request, "check_zap.html")
 
 
 def web_test(request):
@@ -513,3 +551,27 @@ def dmarc_upload(request):
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=401)
+
+
+def export_pdf(request, test):
+    # Create a file-like buffer to receive PDF data.
+    buffer = io.BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    p = canvas.Canvas(buffer)
+
+    # Draw things on the PDF. Here's where the PDF generation happens.
+    # See the ReportLab documentation for the full list of functionality.
+
+    # Close the PDF object cleanly, and we're done.
+    p.showPage()
+    p.save()
+
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename="hello.pdf")
+
+
+def pdf_from_template(request, test):
+    return HttpResponse(request)

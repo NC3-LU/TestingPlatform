@@ -136,9 +136,11 @@ def zap_test(request):
             return redirect("signup")
         target = request.POST["target"]
         api_key = settings.ZAP_API_KEY
-        json_report, html_report = zap_scan(target, api_key)
+        # json_report, html_report = zap_scan(target, api_key)
+        # context = json_report['site'][0]
+        alerts = zap_scan(target, api_key)
+        context = {'alerts': alerts}
         nb_tests += 1
-        context = json_report['site'][0]
         response = render(request, "check_zap.html", context)
 
         try:

@@ -77,9 +77,23 @@ def zap_scan(target, api_key):
     while int(zap.spider.status(scan_id)) < 100:
         time.sleep(1)
 
-    json_report = zap.core.jsonreport()
+    json_report = core.jsonreport()
     json_report = json.loads(json_report.replace('<p>', '').replace('</p>', ''))
-    html_report = zap.core.htmlreport()
-    xml_report = zap.core.xmlreport()
-    pprint(zap.core.alerts(baseurl=target, start=None, count=None))
-    return json_report, html_report
+    html_report = core.htmlreport()
+    xml_report = core.xmlreport()
+
+    alerts = core.alerts(baseurl=target, start=None, count=None)
+    to_pop = ['alertRef', 'attack', 'cweid', 'evidence', 'id', 'inputVector',
+              'messageId', 'method', 'name', 'other', 'param', 'pluginId', 'reference',
+              'sourceid', 'tags', 'url', 'wascid']
+    for alert in alerts:
+        for key in to_pop:
+            alert.pop(key)
+    seen = []
+    for alert in alerts:
+        if alert not in seen:
+            seen.append(alert)
+    alerts = seen
+
+    return alerts
+    # return json_report, html_report, xml_report

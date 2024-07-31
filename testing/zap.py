@@ -1,5 +1,6 @@
 import json
 import time
+from pprint import pprint
 
 import zapv2
 from zapv2 import ZAPv2
@@ -58,18 +59,27 @@ def zap_alerts(zap, target):
 
 
 def zap_scan(target, api_key):
-    zap = ZAPv2(apikey=api_key)
+    local_proxy = {"http": "http://127.0.0.1:8080", "https": "http://127.0.0.1:8080"}
+    session_name = target
+    zap = ZAPv2(proxies=local_proxy, apikey=api_key)
+    core = zap.core
+    core.new_session(name=session_name, overwrite=True)
     if 'https://' not in target:
         if "http://" not in target:
             target = "https://" + target
-    zap.core.new_session(name=target, overwrite=True)
-    zap.core.load_session(name=target)
-    scan_id = zap.spider.scan(target)
+    core.access_url(target)
+    time.sleep(2)
+    spider = zap.spider
+    scan_id = 0
+    scan_id = spider.scan(url=target, maxchildren=None, recurse=True,
+                          contextname=None, subtreeonly=None)
+    time.sleep(2)
     while int(zap.spider.status(scan_id)) < 100:
         time.sleep(1)
+
     json_report = zap.core.jsonreport()
     json_report = json.loads(json_report.replace('<p>', '').replace('</p>', ''))
-    with open("./zap.json", "w") as f:
-        json.dump(json_report, f, indent=4)
     html_report = zap.core.htmlreport()
+    xml_report = zap.core.xmlreport()
+    pprint(zap.core.alerts(baseurl=target, start=None, count=None))
     return json_report, html_report

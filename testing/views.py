@@ -140,12 +140,17 @@ def zap_test(request):
         nb_tests += 1
         context = json_report['site'][0]
         response = render(request, "check_zap.html", context)
-        test_report = TestReport(
-            tested_site=target,
-            test_ran="zap",
-            report=context
-        )
-        test_report.save()
+
+        try:
+            test_report = TestReport.objects.get(tested_site=target, test_ran="zap")
+            test_report.report = context
+            test_report.save()
+        except TestReport.DoesNotExist:
+            test_report = TestReport.objects.get_or_create(
+                tested_site=target,
+                test_ran="zap",
+                report=context
+            )
         response.set_cookie("nb_tests", nb_tests)
         return response
         # return HttpResponse(html_report)

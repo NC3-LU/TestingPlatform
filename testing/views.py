@@ -1,5 +1,6 @@
 import datetime
 import ipaddress
+import os
 import re
 import socket
 import time
@@ -7,6 +8,7 @@ import io
 
 import jinja2
 import xmltodict
+import weasyprint
 
 from typing import Any, Dict
 from urllib.parse import parse_qs, urlparse
@@ -139,7 +141,7 @@ def zap_test(request):
         # json_report, html_report = zap_scan(target, api_key)
         # context = json_report['site'][0]
         alerts = zap_scan(target, api_key)
-        context = {'alerts': alerts}
+        context = {'alerts': alerts, 'target': target}
         nb_tests += 1
         response = render(request, "check_zap.html", context)
 
@@ -573,5 +575,19 @@ def export_pdf(request, test):
     return FileResponse(buffer, as_attachment=True, filename="hello.pdf")
 
 
-def pdf_from_template(request, test):
-    return HttpResponse(request)
+def pdf_from_template(request, test, site):
+    env = jinja2.Environment(loader=jinja2.PackageLoader('testing', 'templates'))
+    template = env.get_template('zap_pdf_wrapper.html')
+    report = TestReport.objects.get(tested_site=site, test_ran=test).report
+
+    css_path = os.path.join(settings.STATIC_DIR, 'css/style.css')
+
+    with open(css_path, 'r') as f:
+        css_content = f.read()
+
+    html_out = template.render(report, static_url=css_path, test=test, site=site)
+    pdf_file = weasyprint.HTML(string=html_out).write_pdf(stylesheets=[weasyprint.CSS(string=css_content)])
+
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{test}_{site}_report.pdf"'
+    return response

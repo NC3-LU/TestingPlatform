@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-
+{% load tags %}
 {% block content %}
 
 <main class="row p-3 flex-column align-items-center">
@@ -29,6 +29,11 @@
             <input type="submit" value="Test" class="btn btn-secondary">
           </form>
         </div>
+        {% if alerts %}
+          <div class="d-flex justify-content-center pb-3">
+            <a href="export/{{ target }}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
+          </div>
+        {% endif %}
           <div class="card-footer text-center text-muted">
             <!-- TODO change href --><a
           href="{% url 'knowledge_base'  %}#tests-email">About the test</a></div>

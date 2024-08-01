@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     path("http-test/", views.http_test, name="http_test"),
-    path("zap-test/", views.zap_test, name="zap_test"),
+    path("zap/", views.zap_test, name="zap_test"),
     # path("web-test/", views.web_test, name="web_test"),
     path("email-test/", views.email_test, name="email_test"),
     path("file-test/", views.file_test, name="file_test"),
@@ -12,7 +12,7 @@ urlpatterns = [
     path("spf-generator/", views.spf_generator, name="spf-generator"),
     path("dmarc-generator/", views.dmarc_generator, name="dmarc-generator"),
     path("email-policy-generator/", views.record_generator, name="email_policy_generator"),
-
+    path("<test>/export/<site>", views.pdf_from_template, name="pdf_from_template"),
     # path('whois-lookup/', views.ping_test, name='ping_test'),
 
     # path("web-test/", views.web_test, name="web_test"),

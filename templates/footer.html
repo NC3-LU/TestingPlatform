@@ -1,38 +1,31 @@
 {% load static %}
 <footer>
-    <div class="container py-3">
-        <div class="d-flex flex-column mb-3">
-            <div class="col-lg-12">
-                <img class="footer-img" src="{% static 'img/nc3_logo_tp.svg' %}" alt="logo testing platform">
-            </div>
-            <div class="col-lg-12 d-flex flex-wrap">
-                <div class="me-3">
-                    <a href="/observatory-bulletin/" class="text-decoration-none">Threat observatory</a>
-                </div>
-                <div class="me-3">
-                    <a href="/market-intelligence-library/" class="text-decoration-none">Market Intelligence</a>
-                </div>
-                <div class="me-3">
-                    <a href="/about-the-observatory/" class="text-decoration-none d-block">Presentation</a>
-                    <a href="/our-methodology/" class="text-decoration-none d-block">Our Methodology</a>
-                </div>
-                <div>
-                    <a href="/contact-us/" class="text-decoration-none">Contact</a>
-                </div>
-            </div>
-        </div>
+  <div class="container py-3">
+    <div class="d-flex flex-column mb-3">
+      <div class="col-lg-12">
+        <img class="footer-img" src="{% static 'img/nc3_logo_tp.svg' %}"
+             alt="logo testing platform">
+      </div>
     </div>
-    <div class="container py-3 border-top">
-        <div class="d-flex justify-content-between">
-            <div>
-                <span>©LHC - All rights reserved.</span>
-            </div>
-            <div>
-                <a href="/terms-conditions/" class="text-decoration-none me-2">Terms</a>
-                <a href="/privacy-policy/" class="text-decoration-none">Privacy</a>
-            </div>
-        </div>
+  </div>
+  <div class="container py-3 border-top">
+    <div class="d-flex justify-content-between">
+      <div>
+        <span>©LHC - All rights reserved.</span>
+      </div>
+      <div>
+        <p class="text-center">
+          <small><a href="{{ version_url }}" target="_blank" rel="noopener noreferrer">
+            {{ app_version }}</a></small><br>
+        </p>
+      </div>
+      <div>
+        <a href="/terms-conditions/" class="text-decoration-none me-2">Terms</a>
+        <a href="{% url 'privacy'  %}" class="text-decoration-none">Privacy</a>
+      </div>
     </div>
+  </div>
+
 </footer>
 <!--
 <footer class="mt-auto py-4">

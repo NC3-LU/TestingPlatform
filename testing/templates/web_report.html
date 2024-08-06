@@ -551,6 +551,8 @@
     </div>
   </div>
 </div>
+ </div>
+
 
  <div class="row d-flex justify-content-center py-5">
 <div class="container-extended box-shadow primary-fadded-blue_border p-5">
@@ -683,7 +685,7 @@
   </div>
   {% endif %}
 </div>
-
+   </div>
 
 <script>
  const total = countGood + countBad + countWarning;
@@ -968,22 +970,21 @@
     </div>
   </div>
 </section>
---> {% if tls_results %}
-<section class="col-lg-11 row my-5 border border-2 rounded p-4">
+-->
+     {% if tls_results %}
+        <div class="row d-flex justify-content-center py-5">
+<div class="container-extended box-shadow primary-fadded-blue_border border-bottom-radius-only p-5">
   <div class="row">
-    <div class="col-lg-12 fs-1 fw-bold">
-      TLS Results
-    </div>
-    <div class="col-lg-12 fs-4">
-      Transport Layer Security (TLS) is a cryptographic protocol that protects data in
+     TLS Results
+  </div>
+   <div class="col-lg-12 fs-4">
+     Transport Layer Security (TLS) is a cryptographic protocol that protects data in
       transit over a network. It does this by establishing a secure channel between two
       communicating applications, using a handshake process to agree on the protocol
       version, cryptographic algorithms, and exchange cryptographic keys. This ensures
       that the data is confidential, authentic, and integral, protecting against
       eavesdropping, tampering, or message forgery.
-    </div>
-  </div>
-
+   </div>
   {% for version, suites in tls_results.items %}
   <div class="row my-2">
     <button type="button" data-bs-toggle="collapse"
@@ -1101,7 +1102,10 @@
       </div>
     </div>
   </div>
-</section>
+</div>
+        </div>
+
+
 {% endif %}
 
 <script>

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-
+{% load tags %}
 {% block content %}
 <section class="blue-gradient_background p-4 text-white">
   <div class="container my-5">
@@ -41,14 +41,18 @@
                  id="target" name="target"
                  value="{{ form }}" required>
         </div>
-        <input type="submit" value="Test"
-               class="text-white button-text-background primary-primary-blue_background">
+        {% if alerts %}
+          <div class="d-flex justify-content-center pb-3">
+            <a href="export/{{ target }}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
+          </div>
+        {% endif %}
+          <div class="card-footer text-center text-muted">
+            <!-- TODO change href --><a
+          href="{% url 'knowledge_base'  %}#tests-email">About the test</a></div>
+
       </form>
-      <div class="bg-white text-center text-muted border-top pt-3"><a
-        class="text-primary-primary-blue" href="/kb/#tests-website">About the test</a>
       </div>
     </div>
-  </div>
 <div class="gx-0 row d-flex justify-content-center py-5">
     <section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
       <h1 class="text-center">Overview of {{ result.domain }}</h1>

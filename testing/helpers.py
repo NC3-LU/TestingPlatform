@@ -9,7 +9,7 @@ import time
 from base64 import b64decode
 from io import BytesIO
 from typing import Any, Dict, List, Union
-
+from bs4 import BeautifulSoup
 import dns.resolver
 import dns.dnssec
 import dns.name
@@ -21,6 +21,9 @@ import dns.resolver
 import nmap3
 import pypandora
 import requests
+import hashlib
+import base64
+from urllib.parse import urljoin, urlparse
 from django.http import HttpResponse
 from xhtml2pdf import pisa
 from Crypto.PublicKey import RSA
@@ -496,48 +499,55 @@ def ipv6_check(
 
 
 def web_server_check(domain: str):
-    try:
-        validators.full_domain_validator(domain)
-    except Exception:
+    # Validate the domain
+    if not validators.domain(domain):
         return {"error": "You entered an invalid hostname!"}
+
     nmap = nmap3.Nmap()
     logger.info(f"server scan: testing {domain}")
-    service_scans = nmap.nmap_version_detection(
-        domain, args="--script vulners --script-args mincvss+5.0"
-    )
-    # Could be used later for better reporting
-    # runtime = service_scans.pop("runtime")
-    # stats = service_scans.pop("stats")
-    # task_results = service_scans.pop("task_results")
+
+    try:
+        service_scans = nmap.nmap_version_detection(domain,
+                                                    args="--script vulners --script-args mincvss+5.0")
+    except Exception as e:
+        logger.error(f"Error during Nmap scan: {e}")
+        return {"error": "Nmap scan failed"}
+
     services = []
     vulnerabilities = []
-    ip, service_scans = list(service_scans.items())[0]
-    for port in service_scans["ports"]:
+
+    try:
+        ip, service_scans = list(service_scans.items())[0]
+    except IndexError:
+        return {"error": "No scan results found"}
+
+    for port in service_scans.get("ports", []):
         if port["state"] != "closed":
-            service = port["service"]
-            vulners = port["scripts"]
+            service = port.get("service", {})
+            vulners = port.get("scripts", [])
             list_of_vulns = []
             if vulners:
-                vulners = vulners[0]["data"]
-                for _vuln, vuln_data in vulners.items():
+                vulners = vulners[0].get("data", {})
+                for vuln, vulndata in vulners.items():
                     try:
-                        list_of_vulns += vuln_data.get("children")
+                        list_of_vulns += vulndata.get("children", [])
                     except TypeError:
                         continue
                     except AttributeError:
                         continue
+
             services.append(service)
             try:
-                vulnerabilities.append(
-                    {
-                        "service": f'{service["product"]} - {service["name"]}',
-                        "vuln_list": list_of_vulns,
-                    }
-                )
+                vulnerabilities.append({
+                    "service": f'{service.get("product", "Unknown")} - {service.get("name", "Unknown")}',
+                    "vuln_list": list_of_vulns,
+                })
             except KeyError:
-                pass
+                continue
+
     logger.info("server scan: Done!")
-    logger.info(vulnerabilities)
+    logger.info(json.dumps(vulnerabilities, indent=2))
+
     return {"services": services, "vulnerabilities": vulnerabilities}
 
 
@@ -780,3 +790,558 @@ def check_dkim(domain, selector):
     except Exception as e:
         print(f'Error checking DKIM for {dkim_domain}: {e}')
         return None, False
+
+#####
+
+def check_csp(domain):
+    """
+    Perform a comprehensive check of the Content Security Policy (CSP) for a given domain.
+
+    Args:
+        domain (str): The domain to check.
+
+    Returns:
+        dict: A dictionary with detailed CSP analysis results.
+    """
+    try:
+        response = requests.get(f"https://{domain}", timeout=10)
+        response.raise_for_status()
+
+        csp_header = response.headers.get('Content-Security-Policy')
+        csp_report_only = response.headers.get('Content-Security-Policy-Report-Only')
+
+        result = {
+            'status': False,
+            'csp_value': csp_header,
+            'csp_report_only': csp_report_only,
+            'issues': [],
+            'recommendations': []
+        }
+
+        if not csp_header and not csp_report_only:
+            result['issues'].append("No Content-Security-Policy header found.")
+            result['recommendations'].append(
+                "Implement a Content-Security-Policy header.")
+            return result
+
+        headers_to_check = [
+            ('Content-Security-Policy', csp_header),
+            ('Content-Security-Policy-Report-Only', csp_report_only)
+        ]
+
+        for header_name, header_value in headers_to_check:
+            if header_value:
+                analyze_csp(header_value, result, header_name)
+
+        result['status'] = len(result['issues']) == 0
+        return result
+
+    except requests.RequestException as e:
+        return {
+            'status': False,
+            'csp_value': None,
+            'csp_report_only': None,
+            'issues': [f"An error occurred while fetching the page: {e}"],
+            'recommendations': ["Ensure the domain is accessible and try again."]
+        }
+
+
+def analyze_csp(csp, result, header_name):
+    directives = parse_csp(csp)
+
+    check_unsafe_directives(directives, result, header_name)
+    check_missing_directives(directives, result, header_name)
+    check_overly_permissive_directives(directives, result, header_name)
+    check_csp_syntax(csp, result, header_name)
+    check_report_uri(directives, result, header_name)
+
+
+def parse_csp(csp):
+    return dict(
+        directive.split(None, 1) for directive in csp.split(';') if directive.strip())
+
+
+def check_unsafe_directives(directives, result, header_name):
+    unsafe_directives = ['unsafe-inline', 'unsafe-eval', 'unsafe-hashes']
+    for directive, value in directives.items():
+        for unsafe in unsafe_directives:
+            if unsafe in value:
+                result['issues'].append(
+                    f"{header_name}: Unsafe directive '{unsafe}' found in '{directive}'.")
+                result['recommendations'].append(
+                    f"Remove '{unsafe}' from the '{directive}' directive if possible.")
+
+
+def check_missing_directives(directives, result, header_name):
+    important_directives = ['default-src', 'script-src', 'style-src', 'img-src',
+                            'connect-src', 'frame-src']
+    for directive in important_directives:
+        if directive not in directives:
+            result['issues'].append(
+                f"{header_name}: Missing important directive '{directive}'.")
+            result['recommendations'].append(
+                f"Consider adding the '{directive}' directive.")
+
+
+def check_overly_permissive_directives(directives, result, header_name):
+    for directive, value in directives.items():
+        if '*' in value:
+            result['issues'].append(
+                f"{header_name}: Overly permissive wildcard '*' found in '{directive}'.")
+            result['recommendations'].append(
+                f"Restrict the '{directive}' directive to specific sources instead of using '*'.")
+
+
+def check_csp_syntax(csp, result, header_name):
+    if not re.match(r'^[a-zA-Z0-9\-]+\s+[^;]+(?:;\s*[a-zA-Z0-9\-]+\s+[^;]+)*$', csp):
+        result['issues'].append(f"{header_name}: CSP syntax appears to be invalid.")
+        result['recommendations'].append("Review and correct the CSP syntax.")
+
+
+def check_report_uri(directives, result, header_name):
+    if 'report-uri' not in directives and 'report-to' not in directives:
+        result['issues'].append(f"{header_name}: No reporting directive found.")
+        result['recommendations'].append(
+            "Consider adding a 'report-uri' or 'report-to' directive for CSP violation reporting.")
+
+
+def check_cookies(domain: str) -> Dict[str, Any]:
+    """
+    Check the security attributes of cookies for a given domain.
+
+    Args:
+        domain (str): The domain to check.
+
+    Returns:
+        dict: A dictionary with the overall security status and detailed information for each cookie.
+              - 'status' (bool): True if all cookies have 'Secure' and 'HttpOnly' attributes, False otherwise.
+              - 'cookies' (List[Dict]): A list of dictionaries with details for each cookie.
+                  - 'name' (str): The name of the cookie.
+                  - 'secure' (bool): True if the cookie has the 'Secure' attribute, False otherwise.
+                  - 'http_only' (bool): True if the cookie has the 'HttpOnly' attribute, False otherwise.
+              - 'message' (str): Additional information or error message.
+    """
+    try:
+        response = requests.get(f"https://{domain}", timeout=10)
+        response.raise_for_status()
+
+        cookies = response.cookies
+        cookie_details = []
+        all_secure = True
+
+        for cookie in cookies:
+            secure = cookie.secure
+            http_only = cookie.has_nonstandard_attr('HttpOnly')
+            all_secure = all_secure and secure and http_only
+            cookie_details.append({
+                'name': cookie.name,
+                'secure': secure,
+                'http_only': http_only
+            })
+
+        message = 'Cookie security attributes check completed.'
+        if not cookie_details:
+            message = 'No cookies found for this domain.'
+
+        return {
+            'status': all_secure,
+            'cookies': cookie_details,
+            'message': message
+        }
+    except RequestException as e:
+        return {
+            'status': False,
+            'cookies': [],
+            'message': f'An error occurred: {str(e)}'
+        }
+
+def check_cors(domain):
+    """
+    Check the CORS settings for a given domain.
+
+    Args:
+        domain (str): The domain to check.
+
+    Returns:
+        dict: A dictionary with the CORS status and the relevant headers.
+              - 'status' (bool): True if CORS is configured, False otherwise.
+              - 'cors_headers' (dict): A dictionary of CORS-related headers and their values.
+              - 'message' (str): Additional information or error message.
+    """
+    try:
+        response = requests.options(f"https://{domain}", timeout=10)
+        cors_headers = {
+            'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+            'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+            'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers'),
+            'Access-Control-Allow-Credentials': response.headers.get('Access-Control-Allow-Credentials')
+        }
+        if any(cors_headers.values()):
+            return {
+                'status': True,
+                'cors_headers': cors_headers,
+                'message': 'CORS headers are present.'
+            }
+        else:
+            return {
+                'status': False,
+                'cors_headers': cors_headers,
+                'message': 'CORS headers are not present.'
+            }
+    except requests.RequestException as e:
+        return {
+            'status': False,
+            'cors_headers': {},
+            'message': f'An error occurred: {e}'
+        }
+
+def check_https_redirect(domain):
+    """
+    Check if a domain correctly redirects from HTTP to HTTPS.
+
+    Args:
+        domain (str): The domain to check.
+
+    Returns:
+        dict: A dictionary with the redirection status and the target URL.
+              - 'status' (bool): True if the domain correctly redirects to HTTPS, False otherwise.
+              - 'redirect_url' (str): The URL to which the domain redirects or None if not applicable.
+              - 'message' (str): Additional information or error message.
+    """
+    try:
+        http_response = requests.get(f"http://{domain}", allow_redirects=False, timeout=10)
+        if http_response.is_redirect and http_response.headers.get('Location', '').startswith('https'):
+            return {
+                'status': True,
+                'redirect_url': http_response.headers.get('Location'),
+                'message': 'HTTP to HTTPS redirection is properly configured.'
+            }
+        else:
+            return {
+                'status': False,
+                'redirect_url': http_response.headers.get('Location'),
+                'message': 'HTTP to HTTPS redirection is not properly configured.'
+            }
+    except requests.RequestException as e:
+        return {
+            'status': False,
+            'redirect_url': None,
+            'message': f'An error occurred: {e}'
+        }
+
+
+def check_referrer_policy(domain):
+    """
+    Check the Referrer Policy header for a given domain.
+
+    Args:
+        domain (str): The domain to check.
+
+    Returns:
+        dict: A dictionary with the status and the value of the 'Referrer-Policy' header.
+              - 'status' (bool): True if 'Referrer-Policy' is set, False otherwise.
+              - 'header_value' (str): The value of the 'Referrer-Policy' header or None if not present.
+              - 'message' (str): Additional information or error message.
+    """
+    try:
+        response = requests.get(f"https://{domain}", timeout=10)
+        response.raise_for_status()
+        referrer_policy = response.headers.get('Referrer-Policy')
+
+        if referrer_policy:
+            return {
+                'status': True,
+                'header_value': referrer_policy,
+                'message': 'Referrer-Policy header is present.'
+            }
+        else:
+            return {
+                'status': False,
+                'header_value': None,
+                'message': 'Referrer-Policy header is not present.'
+            }
+    except requests.RequestException as e:
+        return {
+            'status': False,
+            'header_value': None,
+            'message': f'An error occurred: {e}'
+        }
+
+
+def check_sri(domain):
+    """
+    Check the Subresource Integrity (SRI) of cross-origin scripts and stylesheets on a given domain.
+    Args:
+        domain (str): The domain to check.
+    Returns:
+        dict: A dictionary with the overall SRI status and detailed information for each resource.
+              - 'status' (str): 'neutral', 'green', or 'red' based on the SRI check results.
+              - 'resources': A list of dictionaries with details for each script and stylesheet.
+                  - 'type' (str): Either 'script' or 'stylesheet'.
+                  - 'src' (str): The full source URL of the resource.
+                  - 'is_cross_origin' (bool): True if the resource is from a different origin, False otherwise.
+                  - 'has_integrity' (bool): True if the resource has an 'integrity' attribute, False otherwise.
+                  - 'integrity_value' (str): The value of the 'integrity' attribute or None if not present.
+                  - 'integrity_valid' (bool): True if the integrity attribute matches the resource content, False otherwise.
+              - 'message' (str): Additional information or error message.
+    """
+    try:
+        url = f"https://{domain}"
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+        scripts = soup.find_all('script', src=True)
+        stylesheets = soup.find_all('link', rel='stylesheet', href=True)
+        resource_details = []
+        all_cross_origin_have_valid_integrity = True
+        cross_origin_resources_exist = False
+
+        for resource in scripts + stylesheets:
+            resource_type = 'script' if resource.name == 'script' else 'stylesheet'
+            src = urljoin(url, resource['src'] if resource_type == 'script' else resource['href'])
+            integrity = resource.get('integrity')
+            is_cross_origin = is_cross_origin_url(url, src)
+            has_integrity = bool(integrity)
+            integrity_valid = None
+
+            if is_cross_origin:
+                cross_origin_resources_exist = True
+                if not has_integrity:
+                    all_cross_origin_have_valid_integrity = False
+                else:
+                    integrity_valid = validate_integrity(src, integrity)
+                    if not integrity_valid:
+                        all_cross_origin_have_valid_integrity = False
+
+            resource_details.append({
+                'type': resource_type,
+                'src': src,
+                'is_cross_origin': is_cross_origin,
+                'has_integrity': has_integrity,
+                'integrity_value': integrity,
+                'integrity_valid': integrity_valid if is_cross_origin else None
+            })
+
+        if not cross_origin_resources_exist:
+            status = 'neutral'
+            message = 'No cross-origin resources found. Consider implementing SRI for all resources as a best practice.'
+        elif all_cross_origin_have_valid_integrity:
+            status = 'green'
+            message = 'All cross-origin resources have valid integrity attributes.'
+        else:
+            status = 'red'
+            message = 'Some cross-origin resources are missing valid integrity attributes.'
+
+        return {
+            'status': status,
+            'resources': resource_details,
+            'message': message
+        }
+    except requests.RequestException as e:
+        return {'status': 'red', 'resources': [], 'message': f'An error occurred: {e}'}
+
+
+def is_cross_origin_url(base_url, url):
+    """
+    Check if a URL is cross-origin relative to a base URL.
+
+    Args:
+        base_url (str): The base URL to compare against.
+        url (str): The URL to check.
+
+    Returns:
+        bool: True if the URL is cross-origin, False otherwise.
+    """
+    base_parsed = urlparse(base_url)
+    url_parsed = urlparse(url)
+    return (base_parsed.scheme != url_parsed.scheme or
+            base_parsed.netloc != url_parsed.netloc)
+
+
+def validate_integrity(src, integrity):
+    """
+    Validate the integrity of a resource against its SRI hash.
+
+    Args:
+        src (str): The source URL of the resource.
+        integrity (str): The integrity value to check against.
+
+    Returns:
+        bool: True if the integrity is valid, False otherwise.
+    """
+    try:
+        response = requests.get(src, timeout=10)
+        response.raise_for_status()
+        content = response.content
+
+        # Split multiple integrity values
+        integrity_values = integrity.split()
+
+        for integrity_value in integrity_values:
+            try:
+                algo, provided_hash = integrity_value.split('-', 1)
+                if algo not in ('sha256', 'sha384', 'sha512'):
+                    continue
+
+                hash_func = getattr(hashlib, algo)
+                calculated_hash = base64.b64encode(hash_func(content).digest()).decode(
+                    'utf-8')
+
+                if calculated_hash == provided_hash:
+                    return True
+            except ValueError as e:
+                print(f"Error parsing integrity value '{integrity_value}': {e}")
+                continue
+
+        return False
+    except requests.RequestException as e:
+        print(f"Error fetching resource from {src}: {e}")
+        return False
+    except Exception as e:
+        print(f"Unexpected error during integrity validation: {e}")
+        return False
+
+def check_x_content_type_options(domain):
+    """
+    Check the 'X-Content-Type-Options' header for a given domain.
+
+    Args:
+        domain (str): The domain to check.
+
+    Returns:
+        dict: A dictionary with the status and the value of the 'X-Content-Type-Options' header.
+              - 'status' (bool): True if 'X-Content-Type-Options' is set to 'nosniff', False otherwise.
+              - 'header_value' (str): The value of the 'X-Content-Type-Options' header or None if not present.
+              - 'message' (str): Additional information or error message.
+    """
+    try:
+        response = requests.get(f"https://{domain}", timeout=10)
+        header_value = response.headers.get('X-Content-Type-Options')
+        if header_value == 'nosniff':
+            return {'status': True, 'header_value': header_value, 'message': 'Header is correctly set to nosniff.'}
+        else:
+            return {'status': False, 'header_value': header_value, 'message': 'Header is not set to nosniff.'}
+    except requests.RequestException as e:
+        return {'status': False, 'header_value': None, 'message': f'An error occurred: {e}'}
+
+
+def check_hsts(domain: str) -> Dict[str, Union[bool, str, Dict[str, Union[str, bool, int]]]]:
+    """
+    Checks if the HTTP Strict Transport Security (HSTS) header is implemented and returns detailed information.
+    Args:
+        domain (str): The domain to check.
+    Returns:
+        dict: A dictionary with the HSTS check results.
+              - 'status' (bool): True if the HSTS header is present, False otherwise.
+              - 'data' (str): The raw HSTS header or an error message.
+              - 'parsed' (dict): The parsed components of the HSTS header if present.
+              - 'http_status' (int): The HTTP status code of the response.
+              - 'preload_ready' (bool): Whether the HSTS header includes the preload directive.
+              - 'strength' (str): Evaluation of the HSTS implementation strength.
+              - 'recommendations' (list): List of recommendations for improving HSTS implementation.
+    """
+    url = f'https://{domain}'
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        hsts_header = response.headers.get('strict-transport-security')
+        parsed_hsts = parse_hsts_header(hsts_header) if hsts_header else {}
+
+        preload_ready = parsed_hsts.get('preload', False)
+        strength, recommendations = evaluate_hsts_strength(parsed_hsts)
+
+        return {
+            'status': bool(hsts_header),
+            'data': hsts_header or 'HSTS header not found.',
+            'parsed': parsed_hsts,
+            'http_status': response.status_code,
+            'preload_ready': preload_ready,
+            'strength': strength,
+            'recommendations': recommendations
+        }
+    except requests.RequestException as e:
+        return {
+            'status': False,
+            'data': f'Failed to fetch the domain: {str(e)}',
+            'parsed': {},
+            'http_status': getattr(e.response, 'status_code', None),
+            'preload_ready': False,
+            'strength': 'N/A',
+            'recommendations': ['Ensure the domain is accessible and supports HTTPS.']
+        }
+
+def evaluate_hsts_strength(parsed_hsts: Dict[str, Union[str, bool, int]]) -> tuple[str, List[str]]:
+    """Evaluate the strength of the HSTS implementation and provide recommendations."""
+    strength = 'Weak'
+    recommendations = []
+
+    if not parsed_hsts:
+        return 'None', ['Implement HSTS header']
+
+    max_age = parsed_hsts.get('max-age', 0)
+    if max_age < 31536000:  # Less than 1 year
+        recommendations.append('Increase max-age to at least 1 year (31536000 seconds)')
+
+    if not parsed_hsts.get('includeSubDomains'):
+        recommendations.append('Add includeSubDomains directive')
+
+    if not parsed_hsts.get('preload'):
+        recommendations.append('Add preload directive')
+    else:
+        recommendations.append('Consider submitting domain to HSTS preload list: https://hstspreload.org/')
+
+    if max_age >= 31536000 and parsed_hsts.get('includeSubDomains') and parsed_hsts.get('preload'):
+        strength = 'Strong'
+    elif max_age >= 15768000:  # 6 months
+        strength = 'Moderate'
+
+    return strength, recommendations
+
+def parse_hsts_header(header: str) -> Dict[str, Union[str, bool, int]]:
+    """Parse the HSTS header into its components."""
+    components = header.split(';')
+    parsed = {}
+    for component in components:
+        component = component.strip().lower()
+        if component.startswith('max-age='):
+            parsed['max-age'] = int(component.split('=')[1])
+        elif component == 'includesubdomains':
+            parsed['includeSubDomains'] = True
+        elif component == 'preload':
+            parsed['preload'] = True
+    return parsed
+
+
+def check_security_txt(domain: str) -> dict:
+    """
+    Check if the domain has a security.txt file and return its content if found.
+
+    Args:
+        domain (str): The domain to check.
+
+    Returns:
+        dict: A dictionary with the status and content of the security.txt file.
+              - 'status' (bool): True if the security.txt file is found and readable, False otherwise.
+              - 'data' (str): The content of the security.txt file or an error message.
+    """
+    url = f'https://{domain}/.well-known/security.txt'
+    try:
+        # First, check if the file exists using HEAD request
+        head_response = requests.head(url, timeout=10)
+        if head_response.status_code == 200:
+            # If it exists, attempt to get the content
+            try:
+                response = requests.get(url, timeout=10)
+                response.raise_for_status()
+                return {'status': True, 'data': response.text}
+            except requests.RequestException as e:
+                return {'status': True, 'data': f'security.txt file found but cannot be read: {str(e)}'}
+        elif head_response.status_code in (403, 401):
+            return {'status': False, 'data': 'Access to security.txt is forbidden or unauthorized.'}
+        elif head_response.status_code == 404:
+            return {'status': False, 'data': 'security.txt file not found.'}
+        else:
+            return {'status': False, 'data': f'Unexpected HTTP status: {head_response.status_code}'}
+    except requests.RequestException as e:
+        return {'status': False, 'data': f'security.txt check failed: {str(e)}'}
+

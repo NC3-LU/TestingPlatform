@@ -7,7 +7,7 @@ import io
 
 import jinja2
 import xmltodict
-
+from bs4 import BeautifulSoup
 from typing import Any, Dict
 from urllib.parse import parse_qs, urlparse
 
@@ -42,7 +42,17 @@ from .helpers import (
     check_spf,
     check_dmarc,
     check_tls,
-    check_dkim
+    check_hsts,
+    check_dkim,
+    check_csp,
+    check_cookies,
+    check_cors,
+    check_https_redirect,
+    check_referrer_policy,
+    check_sri,
+    check_x_content_type_options,
+    check_security_txt
+
 )
 
 from .zap import zap_scan
@@ -153,59 +163,37 @@ def zap_test(request):
         return render(request, "check_zap.html")
 
 
-def web_test(request):
-    # TODO check that for a new scan a new session is created an after
-    #  getting the result it shall be closed
-    if request.method == "POST":
-        ipv6 = ipv6_check(request.POST["target"], None)
-        # Command used to start zap locally (ubuntu)
-        # zap.sh -daemon -config api.key=12345 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true
-        # The URL of the application to be tested
-        target = request.POST["target"]
-        # Change to match the API key set in ZAP, or use None if the API key is disabled
-        apikey = "12345"
+@csrf_exempt
+def check_website_security(request):
+    if request.method == 'POST':
+        domain = request.POST.get('target')
 
-        # By default ZAP API client will connect to port 8080
-        zap = ZAPv2(
-            apikey=apikey,
-            proxies={"http": "http://127.0.0.1:8081", "https": "http://127.0.0.1:8081"},
-        )
+        csp_result = check_csp(domain)
+        cookies_result = check_cookies(domain)
+        cors_result = check_cors(domain)
+        https_redirect_result = check_https_redirect(domain)
+        referrer_policy_result = check_referrer_policy(domain)
+        sri_result = check_sri(domain)
+        x_content_type_options_result = check_x_content_type_options(domain)
+        hsts_result = check_hsts(domain)
+        security_txt_result = check_security_txt(domain)
 
-        scanid = zap.spider.scan("http://" + target)
-        while int(zap.spider.status(scanid)) < 100:
-            time.sleep(1)
+        context = {
+            'domain': domain,
+            'csp_result': csp_result,
+            'cookies_result': cookies_result,
+            'cors_result': cors_result,
+            'https_redirect_result': https_redirect_result,
+            'referrer_policy_result': referrer_policy_result,
+            'sri_result': sri_result,
+            'x_content_type_options_result': x_content_type_options_result,
+            'hsts_result': hsts_result,
+            'security_txt_result': security_txt_result
+        }
 
-        results_url = zap.spider.results(scanid)
-        while int(zap.pscan.records_to_scan) > 0:
-            # Loop until the passive scan has finished
-            print("Records to passive scan : " + zap.pscan.records_to_scan)
-            time.sleep(2)
-        alerts = zap.core.alerts()
+        return render(request, 'check_webapp.html', context)
 
-        # Create an empty list to hold the matching alerts
-        matching_alerts = []
-
-        # Loop through the alerts
-        for alert in alerts:
-            # Check if the alert's URL is in the list
-            if alert["url"] in results_url:
-                if alert["confidence"] == "High":
-                    # If it is, append the alert to the matching_alerts list
-                    matching_alerts.append(alert)
-
-        return render(
-            request,
-            "check_webapp.html",
-            {
-                "results_url": results_url,
-                "alerts": matching_alerts,
-                "target": target,
-                "ipv6": ipv6,
-            },
-        )
-
-    else:
-        return render(request, "check_webapp.html")
+    return render(request, 'check_webapp.html')
 
 
 def email_test(request):
@@ -424,7 +412,8 @@ def record_generator(request):
                                 "One of the specified hosts/IP addresses does not match the expected format. Please correct your entered data."
                             )
                             context = {"spf_form": spf_form, "dmarc_form": dmarc_form}
-                            return render(request, "email_policy_generator.html", context)
+                            return render(request, "email_policy_generator.html",
+                                          context)
                 record += data["policy"]
                 context["spf_record"] = record
 
@@ -517,7 +506,7 @@ def dmarc_dl(request, domain, mailfrom, timestamp):
             headers={
                 "Content-Type": "application/xml",
                 "Content-Disposition": f"attachment; "
-                f'filename="dmarc_{domain}_{mailfrom}_{timestamp}.xml"',
+                                       f'filename="dmarc_{domain}_{mailfrom}_{timestamp}.xml"',
             },
         )
         return response

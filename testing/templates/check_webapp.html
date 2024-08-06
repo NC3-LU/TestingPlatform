@@ -1,123 +1,1072 @@
 {% extends "base.html" %}
-{% load tags %}
+{% load static %}
 {% block content %}
 
-<main class="row p-3 flex-column align-items-center">
-  <div class="col-lg-5 col-md-5 mb-2">
-    <div class="h-100 card border border-2 ">
-      <div class="card-body d-flex flex-column">
-        <h3 class="card-title">Webapp Scanner</h3>
-        <a class="align-self-end" href="#">Find out more about the test</a>
-        <form method="post">
-          {% csrf_token %}
-          {% if error %}
-          <span class="text-danger">{{ error }}</span>
-          {% endif %}
-          <div class="mb-3">
-            <label class="mb-1">
-              Enter your websites domain name:
-            </label>
-            <input class="form-control" type="text" placeholder="www.domain.lu"
-                   id="target" name="target"
-                   value="{{ form }}" required>
-          </div>
-          <!-- <div class="mb-3">
-             <select class="form-select" name="scan_type">
-               <option selected>Select one of the options below</option>
-               <option value="explore">Explore the application</option>
-               <option value="passive">Passive attack</option>
-               <option value="attack">Active attack</option>
-             </select>
-           </div>-->
-          <input type="submit" value="Test" class="btn btn-secondary">
-        </form>
-      </div>
-    </div>
-  </div>
-</main>
-<main id="overview-container"
-      class="container-fluid d-flex flex-column align-items-center">
-  {% if results_url %}
-
-  <section class="col-lg-11 row my-5 border border-2 rounded p-4">
-
-    <h1 class="text-center">Checked urls</h1>
-    <div class="overflow-auto h-25">
-      <ul>
-        {% for result in results_url %}
-        <li>{{ result }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-  </section>
-  {% endif %}
-  {% if alerts %}
-
-  <select class="form-control w-25" id="sortOrder">
-    <option value="highest">Highest</option>
-    <option value="lowest">Lowest</option>
-  </select>
-
-  <button id="sortButton" class="btn w-25 bg-dark text-light" onclick="sort();">Sort toggle
-  </button>
-  {% for alert in alerts %}
-  <section class="alert-section col-lg-11 row my-5 border border-2 rounded p-4"
-           data-confidence="{{ alert.confidence }}" data-risk="{{ alert.risk }}">
-
-    <div class="row justify-content-between">
-      <div class="col-lg-12">
-        <h1 class="fs-1 fw-bold">{{ alert.name }}</h1>
-        <div class="fs-4">
-          <p>{{ alert.description }}</p>
-          <p>Risk: {{ alert.risk }}</p>
-          <p>Confidence: {{ alert.confidence }}</p>
-          <p>URL: <a href="{{ alert.url }}">{{ alert.url }}</a></p>
-          <p>Tags:</p>
-          <ul>
-            {% for tag_name, tag_link in alert.tags.items %}
-            <li><a href="{{ tag_link }}">{{ tag_name }}</a></li>
-            {% endfor %}
-          </ul>
-          <p>References:</p>
-          <ul>
-            {{alert.reference}}
-          </ul>
+<section class="blue-gradient_background p-4 text-white">
+    <div class="container my-5">
+        <div class="mb-5">
+            <div class="d-flex align-items-center" style="gap: 1.944em">
+                <hr class="hr-h-width bg-white">
+                <h3>Basic Website Security Checker</h3>
+            </div>
+            <h1 class="font-size-48 font-weight-800 lh-base">Assess the security of your domain!</h1>
         </div>
-
-      </div>
+        <div>
+            <p>Enter your domain to check various security settings like CSP, CORS, HTTPS, HSTS, and more.</p>
+        </div>
     </div>
-  </section>
-  {% endfor %}
-  {% endif %}
-</main>
+</section>
 <script>
- function sort(){
-  const sortOrder = document.getElementById('sortOrder').value;
-  const divs = Array.from(document.getElementsByClassName('alert-div'));
-
-  const sortedDivs = divs.sort((a, b) => {
-    const aConfidence = confidenceLevels[a.getAttribute('data-confidence')];
-    const bConfidence = confidenceLevels[b.getAttribute('data-confidence')];
-    const aRisk = riskLevels[a.getAttribute('data-risk')];
-    const bRisk = riskLevels[b.getAttribute('data-risk')];
-
-    if (sortOrder === 'highest') {
-      if (aConfidence !== bConfidence) return bConfidence - aConfidence;
-      return bRisk - aRisk;
-    } else {
-      if (aConfidence !== bConfidence) return aConfidence - bConfidence;
-      return aRisk - bRisk;
-    }
-  });
-
-  const container = document.getElementById('overview-container'); // replace with your container's ID
-  for (const div of sortedDivs) {
-    container.appendChild(div);
-  }
-}
-
-
-
+    let countGood = 0;
+    let countBad = 0;
+    let countWarning = 0;
+    let countTotal = 0;
 </script>
+<main>
+    <div class="container d-flex justify-content-center py-5">
+        <div class="w-75 box-shadow primary-fadded-blue_border rounded-box-20 p-5">
+            <form method="post">
+                {% csrf_token %}
+                {% if error %}
+                <span class="text-danger">{{ error }}</span>
+                {% endif %}
+                <div class="mb-3">
+                    <label class="mb-1">Enter your domain name:</label>
+                    <input class="form-control" type="text" placeholder="domain.com" id="target" name="target"
+                           value="{{ domain }}" required>
+                </div>
+                <input type="submit" value="Test"
+                       class="text-white button-text-background primary-primary-blue_background">
+            </form>
+        </div>
+    </div>
+    {% if domain %}
+
+    <div class="gx-0 row d-flex justify-content-center py-5">
+        <section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
+            <h1 class="text-center">Overview of {{ domain }}</h1>
+            <div class="row justify-content-evenly mb-5">
+                <div class="col-lg-3 d-flex align-items-center">
+                    <canvas id="chart1"></canvas>
+                </div>
+            </div>
+            <div class="row justify-content-between">
+                <div class="col-lg-7">
+                    <div class="row my-1">
+                        <div class="col-lg-12 fs-4">
+                            {% if csp_result.status %}
+                            <script> countGood++;
+                                countTotal++;</script>
+                            <i class="bi bi-check-circle-fill color-success"> </i>
+                            {% else %}
+                            <script>countBad++;
+                                countTotal++;</script>
+                            <i class="bi bi-x-circle-fill color-danger"></i>
+                            {% endif %}
+                            CSP Status
+                        </div>
+                        <div class="col-lg-12 fs-4">
+                            {% if cookies_result.status %}
+                            <script> countGood++;
+                                countTotal++;</script>
+                            <i class="bi bi-check-circle-fill color-success"> </i>
+                            {% else %}
+                            <script>countBad++;
+                                countTotal++;</script>
+                            <i class="bi bi-x-circle-fill color-danger"></i>
+                            {% endif %}
+                            Cookies Status
+                        </div>
+                        <div class="col-lg-12 fs-4">
+                            {% if cors_result.status %}
+                            <script> countGood++;
+                                countTotal++;</script>
+                            <i class="bi bi-check-circle-fill color-success"> </i>
+                            {% else %}
+                            <script>countBad++;
+                                countTotal++;</script>
+                            <i class="bi bi-x-circle-fill color-danger"></i>
+                            {% endif %}
+                            CORS Status
+                        </div>
+                        <div class="col-lg-12 fs-4">
+                            {% if https_redirect_result.status %}
+                            <script> countGood++;
+                                countTotal++;</script>
+                            <i class="bi bi-check-circle-fill color-success"> </i>
+                            {% else %}
+                            <script>countBad++;
+                                countTotal++;</script>
+                            <i class="bi bi-x-circle-fill color-danger"></i>
+                            {% endif %}
+                            HTTPS Redirect
+                        </div>
+                        <div class="col-lg-12 fs-4">
+                            {% if referrer_policy_result.status %}
+                            <script> countGood++;
+                                countTotal++;</script>
+                            <i class="bi bi-check-circle-fill color-success"> </i>
+                            {% else %}
+                            <script>countBad++;
+                                countTotal++;</script>
+                            <i class="bi bi-x-circle-fill color-danger"></i>
+                            {% endif %}
+                            Referrer Policy
+                        </div>
+                        <div class="col-lg-12 fs-4">
+                            {% if sri_result.status %}
+                            <script> countGood++;
+                                countTotal++;</script>
+                            <i class="bi bi-check-circle-fill color-success"> </i>
+                            {% else %}
+                            <script>countBad++;
+                                countTotal++;</script>
+                            <i class="bi bi-x-circle-fill color-danger"></i>
+                            {% endif %}
+                            Subresource Integrity (SRI)
+                        </div>
+                        <div class="col-lg-12 fs-4">
+                            {% if x_content_type_options_result.status %}
+                            <script> countGood++;
+                                countTotal++;</script>
+                            <i class="bi bi-check-circle-fill color-success"> </i>
+                            {% else %}
+                            <script>countBad++;
+                                countTotal++;</script>
+                            <i class="bi bi-x-circle-fill color-danger"></i>
+                            {% endif %}
+                            X-Content-Type-Options
+                        </div>
+                        <div class="col-lg-12 fs-4">
+                            {% if hsts_result.status %}
+                            <script> countGood++;
+                                countTotal++;</script>
+                            <i class="bi bi-check-circle-fill color-success"> </i>
+                            {% else %}
+                            <script>countBad++;
+                                countTotal++;</script>
+                            <i class="bi bi-x-circle-fill color-danger"></i>
+                            {% endif %}
+                            HTTP Strict Transport Security (HSTS)
+                        </div>
+                        <div class="col-lg-12 fs-4">
+                            {% if security_txt_result.status %}
+                            <script> countGood++;
+                                countTotal++;</script>
+                            <i class="bi bi-check-circle-fill color-success"> </i>
+                            {% else %}
+                            <script>countBad++;
+                                countTotal++;</script>
+                            <i class="bi bi-x-circle-fill color-danger"></i>
+                            {% endif %}
+                            Security.txt
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <h2>Vulnerabilities</h2>
+                    <div class="row mb-4 justify-content-evenly">
+                        <div class="col-lg-6 col-md-8 fs-2 mb-1 ">Good</div>
+                        <div class="col-lg-6 col-md-8 ">
+                            <span id="good-count" class="circle p-2 fs-4 text-white bg-success"></span>
+                        </div>
+                    </div>
+                    <div class="row my-4">
+                        <div class="col-lg-6 col-md-8 fs-2 mb-1 ">Vulnerable</div>
+                        <div class="col-lg-6 col-md-8 ">
+                         <span id="vulnerable-count"
+                               class="circle p-2 fs-4  bg-danger text-white">
+                                </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- CSP -->
+    <div class="gx-0 row d-flex justify-content-center py-5">
+        <section class="container-extended box-shadow primary-fadded-blue_border p-5">
+            <div class="col-lg-12 fs-1 fw-bold">
+                {% if csp_result.status %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+                {% else %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %} Content Security Policy (CSP)
+
+            </div>
+            <div class="col-lg-12 fs-4">
+                <p>Content Security Policy (CSP) is an HTTP header that allows site operators
+                    fine-grained control over where resources on their site can be loaded from. The
+                    use of this header is the best method to prevent cross-site scripting (XSS)
+                    vulnerabilities. Due to the difficulty in retrofitting CSP into existing
+                    websites, CSP is mandatory for all new websites and is strongly recommended for
+                    all existing high-risk sites.</p>
+            </div>
+
+
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse" data-bs-target="#target1"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background rte">
+                    <i id="collapse-icon"
+                       class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+                    Result
+                </button>
+
+                <div class="p-0 collapse" id="target1">
+                    <div class="p-3 border-bottom border-end border-start">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body">
+                                <h5 class="card-title">CSP Value</h5>
+                                <p class="card-text">
+                                    {% if csp_result.csp_value %}
+                                    <code class="text-wrap">{{ csp_result.csp_value }}</code>
+                                    {% else %}
+                                    <span class="text-muted">None</span>
+                                    {% endif %}
+                                </p>
+                                <h5 class="card-title">CSP Report Only</h5>
+                                <p class="card-text">
+                                    {% if csp_result.csp_report_only %}
+                                    <span class="badge bg-warning">{{ csp_result.csp_report_only }}</span>
+                                    {% else %}
+                                    <span class="text-muted">None</span>
+                                    {% endif %}
+                                </p>
+                                <h5 class="card-title">Issues</h5>
+                                <ul class="list-group mb-3">
+                                    {% for issue in csp_result.issues %}
+                                    <li class="list-group-item list-group-item-warning d-flex justify-content-between align-items-center">
+                                        {{ issue }}
+                                        <span class="badge bg-danger rounded-pill">Issue</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                <h5 class="card-title">Recommendations</h5>
+                                <ul class="list-group">
+                                    {% for recommendation in csp_result.recommendations %}
+                                    <li class="list-group-item list-group-item-info d-flex justify-content-between align-items-center">
+                                        {{ recommendation }}
+                                        <span class="badge bg-info rounded-pill">Recommendation</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse" data-bs-target="#target2"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
+                    <i
+                            class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                    How to implement the CSP?
+                </button>
+
+                <div class="p-0 collapse" id="target2">
+                    <div class="p-4 border-bottom border-end border-start">
+                        <p>Determine what types of resources your site should load: Before
+                            implementing
+                            CSP, it is important to identify which types of resources your site needs to
+                            load such as scripts, stylesheets, images, and fonts.</p>
+                        <p><b>Create a whitelist of
+                                allowed sources:</b><br> Once you have determined the types of
+                            resources your site needs to load, you should create a whitelist of allowed
+                            sources for each of them. This will prevent malicious sources from injecting
+                            unwanted code into your site.</p>
+
+                        <p><b>Use the Content-Security-Policy header:</b><br>Add the
+                            Content-Security-Policy
+                            header
+                            to the HTTP response of your site. This header specifies the whitelist of
+                            allowed sources for each resource type.</p>
+                        <p>For example, the following header
+                            specifies that only resources from the same origin as the site are allowed:
+                        </p>
+                        <ul>
+                            <li><b>Content-Security-Policy: default-src 'self'</b></li>
+                        </ul>
+                        <p><b>Test your CSP policy:</b> <br>After implementing your CSP policy, it is
+                            important
+                            to
+                            test it to ensure that it does not break any functionality of your site. You
+                            can use rescan and check if the CSP will pass.</p>
+                        <p><b>Keep your CSP policy up to date:</b><br> As your site evolves, you may
+                            need to add
+                            new
+                            resources or change the sources of existing resources. Therefore, it is
+                            important to review and update your CSP policy regularly to ensure that it
+                            remains effective.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- Cookies -->
+    <div class="gx-0 row d-flex justify-content-center py-5">
+        <section class="container-extended box-shadow primary-fadded-blue_border p-5">
+            <div class="col-lg-12 fs-1 fw-bold">
+                {% if cookies_result.status %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+                {% else %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %} Cookies
+            </div>
+            <div class="col-lg-12 fs-4">
+                <p>Using cookies attributes such as Secure and HttpOnly can protect users from
+                    having their personal information stolen.</p>
+            </div>
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse" data-bs-target="#cookies-found"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background">
+                    <i class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                    Result
+                </button>
+
+                <div class="p-0 collapse" id="cookies-found">
+                    <div class="p-3 border-bottom border-end border-start">
+                        <div class="alert alert-info" role="alert">
+                            {{ cookies_result.message }}
+                        </div>
+
+                        {% if cookies_result.cookies %}
+                        <table class="table table-bordered">
+                            <thead class="thead-light">
+                            <tr>
+                                <th>Cookie Name</th>
+                                <th>Secure</th>
+                                <th>HttpOnly</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for cookie in cookies_result.cookies %}
+                            <tr>
+                                <td>{{ cookie.name }}</td>
+                                <td>{% if cookie.secure %}Yes{% else %}No{% endif %}</td>
+                                <td>{% if cookie.http_only %}Yes{% else %}No{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="alert alert-warning" role="alert">
+                            No cookies found.
+                        </div>
+                        {% endif %}
+
+                        <div class="alert {% if cookies_result.status %}alert-success{% else %}alert-danger{% endif %}"
+                             role="alert">
+                            Overall status: {% if cookies_result.status %}All cookies are secure and HttpOnly
+                            {% else %}Some cookies are not secure or HttpOnly{% endif %}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse"
+                        data-bs-target="#cookie-recommendation"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
+                    <i
+                            class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                    Recommendation
+                </button>
+
+                <div class="p-0 collapse" id="cookie-recommendation">
+                    <div class="p-4 border-bottom border-end border-start">
+                        <p>The <b>secure flag</b> in cookies tells the browser that the cookie should
+                            only be sent
+                            over HTTPS, which is an encrypted connection. This helps to protect the cookie
+                            from being intercepted by attackers. If a website never uses HTTPS, the secure
+                            flag will not offer any protection.</p>
+
+                        <p>The <b>HttpOnly flag</b> tells the browser that the cookie should only be
+                            accessible by
+                            the server. This helps to mitigate XSS attacks, where an attacker tries to
+                            steal
+                            cookies by injecting malicious scripts into a web page.</p>
+
+                        <p>The <b>SameSite flag</b> controls when cookies are sent. When it is set to
+                            Strict, the
+                            cookie is only sent if the site for the cookie matches the site currently
+                            shown
+                            in the browser's URL bar. This helps to mitigate CSRF attacks, where an
+                            attacker
+                            tricks a user into submitting a malicious form on a trusted site.</p>
+
+                        <p>You should also set an <b>expiration date</b> for your cookies. Without one,
+                            the cookie
+                            will last as long as the browser session does. By setting an expiration date,
+                            you can limit how long the cookie persists.</p>
+                        <p>Here are some additional tips for securing cookies:</p>
+                        <ul>
+                            <li>Use short expiration dates for cookies that store sensitive data.</li>
+                            <li>Do not store passwords or other sensitive data in cookies.</li>
+                            <li>Use a secure cookie storage mechanism.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- CORS -->
+    <div class="gx-0 row d-flex justify-content-center py-5">
+        <div class="container-extended box-shadow primary-fadded-blue_border p-5">
+            <div class="col-lg-12 fs-1 fw-bold">
+                {% if cors_result.status %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+                {% else %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+                Cross-Origin Resource Sharing (CORS)
+            </div>
+            <div class="col-lg-12 fs-4">
+                <p>Cross-Origin Resource Sharing (CORS) is an HTTP-header based mechanism that
+                    allows a server to indicate any origins (domain, scheme, or port) other than its
+                    own from which a browser should permit loading resources. CORS also relies on a
+                    mechanism by which browsers make a "preflight" request to the server hosting the
+                    cross-origin resource, in order to check that the server will permit the actual
+                    request. In that preflight, the browser sends headers that indicate the HTTP
+                    method and headers that will be used in the actual request.</p>
+            </div>
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse" data-bs-target="#cors"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background rte">
+                    <i id="cors-icon"
+                       class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+                    Result
+                </button>
+
+                <div class="p-0 collapse" id="cors">
+                    <div class="p-3 border-bottom border-end border-start">
+                        <div class="alert alert-info" role="alert">
+                            {{ cors_result.message }}
+                        </div>
+
+                        {% if cors_result.cors_headers %}
+                        <table class="table table-bordered">
+                            <thead class="thead-light">
+                            <tr>
+                                <th>Header</th>
+                                <th>Value</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for header, value in cors_result.cors_headers.items %}
+                            <tr>
+                                <td>{{ header }}</td>
+                                <td>{% if value %}{{ value }}{% else %}Not set{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="alert alert-warning" role="alert">
+                            No CORS headers found.
+                        </div>
+                        {% endif %}
+
+                        <div class="alert {% if cors_result.status %}alert-success{% else %}alert-danger{% endif %}"
+                             role="alert">
+                            Overall status: {% if cors_result.status %}CORS is configured{% else %}CORS is not
+                            configured{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse"
+                        data-bs-target="#cors-recommendation"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
+                    <i
+                            class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                    Recommendation
+                </button>
+
+                <div class="p-0 collapse" id="cors-recommendation">
+                    <div class="p-4 border-bottom border-end border-start">
+                        <b>Specify origins</b>
+
+                        <p> Instead of using the wildcard <code>"*"</code>, explicitly specify the
+                            allowed origins for
+                            cross-origin requests.
+                            This can be done by setting the Access-Control-Allow-Origin header to a
+                            specific
+                            origin, such as <code>https://nc3.lu</code>, or to a list of trusted origins.
+                            By explicitly specifying the allowed origins, you can prevent unauthorized
+                            access to your resources from untrusted sources.</p>
+
+                        <b>Restrict methods and headers</b>
+
+                        <p>Use the Access-Control-Allow-Methods and Access-Control-Allow-Headers headers
+                            to
+                            define the allowed HTTP methods and request headers for cross-origin requests.
+                            Only include the necessary methods and headers that your application requires,
+                            rather than allowing all methods or headers.
+                            This can help to reduce the attack surface of your application and protect it
+                            from malicious requests.</p>
+
+                        <b>Validate origin</b>
+
+                        <p>Implement server-side validation of the Origin header in the request to
+                            ensure
+                            that it matches the list of allowed origins.
+                            This prevents attackers from spoofing the origin and bypassing CORS
+                            restrictions.
+                            You can use the nginx web server to implement this validation by adding the
+                            following line to your nginx.conf file:
+                            <code>
+                                add_header Access-Control-Allow-Origin $http_origin;
+                            </code>
+                        </p>
+                        <b>Use credentials carefully</b>
+
+                        <p>Be cautious when enabling the Access-Control-Allow-Credentials header.
+                            Only enable it if your application requires sending and receiving credentials
+                            (e.g., cookies, authorization headers) across origins.
+                            Make sure to properly handle and validate the credentials on the server-side
+                            to
+                            prevent unauthorized access.</p>
+                        <b>Apply origin whitelisting</b>
+
+                        <p>Consider maintaining a whitelist of trusted origins within your application's
+                            server-side logic.
+                            Validate incoming requests against this whitelist and only allow requests from
+                            trusted origins.
+                            This can help to further reduce the attack surface of your application and
+                            protect it from malicious requests.</p>
+                        <b>Set secure CORS headers</b>
+
+                        <p>In addition to the CORS headers, ensure that your application implements
+                            other
+                            security headers, such as Content Security Policy (CSP), Strict Transport
+                            Security (HSTS), and X-Frame-Options, to provide a layered security approach.
+                            These headers can help to protect your application from a variety of attacks,
+                            including cross-site scripting (XSS), clickjacking, and man-in-the-middle
+                            (MITM)
+                            attacks.</p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HTTPS Redirect -->
+    <div class="gx-0 row d-flex justify-content-center py-5">
+        <div class="container-extended box-shadow primary-fadded-blue_border p-5">
+            <div class="col-lg-12 fs-1 fw-bold">
+                {% if https_redirect_result.status %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+                {% else %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+                HTTPS Redirect
+            </div>
+            <div class="col-lg-12 fs-4">
+                <p>Properly configured redirections from HTTP to HTTPS allow browsers to correctly
+                    apply HTTP Strict Transport Security (HSTS) settings.</p>
+            </div>
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse" data-bs-target="#https"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background rte">
+                    <i id="https-icon"
+                       class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+                    Result
+                </button>
+
+                <div class="p-0 collapse" id="https">
+                    <div class="p-3 border-bottom border-end border-start">
+                        <div class="alert alert-info" role="alert">
+                            {{ https_redirect_result.message }}
+
+                        </div>
+                            {% if https_redirect_result.redirect_url %}
+                            <div class="alert alert-secondary" role="alert">
+                                Redirect URL: {{ https_redirect_result.redirect_url }}
+                            </div>
+                            {% endif %}
+
+
+                        <div class="alert {% if https_redirect_result.status %}alert-success{% else %}alert-danger{% endif %}"
+                             role="alert">
+                            Overall status: {% if https_redirect_result.status %}
+                            HTTP to HTTPS redirection is
+                            properly configured
+                            {% else %}
+                            HTTP to HTTPS redirection is not properly configured
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse"
+                        data-bs-target="#https-recommendation"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
+                    <i
+                            class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                    Recommendation
+                </button>
+
+                <div class="p-0 collapse" id="https-recommendation">
+                    <div class="p-4 border-bottom border-end border-start">
+                        <p>Use HTTPS for all websites and APIs. This is the most important security
+                            recommendation,
+                            as it encrypts all communication between the client and the server, making it
+                            much more difficult
+                            for attackers to intercept and steal data.</p>
+                        <p>Use 301 redirects to redirect HTTP requests to HTTPS. This ensures that users
+                            are always redirected to the secure
+                            version of the site, even if they type in the HTTP URL.</p>
+                        <p>Enable HSTS. HSTS (HTTP Strict Transport Security) is a security feature that
+                            tells browsers
+                            to always connect to your site over HTTPS, even if the user types in the HTTP
+                            URL.
+                            This helps to prevent attackers from tricking users into connecting to your
+                            site over HTTP.</p>
+                        <p>Do not redirect from HTTP to HTTPS on a different host. This can prevent HSTS
+                            from being set.</p>
+                        <p>Keep your SSL/TLS certificate up to date. This helps to protect your site
+                            from attacks that exploit expired or
+                            misconfigured certificates.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Referrer Policy -->
+    <div class="gx-0 row d-flex justify-content-center py-5">
+        <div class="container-extended box-shadow primary-fadded-blue_border p-5">
+            <div class="col-lg-12 fs-1 fw-bold">
+                {% if referrer_policy_result.status %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+                {% else %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+                Referrer Policy
+            </div>
+            <div class="col-lg-12 fs-4">
+                <p>Referrer Policy can protect the privacy of your users by restricting the
+                    contents of the HTTP Referer header.</p>
+            </div>
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse" data-bs-target="#referrer"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background">
+                    <i id="referrer-icon"
+                       class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+                    Result
+                </button>
+
+                <div class="p-0 collapse" id="referrer">
+                    <div class="p-3 border-bottom border-end border-start">
+                        <div class="alert alert-info" role="alert">
+                            {{ referrer_policy_result.message }}
+                        </div>
+
+                        {% if referrer_policy_result.header_value %}
+                        <div class="alert alert-secondary" role="alert">
+                            Referrer-Policy: {{ referrer_policy_result.header_value }}
+                        </div>
+                        {% endif %}
+
+                        <div class="alert {% if referrer_policy_result.status %}alert-success{% else %}alert-danger{% endif %}"
+                             role="alert">
+                            Overall status: {% if referrer_policy_result.status %}Referrer-Policy header is present
+                            {% else %}Referrer-Policy header is not present{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse"
+                        data-bs-target="#referrer-recommendation"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
+                    <i
+                            class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                    Recommendation
+                </button>
+
+                <div class="p-0 collapse" id="referrer-recommendation">
+                    <div class="p-4 border-bottom border-end border-start">
+                        <p>You can set the header in an apache configuration file or in a
+                            root web directory over an <code>.htaccess</code> file.</p>
+
+                        <p>You need to add:<br>
+                            <code>Header set Referrer-Policy
+                                <b>"replace-with-the-policy-you-want-to-use"</b></code>
+                        </p>
+                        <div class="col-lg-6">
+                            <h4>What policies do exist?</h4>
+                            <ul>
+                                <li><b>"no-referrer"</b>- Do not send the referrer header.</li>
+                                <li><b>"no-referrer-when-downgrade"</b> - Send the referrer header only
+                                    when
+                                    the referring page is using HTTPS.
+                                </li>
+                                <li><b>"same-origin"</b>- Send the referrer header only when the referring
+                                    page is from the same origin (same domain and protocol).
+                                </li>
+                                <li><b>"strict-origin"</b> - Send the referrer header only when the
+                                    referring page is from the same origin, and only include the origin, not
+                                    the full URL.
+                                </li>
+                                <li><b>"strict-origin-when-cross-origin"</b> - Send the referrer header
+                                    only
+                                    when the referring page is from the same origin, and only include the
+                                    origin when the referring page is from a different origin.
+                                </li>
+                                <li><b>"unsafe-url"</b> - Always send the full URL in the referrer header,
+                                    even when the referring page is from a different origin.
+                                </li>
+                            </ul>
+                            <h4>Which one to use?</h4>
+                            <p>
+                                If your website doesn't need to send any referrer information to other
+                                domains, you can use the <code>"no-referrer"</code> directive. This will
+                                prevent the
+                                browser from sending any referrer information in the HTTP header.</p>
+
+                            <p>If your website needs to send referrer information only when the user is
+                                navigating within your own domain, you can use the
+                                <code>"same-origin"</code> directive.
+                                This will prevent the browser from sending referrer information when the
+                                user navigates to a different domain.</p>
+
+                            <p>If your website needs to send referrer information to other domains, but
+                                you
+                                don't want to leak sensitive information, you can use the
+                                <code>"strict-origin-when-cross-origin"</code> directive. This will send
+                                the referrer
+                                information only when the referring page is from the same origin, and will
+                                only include the origin (not the full URL) when the referring page is from
+                                a
+                                different origin.</p>
+
+                            <p>If your website needs to send referrer information to other domains, and
+                                you
+                                don't need to hide the URL of the referring page, you can use the "origin"
+                                or <code>"unsafe-url"</code> directive. The <code>"origin"</code>
+                                directive will send only the origin
+                                (not the full URL) in the referrer header, while the
+                                <code>"unsafe-url"</code> directive
+                                will send the full URL of the referring page.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subresource Integrity -->
+    <div class="gx-0 row d-flex justify-content-center py-5">
+    <div class="container-extended box-shadow primary-fadded-blue_border p-5">
+        <div class="col-lg-12 fs-1 fw-bold">
+            {% if sri_result.status == 'green' %}
+            <i class="bi bi-check-circle-fill color-success"></i>
+            {% elif sri_result.status == 'neutral' %}
+            <i class="bi bi-dash-circle-fill color-warning"></i>
+            {% else %}
+            <i class="bi bi-x-circle-fill color-danger"></i>
+            {% endif %}
+            Subresource Integrity (SRI)
+        </div>
+        <div class="col-lg-12 fs-4">
+            <p>Subresource Integrity (SRI) is a security feature that enables browsers to verify that files they
+                fetch (for example, from a CDN) are delivered without unexpected manipulation. It works by allowing
+                you to provide a cryptographic hash that a fetched file must match.</p>
+        </div>
+        <div class="row my-2">
+            <button type="button" data-bs-toggle="collapse" data-bs-target="#sri"
+                    aria-expanded="false" aria-controls="collapseExample"
+                    class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background rte">
+                <i id="sri-icon"
+                   class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+                Result
+            </button>
+
+            <div class="p-0 collapse" id="sri">
+                <div class="p-3 border-bottom border-end border-start">
+                    <div class="alert alert-info" role="alert">
+                        {{ sri_result.message }}
+                    </div>
+
+                    {% if sri_result.resources %}
+                        <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Type</th>
+                                <th>Source</th>
+                                <th>Cross-Origin</th>
+                                <th>Has Integrity</th>
+                                <th>Integrity Value</th>
+                                <th>Integrity Valid</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for resource in sri_result.resources %}
+                            <tr>
+                                <td><span class="badge bg-primary">{{ resource.type }}</span></td>
+                                <td class="text-wrap"><code>{{ resource.src }}</code></td>
+                                <td>{% if resource.is_cross_origin %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}<i class="bi bi-x-circle-fill text-danger"></i>{% endif %}</td>
+                                <td>{% if resource.has_integrity %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}<i class="bi bi-x-circle-fill text-danger"></i>{% endif %}</td>
+                                <td>{% if resource.integrity_value %}<code>{{ resource.integrity_value }}</code>{% else %}<span class="text-muted">N/A</span>{% endif %}</td>
+                                <td>
+                                {% if resource.is_cross_origin %}
+                                    {% if resource.integrity_valid is none %}
+                                    <span class="text-muted">N/A</span>
+                                    {% elif resource.integrity_valid %}
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                    {% else %}
+                                    <i class="bi bi-x-circle-fill text-danger"></i>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>No resources found.
+                        </div>
+                    {% endif %}
+
+                    <div class="alert
+                        {% if sri_result.status == 'green' %}alert-success
+                        {% elif sri_result.status == 'neutral' %}alert-warning
+                        {% else %}alert-danger{% endif %}"
+                         role="alert">
+                        Overall status: {{ sri_result.message }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- X-Content_type-options -->
+     <div class="gx-0 row d-flex justify-content-center py-5">
+        <div class="container-extended box-shadow primary-fadded-blue_border p-5">
+            <div class="col-lg-12 fs-1 fw-bold">
+                {% if x_content_type_options_result.status %}
+                <i class="bi bi-check-circle-fill color-success"> </i>
+                {% else %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+                X-Content-Type-Options
+            </div>
+            <div class="col-lg-12 fs-4">
+                <p> X-Content-Type-Options is a security header that prevents browsers from guessing the MIME type of a file,
+                  enforcing the type declared by the server.
+                  This helps protect against certain types of attacks, like MIME type sniffing, by ensuring content is handled as intended.</p>
+            </div>
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse" data-bs-target="#x_content"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background ">
+                    <i id="sri-icon"
+                       class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+                    Result
+                </button>
+
+                <div class="p-0 collapse" id="x_content">
+                    <div class="p-3 border-bottom border-end border-start">
+                        <div class="alert alert-info" role="alert">
+                            {{ x_content_type_options_result.message }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse" data-bs-target="#recommendation-x-content"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
+                    <i id="sri-icon"
+                       class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+                    Recommendation
+                </button>
+
+                <div class="p-0 collapse" id="recommendation-x-content">
+                    <div class="p-3 border-bottom border-end border-start">
+                      <p>
+                       Implement the X-Content-Type-Options: nosniff header on your web server to enhance security by
+                       preventing MIME type sniffing attacks. This header ensures browsers strictly
+                        follow the declared content type and do not try to guess the MIME type,
+                         reducing the risk of executing malicious files.
+                      </p>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- HSTS -->
+     <div class="gx-0 row d-flex justify-content-center py-5">
+        <div class="container-extended box-shadow primary-fadded-blue_border p-5">
+            <div class="col-lg-12 fs-1 fw-bold">
+                {% if hsts_result.status %}
+                <i class="bi bi-check-circle-fill color-success"></i>
+                {% else %}
+                <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+                HTTP Strict Transport Security (HSTS)
+            </div>
+            <div class="col-lg-12 fs-4">
+                <p>
+                    HSTS is a web security policy mechanism that helps protect websites against protocol downgrade attacks and cookie hijacking. It allows web servers to declare that web browsers should interact with it using only secure HTTPS connections.
+                </p>
+            </div>
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse" data-bs-target="#hsts"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background">
+                    <i id="sri-icon"
+                       class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+                    Result
+                </button>
+                <div class="p-0 collapse" id="hsts">
+                    <div class="p-3 border-bottom border-end border-start">
+                        <div class="alert alert-info" role="alert">
+                            <h4 class="alert-heading">HSTS Details</h4>
+                            <p>Status:{% if hsts_result.status %} Implemented {% else %} 'Not Implemented'  {% endif %}</p>
+                            <p>HTTP Status: {{ hsts_result.http_status }}</p>
+                            <p>HSTS Header: {{ hsts_result.data }}</p>
+                            <p>Preload Ready:{% if hsts_result.preload_ready %} 'Yes'  {% else %}  'No' {% endif %}</p>
+                            <p>Implementation Strength: {{ hsts_result.strength }}</p>
+                            {% if hsts_result.parsed %}
+                            <h5>Parsed Header:</h5>
+                            <ul>
+                                {% for key, value in hsts_result.parsed.items %}
+                                    <li>{{ key }}: {{ value }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <button type="button" data-bs-toggle="collapse" data-bs-target="#recommendation-hsts"
+                        aria-expanded="false" aria-controls="collapseExample"
+                        class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
+                    <i id="sri-icon"
+                       class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+                    Recommendation
+                </button>
+                <div class="p-0 collapse" id="recommendation-hsts">
+                    <div class="p-3 border-bottom border-end border-start">
+                        {% if hsts_result.recommendations %}
+                        <ul class="list-group">
+                            {% for recommendation in hsts_result.recommendations %}
+                                <li class="list-group-item">{{ recommendation }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-muted">No specific recommendations at this time.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- security.txt -->
+    <div class="gx-0 row d-flex justify-content-center py-5">
+    <div class="container-extended box-shadow primary-fadded-blue_border p-5">
+        <div class="col-lg-12 fs-1 fw-bold">
+            {% if security_txt_result.status %}
+            <i class="bi bi-check-circle-fill color-success"></i>
+            {% else %}
+            <i class="bi bi-x-circle-fill color-danger"></i>
+            {% endif %}
+            security.txt
+        </div>
+        <div class="col-lg-12 fs-4">
+            <p>
+                The security.txt file is used to help security researchers contact the site owner about security issues.
+            </p>
+        </div>
+        <div class="row my-2">
+            <button type="button" data-bs-toggle="collapse" data-bs-target="#security-txt"
+                    aria-expanded="false" aria-controls="collapseExample"
+                    class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background">
+                <i id="security-txt-icon"
+                   class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+                Result
+            </button>
+            <div class="p-0 collapse" id="security-txt">
+                <div class="p-3 border-bottom border-end border-start">
+                    <div class="alert {% if security_txt_result.status %}alert-success{% else %}alert-danger{% endif %}" role="alert">
+                        <h4 class="alert-heading">security.txt Status</h4>
+                        <p>{% if security_txt_result.status %}Found{% else %}Not Found{% endif %}</p>
+                    </div>
+                    {% if security_txt_result.status %}
+                        <h5>Content:</h5>
+                        <pre class="bg-light p-3 border rounded">{{ security_txt_result.data }}</pre>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            {{ security_txt_result.data }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="row my-2">
+            <button type="button" data-bs-toggle="collapse" data-bs-target="#recommendation-security-txt"
+                    aria-expanded="false" aria-controls="collapseExample"
+                    class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
+                <i id="security-txt-rec-icon"
+                   class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+                Recommendation
+            </button>
+            <div class="p-0 collapse" id="recommendation-security-txt">
+                <div class="p-3 border-bottom border-end border-start">
+                    {% if security_txt_result.status %}
+                        <p>The security.txt file is present. Ensure it contains up-to-date information and follows the standard format.</p>
+                        <ul>
+                            <li>Include a "Contact" field with a way to reach your security team.</li>
+                            <li>Add an "Expires" field to indicate when the information should be considered stale.</li>
+                            <li>Consider adding fields like "Encryption" for a PGP key and "Preferred-Languages" for communication preferences.</li>
+                        </ul>
+                    {% else %}
+                        <p>Consider implementing a security.txt file:</p>
+                        <ul>
+                            <li>Create a file named "security.txt" in the "/.well-known/" directory of your website.</li>
+                            <li>Include essential fields like "Contact" and "Expires".</li>
+                            <li>Follow the format specified in RFC 9116.</li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script src="{% static 'js/chartTest.js' %}"></script>
+    <script src="{% static 'js/collapsibleAnimation.js' %}"></script>
+
+    {% endif %}
+
+</main>
 
 {% endblock %}

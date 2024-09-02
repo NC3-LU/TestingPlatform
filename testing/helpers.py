@@ -500,15 +500,14 @@ def ipv6_check(
 
 def web_server_check(domain: str):
     # Validate the domain
-    if not validators.domain(domain):
+    if not validators.full_domain_validator(domain):
         return {"error": "You entered an invalid hostname!"}
 
     nmap = nmap3.Nmap()
     logger.info(f"server scan: testing {domain}")
 
     try:
-        service_scans = nmap.nmap_version_detection(domain,
-                                                    args="--script vulners --script-args mincvss+5.0")
+        service_scans = nmap.nmap_version_detection(domain, args="--script vulners --script-args mincvss+5.0")
     except Exception as e:
         logger.error(f"Error during Nmap scan: {e}")
         return {"error": "Nmap scan failed"}
@@ -530,7 +529,13 @@ def web_server_check(domain: str):
                 vulners = vulners[0].get("data", {})
                 for vuln, vulndata in vulners.items():
                     try:
-                        list_of_vulns += vulndata.get("children", [])
+                        items = vulndata.get("children", [])
+                        for vulnerability in items:
+                            if vulnerability["type"] == "cve":
+                                vulnerability["link"] = f"https://cvepremium.circl.lu/cve/{vulnerability['id']}"
+                            else:
+                                vulnerability["link"] = f"https://vulners.com/{vulnerability['type']}/{vulnerability['id']}"
+                            list_of_vulns.append(vulnerability)
                     except TypeError:
                         continue
                     except AttributeError:
@@ -591,13 +596,9 @@ def web_server_check_no_raw_socket(hostname):
                                 "type": search_result["_source"]["type"],
                             }
                             if info["type"] == "cve":
-                                info[
-                                    "link"
-                                ] = f"https://cvepremium.circl.lu/cve/{info['id']}"
+                                info["link"] = f"https://cvepremium.circl.lu/cve/{info['id']}"
                             else:
-                                info[
-                                    "link"
-                                ] = f"https://vulners.com/{info['type']}/{info['id']}"
+                                info["link"] = f"https://vulners.com/{info['type']}/{info['id']}"
                             vuln_list.append(info)
             try:
                 service_name = (
@@ -727,6 +728,7 @@ def get_pdf_report():
 
     return htmldoc.write_pdf(stylesheets=stylesheets)
 
+
 def check_dnssec(domain):
     try:
         dnskey = dns.resolver.resolve(domain, 'DNSKEY')
@@ -734,6 +736,7 @@ def check_dnssec(domain):
     except Exception as e:
         print(f'Error checking DNSSEC for {domain}: {e}')
         return False
+
 
 def check_mx(domain):
     try:
@@ -743,6 +746,7 @@ def check_mx(domain):
     except Exception as e:
         print(f'Error checking MX records for {domain}: {e}')
         return []
+
 
 def check_spf(domain):
     try:
@@ -755,6 +759,7 @@ def check_spf(domain):
         print(f'Error checking SPF for {domain}: {e}')
         return None, False
 
+
 def check_dmarc(domain):
     dmarc_domain = f'_dmarc.{domain}'
     try:
@@ -766,6 +771,7 @@ def check_dmarc(domain):
     except Exception as e:
         print(f'Error checking DMARC for {domain}: {e}')
         return None, False
+
 
 def check_tls(mx_servers):
     tls_results = {}
@@ -780,6 +786,7 @@ def check_tls(mx_servers):
             tls_results[server] = False
     return tls_results
 
+
 def check_dkim(domain, selector):
     dkim_domain = f'{selector}._domainkey.{domain}'
     try:
@@ -792,6 +799,7 @@ def check_dkim(domain, selector):
         return None, False
 
 #####
+
 
 def check_csp(domain):
     """
@@ -955,6 +963,7 @@ def check_cookies(domain: str) -> Dict[str, Any]:
             'message': f'An error occurred: {str(e)}'
         }
 
+
 def check_cors(domain):
     """
     Check the CORS settings for a given domain.
@@ -994,6 +1003,7 @@ def check_cors(domain):
             'cors_headers': {},
             'message': f'An error occurred: {e}'
         }
+
 
 def check_https_redirect(domain):
     """
@@ -1201,6 +1211,7 @@ def validate_integrity(src, integrity):
         print(f"Unexpected error during integrity validation: {e}")
         return False
 
+
 def check_x_content_type_options(domain):
     """
     Check the 'X-Content-Type-Options' header for a given domain.
@@ -1269,6 +1280,7 @@ def check_hsts(domain: str) -> Dict[str, Union[bool, str, Dict[str, Union[str, b
             'strength': 'N/A',
             'recommendations': ['Ensure the domain is accessible and supports HTTPS.']
         }
+
 
 def evaluate_hsts_strength(parsed_hsts: Dict[str, Union[str, bool, int]]) -> tuple[str, List[str]]:
     """Evaluate the strength of the HSTS implementation and provide recommendations."""

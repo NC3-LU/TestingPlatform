@@ -3,23 +3,17 @@ import ipaddress
 import os
 import re
 import socket
-import time
-import io
-
-import jinja2
 import xmltodict
-from bs4 import BeautifulSoup
 import weasyprint
+import matplotlib.pyplot as plt
+import base64
 
+from io import BytesIO
 from typing import Any, Dict
 from urllib.parse import parse_qs, urlparse
 
-import zapv2
 from ipwhois import IPDefinedError, IPWhois
-from zapv2 import ZAPv2
-from reportlab.pdfgen import canvas
 
-from django.http import FileResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
@@ -27,6 +21,8 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.template.loader import get_template
+from wkhtmltopdf.views import PDFTemplateResponse
 
 from testing_platform import settings
 
@@ -201,6 +197,16 @@ def check_website_security(request):
             'security_txt_result': security_txt_result
         }
 
+        try:
+            test_report = TestReport.objects.get(tested_site=domain, test_ran="web-test")
+            test_report.report = context
+            test_report.save()
+        except TestReport.DoesNotExist:
+            test_report = TestReport.objects.get_or_create(
+                tested_site=domain,
+                test_ran="web-test",
+                report=context
+            )
         return render(request, 'check_webapp.html', context)
 
     return render(request, 'check_webapp.html')
@@ -233,8 +239,19 @@ def email_test(request):
             context['dmarc'], context['dmarc_valid'] = check_dmarc(target)
             context['dkim'], context['dkim_valid'] = check_dkim(target, dkim_selector)
 
+        try:
+            test_report = TestReport.objects.get(tested_site=target, test_ran="email-test")
+            test_report.report = context
+            test_report.save()
+        except TestReport.DoesNotExist:
+            test_report = TestReport.objects.get_or_create(
+                tested_site=target,
+                test_ran="email-test",
+                report=context
+            )
+
         nb_tests += 1
-        response = render(request, "check_email.html", {"result": context})
+        response = render(request, "check_email.html", context)
         response.set_cookie("nb_tests", nb_tests)
         return response
     else:
@@ -286,8 +303,21 @@ def web_server_test(request):
                 "You reached the maximum number of tests. Please create an account.",
             )
             return redirect("signup")
-        context = {}
-        context.update(web_server_check(request.POST["target"]))
+        domain = request.POST["target"]
+        context = {'domain': domain}
+        context.update(web_server_check(domain))
+
+        try:
+            test_report = TestReport.objects.get(tested_site=domain, test_ran="infra-test")
+            test_report.report = context
+            test_report.save()
+        except TestReport.DoesNotExist:
+            test_report = TestReport.objects.get_or_create(
+                tested_site=domain,
+                test_ran="infra-test",
+                report=context
+            )
+
         nb_tests += 1
         response = render(request, "check_infra.html", context)
         response.set_cookie("nb_tests", nb_tests)
@@ -545,39 +575,76 @@ def dmarc_upload(request):
         return HttpResponse(status=401)
 
 
-def export_pdf(request, test):
-    # Create a file-like buffer to receive PDF data.
-    buffer = io.BytesIO()
-
-    # Create the PDF object, using the buffer as its "file."
-    p = canvas.Canvas(buffer)
-
-    # Draw things on the PDF. Here's where the PDF generation happens.
-    # See the ReportLab documentation for the full list of functionality.
-
-    # Close the PDF object cleanly, and we're done.
-    p.showPage()
-    p.save()
-
-    # FileResponse sets the Content-Disposition header so that browsers
-    # present the option to save the file.
-    buffer.seek(0)
-    return FileResponse(buffer, as_attachment=True, filename="hello.pdf")
-
-
 def pdf_from_template(request, test, site):
-    env = jinja2.Environment(loader=jinja2.PackageLoader('testing', 'templates'))
-    template = env.get_template('zap_pdf_wrapper.html')
     report = TestReport.objects.get(tested_site=site, test_ran=test).report
 
     css_path = os.path.join(settings.STATIC_DIR, 'css/style.css')
+    bootstrap_path = os.path.join(settings.STATIC_DIR, 'npm_components/bootstrap/dist/css/bootstrap.css')
 
     with open(css_path, 'r') as f:
-        css_content = f.read()
+        css = f.read()
 
-    html_out = template.render(report, static_url=css_path, test=test, site=site)
+    with open(bootstrap_path, 'r') as f:
+        bootstrap = f.read()
+
+    css_content = bootstrap + '\n' + css
+
+    # Calculate stats
+    count_good = 0
+    count_vulnerable = 0
+    if test == "web-test":
+        for key, value in report.items():
+            if isinstance(value, dict) and 'status' in value:
+                if value['status'] is False:
+                    count_vulnerable += 1
+                else:
+                    count_good += 1
+
+    elif test == "email-test":
+        if report['spf_valid'] is True:
+            count_good += 1
+        else:
+            count_vulnerable += 1
+        if report['dmarc_valid'] is True:
+            count_good += 1
+        else:
+            count_vulnerable += 1
+        if report['dnssec'] is True:
+            count_good += 1
+        else:
+            count_vulnerable += 1
+
+    report['good'] = count_good
+    report['vulnerable'] = count_vulnerable
+
+    # Generate pie chart
+    try:
+        labels = ['Good', 'Vulnerable']
+        sizes = [count_good, count_vulnerable]
+        colors = ['green', 'red']
+        plt.figure(figsize=(4, 4))
+        plt.pie(sizes, labels=labels, labeldistance=0.3, colors=colors, autopct=None,
+                startangle=90, shadow=False)
+        plt.axis('equal')
+
+        # Save the chart as a PNG image
+        buffer = BytesIO()
+        plt.savefig(buffer, format='png')
+        buffer.seek(0)
+        image_png = buffer.getvalue()
+        buffer.close()
+        image_base64 = base64.b64encode(image_png).decode('utf-8')
+        report['img'] = image_base64
+    except ValueError as e:
+        pass
+
+    template = get_template("pdf_wrapper.html")
+    report['site'] = site
+    report['test'] = test
+
+    html_out = template.render(report)
     pdf_file = weasyprint.HTML(string=html_out).write_pdf(stylesheets=[weasyprint.CSS(string=css_content)])
 
     response = HttpResponse(pdf_file, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="{test}_{site}_report.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="tp_{test}_{site}_report.pdf"'
     return response

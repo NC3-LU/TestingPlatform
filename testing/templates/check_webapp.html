@@ -38,6 +38,11 @@
                 <input type="submit" value="Test"
                        class="text-white button-text-background primary-primary-blue_background">
             </form>
+            {% if domain %}
+                <div class="d-flex justify-content-center pb-3 pt-3">
+                    <a href="{% url 'pdf_from_template' test='web-test' site=domain %}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
+                </div>
+            {% endif %}
         </div>
     </div>
     {% if domain %}

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load tags %}
+{% load static %}
 {% block content %}
 <section class="blue-gradient_background p-4 text-white">
   <div class="container my-5">
@@ -41,11 +42,16 @@
           </label>
           <input class="form-control" type="text" placeholder="domain.lu"
                  id="target" name="target"
-                 value="{{ form }}" required>
+                 value="{{ domain }}" required>
         </div>
         <input type="submit" value="Test"
                class="text-white button-text-background primary-primary-blue_background">
       </form>
+      {% if result %}
+        <div class="d-flex justify-content-center pb-3 pt-3">
+          <a href="{% url 'pdf_from_template' test='email-test' site=domain %}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
+        </div>
+      {% endif %}
       <div class="bg-white text-center text-muted border-top pt-3"><a
         class="text-primary-primary-blue" href="/kb/#tests-website">About the test</a>
       </div>
@@ -55,7 +61,7 @@
   {% if result %}
   <div class="gx-0 row d-flex justify-content-center py-5">
     <section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
-      <h1 class="text-center">Overview of {{ result.domain }}</h1>
+      <h1 class="text-center">Overview of {{ domain }}</h1>
       <div class="row justify-content-evenly mb-5">
         <div class="col-lg-3 d-flex align-items-center">
           <canvas id="chart1"></canvas>
@@ -65,7 +71,7 @@
         <div class="col-lg-7">
           <div class="row my-1">
             <div class="col-lg-12 fs-4">
-              {% if result.spf_valid %}
+              {% if spf_valid %}
                 <script> countGood++; countTotal++;</script>
                 <i class="bi bi-check-circle-fill color-success"> </i>
               {% else %}
@@ -75,7 +81,7 @@
               SPF record
             </div>
             <div class="col-lg-12 fs-4">
-              {% if result.dmarc_valid %}
+              {% if dmarc_valid %}
                 <script> countGood++;countTotal++;</script>
                 <i class="bi bi-check-circle-fill color-success"> </i>
               {% else %}
@@ -85,7 +91,7 @@
               DMARC Record
             </div>
             <div class="col-lg-12 fs-4">
-              {% if result.dnssec %}
+              {% if dnssec %}
                 <script> countGood++;countTotal++;</script>
                 <i class="bi bi-check-circle-fill color-success"> </i>
               {% else %}
@@ -95,10 +101,10 @@
               Signed Domain Name (DNSSEC)
             </div>
             <!--<div class="col-lg-12 fs-4">
-              {% if result.dkim_valid %}
+              {% if dkim_valid %}
                 <script> countGood++;countTotal++;</script>
                 <i class="bi bi-check-circle-fill color-success"></i>
-              {% elif result.dkim is None %}
+              {% elif dkim is None %}
                 <script> countWarning++;countTotal++;</script>
                 <i class="bi bi-x-circle-fill text-warning"></i>
               {% else %}
@@ -137,7 +143,7 @@
   <div class="gx-0 row d-flex justify-content-center py-5">
     <section class="container-extended box-shadow primary-fadded-blue_border p-5">
       <div class="col-lg-12 fs-1 fw-bold">
-        {% if result.spf_valid %}
+        {% if spf_valid %}
           <i class="bi bi-check-circle-fill color-success"> </i>
         {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
@@ -147,7 +153,7 @@
       <div class="col-lg-12 fs-4">
         <p>The Sender Policy Framework (SPF) is an email validation protocol that helps detect and block email spoofing. Email spoofing is a common technique used in phishing and spam emails. SPF allows the receiving mail server to verify that incoming mail from a domain comes from a host authorized by that domain’s administrators. The list of authorized sending hosts for a domain is published in the Domain Name System (DNS) records.</p>
         <div class="row my-2">
-          {% if result.spf_valid %}
+          {% if spf_valid %}
             <button type="button" data-bs-toggle="collapse" data-bs-target="#records" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
               <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
               SPF Record
@@ -161,9 +167,9 @@
           <div class="p-0 collapse" id="records">
             <div class="p-4 border-bottom border-end border-start">
               <h2>SPF Record</h2>
-              <code>{{ result.spf }}</code>
+              <code>{{ spf }}</code>
               <p>Valid:
-                {% if result.spf_valid %}
+                {% if spf_valid %}
                   <i class="bi bi-check-circle-fill color-success"> </i>
                 {% else %}
                   <i class="bi bi-x-circle-fill color-danger"></i>
@@ -190,7 +196,7 @@
   <div class="gx-0 row d-flex justify-content-center py-5">
     <section class="container-extended box-shadow primary-fadded-blue_border p-5">
       <div class="col-lg-12 fs-1 fw-bold">
-        {% if result.dmarc_valid %}
+        {% if dmarc_valid %}
           <i class="bi bi-check-circle-fill color-success"> </i>
         {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
@@ -200,7 +206,7 @@
       <div class="col-lg-12 fs-4">
         <p>DMARC (Domain-based Message Authentication, Reporting, and Conformance) is an email authentication protocol that provides additional protection against email spoofing and phishing attacks. It uses the Sender Policy Framework (SPF) and DomainKeys Identified Mail (DKIM) standards. DMARC enables a domain owner to specify how mail servers should handle messages from their domain that don’t pass SPF or DKIM checks. This adds an extra layer of security</p>
         <div class="row my-2">
-          {% if result.dmarc_valid %}
+          {% if dmarc_valid %}
             <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
               <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
               DMARC Record
@@ -214,9 +220,9 @@
           <div class="p-0 collapse" id="d_record">
             <div class="p-4 border-bottom border-end border-start">
               <h2>DMARC Record</h2>
-              <code>{{ result.dmarc }}</code>
+              <code>{{ dmarc }}</code>
               <p>Valid:
-                {% if result.dmarc_valid %}
+                {% if dmarc_valid %}
                   <i class="bi bi-check-circle-fill color-success"> </i>
                 {% else %}
                   <i class="bi bi-x-circle-fill color-danger"></i>
@@ -232,9 +238,9 @@
  <!-- <div class="gx-0 row d-flex justify-content-center py-5">
     <section class="container-extended box-shadow primary-fadded-blue_border p-5">
       <div class="col-lg-12 fs-1 fw-bold">
-        {% if result.dkim_valid %}
+        {% if dkim_valid %}
           <i class="bi bi-check-circle-fill color-success"> </i>
-        {% elif result.dkim is None %}
+        {% elif dkim is None %}
           <i class="bi bi-x-circle-fill text-warning"></i>
         {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
@@ -244,12 +250,12 @@
       <div class="col-lg-12 fs-4">
         <p>DomainKeys Identified Mail (DKIM) is an email authentication method that helps to verify the authenticity and integrity of email messages. It adds a digital signature to the email headers, which allows the receiving email server to verify that the email has not been tampered with during transit and that it was indeed sent by the claimed domain.</p>
         <div class="row my-2">
-          {% if result.dkim_valid %}
+          {% if dkim_valid %}
             <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
               <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
               DKIM Record
             </button>
-          {% elif result.dkim is None %}
+          {% elif dkim is None %}
             <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-warning">
               <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
               DKIM Record
@@ -263,7 +269,7 @@
           <div class="p-0 collapse" id="dkim_record">
             <div class="p-4 border-bottom border-end border-start">
               <h2>DKIM Record</h2>
-              {% if result.dkim %}
+              {% if dkim %}
                 <p>DKIM public key found and can be used to encrypt data.</p>
               {% else %}
                 <p>No suitable DKIM public key found.</p>
@@ -289,7 +295,7 @@
   <div class="gx-0 row d-flex justify-content-center py-5">
     <section class="container-extended box-shadow primary-fadded-blue_border p-5">
       <div class="col-lg-12 fs-1 fw-bold">
-        {% if result.dnssec %}
+        {% if dnssec %}
           <i class="bi bi-check-circle-fill color-success"> </i>
         {% else %}
           <i class="bi bi-x-circle-fill color-danger"></i>
@@ -299,7 +305,7 @@
       <div class="col-lg-12 fs-4">
         <p>DNSSEC (Domain Name System Security Extensions) is a set of cryptographic protocols and security measures designed to enhance the security of the Domain Name System (DNS). By digitally signing DNS data, DNSSEC ensures data integrity and authenticity, protecting against various forms of DNS attacks like cache poisoning or DNS spoofing. It uses public key cryptography to verify the authenticity of DNS responses and provides a chain of trust from the root DNS servers down to the individual domain names, ensuring that the DNS information received by a user is valid and has not been tampered with during transmission.</p>
         <div class="row my-2">
-          {% if result.dnssec %}
+          {% if dnssec %}
             <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
               <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
               DNSSEC Status
@@ -312,7 +318,7 @@
           {% endif %}
           <div class="p-0 collapse" id="dnssec">
             <div class="p-4 border-bottom border-end border-start">
-              {{ result.dnssec }}
+              {{ dnssec }}
             </div>
           </div>
         </div>
@@ -357,15 +363,15 @@
       </div>
       <div class="col-lg-12 fs-4">
         <ul>
-          {% for warning in result.mx.warnings %}
+          {% for warning in mx.warnings %}
             <li>{{ warning }}</li>
           {% endfor %}
         </ul>
-        {% for host in result.mx.servers %}
+        {% for host in mx.servers %}
           <h3>{{ host }}</h3>
           <ul>
             <li>TLS:
-              {% if result.mx.tls.host %}
+              {% if mx.tls.host %}
                 <i class="bi bi-check-circle-fill color-success"></i>
               {% else %}
                 <i class="bi bi-x-circle-fill color-danger"></i>

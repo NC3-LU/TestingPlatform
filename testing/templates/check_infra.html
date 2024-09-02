@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
 <section class="blue-gradient_background p-4 text-white">
   <div class="container my-5">
@@ -8,7 +8,7 @@
         <hr class="hr-h-width bg-white">
         <h3>Infrastructure Test</h3>
       </div>
-      <h1 class="font-size-48 font-weight-800 lh-base">Find out what applications are visible from the outside and the possible CVE's their facing!</h1>
+      <h1 class="font-size-48 font-weight-800 lh-base">Find out what applications are visible from the outside and the possible CVE's they're facing!</h1>
     </div>
     <div>
       <p>To be added.</p>
@@ -29,11 +29,16 @@
           </label>
           <input class="form-control" type="text" placeholder="domain.lu"
                  id="target" name="target"
-                 value="{{ form }}" required>
+                 value="{{ domain }}" required>
         </div>
         <input type="submit" value="Test"
                class="text-white button-text-background primary-primary-blue_background">
       </form>
+      {% if services %}
+        <div class="d-flex justify-content-center pb-3 pt-3">
+          <a href="{% url 'pdf_from_template' test='infra-test' site=domain %}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
+        </div>
+      {% endif %}
       <div class="bg-white text-center text-muted border-top pt-3"><a
         class="text-primary-primary-blue" href="/kb/#web-server">About the test</a>
       </div>

@@ -23,13 +23,16 @@ import pypandora
 import requests
 import hashlib
 import base64
+import smtplib as smtp
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import urljoin, urlparse
 from django.http import HttpResponse
 from xhtml2pdf import pisa
 from Crypto.PublicKey import RSA
 from django.template.loader import render_to_string
 from weasyprint import CSS, HTML
-
+from typing import Dict, List, Tuple
+import logging
 from testing import validators
 from testing.models import TlsScanHistory
 from testing_platform.settings import PANDORA_ROOT_URL
@@ -773,17 +776,81 @@ def check_dmarc(domain):
         return None, False
 
 
-def check_tls(mx_servers):
+def check_tls(mx_servers: List[str]) -> Dict[str, Dict[str, str]]:
+    """
+    Check TLS support for a list of mail servers across common SMTP ports.
+
+    This function tests each provided mail server for TLS support on ports 25, 587, and 465.
+    It uses multi-threading to check multiple servers concurrently for improved performance.
+
+    For ports 25 and 587, it attempts to use STARTTLS to upgrade the connection to TLS.
+    For port 465, it attempts to establish a direct SSL/TLS connection.
+
+    The function performs strict certificate verification and hostname checking to ensure
+    the security of the connections.
+
+    Args:
+    mx_servers (List[str]): A list of mail server hostnames to check.
+
+    Returns:
+    Dict[str, Dict[str, str]]: A nested dictionary where the outer key is the server hostname,
+                               and the inner dictionary contains port numbers as keys and
+                               TLS support status or error messages as values.
+
+    Example return value:
+    {
+        "mail.example.com": {
+            "mail.example.com:25": "TLS supported (STARTTLS)",
+            "mail.example.com:587": "TLS supported (STARTTLS)",
+            "mail.example.com:465": "TLS supported"
+        }
+    }
+
+    Note:
+    - The function limits concurrent threads to a maximum of 10 to prevent resource exhaustion.
+    - Exceptions during the checking process are logged for debugging purposes.
+    - SSL certificate verification errors are caught and reported separately from other errors.
+    """
+
+    def check_server(server: str) -> Tuple[str, Dict[str, str]]:
+        results = {}
+        ports = [25, 587, 465]  # Common SMTP ports
+        for port in ports:
+            try:
+                context = ssl.create_default_context()
+                context.check_hostname = True
+                context.verify_mode = ssl.CERT_REQUIRED
+
+                with socket.create_connection((server, port), timeout=5) as sock:
+                    if port in (25, 587):
+                        # For these ports, try STARTTLS
+                        with smtp.SMTP(host=server, port=port, timeout=5) as smtp_conn:
+                            smtp_conn.ehlo()
+                            if smtp_conn.has_extn('STARTTLS'):
+                                smtp_conn.starttls(context=context)
+                                smtp_conn.ehlo()
+                                results[f"{server}:{port}"] = "TLS supported (STARTTLS)"
+                            else:
+                                results[f"{server}:{port}"] = "TLS not supported"
+                    elif port == 465:
+                        # For 465, it should be SSL/TLS from the start
+                        with context.wrap_socket(sock, server_hostname=server) as ssock:
+                            cert = ssock.getpeercert()
+                            ssl.match_hostname(cert, server)
+                            results[f"{server}:{port}"] = "TLS supported"
+            except ssl.SSLCertVerificationError:
+                results[f"{server}:{port}"] = "TLS supported, but certificate verification failed"
+            except Exception as e:
+                results[f"{server}:{port}"] = f"Error: {str(e)}"
+                logging.exception(f"Error checking {server}:{port}")
+        return server, results
+
     tls_results = {}
-    for server in mx_servers:
-        try:
-            context = ssl.create_default_context()
-            with socket.create_connection((server, 25)) as sock:
-                with context.wrap_socket(sock, server_hostname=server) as ssock:
-                    tls_results[server] = True
-        except Exception as e:
-            print(f'TLS is not supported on {server}: {e}')
-            tls_results[server] = False
+    with ThreadPoolExecutor(max_workers=min(len(mx_servers), 10)) as executor:
+        future_to_server = {executor.submit(check_server, server): server for server in mx_servers}
+        for future in as_completed(future_to_server):
+            server, result = future.result()
+            tls_results[server] = result
     return tls_results
 
 

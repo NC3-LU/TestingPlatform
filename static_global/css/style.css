@@ -222,7 +222,9 @@ input[type=text],input[type=password],input[type=number], input[type=placeholder
 .form-control{
     transition:0.2s;
 }
-
+.card-link{
+  cursor:pointer;
+}
 /* NAVIGATION */
 
 nav{

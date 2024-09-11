@@ -87,7 +87,7 @@
     <div class="container">
         <!-- Overview Section -->
         <div class="box">
-            <h1 class="text-center">Overview of {{ domain }}</h1>
+            <h1 class="text-center">Overview</h1>
 
             <div class="status">
                 {% if csp_result.status %}
@@ -161,7 +161,7 @@
                 {% endif %}
             </div>
 
-            <div class="vulnerabilities">
+            <div class="d-flex flex-column vulnerabilities pt-3">
                 <h2>Vulnerabilities</h2>
                 <div class="good">
                     <i class="bi bi-check-circle-fill color-success"></i> Good: {{ good }}
@@ -169,7 +169,7 @@
                 <div class="vulnerable">
                     <i class="bi bi-x-circle-fill color-danger"></i> Vulnerable: {{ vulnerable }}
                 </div>
-                <div class="justify-content-center">
+                <div class="d-flex justify-content-center">
                   <img src="data:image/png;base64,{{ img }}" alt="Pie chart of status counts">
                 </div>
             </div>

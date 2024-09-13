@@ -20,10 +20,6 @@
 <main>
   <div class="container d-flex justify-content-center py-5">
     <div class="w-75 box-shadow primary-fadded-blue_border rounded-box-20 p-5">
-       <h3>File Testing</h3>
-      <p>
-        Discover if a file is suspicious thanks to the Pandora analysis framework.</p>
-        weakness identified
 
       <form method="post">
         {% csrf_token %}
@@ -32,11 +28,9 @@
         {% endif %}
         <div class="mb-3">
           <label class="mb-1">
-            Enter your websites domain name:
+            Select the file you want to check:
           </label>
-          <input class="form-control" type="text" placeholder="www.domain.lu"
-                 id="target" name="target"
-                 value="{{ form }}" required>
+     <input class="form-control" type="file" placeholder="Select the file you want to check." id="target3" name="target" required="">
         </div>
         <input type="submit" value="Test"
                class="text-white button-text-background primary-primary-blue_background">

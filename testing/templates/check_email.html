@@ -7,13 +7,18 @@
     <div class="mb-5">
       <div class="d-flex align-items-center" style="gap: 1.944em">
         <hr class="hr-h-width bg-white">
-        <h3>E-Mail Security Checker</h3>
+        <h3>E-Mail Security Assessment</h3>
       </div>
       <h1 class="font-size-48 font-weight-800 lh-base">Assess the security of your email setup (SPF and DMARC DNS records, DNSSEC deployment, etc.)!</h1>
     </div>
     <div>
       <p>
-       Assess the security of your email setup (SPF and DMARC DNS records, DNSSEC deployment, etc.)</p>
+        Evaluate the robustness of your email domain's security configuration.
+        This test analyzes critical email authentication protocols and DNS security measures,
+        including SPF (Sender Policy Framework), DMARC (Domain-based Message Authentication, Reporting, and Conformance),
+        and DNSSEC (Domain Name System Security Extensions). Identify vulnerabilities, ensure proper implementation of security standards,
+        and receive recommendations to enhance your email infrastructure's protection against spoofing, phishing, and other common
+        email-based threats.</p>
     </div>
   </div>
 </section>
@@ -25,12 +30,9 @@
 </script>
 
 <main>
-   <div class="container d-flex justify-content-center py-5">
+  <div class="container d-flex justify-content-center py-5">
     <div class="w-75 box-shadow primary-fadded-blue_border rounded-box-20 p-5">
-      <p>
-       Assess the security of your email setup
-          (SPF and DMARC DNS records, DNSSEC deployment, etc.)
-      </p>
+
       <form method="post">
         {% csrf_token %}
         {% if error %}
@@ -48,12 +50,12 @@
                class="text-white button-text-background primary-primary-blue_background">
       </form>
       {% if result %}
-        <div class="d-flex justify-content-center pb-3 pt-3">
-          <a href="{% url 'pdf_from_template' test='email-test' site=domain %}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
-        </div>
+      <div class="d-flex justify-content-center pb-3 pt-3">
+        <a href="{% url 'pdf_from_template' test='email-test' site=domain %}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
+      </div>
       {% endif %}
       <div class="bg-white text-center text-muted border-top pt-3"><a
-        class="text-primary-primary-blue" href="/kb/#tests-website">About the test</a>
+          class="text-primary-primary-blue" href="/kb/#tests-email">About the test</a>
       </div>
     </div>
   </div>
@@ -71,47 +73,47 @@
         <div class="col-lg-7">
           <div class="row my-1">
             <div class="col-lg-12 fs-4">
-              {% if spf_valid %}
-                <script> countGood++; countTotal++;</script>
-                <i class="bi bi-check-circle-fill color-success"> </i>
+              {% if spf.valid %}
+              <script> countGood++; countTotal++;</script>
+              <i class="bi bi-check-circle-fill color-success"></i>
               {% else %}
-                <script>countBad++;countTotal++;</script>
-                <i class="bi bi-x-circle-fill color-danger"></i>
+              <script>countBad++;countTotal++;</script>
+              <i class="bi bi-x-circle-fill color-danger"></i>
               {% endif %}
               SPF record
             </div>
             <div class="col-lg-12 fs-4">
-              {% if dmarc_valid %}
-                <script> countGood++;countTotal++;</script>
-                <i class="bi bi-check-circle-fill color-success"> </i>
+              {% if dmarc.valid %}
+              <script> countGood++;countTotal++;</script>
+              <i class="bi bi-check-circle-fill color-success"></i>
               {% else %}
-                <script>countBad++;countTotal++;</script>
-                <i class="bi bi-x-circle-fill color-danger"></i>
+              <script>countBad++;countTotal++;</script>
+              <i class="bi bi-x-circle-fill color-danger"></i>
               {% endif %}
               DMARC Record
             </div>
             <div class="col-lg-12 fs-4">
               {% if dnssec %}
-                <script> countGood++;countTotal++;</script>
-                <i class="bi bi-check-circle-fill color-success"> </i>
+              <script> countGood++;countTotal++;</script>
+              <i class="bi bi-check-circle-fill color-success"></i>
               {% else %}
-                <script>countBad++;countTotal++;</script>
-                <i class="bi bi-x-circle-fill color-danger"></i>
+              <script>countBad++;countTotal++;</script>
+              <i class="bi bi-x-circle-fill color-danger"></i>
               {% endif %}
               Signed Domain Name (DNSSEC)
             </div>
             <!--<div class="col-lg-12 fs-4">
-              {% if dkim_valid %}
-                <script> countGood++;countTotal++;</script>
-                <i class="bi bi-check-circle-fill color-success"></i>
-              {% elif dkim is None %}
-                <script> countWarning++;countTotal++;</script>
-                <i class="bi bi-x-circle-fill text-warning"></i>
-              {% else %}
-                <script>countBad++;countTotal++;</script>
-                <i class="bi bi-x-circle-fill color-danger"></i>
-              {% endif %}
-              DKIM Record
+{% if dkim_valid %}
+<script> countGood++;countTotal++;</script>
+<i class="bi bi-check-circle-fill color-success"></i>
+{% elif dkim is None %}
+<script> countWarning++;countTotal++;</script>
+<i class="bi bi-x-circle-fill text-warning"></i>
+{% else %}
+<script>countBad++;countTotal++;</script>
+<i class="bi bi-x-circle-fill color-danger"></i>
+{% endif %}
+DKIM Record
             </div>-->
           </div>
         </div>
@@ -143,49 +145,52 @@
   <div class="gx-0 row d-flex justify-content-center py-5">
     <section class="container-extended box-shadow primary-fadded-blue_border p-5">
       <div class="col-lg-12 fs-1 fw-bold">
-        {% if spf_valid %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% if spf.valid %}
+        <i class="bi bi-check-circle-fill color-success"></i>
         {% else %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
+        <i class="bi bi-x-circle-fill color-danger"></i>
         {% endif %}
         SPF Record
       </div>
       <div class="col-lg-12 fs-4">
         <p>The Sender Policy Framework (SPF) is an email validation protocol that helps detect and block email spoofing. Email spoofing is a common technique used in phishing and spam emails. SPF allows the receiving mail server to verify that incoming mail from a domain comes from a host authorized by that domain’s administrators. The list of authorized sending hosts for a domain is published in the Domain Name System (DNS) records.</p>
         <div class="row my-2">
-          {% if spf_valid %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#records" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
-              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-              SPF Record
-            </button>
-          {% else %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#records" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-              SPF Record
-            </button>
-          {% endif %}
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#records" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background rte collapsed">
+            <i id="collapse-icon" class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+            Result
+          </button>
           <div class="p-0 collapse" id="records">
             <div class="p-4 border-bottom border-end border-start">
               <h2>SPF Record</h2>
-              <code>{{ spf }}</code>
+              <code>{{ spf.record }}</code>
               <p>Valid:
-                {% if spf_valid %}
-                  <i class="bi bi-check-circle-fill color-success"> </i>
+                {% if spf.valid %}
+                <i class="bi bi-check-circle-fill color-success"></i>
                 {% else %}
-                  <i class="bi bi-x-circle-fill color-danger"></i>
+                <i class="bi bi-x-circle-fill color-danger"></i>
                 {% endif %}
               </p>
             </div>
           </div>
         </div>
         <div class="row my-2">
-          <button type="button" data-bs-toggle="collapse" data-bs-target="#spf_recommendation" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#spf_recommendation" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
             <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
             Recommendations
           </button>
           <div class="p-0 collapse" id="spf_recommendation">
             <div class="p-4 border-bottom border-end border-start">
-              <p>Create and publish an SPF record in your DNS settings for your domain. The SPF record specifies which email servers are authorized to send emails on behalf of your domain name. Identify the IP addresses of your legitimate email servers and include them in your SPF record. This ensures that only authorized servers can send emails using your domain name. Configure your SPF record with a "hard fail" mechanism (-all) to explicitly reject any emails that do not originate from authorized IP addresses. This helps prevent unauthorized sources from sending emails on behalf of your domain. Consider implementing SPF alignment mechanisms, such as DMARC (Domain-based Message Authentication, Reporting, and Conformance), to further strengthen email authentication and protect against domain spoofing.</p>
+              <b>How to Create and Publish an SPF Record</b>
+
+              <p>Follow these steps to create and publish an SPF record in your DNS settings for your domain:</p>
+
+              <ul>
+                <li>Identify the IP addresses of your legitimate email servers.</li>
+                <li>Include these IP addresses in your SPF record to specify which email servers are authorized to send emails on behalf of your domain.</li>
+                <li>Configure your SPF record with a "hard fail" mechanism <code>(-all)</code> to explicitly reject emails not originating from authorized servers.</li>
+              </ul>
+
+              <p>This ensures that only authorized servers can send emails using your domain name, helping to prevent unauthorized sources from doing so.</p>
             </div>
           </div>
         </div>
@@ -196,36 +201,29 @@
   <div class="gx-0 row d-flex justify-content-center py-5">
     <section class="container-extended box-shadow primary-fadded-blue_border p-5">
       <div class="col-lg-12 fs-1 fw-bold">
-        {% if dmarc_valid %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
+        {% if dmarc.valid %}
+        <i class="bi bi-check-circle-fill color-success"></i>
         {% else %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
+        <i class="bi bi-x-circle-fill color-danger"></i>
         {% endif %}
         DMARC Record
       </div>
       <div class="col-lg-12 fs-4">
         <p>DMARC (Domain-based Message Authentication, Reporting, and Conformance) is an email authentication protocol that provides additional protection against email spoofing and phishing attacks. It uses the Sender Policy Framework (SPF) and DomainKeys Identified Mail (DKIM) standards. DMARC enables a domain owner to specify how mail servers should handle messages from their domain that don’t pass SPF or DKIM checks. This adds an extra layer of security</p>
         <div class="row my-2">
-          {% if dmarc_valid %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
-              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-              DMARC Record
-            </button>
-          {% else %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-              DMARC Record
-            </button>
-          {% endif %}
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background rte collapsed">
+            <i id="collapse-icon" class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+            Result
+          </button>
           <div class="p-0 collapse" id="d_record">
             <div class="p-4 border-bottom border-end border-start">
               <h2>DMARC Record</h2>
               <code>{{ dmarc }}</code>
               <p>Valid:
-                {% if dmarc_valid %}
-                  <i class="bi bi-check-circle-fill color-success"> </i>
+                {% if dmarc.valid %}
+                <i class="bi bi-check-circle-fill color-success"></i>
                 {% else %}
-                  <i class="bi bi-x-circle-fill color-danger"></i>
+                <i class="bi bi-x-circle-fill color-danger"></i>
                 {% endif %}
               </p>
             </div>
@@ -235,70 +233,70 @@
     </section>
   </div>
 
- <!-- <div class="gx-0 row d-flex justify-content-center py-5">
-    <section class="container-extended box-shadow primary-fadded-blue_border p-5">
-      <div class="col-lg-12 fs-1 fw-bold">
-        {% if dkim_valid %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
-        {% elif dkim is None %}
-          <i class="bi bi-x-circle-fill text-warning"></i>
-        {% else %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
-        {% endif %}
-        DKIM Record
-      </div>
-      <div class="col-lg-12 fs-4">
-        <p>DomainKeys Identified Mail (DKIM) is an email authentication method that helps to verify the authenticity and integrity of email messages. It adds a digital signature to the email headers, which allows the receiving email server to verify that the email has not been tampered with during transit and that it was indeed sent by the claimed domain.</p>
-        <div class="row my-2">
-          {% if dkim_valid %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
-              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-              DKIM Record
-            </button>
-          {% elif dkim is None %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-warning">
-              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-              DKIM Record
-            </button>
-          {% else %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-              DKIM Record
-            </button>
-          {% endif %}
-          <div class="p-0 collapse" id="dkim_record">
-            <div class="p-4 border-bottom border-end border-start">
-              <h2>DKIM Record</h2>
-              {% if dkim %}
-                <p>DKIM public key found and can be used to encrypt data.</p>
-              {% else %}
-                <p>No suitable DKIM public key found.</p>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-        <div class="row my-2">
-          <button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_recommendation" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
-            <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-            Recommendations
-          </button>
-          <div class="p-0 collapse" id="dkim_recommendation">
-            <div class="p-4 border-bottom border-end border-start">
-              <p>Use a reliable DKIM key generator to create a pair of cryptographic keys - a private key for signing outgoing emails and a corresponding public key that will be published in your DNS records. Add the DKIM public key to your domain's DNS records as a TXT record. This allows receiving email servers to retrieve and verify the DKIM signature.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+  <!-- <div class="gx-0 row d-flex justify-content-center py-5">
+<section class="container-extended box-shadow primary-fadded-blue_border p-5">
+<div class="col-lg-12 fs-1 fw-bold">
+{% if dkim_valid %}
+<i class="bi bi-check-circle-fill color-success"> </i>
+{% elif dkim is None %}
+<i class="bi bi-x-circle-fill text-warning"></i>
+{% else %}
+<i class="bi bi-x-circle-fill color-danger"></i>
+{% endif %}
+DKIM Record
+</div>
+<div class="col-lg-12 fs-4">
+<p>DomainKeys Identified Mail (DKIM) is an email authentication method that helps to verify the authenticity and integrity of email messages. It adds a digital signature to the email headers, which allows the receiving email server to verify that the email has not been tampered with during transit and that it was indeed sent by the claimed domain.</p>
+<div class="row my-2">
+{% if dkim_valid %}
+<button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+<i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+DKIM Record
+</button>
+{% elif dkim is None %}
+<button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-warning">
+<i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+DKIM Record
+</button>
+{% else %}
+<button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+<i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+DKIM Record
+</button>
+{% endif %}
+<div class="p-0 collapse" id="dkim_record">
+<div class="p-4 border-bottom border-end border-start">
+<h2>DKIM Record</h2>
+{% if dkim %}
+<p>DKIM public key found and can be used to encrypt data.</p>
+{% else %}
+<p>No suitable DKIM public key found.</p>
+{% endif %}
+</div>
+</div>
+</div>
+<div class="row my-2">
+<button type="button" data-bs-toggle="collapse" data-bs-target="#dkim_recommendation" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
+<i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+Recommendations
+</button>
+<div class="p-0 collapse" id="dkim_recommendation">
+<div class="p-4 border-bottom border-end border-start">
+<p>Use a reliable DKIM key generator to create a pair of cryptographic keys - a private key for signing outgoing emails and a corresponding public key that will be published in your DNS records. Add the DKIM public key to your domain's DNS records as a TXT record. This allows receiving email servers to retrieve and verify the DKIM signature.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
   </div>-->
 
   <div class="gx-0 row d-flex justify-content-center py-5">
     <section class="container-extended box-shadow primary-fadded-blue_border p-5">
       <div class="col-lg-12 fs-1 fw-bold">
         {% if dnssec %}
-          <i class="bi bi-check-circle-fill color-success"> </i>
+        <i class="bi bi-check-circle-fill color-success"></i>
         {% else %}
-          <i class="bi bi-x-circle-fill color-danger"></i>
+        <i class="bi bi-x-circle-fill color-danger"></i>
         {% endif %}
         Signed Domain Name (DNSSEC)
       </div>
@@ -306,15 +304,15 @@
         <p>DNSSEC (Domain Name System Security Extensions) is a set of cryptographic protocols and security measures designed to enhance the security of the Domain Name System (DNS). By digitally signing DNS data, DNSSEC ensures data integrity and authenticity, protecting against various forms of DNS attacks like cache poisoning or DNS spoofing. It uses public key cryptography to verify the authenticity of DNS responses and provides a chain of trust from the root DNS servers down to the individual domain names, ensuring that the DNS information received by a user is valid and has not been tampered with during transmission.</p>
         <div class="row my-2">
           {% if dnssec %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
-              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-              DNSSEC Status
-            </button>
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+            <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+            DNSSEC Status
+          </button>
           {% else %}
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-              <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-              DNSSEC Status
-            </button>
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
+            <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+            DNSSEC Status
+          </button>
           {% endif %}
           <div class="p-0 collapse" id="dnssec">
             <div class="p-4 border-bottom border-end border-start">
@@ -356,32 +354,32 @@
     </section>
   </div>
 
-  <div class="gx-0 row d-flex justify-content-center py-5">
-    <section class="container-extended box-shadow primary-fadded-blue_border p-5">
-      <div class="col-lg-12 fs-1 fw-bold">
-        Mail Exchanger (MX) Records
-      </div>
-      <div class="col-lg-12 fs-4">
-        <ul>
-          {% for warning in mx.warnings %}
-            <li>{{ warning }}</li>
-          {% endfor %}
-        </ul>
-        {% for host in mx.servers %}
-          <h3>{{ host }}</h3>
-          <ul>
-            <li>TLS:
-              {% if mx.tls.host %}
-                <i class="bi bi-check-circle-fill color-success"></i>
-              {% else %}
-                <i class="bi bi-x-circle-fill color-danger"></i>
-              {% endif %}
-            </li>
-          </ul>
-        {% endfor %}
-      </div>
-    </section>
-  </div>
+  <!--<div class="gx-0 row d-flex justify-content-center py-5">
+<section class="container-extended box-shadow primary-fadded-blue_border p-5">
+<div class="col-lg-12 fs-1 fw-bold">
+Mail Exchanger (MX) Records
+</div>
+<div class="col-lg-12 fs-4">
+<ul>
+{% for warning in mx.warnings %}
+<li>{{ warning }}</li>
+{% endfor %}
+</ul>
+{% for host in mx.servers %}
+<h3>{{ host }}</h3>
+<ul>
+<li>TLS:
+{% if mx.tls.host %}
+<i class="bi bi-check-circle-fill color-success"></i>
+{% else %}
+<i class="bi bi-x-circle-fill color-danger"></i>
+{% endif %}
+</li>
+</ul>
+{% endfor %}
+</div>
+</section>
+  </div>-->
 
   {% endif %}
 </main>

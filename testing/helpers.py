@@ -1,14 +1,12 @@
 import json
-import logging
 import os
 import re
-import socket
 import subprocess
 import sys
 import time
 from base64 import b64decode
 from io import BytesIO
-from typing import Any, Dict, List, Union
+from typing import Any, Union, Dict
 from bs4 import BeautifulSoup
 import dns.resolver
 import dns.dnssec
@@ -26,192 +24,16 @@ import base64
 import smtplib as smtp
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import urljoin, urlparse
-from django.http import HttpResponse
-from xhtml2pdf import pisa
 from Crypto.PublicKey import RSA
 from django.template.loader import render_to_string
 from weasyprint import CSS, HTML
 from typing import Dict, List, Tuple
 import logging
 from testing import validators
-from testing.models import TlsScanHistory
 from testing_platform.settings import PANDORA_ROOT_URL
-
 from .cipher_scoring import load_cipher_info
 
-from django.template.loader import get_template
-
 logger = logging.getLogger(__name__)
-
-
-def get_http_report(target, rescan):
-    ################################
-    # HTTP SCAN Mozilla Observatory
-    ################################
-    try:
-        validators.full_domain_validator(target)
-    except Exception:
-        return {"error": "You entered an invalid hostname!"}
-    response = {}
-
-    logger.info(f"http scan: scanning {target}, with rescan set to {rescan}")
-
-    http_url = (
-        "https://http-observatory.security.mozilla.org/api/v1/analyze?host=" + target
-    )
-    if rescan:
-        http_url += "&rescan=true"
-
-    logger.info(f"http scan: requesting scan at {http_url}")
-    data = requests.post(http_url)
-    json_object = data.json()
-
-    headers = {}
-
-    if "error" in json_object:
-        if json_object["error"] == "invalid-hostname":
-            return {"error": "You entered an invalid hostname!"}
-    else:
-        scan_history = json.loads(
-            requests.get(
-                "https://http-observatory.security.mozilla.org/api/v1/getHostHistory?host="
-                + target
-            ).text
-        )
-        scan_id = json_object["scan_id"]
-        scan_summary = json_object
-        state = ""
-        counter = 0
-
-        if json_object["state"] == "ABORTED":
-            result_obj = json.loads(
-                requests.get(
-                    "https://http-observatory.security.mozilla.org/api/v1/getScanResults?scan="
-                    + str(scan_history[-1]["scan_id"])
-                ).text
-            )
-            response = {k.replace("-", "_"): v for k, v in result_obj.items()}
-            return {
-                "result": response,
-                "domain_name": target,
-                "scan_summary": scan_summary,
-                "headers": headers,
-                "scan_history": scan_history,
-            }
-
-        while json_object["state"] not in ("ABORTED", "FAILED") and counter < 5:
-            get_scan = requests.get(
-                "https://http-observatory.security.mozilla.org/api/v1/analyze?host="
-                + target
-            ).text
-            check_object = json.loads(get_scan)
-            state = check_object.get("state", "NO_STATE")
-            counter += 1
-            if state == "FINISHED":
-                use = False
-                headers = {
-                    k.replace("-", "_"): v
-                    for k, v in check_object["response_headers"].items()
-                }
-                scan_id = check_object["scan_id"]
-                scan_summary = check_object
-                logger.info(f"http scan: finished scan in {counter} request(s)")
-                result_obj = json.loads(
-                    requests.get(
-                        "https://http-observatory.security.mozilla.org/api/v1/getScanResults?scan="
-                        + str(scan_id)
-                    ).text
-                )
-                response = {k.replace("-", "_"): v for k, v in result_obj.items()}
-                if use:
-                    headers = {
-                        k.replace("-", "_"): v
-                        for k, v in json_object["response_headers"].items()
-                    }
-                break
-            else:
-                if state in (
-                    "ABORTED",
-                    "FAILED",
-                    "PENDING",
-                    "STARTING",
-                    "RUNNING",
-                    "NO_STATE",
-                ):
-                    logger.info(
-                        f"http scan: got {state} after {counter} request(s) for {target}, retrying in 3s"
-                    )
-                    time.sleep(3)
-                else:
-                    logger.info(f"http scan: got unknown state {state} for {target}")
-                    print(f"http scan: got unknown state {state} for {target}")
-
-        if counter == 5 and state != "FINISHED":
-            logger.warning("http scan: not finished after 5 times, skipping")
-
-        logger.info("http scan: Done!")
-        return {
-            "result": response,
-            "domain_name": target,
-            "scan_summary": scan_summary,
-            "headers": headers,
-            "scan_history": scan_history,
-        }
-
-
-def get_tls_report(target, rescan):
-    ################################
-    # TLS SCAN Mozilla Observatory
-    ################################
-    tls_target = target.replace("www.", "")
-    tls_scan_id = ""
-    url = (
-        "https://tls-observatory.services.mozilla.com/api/v1/scan?target=" + tls_target
-    )
-    if rescan:
-        url += "&rescan=true"
-    try:
-        do_tls_scan = json.loads(requests.post(url).text)
-        tls_scan_id = do_tls_scan["scan_id"]
-        TlsScanHistory.objects.update_or_create(
-            domain=tls_target, defaults={"scan_id": tls_scan_id}
-        )
-    except ValueError:
-        tls_scan_history = TlsScanHistory.objects.get(domain=tls_target)
-        tls_scan_id = tls_scan_history.scan_id
-
-    fetch_tls = json.loads(
-        requests.get(
-            "https://tls-observatory.services.mozilla.com/api/v1/results?id="
-            + str(tls_scan_id)
-        ).text
-    )
-
-    completion_perc = fetch_tls["completion_perc"]
-    counter = 0
-    while completion_perc != 100 and counter < 5:
-        fetch_tls = json.loads(
-            requests.get(
-                "https://tls-observatory.services.mozilla.com/api/v1/results?id="
-                + str(tls_scan_id)
-            ).text
-        )
-        completion_perc = fetch_tls["completion_perc"]
-        counter += 1
-        if completion_perc == 100:
-            logger.info(f"tls scan: finished scan in {counter} request(s).")
-            break
-        else:
-            logger.info(
-                f"tls scan: got {completion_perc}% done for {target} after {counter} request(s), sleeping 3s"
-            )
-            time.sleep(3)
-
-    if completion_perc < 100 and counter == 5:
-        logger.warning("tls scan: scan not finished after 5 tries, skipping")
-
-    return fetch_tls
-
 
 def check_soa_record(target: str) -> Union[bool, Dict]:
     """Checks the presence of a SOA record for the Email Systems Testing."""
@@ -733,47 +555,137 @@ def get_pdf_report():
 
 
 def check_dnssec(domain):
+    """
+    Check if DNSSEC is enabled for the domain.
+
+    Args:
+        domain (str): The domain to check.
+
+    Returns:
+        dict: A dictionary containing DNSSEC status and details.
+    """
+    result = {"enabled": False, "keys": [], "error": None}
     try:
         dnskey = dns.resolver.resolve(domain, 'DNSKEY')
-        return bool(dnskey)
+        result["enabled"] = True
+        result["keys"] = [key.to_text() for key in dnskey]
+    except dns.resolver.NXDOMAIN:
+        result["error"] = "Domain does not exist"
+    except dns.resolver.NoAnswer:
+        result["error"] = "No DNSKEY records found"
+    except dns.exception.DNSException as e:
+        result["error"] = f"DNS error: {str(e)}"
     except Exception as e:
-        print(f'Error checking DNSSEC for {domain}: {e}')
-        return False
+        result["error"] = f"Unexpected error: {str(e)}"
 
+    logger.info(f"DNSSEC check for {domain}: {'Enabled' if result['enabled'] else 'Disabled'}")
+    if result["error"]:
+        logger.warning(f"DNSSEC check error for {domain}: {result['error']}")
+
+    return result
 
 def check_mx(domain):
+    """
+    Check MX records for the domain.
+
+    Args:
+        domain (str): The domain to check.
+
+    Returns:
+        dict: A dictionary containing MX records and details.
+    """
+    result = {"records": [], "error": None}
     try:
         mx_records = dns.resolver.resolve(domain, 'MX')
-        mx_servers = [str(mx.exchange) for mx in mx_records]
-        return mx_servers
+        result["records"] = [{"preference": mx.preference, "exchange": str(mx.exchange)} for mx in mx_records]
+    except dns.resolver.NXDOMAIN:
+        result["error"] = "Domain does not exist"
+    except dns.resolver.NoAnswer:
+        result["error"] = "No MX records found"
+    except dns.exception.DNSException as e:
+        result["error"] = f"DNS error: {str(e)}"
     except Exception as e:
-        print(f'Error checking MX records for {domain}: {e}')
-        return []
+        result["error"] = f"Unexpected error: {str(e)}"
 
+    logger.info(f"MX check for {domain}: {len(result['records'])} records found")
+    if result["error"]:
+        logger.warning(f"MX check error for {domain}: {result['error']}")
+
+    return result
 
 def check_spf(domain):
+    """
+    Check SPF record for the domain.
+
+    Args:
+        domain (str): The domain to check.
+
+    Returns:
+        dict: A dictionary containing SPF record details.
+    """
+    result = {"record": None, "valid": False, "error": None}
     try:
-        spf_record = dns.resolver.resolve(domain, 'TXT')
-        for record in spf_record:
+        txt_records = dns.resolver.resolve(domain, 'TXT')
+        for record in txt_records:
             if 'v=spf1' in str(record):
-                return record.to_text(), True
-        return None, False
+                result["record"] = record.to_text()
+                result["valid"] = True
+                break
+    except dns.resolver.NXDOMAIN:
+        result["error"] = "Domain does not exist"
+    except dns.resolver.NoAnswer:
+        result["error"] = "No TXT records found"
+    except dns.exception.DNSException as e:
+        result["error"] = f"DNS error: {str(e)}"
     except Exception as e:
-        print(f'Error checking SPF for {domain}: {e}')
-        return None, False
+        result["error"] = f"Unexpected error: {str(e)}"
 
+    logger.info(f"SPF check for {domain}: {'Valid' if result['valid'] else 'Not found or invalid'}")
+    if result["error"]:
+        logger.warning(f"SPF check error for {domain}: {result['error']}")
 
-def check_dmarc(domain):
+    return result
+
+def check_dmarc(domain: str) -> dict[str, bool | None | str | Any]:
+    """
+    Check the DMARC record for a given domain.
+
+    Args:
+        domain (str): The domain to check for DMARC record.
+
+    Returns:
+        dict: A dictionary containing DMARC record details.
+    """
+    result = {"record": None, "valid": False, "error": None}
     dmarc_domain = f'_dmarc.{domain}'
+
     try:
-        dmarc_record = dns.resolver.resolve(dmarc_domain, 'TXT')
-        for record in dmarc_record:
-            if 'v=DMARC1' in str(record):
-                return record.to_text(), True
-        return None, False
+        dmarc_records = dns.resolver.resolve(dmarc_domain, 'TXT')
+
+        for record in dmarc_records:
+            record_text = record.to_text().strip('"')
+            if record_text.startswith('v=DMARC1'):
+                result['record'] = record_text
+                result['valid'] = True
+                break
+
+        if not result['valid']:
+            result['error'] = "No valid DMARC record found"
+
+    except dns.resolver.NXDOMAIN:
+        result['error'] = "Domain does not exist"
+    except dns.resolver.NoAnswer:
+        result['error'] = "No TXT records found"
+    except dns.exception.DNSException as e:
+        result['error'] = f"DNS error: {str(e)}"
     except Exception as e:
-        print(f'Error checking DMARC for {domain}: {e}')
-        return None, False
+        result['error'] = f"Unexpected error: {str(e)}"
+
+    logger.info(f"DMARC check for {domain}: {'Valid' if result['valid'] else 'Not found or invalid'}")
+    if result['error']:
+        logger.warning(f"DMARC check error for {domain}: {result['error']}")
+
+    return result
 
 
 def check_tls(mx_servers: List[str]) -> Dict[str, Dict[str, str]]:
@@ -864,8 +776,6 @@ def check_dkim(domain, selector):
     except Exception as e:
         print(f'Error checking DKIM for {dkim_domain}: {e}')
         return None, False
-
-#####
 
 
 def check_csp(domain):

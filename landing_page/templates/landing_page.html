@@ -37,11 +37,9 @@
           class="h-100 card primary-fadded-blue_border rounded-box-20 multi-purpose-gray-50_background  ">
           <div class="card-body d-flex flex-column">
             <div style="min-height:210px;">
-              <h5 class="card-title font-weight-600 text-blue-gradient">Website
-                Application Testing</h5>
+              <h5 class="card-title font-weight-600 text-blue-gradient">Web Security Assessment</h5>
               <p class="text-multi-purpose-gray-600">
-                Assess the security of your website against known
-                vulnerabilities and provides you recommendations.
+              Assesses web security, including CSP, cookies, CORS, HTTPS, and more, identifying vulnerabilities.
               </p>
             </div>
             <form method="post" action="infra-testing/web-test/" id="http-test">
@@ -57,7 +55,7 @@
                        id="target" name="target"
                        value="{{ form }}" required>
               </div>
-               <input type="submit" value="Test" class="text-white button-text-background primary-primary-blue_background"
+              <input type="submit" value="Test" class="text-white button-text-background primary-primary-blue_background"
                      onclick='openPopup("http-test")'>
             </form>
           </div>
@@ -72,10 +70,8 @@
           class="card  h-100 primary-fadded-blue_border rounded-box-20 multi-purpose-gray-50_background">
           <div class="card-body d-flex flex-column ">
             <div style="min-height:210px;">
-              <h5 class="card-title font-weight-600 text-blue-gradient">Infrastructure
-                Testing</h5>
-              <p class="text-multi-purpose-gray-600">Assess the configuration of your
-                web server (if publicly available).</p>
+              <h5 class="card-title font-weight-600 text-blue-gradient">Service & Vulnerability Assessment</h5>
+              <p class="text-multi-purpose-gray-600">Identifies server services and potential vulnerabilities with recommendations for security improvements</p>
             </div>
 
             <form method="post" action="infra-testing/infra-test/" id="web-server-test">
@@ -102,14 +98,11 @@
           class="card h-100 primary-fadded-blue_border rounded-box-20  multi-purpose-gray-50_background">
           <div class="card-body d-flex flex-column ">
             <div style="min-height:210px;">
-              <h5 class="card-title font-weight-600 text-blue-gradient">Email Systems
-                Testing</h5>
-              <p class="text-multi-purpose-gray-600">Assess the security of your email
-                setup
-                (<a href="{% url 'knowledge_base'  %}#standards-dmarc-spf">SPF,
-                  DMARC</a>,
-                <a href="{% url 'knowledge_base'  %}#standards-dkim">DKIM</a>
-                DNS records, and deployment of DNSSEC).</p>
+              <h5 class="card-title font-weight-600 text-blue-gradient">E-Mail Security Assessment</h5>
+              <p class="text-multi-purpose-gray-600">Assess the security of your email setup
+                      (<a href="/knowledge_base#standards-dmarc-spf" class="nested-link">SPF, DMARC</a>,
+                      <a href="/knowledge_base#standards-dkim" class="nested-link">DKIM</a>
+                      DNS records, and deployment of DNSSEC).</p>
             </div>
             <form method="post" action="infra-testing/email-test/" id="email-test">
               {% csrf_token %}
@@ -149,56 +142,56 @@
   </div>
 </section>
 <!--<div class="container my-5">
-  <div class="mb-5">
+<div class="mb-5">
 
-    <div class="d-flex align-items-center justify-content-center gap-4" >
-      <hr class="hr-h-width primary-primary-blue_background">
-      <h3 class="text-primary-primary-blue">About the testing platform</h3>
-      <hr class="hr-h-width primary-primary-blue_background">
-    </div>
-    <h2 class="font-size-48 font-weight-800 lh-base text-blue-gradient">The Goal</h2>
-    <p class="font-size-20 lh-base">The testing platform holds the tools and
-      services that will help organisations to perform basic tests on their most
-      commonly exposed infrastructures, starting with email and web servers. More tools
-      will be added through time to increase the coverage of available tests.</p>
-    <a class="gap-1 font-weight-600" href="#">Find out more here <i class="bi bi-arrow-right-short"></i></a>
-  </div>
-  <div class="row bg-primary rounded-3 p-4 my-4">
-    <div class="col-lg-10 d-flex justify-content-evenly align-items-center flex-wrap">
-      <div class="d-flex flex-column align-items-center text-white">
-        <div class="d-flex align-items-center mb-2">
-          <span class="fs-1 fw-bold">0</span>
+<div class="d-flex align-items-center justify-content-center gap-4" >
+<hr class="hr-h-width primary-primary-blue_background">
+<h3 class="text-primary-primary-blue">About the testing platform</h3>
+<hr class="hr-h-width primary-primary-blue_background">
+</div>
+<h2 class="font-size-48 font-weight-800 lh-base text-blue-gradient">The Goal</h2>
+<p class="font-size-20 lh-base">The testing platform holds the tools and
+services that will help organisations to perform basic tests on their most
+commonly exposed infrastructures, starting with email and web servers. More tools
+will be added through time to increase the coverage of available tests.</p>
+<a class="gap-1 font-weight-600" href="#">Find out more here <i class="bi bi-arrow-right-short"></i></a>
+</div>
+<div class="row bg-primary rounded-3 p-4 my-4">
+<div class="col-lg-10 d-flex justify-content-evenly align-items-center flex-wrap">
+<div class="d-flex flex-column align-items-center text-white">
+<div class="d-flex align-items-center mb-2">
+<span class="fs-1 fw-bold">0</span>
 
-        </div>
-        <span class="fs-6 fw-semibold">Stat 1</span>
-      </div>
-      <div class="d-flex flex-column align-items-center text-white">
-        <div class="d-flex align-items-center mb-2">
-          <span class="fs-1 fw-bold">0</span>
+</div>
+<span class="fs-6 fw-semibold">Stat 1</span>
+</div>
+<div class="d-flex flex-column align-items-center text-white">
+<div class="d-flex align-items-center mb-2">
+<span class="fs-1 fw-bold">0</span>
 
-        </div>
-        <span class="fs-6 fw-semibold">Stat 2</span>
-      </div>
-      <div class="d-flex flex-column align-items-center text-white">
-        <div class="d-flex align-items-center mb-2">
-          <span class="fs-1 fw-bold">0</span>
+</div>
+<span class="fs-6 fw-semibold">Stat 2</span>
+</div>
+<div class="d-flex flex-column align-items-center text-white">
+<div class="d-flex align-items-center mb-2">
+<span class="fs-1 fw-bold">0</span>
 
-        </div>
-        <span class="fs-6 fw-semibold">Stat 3</span>
-      </div>
-      <div class="d-flex flex-column align-items-center text-white">
-        <div class="d-flex align-items-center mb-2">
-          <span class="fs-1 fw-bold">0</span>
+</div>
+<span class="fs-6 fw-semibold">Stat 3</span>
+</div>
+<div class="d-flex flex-column align-items-center text-white">
+<div class="d-flex align-items-center mb-2">
+<span class="fs-1 fw-bold">0</span>
 
-        </div>
-        <span class="fs-6 fw-semibold">Stat 4</span>
-      </div>
-    </div>
-    <a href="/observatory-bulletin/"
-       class="col-lg-2 btn btn-link text-white fw-bold align-self-center">
-      Learn more <i class="bi bi-arrow-right"></i>
-    </a>
-  </div>
+</div>
+<span class="fs-6 fw-semibold">Stat 4</span>
+</div>
+</div>
+<a href="/observatory-bulletin/"
+class="col-lg-2 btn btn-link text-white fw-bold align-self-center">
+Learn more <i class="bi bi-arrow-right"></i>
+</a>
+</div>
 </div>-->
 <section>
   <div id="contact-us-header" class="section blue-gradient_background  px-3">
@@ -295,24 +288,24 @@
 </section>
 
 <script>
-  function openPopup(id){
-    let form = document.getElementById(id);
-    if (form.target.value != "") {
-      let popup_loading = document.getElementById('popup-loading');
-      popup_loading.classList.add("open-popup");
-      let bg = document.getElementById('blur-bg');
-      bg.classList.add("open-popup");
-      let popup_content = document.getElementById('popup-content');
-      popup_content.classList.add("open-popup");
-    }
+  function openPopup(id) {
+      let form = document.getElementById(id);
+      if (form.target.value != "") {
+          let popup_loading = document.getElementById('popup-loading');
+          popup_loading.classList.add("open-popup");
+          let bg = document.getElementById('blur-bg');
+          bg.classList.add("open-popup");
+          let popup_content = document.getElementById('popup-content');
+          popup_content.classList.add("open-popup");
+      }
   }
-  function hidePopup(){
-    let popup_loading = document.getElementById('popup-loading');
-    popup_loading.classList.remove("open-popup");
-    let bg = document.getElementById('blur-bg');
-    let popup_content = document.getElementById('popup-content');
-    popup_content.classList.remove("open-popup");
-    bg.classList.remove("open-popup");
+  function hidePopup() {
+      let popup_loading = document.getElementById('popup-loading');
+      popup_loading.classList.remove("open-popup");
+      let bg = document.getElementById('blur-bg');
+      let popup_content = document.getElementById('popup-content');
+      popup_content.classList.remove("open-popup");
+      bg.classList.remove("open-popup");
   }
   window.onpageshow = hidePopup;
 </script>

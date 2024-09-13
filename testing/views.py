@@ -31,7 +31,7 @@ from .helpers import (
     check_soa_record,
     email_check,
     file_check,
-    get_http_report,
+
     ipv6_check,
     tls_version_check,
     web_server_check,
@@ -95,77 +95,42 @@ def ping_test(request):
 def test_landing(request):
     return render(request, "test_landing.html")
 
-
-def http_test(request):
-    if request.method == "POST":
-        try:
-            nb_tests = int(request.COOKIES["nb_tests"])
-        except KeyError:
-            nb_tests = 0
-        if nb_tests == 3 and not request.user.is_authenticated:
-            messages.error(
-                request,
-                "You reached the maximum number of tests. Please create an account.",
-            )
-            return redirect("signup")
-        context = {"rescan": False}
-        # if "rescan" in request.POST:
-        #  context["rescan"] = True
-
-        context.update(get_http_report(request.POST["target"], False))
-        # context.update(ipv6_check(request.POST["target"], None))
-
-        try:
-            tls_results = tls_version_check(request.POST["target"], "web")
-            context["tls_results"] = tls_results["result"]
-            context["tls_lowest_sec_level"] = tls_results["lowest_sec_level"]
-        except Exception:
-            pass
-
-        nb_tests += 1
-        response = render(request, "check_website.html", context)
-        response.set_cookie("nb_tests", nb_tests)
-        return response
-    else:
-        return render(request, "check_website.html")
-
-
-def zap_test(request):
-    if request.method == "POST":
-        try:
-            nb_tests = int(request.COOKIES["nb_tests"])
-        except KeyError:
-            nb_tests = 0
-        if nb_tests == 3 and not request.user.is_authenticated:
-            messages.error(
-                request,
-                "You reached the maximum number of tests. Please create an account.",
-            )
-            return redirect("signup")
-        target = request.POST["target"]
-        api_key = settings.ZAP_API_KEY
-        # json_report, html_report = zap_scan(target, api_key)
-        # context = json_report['site'][0]
-        alerts = zap_scan(target, api_key)
-        context = {'alerts': alerts, 'target': target}
-        nb_tests += 1
-        response = render(request, "check_zap.html", context)
-
-        try:
-            test_report = TestReport.objects.get(tested_site=target, test_ran="zap")
-            test_report.report = context
-            test_report.save()
-        except TestReport.DoesNotExist:
-            test_report = TestReport.objects.get_or_create(
-                tested_site=target,
-                test_ran="zap",
-                report=context
-            )
-        response.set_cookie("nb_tests", nb_tests)
-        return response
-        # return HttpResponse(html_report)
-    else:
-        return render(request, "check_zap.html")
+# def zap_test(request):
+#     if request.method == "POST":
+#         try:
+#             nb_tests = int(request.COOKIES["nb_tests"])
+#         except KeyError:
+#             nb_tests = 0
+#         if nb_tests == 3 and not request.user.is_authenticated:
+#             messages.error(
+#                 request,
+#                 "You reached the maximum number of tests. Please create an account.",
+#             )
+#             return redirect("signup")
+#         target = request.POST["target"]
+#         api_key = settings.ZAP_API_KEY
+#         # json_report, html_report = zap_scan(target, api_key)
+#         # context = json_report['site'][0]
+#         alerts = zap_scan(target, api_key)
+#         context = {'alerts': alerts, 'target': target}
+#         nb_tests += 1
+#         response = render(request, "check_zap.html", context)
+#
+#         try:
+#             test_report = TestReport.objects.get(tested_site=target, test_ran="zap")
+#             test_report.report = context
+#             test_report.save()
+#         except TestReport.DoesNotExist:
+#             test_report = TestReport.objects.get_or_create(
+#                 tested_site=target,
+#                 test_ran="zap",
+#                 report=context
+#             )
+#         response.set_cookie("nb_tests", nb_tests)
+#         return response
+#         # return HttpResponse(html_report)
+#     else:
+#         return render(request, "check_zap.html")
 
 
 @csrf_exempt
@@ -232,11 +197,14 @@ def email_test(request):
 
             context['domain'] = target
             context['dnssec'] = check_dnssec(target)
-            mx_servers = check_mx(target)
-            context['mx'] = {'servers': mx_servers, 'tls': check_tls(mx_servers)}
-            context['spf'], context['spf_valid'] = check_spf(target)
-            context['dmarc'], context['dmarc_valid'] = check_dmarc(target)
-            context['dkim'], context['dkim_valid'] = check_dkim(target, dkim_selector)
+            #mx_servers = check_mx(target)
+            #context['mx'] = {'servers': mx_servers, 'tls': check_tls(mx_servers)}
+
+            context['spf'] = check_spf(target)
+
+
+            context['dmarc'] = check_dmarc(target)
+            #context['dkim'], context['dkim_valid'] = check_dkim(target, dkim_selector)
 
         try:
             test_report = TestReport.objects.get(tested_site=target, test_ran="email-test")

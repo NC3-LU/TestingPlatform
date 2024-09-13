@@ -3,14 +3,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("http-test/", views.http_test, name="http_test"),
-
     path("web-test/", views.check_website_security, name="web_test"),
-    path("zap/", views.zap_test, name="zap_test"),
-
     path("email-test/", views.email_test, name="email_test"),
     path("file-test/", views.file_test, name="file_test"),
-    path("infra-test/", views.web_server_test, name="infra-test"),
+    path("service-test/", views.web_server_test, name="service-test"),
     path("spf-generator/", views.spf_generator, name="spf-generator"),
     path("dmarc-generator/", views.dmarc_generator, name="dmarc-generator"),
     path("email-policy-generator/", views.record_generator, name="email_policy_generator"),

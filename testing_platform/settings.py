@@ -281,3 +281,5 @@ BOOTSTRAP5 = {
 if not DEBUG and SECRET_KEY == "secret":
     print("FATAL: the secret key in the config has not yet been configured. Quitting.")
     exit(-1)
+
+ZAP_API_KEY = os.environ.get("ZAP_API_KEY", "123456")

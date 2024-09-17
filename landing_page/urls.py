@@ -17,5 +17,5 @@ urlpatterns = [
         ".well-known/security.txt",
         TemplateView.as_view(template_name="security.txt", content_type="text/plain"),
     ),
-    path("ldih/<ldih_uuid>", views.ldih, name='ldih')
+    path("ldih/uid=<ldih_uuid>", views.ldih, name='ldih')
 ]

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+
+    .container {
+      width: 100%;
+      margin: 0 auto;
+      padding: 5px;
+      background-color: #ffffff;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2, h3 {
+      color: #333;
+    }
+
+    p, li {
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .status {
+      margin: 5px 0;
+    }
+
+    .status i {
+      margin-right: 10px;
+    }
+
+    .box {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin: 20px 0;
+      break-inside: avoid !important;
+    }
+
+    .green { color: green; }
+    .red { color: red; }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    .table th, .table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    .table th {
+      background-color: #f4f4f4;
+    }
+
+    .alert {
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid transparent;
+      border-radius: 4px;
+    }
+
+    .alert-success {
+      color: #155724;
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+    }
+
+    .alert-danger {
+      color: #721c24;
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+
+    .alert-info {
+      color: #0b4f60;
+      background-color: #dbf3f8;
+      border-color: #bde3ea;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="box">
+      <h1>Services</h1>
+      <p>Listing of all the services found running on your server.</p>
+      <p>Check out the <a href="#general-recommendations-webconf">general
+        recommendations</a>
+        below for more details.</p>
+      <br>
+      {% if services %}
+      <table class="table table-light table-bordered table-striped">
+        <tr>
+          <th>Name</th>
+          <th>Product</th>
+          <th>Version</th>
+        </tr>
+        {% for service in services %}
+        <tr>
+          <td>{{ service.name }}</td>
+          <td>{{ service.product }}</td>
+          <td>
+            {% if service.version %}
+              {{ service.version }}
+            {% else %}
+              Not found
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+      {% endif %}
+    </div>
+
+    <div class="box">
+      <h1>Vulnerabilities</h1>
+      <ul>
+        <li>
+          Listing of all the potential vulnerabilities found on your system,
+          per software, when applicable.
+        </li>
+        <li>Click on the <i class="bi bi-search"></i> icon for more details.</li>
+        <li>
+          Check out the <a href="#general-recommendations-infra">general
+          recommendations</a>
+          below for more details.
+        </li>
+      </ul>
+      <br>
+      {% for vulnerability in vulnerabilities %}
+        <h3>{{ vulnerability.service }}</h3>
+        {% if vulnerability.vuln_list %}
+          <div class="table-responsive">
+            <table class="table table-light table-bordered table-striped">
+              <tr>
+                <th>ID</th>
+                <th>CVSS</th>
+                <th>Type</th>
+                <th>External link</th>
+              </tr>
+              {% for vuln in vulnerability.vuln_list %}
+                <tr>
+                  <td>{{ vuln.id }}</td>
+                  <td>{{ vuln.cvss }}</td>
+                  <td>{{ vuln.type }}</td>
+                  <td>
+                      <a href="{{ vuln.link }}"
+                         target="_blank">
+                        <i class="bi bi-search"></i>
+                      </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% else %}
+          <p>No vulnerabilities found for this service.</p>
+        {% endif %}
+      {% endfor %}
+      <div class="container" id="general-recommendations-infra">
+        <h3>General recommendations</h3>
+        <p>
+          Generally speaking, make sure all of your software is up-to-date.
+          Most of the time, results show that a service may be exploited when the
+          software behind it is outdated.
+        </p>
+        <h4>Why is my software version not showed, and what should I do?</h4>
+        This information was not found, as it is not visible either in your server's
+        HTTP headers or any of the publicly available data from your server.
+        Possible course of actions:
+        <ul>
+          <li>
+            Best practice is to find documentation for the service, and follow the
+            instructions to find what version is running on your system.
+          </li>
+          <li>
+            If your infrastructure is administered by third party, please contact
+            them
+            to inquire about possible updates to be made on your systems.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>

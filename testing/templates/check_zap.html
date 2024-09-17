@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+{% load tags %}
+{% block content %}
+<section class="blue-gradient_background p-4 text-white">
+  <div class="container my-5">
+    <div class="mb-5">
+      <div class="d-flex align-items-center" style="gap: 1.944em">
+        <hr class="hr-h-width bg-white">
+        <h3>Zap Scanner</h3>
+      </div>
+      <h1 class="font-size-48 font-weight-800 lh-base">The website testing assesses the security of your website!</h1>
+    </div>
+    <div>
+      <p>
+      The website testing assesses the security of your website against known
+            vulnerabilities, then provides you recommendations to resolve each security
+            weakness identified!</p>
+    </div>
+  </div>
+</section>
+
+<main>
+   <div class="container d-flex justify-content-center py-5">
+    <div class="w-75 box-shadow primary-fadded-blue_border rounded-box-20 p-5">
+      <h3>Zap Scanner</h3>
+      <p>
+       Assess the security of your email setup
+          (SPF and DMARC DNS records, DNSSEC deployment, etc.)
+      </p>
+      <form method="post">
+        {% csrf_token %}
+        {% if error %}
+        <span class="text-danger">{{ error }}</span>
+        {% endif %}
+        <div class="mb-3">
+          <label class="mb-1">
+            Enter your email domain name:
+          </label>
+          <input class="form-control" type="text" placeholder="domain.lu"
+                 id="target" name="target"
+                 value="{{ form }}" required>
+        </div>
+        {% if alerts %}
+          <div class="d-flex justify-content-center pb-3">
+            <a href="export/{{ target }}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
+          </div>
+        {% endif %}
+          <div class="card-footer text-center text-muted">
+            <!-- TODO change href --><a
+          href="{% url 'knowledge_base'  %}#tests-email">About the test</a></div>
+
+      </form>
+      </div>
+    </div>
+<div class="gx-0 row d-flex justify-content-center py-5">
+    <section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
+      <h1 class="text-center">Overview of {{ result.domain }}</h1>
+      <div class="row justify-content-evenly mb-5">
+        <div class="col-lg-3 d-flex align-items-center">
+          <canvas id="chart1"></canvas>
+        </div>
+      </div>
+
+    </section>
+</div>
+  {% include "zap_report.html" %}
+</main>
+
+{% endblock %}

@@ -1,0 +1,90 @@
+{% if alerts %}
+<script>
+  let countGood = 0;
+  let countBad = 0;
+  let countWarning = 0;
+  let countTotal = 0;
+</script>
+
+  <section class="col-lg-11 col-md-12 row my-5 border border-2 rounded p-4">
+    {% for alert in alerts %}
+      <div class="row">
+        <div class="col-lg-12 fs-1 fw-bold">
+          {% if alert.risk == "High" %}
+            <span class="background-icon mb-3" style="background-color: var(--redColor); font-size: 18px; vertical-align: middle">HIGH</span>
+          {% elif alert.risk == "Medium" %}
+            <span class="background-icon mb-3" style="background-color: var(--gradeBPlus); font-size: 18px; vertical-align: middle">MEDIUM</span>
+          {% elif alert.risk == "Low" %}
+            <span class="background-icon mb-3" style="background-color: var(--gradeB); font-size: 18px; vertical-align: middle">LOW</span>
+          {% elif alert.risk == "Informational" %}
+            <span class="background-icon mb-3" style="background-color: var(--grey); font-size: 18px; vertical-align: middle">INFO</span>
+          {% endif %}
+          {{ alert.alert }}
+        </div>
+        <h5>Description:</h5>
+        <div class="col-lg-12 fs-4">
+          {{ alert.description }}
+        </div>
+        <h5>Solution:</h5>
+        <div class="col-lg-12 fs-4">
+          {{ alert.solution }}
+        </div>
+        <br>
+      </div>
+    {% endfor %}
+  </section>
+<script>
+  var successPercentage = countGood / countTotal * 100;
+  let failurePercentage = countBad / countTotal * 100;
+  let informationalPercentage = countWarning / countTotal * 100;
+  var data = [{
+    data: [successPercentage, failurePercentage, informationalPercentage],
+    backgroundColor: [
+      "#4ecb71",
+      "#ff5c5c",
+      "#f5e230",
+    ],
+    borderColor: "#fff"
+  }];
+
+  var options = {
+    tooltips: {
+      enabled: false
+    },
+    plugins: {
+      datalabels: {
+        formatter: (value, ctx) => {
+          let sum = 0;
+          let dataArr = ctx.chart.data.datasets[0].data;
+          dataArr.map(data => {
+            sum += data;
+          });
+          let percentage = (value * 100 / sum).toFixed(2) + "%";
+          return percentage;
+        },
+        color: '#fff',
+      },
+      title: {
+        display: true,
+        text: 'Score'
+      }
+    },
+  };
+
+  var ctx = document.getElementById("chart1").getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      datasets: data
+    },
+    options: options
+  });
+
+  document.getElementById('vulnerable-count').innerHTML = countBad;
+  document.getElementById('good-count').innerHTML = countGood;
+  document.getElementById('warning-count').innerHTML = countWarning;
+  $('.accordion-button').click(function () {
+    $(this).find('.bi').toggleClass('rotate');
+  });
+</script>
+{% endif %}

@@ -542,6 +542,7 @@ def dmarc_upload(request):
         return HttpResponse(status=401)
 
 
+@login_required
 def pdf_from_template(request, test, site):
     report = TestReport.objects.get(tested_site=site, test_ran=test).report
 
@@ -568,15 +569,15 @@ def pdf_from_template(request, test, site):
                     count_good += 1
 
     elif test == "email-test":
-        if report['spf_valid'] is True:
+        if report['spf']['valid'] is True:
             count_good += 1
         else:
             count_vulnerable += 1
-        if report['dmarc_valid'] is True:
+        if report['dmarc']['valid'] is True:
             count_good += 1
         else:
             count_vulnerable += 1
-        if report['dnssec'] is True:
+        if report['dnssec']['enabled'] is True:
             count_good += 1
         else:
             count_vulnerable += 1
@@ -586,8 +587,9 @@ def pdf_from_template(request, test, site):
 
     # Generate pie chart
     try:
-        labels = ['Good', 'Vulnerable']
-        sizes = [count_good, count_vulnerable]
+        data = {'Good': count_good, 'Vulnerable': count_vulnerable}
+        labels = [key for key, value in data.items() if value != 0]
+        sizes = [value for value in data.values() if value != 0]
         colors = ['green', 'red']
         plt.figure(figsize=(4, 4))
         plt.pie(sizes, labels=labels, labeldistance=0.3, colors=colors, autopct=None,

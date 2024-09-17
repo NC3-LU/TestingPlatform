@@ -49,7 +49,7 @@
         <input type="submit" value="Test"
                class="text-white button-text-background primary-primary-blue_background">
       </form>
-      {% if result %}
+      {% if domain %}
       <div class="d-flex justify-content-center pb-3 pt-3">
         <a href="{% url 'pdf_from_template' test='email-test' site=domain %}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
       </div>
@@ -293,7 +293,7 @@ Recommendations
   <div class="gx-0 row d-flex justify-content-center py-5">
     <section class="container-extended box-shadow primary-fadded-blue_border p-5">
       <div class="col-lg-12 fs-1 fw-bold">
-        {% if dnssec %}
+        {% if dnssec.enabled %}
         <i class="bi bi-check-circle-fill color-success"></i>
         {% else %}
         <i class="bi bi-x-circle-fill color-danger"></i>
@@ -303,20 +303,22 @@ Recommendations
       <div class="col-lg-12 fs-4">
         <p>DNSSEC (Domain Name System Security Extensions) is a set of cryptographic protocols and security measures designed to enhance the security of the Domain Name System (DNS). By digitally signing DNS data, DNSSEC ensures data integrity and authenticity, protecting against various forms of DNS attacks like cache poisoning or DNS spoofing. It uses public key cryptography to verify the authenticity of DNS responses and provides a chain of trust from the root DNS servers down to the individual domain names, ensuring that the DNS information received by a user is valid and has not been tampered with during transmission.</p>
         <div class="row my-2">
-          {% if dnssec %}
-          <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-success">
+          <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background rte collapsed">
             <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-            DNSSEC Status
+            Result
           </button>
-          {% else %}
-          <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-danger">
-            <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
-            DNSSEC Status
-          </button>
-          {% endif %}
           <div class="p-0 collapse" id="dnssec">
             <div class="p-4 border-bottom border-end border-start">
-              {{ dnssec }}
+              <h2>DMARC Record</h2>
+              <code>{{ dnssec }}</code>
+              <p>
+                Enabled:
+                {% if dnssec.enabled %}
+                  <i class="bi bi-check-circle-fill color-success"></i>
+                {% else %}
+                  <i class="bi bi-x-circle-fill color-danger"></i>
+                {% endif %}
+              </p>
             </div>
           </div>
         </div>
@@ -328,25 +330,12 @@ Recommendations
         </button>
         <div class="p-0 collapse" id="dnssec-recommendation">
           <div class="p-3 border-bottom border-end border-start table-responsive">
-            <p>
-              IPv6 is the next generation of the Internet Protocol, and it offers a number of advantages over IPv4, the current version of the protocol.
-            </p>
             <ul>
-              <li>
-                Address exhaustion: IPv4 is running out of available addresses due to the rapid growth of connected devices. IPv6 provides a significantly larger address space, ensuring that there are enough unique IP addresses to accommodate the expanding number of devices and services.
-              </li>
-              <li>
-                Future-proofing: As the industry shifts towards IPv6, enabling IPv6 support ensures compatibility and seamless communication with the growing number of IPv6-enabled networks and devices. It future-proofs your infrastructure, avoiding potential connectivity issues and the need for costly workarounds.
-              </li>
-              <li>
-                Enhanced functionality: IPv6 offers improvements in areas such as auto-configuration, mobility, and quality of service, allowing for more efficient and advanced network operations. Enabling IPv6 unlocks these enhanced functionalities, promoting a better user experience and enabling innovative applications and services.
-              </li>
-              <li>
-                Global reachability: With IPv6, your services can reach a larger global audience, including regions and networks that primarily use IPv6. By enabling IPv6, you expand your online presence and increase accessibility to your web services.
-              </li>
-              <li>
-                Security advancements: IPv6 includes built-in security features, such as IPsec (Internet Protocol Security), which provides native encryption, authentication, and data integrity. Enabling IPv6 allows you to leverage these security enhancements, improving the confidentiality and integrity of your network traffic.
-              </li>
+              <li><strong>Enable DNSSEC on Authoritative Name Servers:</strong> Ensure that your domain’s authoritative name servers support DNSSEC by enabling it in your DNS management tool or control panel. This typically involves generating and maintaining cryptographic key pairs (ZSK and KSK) and signing DNS records.</li>
+              <li><strong>Regular Key Management:</strong> Implement a robust key management process, including regularly rotating your Zone Signing Key (ZSK) and, less frequently, your Key Signing Key (KSK). Use automated key rollovers whenever possible to reduce the risk of human error.</li>
+              <li><strong>Monitor DNSSEC Status:</strong> Continuously monitor DNSSEC validation and resolution through tools like DNSViz or the BIND DNSSEC tools to ensure records are correctly signed and resolvable. This can help quickly identify and rectify any misconfigurations.</li>
+              <li><strong>Use a DNSSEC-enabled Resolver:</strong> Ensure your DNS resolvers are DNSSEC-aware and validate signed records. This adds a layer of protection for users by verifying the authenticity of DNS data.</li>
+              <li><strong>Plan for Emergency Key Rollovers:</strong> Prepare for emergency situations where a key might need to be revoked or replaced quickly, such as in case of a compromise. Implement a documented recovery procedure to minimize downtime.</li>
             </ul>
           </div>
         </div>

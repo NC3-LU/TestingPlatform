@@ -154,12 +154,10 @@
                   <td>{{ vuln.cvss }}</td>
                   <td>{{ vuln.type }}</td>
                   <td>
-                    {% if vuln.link %}
-                      <a href="https://vulners.com/{{ vuln.type }}/{{ vuln.id }}"
+                      <a href="{{ vuln.link }}"
                          target="_blank">
                         <i class="bi bi-search"></i>
                       </a>
-                    {% endif %}
                   </td>
                 </tr>
               {% endfor %}

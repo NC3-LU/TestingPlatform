@@ -1,28 +1,53 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
-<main class="row p-3 flex-column align-items-center">
-  <div class="col-xl-5 col-lg-8 col-md-8 mb-2">
-    <div class="card shadow h-100 border border-2">
-      <div class="card-body d-flex flex-column ">
-        <h5 class="card-title">Infrastructure Testing</h5>
-        <p>Assess the configuration of your infrastructure (if publicly available)</p>
-        <form method="post" action="{% url 'infra-test' %}" class="">
-          {% csrf_token %}
-          <div class="mb-3">
-            <label>Enter a web server hostname / ip address:</label>
-            <input type="text" placeholder="server.lu" id="target5" name="target"
-                   value="" required>
-          </div>
-          <input type="submit" value="Test" class="btn btn-secondary">
-        </form>
+<section class="blue-gradient_background p-4 text-white">
+  <div class="container my-5">
+    <div class="mb-5">
+      <div class="d-flex align-items-center" style="gap: 1.944em">
+        <hr class="hr-h-width bg-white">
+        <h3>Service and Vulnerability Assessment</h3>
       </div>
-      <div class="card-footer text-center text-muted"><a
-        href="{% url 'knowledge_base'  %}#tests-web-server">About the test</a></div>
+      <h1 class="font-size-48 font-weight-800 lh-base">
+        Identifies server services and potential vulnerabilities with recommendations for security improvements</h1>
+    </div>
+    <div>
+      <p>This test identifies all services running on your server and highlights potential vulnerabilities associated with them. It provides detailed information on software products, versions, and known vulnerabilities, along with general recommendations for maintaining security by keeping your software up-to-date.</p>
     </div>
   </div>
-  <section
-    class="col-lg-11 row my-5 border border-2 rounded p-4 ">
+</section>
+<main>
+  <div class="container d-flex justify-content-center py-5">
+    <div class="w-75 box-shadow primary-fadded-blue_border rounded-box-20 p-5">
+      <form method="post">
+        {% csrf_token %}
+        {% if error %}
+        <span class="text-danger">{{ error }}</span>
+        {% endif %}
+        <div class="mb-3">
+          <label class="mb-1">
+            Enter your email domain name / ip address:
+          </label>
+          <input class="form-control" type="text" placeholder="domain.lu"
+                 id="target" name="target"
+                 value="{{ domain }}" required>
+        </div>
+        <input type="submit" value="Test"
+               class="text-white button-text-background primary-primary-blue_background">
+      </form>
+      {% if services %}
+        <div class="d-flex justify-content-center pb-3 pt-3">
+          <a href="{% url 'pdf_from_template' test='infra-test' site=domain %}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
+        </div>
+      {% endif %}
+      <div class="bg-white text-center text-muted border-top pt-3"><a
+        class="text-primary-primary-blue" href="/kb/#web-server">About the test</a>
+      </div>
+    </div>
+  </div>
+  {% if services %}
+   <div class="gx-0 row d-flex justify-content-center py-5">
+<section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
     <div class="col-lg-12 fs-1 fw-bold">
       Services
     </div>
@@ -57,9 +82,11 @@
     </div>
 
   </section>
-
-  <section
-    class="col-lg-11 row my-5 border border-2 rounded p-4">
+   </div>
+  {% endif %}
+    {% if vulnerabilities %}
+   <div class="gx-0 row d-flex justify-content-center py-5">
+<section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
     <div class="col-lg-12 fs-1 fw-bold">
       Vulnerabilities
     </div>
@@ -77,15 +104,13 @@
         </li>
       </ul>
       <div class="row my-2" id="general-recommendations-infra">
-      <button type="button" data-bs-toggle="collapse"
-              data-bs-target="#referrer-policy"
+      <button type="button" data-bs-toggle="collapse" data-bs-target="#vuln-recommendations"
               aria-expanded="false" aria-controls="collapseExample"
-              class="btn p-3 fs-2 fw-bold text-start text-light bg-info">
-        <i
-          class="p-2 rounded-circle bi bi-chevron-right bg-white me-3 text-black"></i>
+              class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
+        <i class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
         General recommendations
       </button>
-      <div class="p-0 collapse" id="referrer-policy">
+      <div class="p-0 collapse" id="vuln-recommendations">
         <div class=" p-3 border-bottom border-end border-start">
           <p>
             Generally speaking, make sure all of your software is up-to-date.
@@ -129,12 +154,10 @@
                   <td>{{ vuln.cvss }}</td>
                   <td>{{ vuln.type }}</td>
                   <td>
-                    {% if vuln.link %}
-                      <a href="https://vulners.com/{{ vuln.type }}/{{ vuln.id }}"
+                      <a href="{{ vuln.link }}"
                          target="_blank">
                         <i class="bi bi-search"></i>
                       </a>
-                    {% endif %}
                   </td>
                 </tr>
               {% endfor %}
@@ -147,37 +170,12 @@
 
     </div>
 
+
+   </div>
   </section>
-
-  <script>
-    function openPopup(id){
-      let popup = document.getElementById(id);
-      popup.classList.add("open-popup");
-    }
-    function hidePopup(id){
-      let popup = document.getElementById(id);
-      popup.classList.remove("open-popup");
-    }
-
-
-  </script>
-  <script>
-  var coll = document.getElementsByClassName("collapsible");
-  var i;
-
-  for (i = 0; i < coll.length; i++) {
-    coll[i].addEventListener("click", function () {
-      this.classList.toggle("active");
-      var content = this.nextElementSibling;
-      if (content.style.display === "block") {
-        content.style.display = "none";
-      } else {
-        content.style.display = "block";
-      }
-    });
-  }
-
-
-  </script>
+</div>
+  {% endif %}
+  <script src="{% static 'js/chartTest.js' %}"></script>
+  <script src="{% static 'js/collapsibleAnimation.js' %}"></script>
 </main>
 {% endblock %}

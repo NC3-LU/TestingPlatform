@@ -1,12 +1,19 @@
 import datetime
 import ipaddress
+import os
 import re
 import socket
-import time
+import xmltodict
+import weasyprint
+import matplotlib.pyplot as plt
+import base64
+
+from io import BytesIO
 from typing import Any, Dict
 from urllib.parse import parse_qs, urlparse
 
-import xmltodict
+from ipwhois import IPDefinedError, IPWhois
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
@@ -14,8 +21,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from ipwhois import IPDefinedError, IPWhois
-from zapv2 import ZAPv2
+from django.template.loader import get_template
 
 from testing_platform import settings
 
@@ -25,12 +31,31 @@ from .helpers import (
     check_soa_record,
     email_check,
     file_check,
-    get_http_report,
+
     ipv6_check,
     tls_version_check,
     web_server_check,
+    check_dnssec,
+    check_mx,
+    check_spf,
+    check_dmarc,
+    check_tls,
+    check_hsts,
+    check_dkim,
+    check_csp,
+    check_cookies,
+    check_cors,
+    check_https_redirect,
+    check_referrer_policy,
+    check_sri,
+    check_x_content_type_options,
+    check_security_txt
+
 )
-from .models import DMARCRecord, DMARCReport, MailDomain
+
+from .zap import zap_scan
+
+from .models import DMARCRecord, DMARCReport, MailDomain, TestReport
 
 
 @login_required
@@ -70,104 +95,95 @@ def ping_test(request):
 def test_landing(request):
     return render(request, "test_landing.html")
 
+# def zap_test(request):
+#     if request.method == "POST":
+#         try:
+#             nb_tests = int(request.COOKIES["nb_tests"])
+#         except KeyError:
+#             nb_tests = 0
+#         if nb_tests == 3 and not request.user.is_authenticated:
+#             messages.error(
+#                 request,
+#                 "You reached the maximum number of tests. Please create an account.",
+#             )
+#             return redirect("signup")
+#         target = request.POST["target"]
+#         api_key = settings.ZAP_API_KEY
+#         # json_report, html_report = zap_scan(target, api_key)
+#         # context = json_report['site'][0]
+#         alerts = zap_scan(target, api_key)
+#         context = {'alerts': alerts, 'target': target}
+#         nb_tests += 1
+#         response = render(request, "check_zap.html", context)
+#
+#         try:
+#             test_report = TestReport.objects.get(tested_site=target, test_ran="zap")
+#             test_report.report = context
+#             test_report.save()
+#         except TestReport.DoesNotExist:
+#             test_report = TestReport.objects.get_or_create(
+#                 tested_site=target,
+#                 test_ran="zap",
+#                 report=context
+#             )
+#         response.set_cookie("nb_tests", nb_tests)
+#         return response
+#         # return HttpResponse(html_report)
+#     else:
+#         return render(request, "check_zap.html")
 
-def http_test(request):
-    if request.method == "POST":
+
+@csrf_exempt
+def check_website_security(request):
+    if request.method == 'POST':
+        domain = request.POST.get('target')
+
+        csp_result = check_csp(domain)
+        cookies_result = check_cookies(domain)
+        cors_result = check_cors(domain)
+        https_redirect_result = check_https_redirect(domain)
+        referrer_policy_result = check_referrer_policy(domain)
+        sri_result = check_sri(domain)
+        x_content_type_options_result = check_x_content_type_options(domain)
+        hsts_result = check_hsts(domain)
+        security_txt_result = check_security_txt(domain)
+
+        context = {
+            'domain': domain,
+            'csp_result': csp_result,
+            'cookies_result': cookies_result,
+            'cors_result': cors_result,
+            'https_redirect_result': https_redirect_result,
+            'referrer_policy_result': referrer_policy_result,
+            'sri_result': sri_result,
+            'x_content_type_options_result': x_content_type_options_result,
+            'hsts_result': hsts_result,
+            'security_txt_result': security_txt_result
+        }
+
         try:
-            nb_tests = int(request.COOKIES["nb_tests"])
-        except KeyError:
-            nb_tests = 0
-        if nb_tests == 3 and not request.user.is_authenticated:
-            messages.error(
-                request,
-                "You reached the maximum number of tests. Please create an account.",
+            test_report = TestReport.objects.get(tested_site=domain, test_ran="web-test")
+            test_report.report = context
+            test_report.save()
+        except TestReport.DoesNotExist:
+            test_report = TestReport.objects.get_or_create(
+                tested_site=domain,
+                test_ran="web-test",
+                report=context
             )
-            return redirect("signup")
-        context = {"rescan": False}
-        # if "rescan" in request.POST:
-        #  context["rescan"] = True
+        return render(request, 'check_webapp.html', context)
 
-        context.update(get_http_report(request.POST["target"], False))
-        # context.update(ipv6_check(request.POST["target"], None))
-
-        try:
-            tls_results = tls_version_check(request.POST["target"], "web")
-            context["tls_results"] = tls_results["result"]
-            context["tls_lowest_sec_level"] = tls_results["lowest_sec_level"]
-        except Exception:
-            pass
-
-        nb_tests += 1
-        response = render(request, "check_website.html", context)
-        response.set_cookie("nb_tests", nb_tests)
-        return response
-    else:
-        return render(request, "check_website.html")
-
-
-def web_test(request):
-    # TODO check that for a new scan a new session is created an after
-    #  getting the result it shall be closed
-    if request.method == "POST":
-        ipv6 = ipv6_check(request.POST["target"], None)
-        # Command used to start zap locally (ubuntu)
-        # zap.sh -daemon -config api.key=12345 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true
-        # The URL of the application to be tested
-        target = request.POST["target"]
-        # Change to match the API key set in ZAP, or use None if the API key is disabled
-        apikey = "12345"
-
-        # By default ZAP API client will connect to port 8080
-        zap = ZAPv2(
-            apikey=apikey,
-            proxies={"http": "http://127.0.0.1:8081", "https": "http://127.0.0.1:8081"},
-        )
-
-        scanid = zap.spider.scan("http://" + target)
-        while int(zap.spider.status(scanid)) < 100:
-            time.sleep(1)
-
-        results_url = zap.spider.results(scanid)
-        while int(zap.pscan.records_to_scan) > 0:
-            # Loop until the passive scan has finished
-            print("Records to passive scan : " + zap.pscan.records_to_scan)
-            time.sleep(2)
-        alerts = zap.core.alerts()
-
-        # Create an empty list to hold the matching alerts
-        matching_alerts = []
-
-        # Loop through the alerts
-        for alert in alerts:
-            # Check if the alert's URL is in the list
-            if alert["url"] in results_url:
-                if alert["confidence"] == "High":
-                    # If it is, append the alert to the matching_alerts list
-                    matching_alerts.append(alert)
-
-        return render(
-            request,
-            "check_webapp.html",
-            {
-                "results_url": results_url,
-                "alerts": matching_alerts,
-                "target": target,
-                "ipv6": ipv6,
-            },
-        )
-
-    else:
-        return render(request, "check_webapp.html")
+    return render(request, 'check_webapp.html')
 
 
 def email_test(request):
     context = {}
     if request.method == "POST":
         try:
-            nb_tests = int(request.COOKIES["nb_tests"])
-        except KeyError:
+            nb_tests = int(request.COOKIES.get("nb_tests", 0))
+        except ValueError:
             nb_tests = 0
-        if nb_tests == 3 and not request.user.is_authenticated:
+        if nb_tests >= 3 and not request.user.is_authenticated:
             messages.error(
                 request,
                 "You reached the maximum number of tests. Please create an account.",
@@ -177,35 +193,32 @@ def email_test(request):
         if not check_soa_record(target):
             context = {"status": False, "statusmessage": "The given domain is invalid!"}
         else:
-            email_result = email_check(target)
-            context.update(email_result)
-            # messages.info(request, "Analyzed SPF/DMARC config")
-            context.update(check_dkim_public_key(target, []))
-            # messages.info(request, "Analyzed DKIM config")
-            # context.update(ipv6_check(target, None))
-            # messages.info(request, "Analyzed IPv6 configuration")
-            context["tls_result"] = {}
-            context["tls_lowest_sec_level"] = {}
-            # messages.info(request, f"Found {len(email_result['mx']['hosts'])} MX hosts.")
-            # for host in email_result["mx"]["hosts"]:
-            #    try:
-            #        tls_result = tls_version_check(host["hostname"], "mail")
-            #        context["tls_result"][host["hostname"]] = tls_result["result"]
-            #        context["tls_lowest_sec_level"][host["hostname"]] = tls_result[
-            #            "lowest_sec_level"
-            #        ]
-            #    except Exception:
-            #        continue
-            # messages.info(request, f"MX host scanned.")
+            dkim_selector = "default"  # You may want to allow user input for this
 
-            # context.update({"status": True})
-            #        host["hostname"], None
-            #    )
-            #    context["tls_mx"] = tls_version_check(
-            #        host["hostname"]
-            #    )
+            context['domain'] = target
+            context['dnssec'] = check_dnssec(target)
+            #mx_servers = check_mx(target)
+            #context['mx'] = {'servers': mx_servers, 'tls': check_tls(mx_servers)}
+
+            context['spf'] = check_spf(target)
+
+
+            context['dmarc'] = check_dmarc(target)
+            #context['dkim'], context['dkim_valid'] = check_dkim(target, dkim_selector)
+
+        try:
+            test_report = TestReport.objects.get(tested_site=target, test_ran="email-test")
+            test_report.report = context
+            test_report.save()
+        except TestReport.DoesNotExist:
+            test_report = TestReport.objects.get_or_create(
+                tested_site=target,
+                test_ran="email-test",
+                report=context
+            )
+
         nb_tests += 1
-        response = render(request, "check_email.html", {"result": context})
+        response = render(request, "check_email.html", context)
         response.set_cookie("nb_tests", nb_tests)
         return response
     else:
@@ -257,8 +270,21 @@ def web_server_test(request):
                 "You reached the maximum number of tests. Please create an account.",
             )
             return redirect("signup")
-        context = {}
-        context.update(web_server_check(request.POST["target"]))
+        domain = request.POST["target"]
+        context = {'domain': domain}
+        context.update(web_server_check(domain))
+
+        try:
+            test_report = TestReport.objects.get(tested_site=domain, test_ran="infra-test")
+            test_report.report = context
+            test_report.save()
+        except TestReport.DoesNotExist:
+            test_report = TestReport.objects.get_or_create(
+                tested_site=domain,
+                test_ran="infra-test",
+                report=context
+            )
+
         nb_tests += 1
         response = render(request, "check_infra.html", context)
         response.set_cookie("nb_tests", nb_tests)
@@ -361,6 +387,68 @@ def dmarc_generator(request):
 
 
 @login_required
+def record_generator(request):
+    spf_form = SPFRecordForm()
+    dmarc_form = DMARCRecordForm(user=request.user)
+    context = {}
+
+    if request.method == "POST":
+        if 'spf' in request.POST:
+            spf_form = SPFRecordForm(request.POST)
+            if spf_form.is_valid():
+                data = spf_form.cleaned_data
+                record = "v=spf1 mx "
+                hosts = data["hosts"].split(",")
+                for host in hosts:
+                    host = host.strip()
+                    if host:
+                        try:
+                            match_ip = ipaddress.ip_address(host)
+                        except ValueError:
+                            match_ip = None
+                        match_hostname = re.fullmatch(
+                            r"^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$", host
+                        )
+                        if match_ip:
+                            record += f"ip{match_ip.version}:{host} "
+                        elif match_hostname:
+                            record += f"a:{host} "
+                        else:
+                            messages.error(
+                                request,
+                                "One of the specified hosts/IP addresses does not match the expected format. Please correct your entered data."
+                            )
+                            context = {"spf_form": spf_form, "dmarc_form": dmarc_form}
+                            return render(request, "email_policy_generator.html",
+                                          context)
+                record += data["policy"]
+                context["spf_record"] = record
+
+        elif 'dmarc' in request.POST:
+            dmarc_form = DMARCRecordForm(user=request.user, data=request.POST)
+            if dmarc_form.is_valid():
+                data = dmarc_form.cleaned_data
+                report = DMARCRecord(
+                    user=request.user,
+                    domain=data["domain"],
+                    policy=data["policy"],
+                    spf_policy=data["spf_policy"],
+                    dkim_policy=data["dkim_policy"],
+                    mailto=data["mailto"],
+                )
+                report.save()
+                context = {
+                    "dmarc_form": dmarc_form,
+                    "txt_record": report.txt_record,
+                    "dmarc_record": report.dmarc_record,
+                }
+
+    context["spf_form"] = spf_form
+    context["dmarc_form"] = dmarc_form
+    return render(request, "email_policy_generator.html", context)
+
+
+@login_required
 def dmarc_reporter(request):
     domains = MailDomain.objects.filter(user=request.user)
     records = DMARCRecord.objects.filter(user=request.user)
@@ -425,7 +513,7 @@ def dmarc_dl(request, domain, mailfrom, timestamp):
             headers={
                 "Content-Type": "application/xml",
                 "Content-Disposition": f"attachment; "
-                f'filename="dmarc_{domain}_{mailfrom}_{timestamp}.xml"',
+                                       f'filename="dmarc_{domain}_{mailfrom}_{timestamp}.xml"',
             },
         )
         return response
@@ -452,3 +540,80 @@ def dmarc_upload(request):
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=401)
+
+
+@login_required
+def pdf_from_template(request, test, site):
+    report = TestReport.objects.get(tested_site=site, test_ran=test).report
+
+    css_path = os.path.join(settings.STATIC_DIR, 'css/style.css')
+    bootstrap_path = os.path.join(settings.STATIC_DIR, 'npm_components/bootstrap/dist/css/bootstrap.css')
+
+    with open(css_path, 'r') as f:
+        css = f.read()
+
+    with open(bootstrap_path, 'r') as f:
+        bootstrap = f.read()
+
+    css_content = bootstrap + '\n' + css
+
+    # Calculate stats
+    count_good = 0
+    count_vulnerable = 0
+    if test == "web-test":
+        for key, value in report.items():
+            if isinstance(value, dict) and 'status' in value:
+                if value['status'] is False:
+                    count_vulnerable += 1
+                else:
+                    count_good += 1
+
+    elif test == "email-test":
+        if report['spf']['valid'] is True:
+            count_good += 1
+        else:
+            count_vulnerable += 1
+        if report['dmarc']['valid'] is True:
+            count_good += 1
+        else:
+            count_vulnerable += 1
+        if report['dnssec']['enabled'] is True:
+            count_good += 1
+        else:
+            count_vulnerable += 1
+
+    report['good'] = count_good
+    report['vulnerable'] = count_vulnerable
+
+    # Generate pie chart
+    try:
+        data = {'Good': count_good, 'Vulnerable': count_vulnerable}
+        labels = [key for key, value in data.items() if value != 0]
+        sizes = [value for value in data.values() if value != 0]
+        colors = ['green', 'red']
+        plt.figure(figsize=(4, 4))
+        plt.pie(sizes, labels=labels, labeldistance=0.3, colors=colors, autopct=None,
+                startangle=90, shadow=False)
+        plt.axis('equal')
+
+        # Save the chart as a PNG image
+        buffer = BytesIO()
+        plt.savefig(buffer, format='png')
+        buffer.seek(0)
+        image_png = buffer.getvalue()
+        buffer.close()
+        image_base64 = base64.b64encode(image_png).decode('utf-8')
+        report['img'] = image_base64
+    except ValueError as e:
+        pass
+
+    template = get_template("pdf_wrapper.html")
+    report['site'] = site
+    report['test'] = test
+
+    html_out = template.render(report)
+    pdf_file = weasyprint.HTML(string=html_out).write_pdf(stylesheets=[weasyprint.CSS(string=css_content)])
+
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="tp_{test}_{site}_report.pdf"'
+    return response

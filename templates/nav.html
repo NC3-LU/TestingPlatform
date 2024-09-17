@@ -1,10 +1,27 @@
 {% load static %}
-<nav class="navbar navbar-light navbar-expand-xl">
-  <div class="container-fluid d-flex flex-row justify-content-around">
+<div class="govbar" id="govbar">
 
-    <a class="navbar-brand d-none d-lg-block" href="{% url 'index' %}"><img
-      src="{% static 'img/logo-nc3-web.png' %}" height="65px"> &nbsp;Testing
-      Platform</a>
+  <img class="govbar-logo" src="https://cdn.public.lu/pictures/logos/gov/fr/gov-light.png"
+       alt="Le Gouvernement du Grand-Duché de Luxembourg">
+
+
+  <ul class="govbar-links">
+    <li><a class="govbar-link" target="_blank" title="luxembourg.lu (nouvelle fenêtre)"
+           href="http://luxembourg.lu">luxembourg.lu</a></li>
+    <li><a class="govbar-link" target="_blank" title="guichet.lu (nouvelle fenêtre)"
+           href="http://guichet.lu">guichet.lu</a></li>
+    <li><a class="govbar-link" target="_blank" title="crossgov.lu (nouvelle fenêtre)"
+           href="http://crossgov.lu">crossgov.lu</a></li>
+    <li><a class="govbar-link govbar-more" target="_blank"
+           title="L’annuaire des sites internets publics luxembourgeois (nouvelle fenêtre)"
+           href="http://etat.lu/">Autres sites</a></li>
+  </ul>
+</div>
+<nav class="navbar navbar-light navbar-expand-xl">
+  <div class="container d-flex flex-row justify-content-around">
+
+    <a class="navbar-brand d-lg-block" href="{% url 'index' %}"><img
+      src="{% static 'img/nc3_logo_tp_white.svg' %}" height="65px"></a>
 
     <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar">
       <i class="fs-3 text-white bi bi-list"></i>
@@ -13,7 +30,7 @@
       <ul class="navbar-nav d-flex ms-auto mb-2 mb-lg-0 navbar-dark">
 
         <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-          {% if user.is_authenticated %}
+        {% if user.is_authenticated %}
         <li class="nav-item dropdown">
 
           <a class="nav-link dropdown-toggle" href="#" id="dropdown07"
@@ -31,30 +48,31 @@
             <!--<li><a class="dropdown-item" href="/infra-testing/whois-lookup">WHOIS Lookup</a></li>-->
             <li class="dropdown-divider"></li>
             <li><h6 class="dropdown-header">Email Security Tools</h6></li>
-            <li><a class="dropdown-item" href="/infra-testing/dmarc-generator">DMARC
-              Generator</a></li>
-            <li><a class="dropdown-item" href="/infra-testing/spf-generator">SPF
-              Generator</a></li>
+            <li><a class="dropdown-item" href="/infra-testing/email-policy-generator">E-Mail Policy Generator (SPF, DMARC)</a></li>
           </ul>
         </li>
-          {% endif %}
+        {% endif %}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#"
              id="dropdown08" data-bs-toggle="dropdown"
              aria-expanded="false">Testing Platform</a>
 
           <ul class="dropdown-menu" aria-labelledby="dropdown08">
-            <li><a class="dropdown-item" href="{% url 'knowledge_base' %}">Knowledgebase</a></li>
-            <li><a class="dropdown-item" href="{% url 'swagger-ui' %}">API documentation</a></li>
+            <li><a class="dropdown-item"
+                   href="{% url 'knowledge_base' %}">Knowledgebase</a></li>
+            <li><a class="dropdown-item" href="{% url 'swagger-ui' %}">API
+              documentation</a></li>
             <li class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="https://www.nc3.lu/pages/services/testing-platform.html">About</a></li>
+            <li><a class="dropdown-item"
+                   href="https://www.nc3.lu/pages/services/testing-platform.html">About</a>
+            </li>
           </ul>
         </li>
 
         {% if user.is_authenticated %}
-          {% if user.is_superuser %}
-            <li class="nav-item"><a class="nav-link" href="/admin/">Admin</a></li>
-          {% endif %}
+        {% if user.is_superuser %}
+        <li class="nav-item"><a class="nav-link" href="/admin/">Admin</a></li>
+        {% endif %}
         <li class="nav-item dropdown">
 
           <a class="nav-link dropdown-toggle" href="#" id="dropdown19"

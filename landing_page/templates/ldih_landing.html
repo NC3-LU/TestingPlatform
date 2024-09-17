@@ -2,22 +2,22 @@
 
 {% block content %}
 {% load static %}
-<main class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
-    <img src="{% static 'img/logo-NC3_logos_LOGO_Threat_Platform.png' %}" height="200px">
-    <!--<h1><span style="color:#009fe3;">c</span><span style="color:#ec1e27;">3</span> Testing Platform</h1>-->
-    <section class="container">
-        <p class="lead">
-            The testing platform holds the tools and services that will help organisations to perform basic tests on
-            their most commonly exposed infrastructures, starting with email and web servers. More tools will be added
-            through time to increase the coverage of available tests.
-        </p>
-    </section>
-    <p class="lead">
-        <a href="/signup/{{ ldih_uuid }}" class="btn btn-lg btn-secondary fw-bold border-white" style="background-color:#009fe3;">Register now!</a>
-    </p>
-</main>
 
 <section class="container">
+  <main class="bg-light d-flex w-100 h-100 p-3 flex-column align-items-center text-center">
+      <img src="{% static 'img/logo-NC3_logos_LOGO_Threat_Platform.png' %}" height="200px">
+      <!--<h1><span style="color:#009fe3;">c</span><span style="color:#ec1e27;">3</span> Testing Platform</h1>-->
+      <section class="container">
+          <p class="lead">
+              The testing platform holds the tools and services that will help organisations to perform basic tests on
+              their most commonly exposed infrastructures, starting with email and web servers. More tools will be added
+              through time to increase the coverage of available tests.
+          </p>
+      </section>
+      <p class="lead">
+          <a href="/signup/{{ ldih_uuid }}" class="btn btn-lg btn-secondary fw-bold border-white" style="background-color:#009fe3;">Register now!</a>
+      </p>
+  </main>
     <div class="mt-5">
         <h3>Welcome to the nc3 Testing Platform!</h3>
         <div class="mb-5">

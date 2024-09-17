@@ -39,7 +39,7 @@ def analysis_request(request):
             return redirect("iot_index")
     else:
         form = FirmwareAnalysisRequestForm()
-    return render(request, "iot_request.html", {"form": form})
+    return render(request, "onekey_request.html", {"form": form})
 
 
 def generate_report(request, firmware_uuid):

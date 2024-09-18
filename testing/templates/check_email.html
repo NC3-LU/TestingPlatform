@@ -218,14 +218,43 @@ DKIM Record
           <div class="p-0 collapse" id="d_record">
             <div class="p-4 border-bottom border-end border-start">
               <h2>DMARC Record</h2>
-              <code>{{ dmarc }}</code>
-              <p>Valid:
-                {% if dmarc.valid %}
-                <i class="bi bi-check-circle-fill color-success"></i>
-                {% else %}
-                <i class="bi bi-x-circle-fill color-danger"></i>
-                {% endif %}
-              </p>
+              {% if dmarc.error %}
+              <div class="alert alert-danger" role="alert">
+                  {{ dmarc.error }}
+              </div>
+          {% else %}
+              <div class="alert {% if dmarc.valid %}alert-success{% else %}alert-warning{% endif %}" role="alert">
+                  <h4 class="alert-heading">
+                      DMARC Record Status:
+                      {% if dmarc.valid %}
+                          <span class="text-success">Valid</span>
+                      {% else %}
+                          <span class="text-warning">Invalid</span>
+                      {% endif %}
+                  </h4>
+              </div>
+
+              {% if dmarc.record %}
+                  <div class="alert alert-info" role="alert">
+                      <h4 class="alert-heading">DMARC Record:</h4>
+                      <pre><code>{{ dmarc.record }}</code></pre>
+                  </div>
+
+                  <h4>Record Details:</h4>
+                 <ul class="list-group">
+                            {% for item in dmarc.record|split:';' %}
+                                {% with key_value=item|split:'=' %}
+                                    {% if key_value|length == 2 %}
+                                        <li class="list-group-item">
+                                            <strong>{{ key_value.0 }}:</strong> {{ key_value.1 }}
+                                        </li>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endfor %}
+                        </ul>
+              {% endif %}
+          {% endif %}
+
             </div>
           </div>
         </div>
@@ -309,8 +338,25 @@ Recommendations
           </button>
           <div class="p-0 collapse" id="dnssec">
             <div class="p-4 border-bottom border-end border-start">
-              <h2>DMARC Record</h2>
-              <code>{{ dnssec }}</code>
+              <h2>DNSSEC Record</h2>
+              {% if dnssec.error %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ dnssec.error }}
+                    </div>
+                {% else %}
+                    <div class="alert {% if dnssec.enabled %}alert-success{% else %}alert-warning{% endif %}" role="alert">
+                        DNSSEC is {% if dnssec.enabled %}enabled{% else %}not enabled{% endif %}
+                    </div>
+
+                    {% if dnssec.keys %}
+                        <div class="alert alert-info" role="alert">
+                            <h4 class="alert-heading">DNSSEC Keys:</h4>
+                            <pre><code>{% for key in dnssec.keys %}{{ key }}{% if not forloop.last %}
+{% endif %}{% endfor %}</code></pre>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
               <p>
                 Enabled:
                 {% if dnssec.enabled %}
@@ -324,7 +370,7 @@ Recommendations
         </div>
       </div>
       <div class="row my-2">
-        <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec-recommendation" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light bg-info">
+        <button type="button" data-bs-toggle="collapse" data-bs-target="#dnssec-recommendation" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
           <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
           Recommendations
         </button>

@@ -36,9 +36,11 @@
                class="text-white button-text-background primary-primary-blue_background">
       </form>
       {% if services %}
-        <div class="d-flex justify-content-center pb-3 pt-3">
-          <a href="{% url 'pdf_from_template' test='infra-test' site=domain %}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
-        </div>
+        {% if user.is_authenticated %}
+          <div class="d-flex justify-content-center pb-3 pt-3">
+            <a href="{% url 'pdf_from_template' test='infra-test' site=domain %}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
+          </div>
+        {% endif %}
       {% endif %}
       <div class="bg-white text-center text-muted border-top pt-3"><a
         class="text-primary-primary-blue" href="/kb/#web-server">About the test</a>

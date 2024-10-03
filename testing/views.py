@@ -226,12 +226,15 @@ def email_test(request):
 
 
 def file_test(request):
-    if request.method == "POST" and request.FILES["target"]:
-        context: Dict[str, Any] = {}
-        file_to_check = request.FILES["target"].read()
-        file_to_check_name = request.FILES["target"].name
-        context.update(file_check(file_to_check, file_to_check_name))
-        return render(request, "check_file.html", context)
+    if request.method == "POST":
+        if "target" in request.FILES:
+            context: Dict[str, Any] = {}
+            file_to_check = request.FILES["target"].read()
+            file_to_check_name = request.FILES["target"].name
+            context.update(file_check(file_to_check, file_to_check_name))
+            return render(request, "check_file.html", context)
+        else:
+            return render(request, "check_file.html", {"error": "There was an error with the provided file. Please try again later."})
     else:
         return render(request, "check_file.html")
 

@@ -21,7 +21,7 @@
   <div class="container d-flex justify-content-center py-5">
     <div class="w-75 box-shadow primary-fadded-blue_border rounded-box-20 p-5">
 
-      <form method="post">
+      <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% if error %}
         <span class="text-danger">{{ error }}</span>
@@ -30,7 +30,7 @@
           <label class="mb-1">
             Select the file you want to check:
           </label>
-     <input class="form-control" type="file" placeholder="Select the file you want to check." id="target3" name="target" required="">
+          <input class="form-control" type="file" placeholder="Select the file you want to check." id="target3" name="target" required="" accept="*/*">
         </div>
         <input type="submit" value="Test"
                class="text-white button-text-background primary-primary-blue_background">
@@ -41,23 +41,25 @@
     </div>
   </div>
   {% if result %}
-  <section class="col-lg-11 row my-5 border border-2 rounded p-4 justify-content-center">
-    <div class="col-lg-6 col-md-5 mb-2 text-center fs-5 ">
-      <h1 class="text-center">File Test Results</h1>
-      {% if result.success %}
-        {% if result.status == "CLEAN" %}
-          <i class="bi bi-check-circle-fill color-success"> </i> Clean File!
-        {% else %}
-          <i class="bi bi-x-circle-fill color-danger"></i> Please check the details of the scan!
-        {% endif %}
-        <br/>
-        <a href="{{ result.link }}" rel="noreferrer" target="_blank">Details of the scan.</a>
-      {% endif %}
-      <div class="col-lg col-md mb-2 text-center">
-        Results provided by the <a href="https://github.com/pandora-analysis" rel="noreferrer" target="_blank"><b>Pandora Analysis framework</b></a>.
-      </div>
+    <div class="gx-0 row d-flex justify-content-center py-5">
+      <section class="col-lg-11 row my-5 border border-2 rounded p-4 justify-content-center">
+        <div class="col-lg-6 col-md-5 mb-2 text-center fs-5 ">
+          <h1 class="text-center">File Test Results</h1>
+          {% if result.success %}
+            {% if result.status == "CLEAN" %}
+              <i class="bi bi-check-circle-fill color-success"> </i> Clean File!
+            {% else %}
+              <i class="bi bi-x-circle-fill color-danger"></i> Please check the details of the scan!
+            {% endif %}
+            <br/>
+            <a href="{{ result.link }}" rel="noreferrer" target="_blank">Details of the scan.</a>
+          {% endif %}
+          <div class="col-lg col-md mb-2 text-center">
+            Results provided by the <a href="https://github.com/pandora-analysis" rel="noreferrer" target="_blank"><b>Pandora Analysis framework</b></a>.
+          </div>
+        </div>
+      </section>
     </div>
-  </section>
   {% endif %}
 </main>
 {% endblock %}

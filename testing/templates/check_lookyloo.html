@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load tags %}
+{% load static %}
+{% block content %}
+<section class="blue-gradient_background p-4 text-white">
+  <div class="container my-5">
+    <div class="mb-5">
+      <div class="d-flex align-items-center" style="gap: 1.944em">
+        <hr class="hr-h-width bg-white">
+        <h3>URL Verification</h3>
+      </div>
+      <h1 class="font-size-48 font-weight-800 lh-base">Got a suspicious email containing unknown links? </h1>
+    </div>
+    <div>
+      <p>
+        You can test urls you have received in an email/document to test it against known phishing databases.
+        This test might take around 30 seconds to complete.</p>
+    </div>
+  </div>
+</section>
+<main>
+  <div class="container d-flex justify-content-center py-5">
+    <div class="w-75 box-shadow primary-fadded-blue_border rounded-box-20 p-5">
+
+      <form method="post">
+        {% csrf_token %}
+        {% if error %}
+        <span class="text-danger">{{ error }}</span>
+        {% endif %}
+        <div class="mb-3">
+          <label class="mb-1">
+            Enter your email domain name:
+          </label>
+          <input class="form-control" type="text" placeholder="suspicious.domain.com"
+                 id="target" name="target"
+                 value="{{ domain }}" required>
+        </div>
+        <input type="submit" value="Test"
+               class="text-white button-text-background primary-primary-blue_background">
+      </form>
+      {% if domain %}
+        {% if user.is_authenticated %}
+          <div class="d-flex justify-content-center pb-3 pt-3">
+            <a href="{% url 'pdf_from_template' test='lookyloo-test' site=url %}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
+          </div>
+        {% endif %}
+      {% endif %}
+      <div class="bg-white text-center text-muted border-top pt-3"><a
+          class="text-primary-primary-blue" href="/kb/#tests-email">About the test</a>
+      </div>
+    </div>
+  </div>
+  {% if not recent_captures %}
+    {% if lookyloo_status %}
+      <div class="gx-0 row d-flex justify-content-center py-5">
+        <section class="container-extended box-shadow primary-fadded-blue_border p-5">
+          <div class="col-lg-12 fs-1 fw-bold">
+            Result of the Lookyloo request
+          </div>
+          <div class="col-lg-12 fs-4">
+            <div class="row my-2">
+              <div class="p-0" id="lookyloo">
+                <div class="p-4">
+                  Render of the page you submitted
+                  <img src="data:image/png;base64,{{ screenshot }}" alt="Rendered page"/>
+                  <code></code>
+                  <p>Result:
+                    {% if not capture.overall %}
+                    <i class="bi bi-check-circle-fill color-success"></i> No entry found in the phishing databases.
+                    {% else %}
+                    <i class="bi bi-x-circle-fill color-danger"></i> Found entries in the phishing databases.
+                    {% endif %}
+                    <div class="alert {% if overall %}alert-danger{% else %}alert-info{% endif %}" role="alert">
+                      <p>URL: {{ capture.url }}</p>
+                      <p>Phishtank:
+                        {% if capture.phishtank == False %}
+                          <i class="bi bi-check-circle-fill color-success"></i> No report
+                        {% else %}
+                          <i class="bi bi-x-circle-fill color-danger"></i> Reported
+                        {% endif %}
+                      </p>
+                      <p>Virustotal:
+                        {% if capture.phishtank == False %}
+                          <i class="bi bi-check-circle-fill color-success"></i> No report
+                        {% else %}
+                          <i class="bi bi-x-circle-fill color-danger"></i> Reported
+                        {% endif %}
+                      </p>
+                      <p>urlhaus:
+                        {% if capture.phishtank == False %}
+                          <i class="bi bi-check-circle-fill color-success"></i> No report
+                        {% else %}
+                          <i class="bi bi-x-circle-fill color-danger"></i> Reported
+                        {% endif %}
+                      </p>
+                      <p>urlscan:
+                        {% if capture.phishtank == False %}
+                          <i class="bi bi-check-circle-fill color-success"></i> No report
+                        {% else %}
+                          <i class="bi bi-x-circle-fill color-danger"></i> Reported
+                        {% endif %}
+                      </p>
+                    </div>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row my-2">
+              <button type="button" data-bs-toggle="collapse" data-bs-target="#spf_recommendation" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
+                <i class="circle p-2 bi bi-chevron-right bg-white me-3 text-black"></i>
+                Recommendations
+              </button>
+              <div class="p-0 collapse" id="spf_recommendation">
+                <div class="p-4 border-bottom border-end border-start">
+                  <b>What to do when I receive an email with suspicious links?</b>
+                  <p>Never open a link you receive from an untrusted source. Instead, you can use tools like the one you just used to investigate if the website is a phishing one or not.</p>
+                  <p>Keep in mind that:</p>
+                  <ul>
+                    <li>The result above may be wrong based on the time of the capture and the actual state of the tested website.</li>
+                    <li>If there is no phishing report associated with the URL, it might still be spam. You can thus visit the website at your own discretion.</li>
+                  </ul>
+                  <b>What do I do if there is a report?</b>
+                  <p>A report in any or all of the tests certifies that the page you have scanned is a phishing website. Thus we recommend you <b>do not visit this page</b>.</p>
+                  <p>You can also report the email where the URL was included through Spambee.</p>
+                  <p>Find out more about Spambee <a href="spambee.lu">here</a>!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    {% else %}
+      <div class="gx-0 row d-flex justify-content-center py-5">
+        <section class="container-extended box-shadow primary-fadded-blue_border p-5">
+          <div class="col-lg-12 fs-1 fw-bold">
+            <i class="bi bi-x-circle-fill color-danger"></i>
+            The Lookyloo service is currently down.
+          </div>
+          <p>Please try again later.</p>
+        </section>
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="gx-0 row d-flex justify-content-center py-5">
+      <section class="container-extended box-shadow primary-fadded-blue_border p-5">
+        <div class="col-lg-12 fs-1 fw-bold">
+          Recent Lookyloo Captures
+        </div>
+        <div class="col-lg-12 fs-4">
+          <div class="row my-2">
+            {% for capture in recent_captures %}
+              <div class="alert {% if overall %}alert-danger{% else %}alert-info{% endif %}" role="alert">
+                <p>URL: {{ capture.url }}</p>
+                <p>Phishtank:
+                  {% if capture.phishtank == False %}
+                    <i class="bi bi-check-circle-fill color-success"></i> No report
+                  {% else %}
+                    <i class="bi bi-x-circle-fill color-danger"></i> Reported
+                  {% endif %}
+                </p>
+                <p>Virustotal:
+                  {% if capture.phishtank == False %}
+                    <i class="bi bi-check-circle-fill color-success"></i> No report
+                  {% else %}
+                    <i class="bi bi-x-circle-fill color-danger"></i> Reported
+                  {% endif %}
+                </p>
+                <p>urlhaus:
+                  {% if capture.phishtank == False %}
+                    <i class="bi bi-check-circle-fill color-success"></i> No report
+                  {% else %}
+                    <i class="bi bi-x-circle-fill color-danger"></i> Reported
+                  {% endif %}
+                </p>
+                <p>urlscan:
+                  {% if capture.phishtank == False %}
+                    <i class="bi bi-check-circle-fill color-success"></i> No report
+                  {% else %}
+                    <i class="bi bi-x-circle-fill color-danger"></i> Reported
+                  {% endif %}
+                </p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+    </div>
+  {% endif %}
+</main>
+
+<script src="{% static 'js/chartTest.js' %}"></script>
+<script src="{% static 'js/collapsibleAnimation.js' %}"></script>
+{% endblock %}

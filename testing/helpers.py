@@ -4,6 +4,7 @@ import re
 import subprocess
 import sys
 import time
+import datetime
 from base64 import b64decode
 from io import BytesIO
 from typing import Any, Union, Dict
@@ -32,8 +33,10 @@ import logging
 from testing import validators
 from testing_platform.settings import PANDORA_ROOT_URL
 from .cipher_scoring import load_cipher_info
+from pylookyloo import Lookyloo
 
 logger = logging.getLogger(__name__)
+
 
 def check_soa_record(target: str) -> Union[bool, Dict]:
     """Checks the presence of a SOA record for the Email Systems Testing."""
@@ -1334,3 +1337,37 @@ def check_security_txt(domain: str) -> dict:
     except requests.RequestException as e:
         return {'status': False, 'data': f'security.txt check failed: {str(e)}'}
 
+
+def get_capture_result(lookyloo, capture_uuid):
+    capture_results = lookyloo.get_modules_responses(capture_uuid)
+    url = lookyloo.get_info(capture_uuid)['url']
+    if len(url) > 60:
+        url = url[:30] + ' [...] ' + url[-30:] + ' (shortened url)'
+    virustotal = any(value is not None for value in capture_results['vt'].values())
+    phishtank = any(value is not None for value in
+                    capture_results['phishtank']['urls'].values())
+    urlhaus = any(
+        value is not None for value in capture_results['urlhaus']['urls'].values())
+    if capture_results['urlscan']['result']:
+        urlscan = capture_results['urlscan']['result']['verdicts']['overall'][
+            'malicious']
+    else:
+        urlscan = False
+    overall = virustotal or phishtank or urlhaus or urlscan
+    return {
+        'url': url,
+        'virustotal': virustotal,
+        'phishtank': phishtank,
+        'urlhaus': urlhaus,
+        'urlscan': urlscan,
+        'overall': overall
+    }
+
+
+def get_recent_captures(lookyloo):
+    ts = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(weeks=1)
+    recent_captures = lookyloo.get_recent_captures(timestamp=ts)[:10]
+    print(recent_captures)
+    for i in range(len(recent_captures)):
+        recent_captures[i] = get_capture_result(lookyloo, recent_captures[i])
+    return recent_captures

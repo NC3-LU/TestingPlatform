@@ -7,6 +7,7 @@ urlpatterns = [
     path("email-test/", views.email_test, name="email_test"),
     path("file-test/", views.file_test, name="file_test"),
     path("service-test/", views.web_server_test, name="service-test"),
+    path("url-test/", views.url_test, name="url-test"),
     path("spf-generator/", views.spf_generator, name="spf-generator"),
     path("dmarc-generator/", views.dmarc_generator, name="dmarc-generator"),
     path("email-policy-generator/", views.record_generator, name="email_policy_generator"),

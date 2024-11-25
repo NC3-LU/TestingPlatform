@@ -3,14 +3,18 @@ import ipaddress
 import os
 import re
 import socket
+from time import sleep
+
 import xmltodict
 import weasyprint
 import matplotlib.pyplot as plt
 import base64
+from pylookyloo import Lookyloo
 
 from io import BytesIO
 from typing import Any, Dict
 from urllib.parse import parse_qs, urlparse
+from PIL import Image
 
 from ipwhois import IPDefinedError, IPWhois
 
@@ -27,21 +31,14 @@ from testing_platform import settings
 
 from .forms import DMARCRecordForm, SPFRecordForm
 from .helpers import (
-    check_dkim_public_key,
     check_soa_record,
-    email_check,
     file_check,
-
     ipv6_check,
-    tls_version_check,
     web_server_check,
     check_dnssec,
-    check_mx,
     check_spf,
     check_dmarc,
-    check_tls,
     check_hsts,
-    check_dkim,
     check_csp,
     check_cookies,
     check_cors,
@@ -49,12 +46,10 @@ from .helpers import (
     check_referrer_policy,
     check_sri,
     check_x_content_type_options,
-    check_security_txt
-
+    check_security_txt,
+    get_capture_result,
+    get_recent_captures
 )
-
-from .zap import zap_scan
-
 from .models import DMARCRecord, DMARCReport, MailDomain, TestReport
 
 
@@ -620,3 +615,26 @@ def pdf_from_template(request, test, site):
     response = HttpResponse(pdf_file, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="tp_{test}_{site}_report.pdf"'
     return response
+
+
+def url_test(request):
+    lookyloo = Lookyloo('https://lookyloo.circl.lu')
+    if request.method == 'POST':
+        url = request.POST.get('target')
+        if lookyloo.is_up:
+            context = {'lookyloo_status': lookyloo.is_up}
+            capture_uuid = lookyloo.submit(url=url, quiet=True)
+            while lookyloo.get_status(capture_uuid)['status_code'] != 1:
+                if lookyloo.get_status(capture_uuid)['status_code'] == -1:
+                    context['error'] = 'Lookyloo has encountered an issue with the requested capture. Please try again.'
+                sleep(5)
+            capture = get_capture_result(lookyloo, capture_uuid)
+            context['capture'] = capture
+            screenshot_stream = lookyloo.get_screenshot(capture_uuid)
+            screenshot = base64.b64encode(screenshot_stream.read()).decode('utf-8')
+            context['screenshot'] = screenshot
+            return render(request, 'check_lookyloo.html', context)
+    else:
+        recent_captures = get_recent_captures(lookyloo)
+        return render(request, 'check_lookyloo.html', {'recent_captures': recent_captures})
+    return render(request, 'check_lookyloo.html')

@@ -63,7 +63,7 @@ def login_user(request):
             user = authenticate(request=request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.success(request, "Your logged in successfully!")
+                # messages.success(request, "Logged in successfully")
                 return HttpResponseRedirect("/")
             else:
                 return render(request, "login.html", {"form": form})

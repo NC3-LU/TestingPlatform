@@ -15,3 +15,6 @@ const coll = document.getElementsByClassName("collapsible");
         $('.accordion-button').click(function () {
             $(this).find('.bi').toggleClass('rotate');
         });
+        $('.list-group-item').click(function () {
+            $(this).find('.bi').toggleClass('rotate');
+        });

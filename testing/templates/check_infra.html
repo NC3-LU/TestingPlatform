@@ -48,136 +48,221 @@
     </div>
   </div>
   {% if services %}
-   <div class="gx-0 row d-flex justify-content-center py-5">
-<section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
-    <div class="col-lg-12 fs-1 fw-bold">
-      Services
-    </div>
-    <div class="col-lg-6 mb-2 text-left fs-5">
-      <p>Listing of all the services found running on your server.</p>
-      <p>Check out the <a href="#general-recommendations-webconf">general
-        recommendations</a>
-        below for more details.</p>
-      <br>
-      {% if services %}
-      <table class="table table-light table-bordered table-striped">
-        <tr>
-          <th>Name</th>
-          <th>Product</th>
-          <th>Version</th>
-        </tr>
-        {% for service in services %}
-        <tr>
-          <td>{{ service.name }}</td>
-          <td>{{ service.product }}</td>
-          <td>
-            {% if service.version %}
-            {{ service.version }}
-            {% else %}
-            Not found
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </table>
-      {% endif %}
-    </div>
-
-  </section>
-   </div>
-  {% endif %}
-    {% if vulnerabilities %}
-   <div class="gx-0 row d-flex justify-content-center py-5">
-<section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
-    <div class="col-lg-12 fs-1 fw-bold">
-      Vulnerabilities
-    </div>
-    <div class="col-lg-12 mb-2 text-left fs-5 " id="vulnerabilities">
-      <ul>
-        <li>
-          Listing of all the potential vulnerabilities found on your system,
-          per software, when applicable.
-        </li>
-        <li>Click on the <i class="bi bi-search"></i> icon for more details.</li>
-        <li>
-          Check out the <a href="#general-recommendations-infra">general
-          recommendations</a>
-          below for more details.
-        </li>
-      </ul>
-      <div class="row my-2" id="general-recommendations-infra">
-      <button type="button" data-bs-toggle="collapse" data-bs-target="#vuln-recommendations"
-              aria-expanded="false" aria-controls="collapseExample"
-              class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
-        <i class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
-        General recommendations
-      </button>
-      <div class="p-0 collapse" id="vuln-recommendations">
-        <div class=" p-3 border-bottom border-end border-start">
-          <p>
-            Generally speaking, make sure all of your software is up-to-date.
-            Most of the time, results show that a service may be exploited when the
-            software behind it is outdated.
-          </p>
-          <h4>Why is my software version not showed, and what should I do?</h4>
-          This information was not found, as it is not visible either in your server's
-          HTTP headers or any of the publicly available data from your server.
-          Possible course of actions:
-          <ul>
-            <li>
-              Best practice is to find documentation for the service, and follow the
-              instructions to find what version is running on your system.
-            </li>
-            <li>
-              If your infrastructure is administered by third party, please contact
-              them
-              to inquire about possible updates to be made on your systems.
-            </li>
-          </ul>
+    <div class="gx-0 row d-flex justify-content-center py-5">
+      <section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
+        <div class="col-lg-12 fs-1 fw-bold">
+          Services
         </div>
-      </div>
+        <div class="col-lg-6 mb-2 text-left fs-5">
+          <p>Listing of all the services found running on your server.</p>
+          <br>
+          {% if services %}
+          <table class="table table-light table-bordered table-striped">
+            <tr>
+              <th>Name</th>
+              <th>Product</th>
+              <th>Version</th>
+            </tr>
+            {% for service in services %}
+            <tr>
+              <td>{{ service.name }}</td>
+              <td>{{ service.product }}</td>
+              <td>
+                {% if service.version %}
+                {{ service.version }}
+                {% else %}
+                Not found
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+          {% endif %}
+        </div>
+
+      </section>
     </div>
-    <div>
-      <br>
-      {% for vulnerability in vulnerabilities %}
-        <h3>{{ vulnerability.service }}</h3>
-        {% if vulnerability.vuln_list %}
-          <div class="table-responsive">
-            <table class="table table-light table-bordered table-striped">
-              <tr>
-                <th>ID</th>
-                <th>CVSS</th>
-                <th>Type</th>
-                <th>External link</th>
-              </tr>
-              {% for vuln in vulnerability.vuln_list %}
-                <tr>
-                  <td>{{ vuln.id }}</td>
-                  <td>{{ vuln.cvss }}</td>
-                  <td>{{ vuln.type }}</td>
-                  <td>
-                      <a href="{{ vuln.link }}"
-                         target="_blank">
-                        <i class="bi bi-search"></i>
-                      </a>
-                  </td>
-                </tr>
-              {% endfor %}
-            </table>
-          </div>
-        {% else %}
-          <p>No vulnerabilities found for this service.</p>
-        {% endif %}
-      {% endfor %}
-
-    </div>
-
-
-   </div>
-  </section>
-</div>
   {% endif %}
-  <script src="{% static 'js/chartTest.js' %}"></script>
+  {% if vulnerabilities %}
+    <div class="gx-0 row d-flex justify-content-center py-5">
+      <section class="container-extended box-shadow primary-fadded-blue_border p-5">
+        <div class="row my-2">
+          <div class="col-lg-12 fs-1 fw-bold">
+            Vulnerabilities
+          </div>
+          <div class="col-lg-12 mb-1 mt-1 text-left fs-5">
+            <p>
+              Listing of all the potential vulnerabilities found on your system,
+              per software, when applicable.
+            </p>
+            <p>
+              Check out the <a href="#general-recommendations-infra">general
+              recommendations</a>
+              below for more details.
+            </p>
+          </div>
+          <div class="card border-0">
+            <div class="card-body">
+              {% for vulnerability in vulnerabilities %}
+                {% if vulnerability.vuln_dict.cve %}
+                  <h3 class="card-title">{{ vulnerability.service }}</h3>
+                  <h5>CVE</h5>
+                  <ul class="list-group mb-3">
+                    {% for cve in vulnerability.vuln_dict.cve %}
+                      <li type="button" data-bs-toggle="collapse" data-bs-target="#{{ cve.id }}"
+                          aria-expanded="false" aria-controls="collapseExample"
+                          class="list-group-item bg-light d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                          <span class="badge bg-info rounded-pill me-2">{{ cve.type }}</span> {{ cve.id }}
+                          {% if cve.sightings.total > 0 %}
+                            <span class="badge bg-warning rounded-pill ms-2">Sightings</span>
+                          {% endif %}
+                        </div>
+                        <div class="d-flex align-items-center">
+                          <span class="badge
+                            {% if cve.severity == "CRITICAL" %} bg-danger
+                            {% elif cve.severity == "HIGH" %} bg-danger
+                            {% elif cve.severity == "MEDIUM" %} bg-warning
+                            {% else %} bg-info
+                            {% endif %}
+                            rounded-pill me-2">{{ cve.cvss }} ({{ cve.severity }})
+                          </span>
+                          <i id="cve-rec-icon" class="p-2 circle-small bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
+                        </div>
+                      </li>
+                      <div class="p-0 collapse" id="{{ cve.id }}">
+                        <div class=" p-3 border-bottom border-end border-start">
+                          <h3>Description</h3>
+                          <p>{{ cve.description }}</p>
+                          {% if cve.cvss_details %}
+                            <ul>
+                              <li>
+                                <strong>Attack Vector</strong>: {{ cve.cvss_details.attackVector }}
+                              </li>
+                              <li>
+                                <strong>Attack COmplexity</strong>: {{ cve.cvss_details.attackComplexity }}
+                              </li>
+                              <li>
+                                <strong>Privileges Required</strong>: {{ cve.cvss_details.privilegesRequired }}
+                              </li>
+                              <li>
+                                <strong>User Interaction</strong>: {{ cve.cvss_details.userInteraction }}
+                              </li>
+                              <li>
+                                <strong>Scope</strong>: {{ cve.cvss_details.scope }}
+                              </li>
+                              <li>
+                                <strong>Confidentiality Impact</strong>: {{ cve.cvss_details.confidentialityImpact }}
+                              </li>
+                              <li>
+                                <strong>Integrity Impact</strong>: {{ cve.cvss_details.integrityImpact }}
+                              </li>
+                              <li>
+                                <strong>Availability Impact</strong>: {{ cve.cvss_details.availabilityImpact }}
+                              </li>
+                            </ul>
+                          {% endif %}
+                          <p class="mt-2"><a href="{{ cve.link }}" target="_blank">More details</a></p>
+                        </div>
+                        <div class="p-3 border-bottom border-end border-start">
+                          <p><strong>Sightings over the last month:</strong> {{ cve.sightings.total }}</p>
+                          {% if cve.sightings.total > 0 %}
+                            <canvas id="sightings"></canvas>
+                          {% endif %}
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+                {% if vulnerability.vuln_dict.others %}
+                  <hr>
+                  <h5 class="mt-2">Others</h5>
+                  <ul class="list-group mb-3">
+                    {% for vuln in vulnerability.vuln_dict.others %}
+                      <a href="{{ vuln.link }}" target="_blank">
+                        <li class="list-group-item bg-light d-flex justify-content-between align-items-center">
+                          <div class="d-flex align-items-center">
+                            <span class="badge bg-info rounded-pill me-2">{{ vuln.type }}</span> {{ vuln.id }}
+                          </div>
+                          <span class="badge
+                            {% if vuln.severity == "CRITICAL" %} bg-danger
+                            {% elif vuln.severity == "HIGH" %} bg-danger
+                            {% elif vuln.severity == "MEDIUM" %} bg-warning
+                            {% else %} bg-info
+                            {% endif %}
+                            rounded-pill">{{ vuln.cvss }} ({{ vuln.severity }})</span>
+                        </li>
+                      </a>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          <div class="card border-0">
+            <div class="row my-2" id="general-recommendations-infra">
+              <button type="button" data-bs-toggle="collapse" data-bs-target="#vuln-recommendations"
+                      aria-expanded="false" aria-controls="collapseExample"
+                      class="accordion-button btn p-3 fs-2 fw-bold text-start text-light primary-primary-blue_background">
+                <i class="p-2 circle bi bi-chevron-right bg-white me-3 text-black"></i>
+                General recommendations
+              </button>
+              <div class="p-0 collapse" id="vuln-recommendations">
+                <div class=" p-3 border-bottom border-end border-start">
+                  <p>
+                    Generally speaking, make sure all of your software is up-to-date.
+                    Most of the time, results show that a service may be exploited when the
+                    software behind it is outdated.
+                  </p>
+                  <h4>Why is my software version not showed, and what should I do?</h4>
+                  This information was not found, as it is not visible either in your server's
+                  HTTP headers or any of the publicly available data from your server.
+                  Possible course of actions:
+                  <ul>
+                    <li>
+                      Best practice is to find documentation for the service, and follow the
+                      instructions to find what version is running on your system.
+                    </li>
+                    <li>
+                      If your infrastructure is administered by third party, please contact
+                      them
+                      to inquire about possible updates to be made on your systems.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  {% endif %}
   <script src="{% static 'js/collapsibleAnimation.js' %}"></script>
+  <script>
+    const labels = {{ cve.sightings.dates|safe }};
+    const values = {{ cve.sightings.counts|safe }};
+    const ctx = document.getElementById('sightings').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar', // Change to 'line' or 'pie' for other types
+      data: {
+        labels: labels, // X-axis (dates)
+        datasets: [{
+          label: 'Sightings Count by Date',
+          data: values, // Y-axis
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
 </main>
 {% endblock %}

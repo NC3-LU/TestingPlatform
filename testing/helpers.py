@@ -408,9 +408,12 @@ def lookup_cve(vuln_id):
     if vuln_lookup.is_up:
         try:
             cve = vuln_lookup.get_vulnerability(vuln_id)
+        except requests.exceptions.ConnectionError:
+            cve = {}
+        try:
             sightings = vuln_lookup.get_sightings(vuln_id=vuln_id, date_from=(datetime.now() - relativedelta(months=1)).date())
-        except ConnectionError:
-            cve, sightings = {}, {}
+        except requests.exceptions.ConnectionError:
+            sightings = {}
 
         containers = cve.get('containers', {})
         cna = containers.get('cna', {})

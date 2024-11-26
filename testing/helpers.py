@@ -406,7 +406,12 @@ def cvss_rating(cvss_score):
 def lookup_cve(vuln_id):
     vuln_lookup = PyVulnerabilityLookup('https://vulnerability.circl.lu')
     if vuln_lookup.is_up:
-        cve = vuln_lookup.get_vulnerability(vuln_id)
+        try:
+            cve = vuln_lookup.get_vulnerability(vuln_id)
+            sightings = vuln_lookup.get_sightings(vuln_id=vuln_id, date_from=(datetime.now() - relativedelta(months=1)).date())
+        except ConnectionError:
+            cve, sightings = {}, {}
+
         containers = cve.get('containers', {})
         cna = containers.get('cna', {})
         adp = containers.get('adp', [{}])
@@ -438,7 +443,6 @@ def lookup_cve(vuln_id):
         else:
             cve_info['cvss'] = {}
 
-        sightings = vuln_lookup.get_sightings(vuln_id=vuln_id, date_from=(datetime.now() - relativedelta(months=1)).date())
         if sightings:
             dates = [
                 datetime.fromisoformat(

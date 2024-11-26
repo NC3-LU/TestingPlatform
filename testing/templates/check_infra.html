@@ -168,6 +168,33 @@
                           <p><strong>Sightings over the last month:</strong> {{ cve.sightings.total }}</p>
                           {% if cve.sightings.total > 0 %}
                             <canvas id="sightings"></canvas>
+                            <script src="{% static 'js/chart.js' %}"></script>
+                            <script>
+                              const labels = {{ cve.sightings.dates|safe }};
+                              const values = {{ cve.sightings.counts|safe }};
+                              const ctx = document.getElementById('sightings').getContext('2d');
+                              new Chart(ctx, {
+                                type: 'bar', // Change to 'line' or 'pie' for other types
+                                data: {
+                                  labels: labels, // X-axis (dates)
+                                  datasets: [{
+                                    label: 'Sightings Count by Date',
+                                    data: values, // Y-axis
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    borderWidth: 1
+                                  }]
+                                },
+                                options: {
+                                  responsive: true,
+                                  scales: {
+                                    y: {
+                                      beginAtZero: true
+                                    }
+                                  }
+                                }
+                              });
+                            </script>
                           {% endif %}
                         </div>
                       </div>
@@ -238,31 +265,5 @@
     </div>
   {% endif %}
   <script src="{% static 'js/collapsibleAnimation.js' %}"></script>
-  <script>
-    const labels = {{ cve.sightings.dates|safe }};
-    const values = {{ cve.sightings.counts|safe }};
-    const ctx = document.getElementById('sightings').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar', // Change to 'line' or 'pie' for other types
-      data: {
-        labels: labels, // X-axis (dates)
-        datasets: [{
-          label: 'Sightings Count by Date',
-          data: values, // Y-axis
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
-  </script>
 </main>
 {% endblock %}

@@ -636,5 +636,6 @@ def url_test(request):
             return render(request, 'check_lookyloo.html', context)
     else:
         recent_captures = get_recent_captures(lookyloo)
+        print(recent_captures)
         return render(request, 'check_lookyloo.html', {'recent_captures': recent_captures})
     return render(request, 'check_lookyloo.html')

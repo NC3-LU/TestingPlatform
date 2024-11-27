@@ -4,7 +4,8 @@ import re
 import subprocess
 import sys
 import time
-import datetime
+from datetime import datetime, timezone, timedelta
+from dateutil.relativedelta import relativedelta
 from base64 import b64decode
 from io import BytesIO
 from typing import Any, Union, Dict
@@ -23,6 +24,7 @@ import requests
 import hashlib
 import base64
 import smtplib as smtp
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import urljoin, urlparse
 from Crypto.PublicKey import RSA
@@ -33,6 +35,7 @@ import logging
 from testing import validators
 from testing_platform.settings import PANDORA_ROOT_URL
 from .cipher_scoring import load_cipher_info
+from pyvulnerabilitylookup import PyVulnerabilityLookup
 from pylookyloo import Lookyloo
 
 logger = logging.getLogger(__name__)
@@ -352,18 +355,24 @@ def web_server_check(domain: str):
         if port["state"] != "closed":
             service = port.get("service", {})
             vulners = port.get("scripts", [])
-            list_of_vulns = []
+            vuln_dict = {'cve': [], 'others': []}
             if vulners:
                 vulners = vulners[0].get("data", {})
                 for vuln, vulndata in vulners.items():
                     try:
                         items = vulndata.get("children", [])
                         for vulnerability in items:
+                            vulnerability['severity'] = cvss_rating(vulnerability['cvss'])
                             if vulnerability["type"] == "cve":
-                                vulnerability["link"] = f"https://cvepremium.circl.lu/cve/{vulnerability['id']}"
+                                vuln_info = lookup_cve(vulnerability['id'])
+                                vulnerability["description"] = vuln_info['description']
+                                vulnerability['cvss_details'] = vuln_info['cvss']
+                                vulnerability['sightings'] = vuln_info['sightings']
+                                vulnerability["link"] = f"https://vulnerability.circl.lu/vuln/{vulnerability['id']}"
+                                vuln_dict['cve'].append(vulnerability)
                             else:
                                 vulnerability["link"] = f"https://vulners.com/{vulnerability['type']}/{vulnerability['id']}"
-                            list_of_vulns.append(vulnerability)
+                                vuln_dict['others'].append(vulnerability)
                     except TypeError:
                         continue
                     except AttributeError:
@@ -373,15 +382,87 @@ def web_server_check(domain: str):
             try:
                 vulnerabilities.append({
                     "service": f'{service.get("product", "Unknown")} - {service.get("name", "Unknown")}',
-                    "vuln_list": list_of_vulns,
+                    "vuln_dict": vuln_dict,
                 })
             except KeyError:
                 continue
 
     logger.info("server scan: Done!")
-    logger.info(json.dumps(vulnerabilities, indent=2))
 
     return {"services": services, "vulnerabilities": vulnerabilities}
+
+
+def cvss_rating(cvss_score):
+    if float(cvss_score) >= 9:
+        return "CRITICAL"
+    elif 9 > float(cvss_score) >= 7:
+        return "HIGH"
+    elif 7 > float(cvss_score) >= 4:
+        return "MEDIUM"
+    else:
+        return "LOW"
+
+
+def lookup_cve(vuln_id):
+    vuln_lookup = PyVulnerabilityLookup('https://vulnerability.circl.lu')
+    if vuln_lookup.is_up:
+        try:
+            cve = vuln_lookup.get_vulnerability(vuln_id)
+        except requests.exceptions.ConnectionError:
+            cve = {}
+        try:
+            sightings = vuln_lookup.get_sightings(vuln_id=vuln_id, date_from=(datetime.now() - relativedelta(months=1)).date())
+        except requests.exceptions.ConnectionError:
+            sightings = {}
+
+        containers = cve.get('containers', {})
+        cna = containers.get('cna', {})
+        adp = containers.get('adp', [{}])
+        cve_info = {}
+
+        # Description
+        descriptions = cna.get('descriptions', [])
+        for description in descriptions:
+            if description.get('lang') == 'en':
+                cve_info['description'] = description.get('value', 'N/A')
+                break
+            else:
+                cve_info['description'] = 'N/A'
+
+        # Severity
+        metrics = cna.get('metrics', [])
+        if not metrics:
+            for item in adp:
+                if 'metrics' in item:
+                    metrics = item['metrics']
+                    break
+
+        if metrics:
+            for metric in metrics:
+                if 'cvssV3_1' in metric or 'cvssV4_0' in metric:
+                    cvss_data = metric.get('cvssV3_1', {}) or metric.get('cvssV4_0', {})
+                    cve_info['cvss'] = cvss_data
+                    break
+        else:
+            cve_info['cvss'] = {}
+
+        if sightings:
+            dates = [
+                datetime.fromisoformat(
+                    sighting['creation_timestamp']).date()
+                for sighting in sightings['data']
+            ]
+            date_counts = dict(Counter(dates))
+            sightings['dates'] = [str(date) for date in date_counts.keys()]
+            sightings['counts'] = list(date_counts.values())
+
+        cve_info['sightings'] = {
+            'total': sightings.get('metadata', {}).get('count', 0),
+            'dates': sightings.get('dates', []),
+            'counts': sightings.get('counts', [])
+        }
+
+        return cve_info
 
 
 def web_server_check_no_raw_socket(hostname):
@@ -587,6 +668,7 @@ def check_dnssec(domain):
 
     return result
 
+
 def check_mx(domain):
     """
     Check MX records for the domain.
@@ -615,6 +697,7 @@ def check_mx(domain):
         logger.warning(f"MX check error for {domain}: {result['error']}")
 
     return result
+
 
 def check_spf(domain):
     """
@@ -648,6 +731,7 @@ def check_spf(domain):
         logger.warning(f"SPF check error for {domain}: {result['error']}")
 
     return result
+
 
 def check_dmarc(domain: str) -> dict[str, bool | None | str | Any]:
     """
@@ -1365,7 +1449,7 @@ def get_capture_result(lookyloo, capture_uuid):
 
 
 def get_recent_captures(lookyloo):
-    ts = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(weeks=1)
+    ts = datetime.now(timezone.utc) - timedelta(weeks=1)
     recent_captures = lookyloo.get_recent_captures(timestamp=ts)[:10]
     print(recent_captures)
     for i in range(len(recent_captures)):

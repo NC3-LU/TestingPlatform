@@ -70,7 +70,7 @@
                     {% else %}
                     <i class="bi bi-x-circle-fill color-danger"></i> Found entries in the phishing databases.
                     {% endif %}
-                    <div class="alert {% if overall %}alert-danger{% else %}alert-info{% endif %}" role="alert">
+                    <div class="alert {% if capture.overall %}alert-danger{% else %}alert-info{% endif %}" role="alert">
                       <p>URL: {{ capture.url }}</p>
                       <p>Phishtank:
                         {% if capture.phishtank == False %}
@@ -80,21 +80,21 @@
                         {% endif %}
                       </p>
                       <p>Virustotal:
-                        {% if capture.phishtank == False %}
+                        {% if capture.virustotal == False %}
                           <i class="bi bi-check-circle-fill color-success"></i> No report
                         {% else %}
                           <i class="bi bi-x-circle-fill color-danger"></i> Reported
                         {% endif %}
                       </p>
                       <p>urlhaus:
-                        {% if capture.phishtank == False %}
+                        {% if capture.urlhaus == False %}
                           <i class="bi bi-check-circle-fill color-success"></i> No report
                         {% else %}
                           <i class="bi bi-x-circle-fill color-danger"></i> Reported
                         {% endif %}
                       </p>
                       <p>urlscan:
-                        {% if capture.phishtank == False %}
+                        {% if capture.urlscan == False %}
                           <i class="bi bi-check-circle-fill color-success"></i> No report
                         {% else %}
                           <i class="bi bi-x-circle-fill color-danger"></i> Reported
@@ -149,7 +149,7 @@
         <div class="col-lg-12 fs-4">
           <div class="row my-2">
             {% for capture in recent_captures %}
-              <div class="alert {% if overall %}alert-danger{% else %}alert-info{% endif %}" role="alert">
+              <div class="alert {% if capture.overall %}alert-danger{% else %}alert-info{% endif %}" role="alert">
                 <p>URL: {{ capture.url }}</p>
                 <p>Phishtank:
                   {% if capture.phishtank == False %}
@@ -159,21 +159,21 @@
                   {% endif %}
                 </p>
                 <p>Virustotal:
-                  {% if capture.phishtank == False %}
+                  {% if capture.virustotal == False %}
                     <i class="bi bi-check-circle-fill color-success"></i> No report
                   {% else %}
                     <i class="bi bi-x-circle-fill color-danger"></i> Reported
                   {% endif %}
                 </p>
                 <p>urlhaus:
-                  {% if capture.phishtank == False %}
+                  {% if capture.urlhaus == False %}
                     <i class="bi bi-check-circle-fill color-success"></i> No report
                   {% else %}
                     <i class="bi bi-x-circle-fill color-danger"></i> Reported
                   {% endif %}
                 </p>
                 <p>urlscan:
-                  {% if capture.phishtank == False %}
+                  {% if capture.urlscan == False %}
                     <i class="bi bi-check-circle-fill color-success"></i> No report
                   {% else %}
                     <i class="bi bi-x-circle-fill color-danger"></i> Reported

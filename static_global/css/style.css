@@ -105,6 +105,17 @@ margin:auto;
   padding:1%;
   }
 
+.circle-small{
+ border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  padding:1%;
+  }
+
 .bi{
  transition: transform 0.3s ease-in-out;
 }

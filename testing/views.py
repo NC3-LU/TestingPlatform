@@ -284,11 +284,11 @@ def web_server_test(request):
             )
 
         nb_tests += 1
-        response = render(request, "check_infra.html", context)
+        response = render(request, "check_services.html", context)
         response.set_cookie("nb_tests", nb_tests)
         return response
     else:
-        return render(request, "check_infra.html")
+        return render(request, "check_services.html")
 
 
 @login_required
@@ -636,5 +636,6 @@ def url_test(request):
             return render(request, 'check_lookyloo.html', context)
     else:
         recent_captures = get_recent_captures(lookyloo)
+        print(recent_captures)
         return render(request, 'check_lookyloo.html', {'recent_captures': recent_captures})
     return render(request, 'check_lookyloo.html')

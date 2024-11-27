@@ -81,6 +81,22 @@
       background-color: #dbf3f8;
       border-color: #bde3ea;
     }
+
+    .rounded-pill {
+      border-radius: 50rem !important;
+    }
+
+    .bg-info {
+      background-color: #0dcaf0!important;
+    }
+
+    .bg-warning {
+      background-color: #ffc107!important;
+    }
+
+    .bg-danger {
+      background-color: #dc3545!important;
+    }
   </style>
 </head>
 <body>
@@ -88,9 +104,6 @@
     <div class="box">
       <h1>Services</h1>
       <p>Listing of all the services found running on your server.</p>
-      <p>Check out the <a href="#general-recommendations-webconf">general
-        recommendations</a>
-        below for more details.</p>
       <br>
       {% if services %}
       <table class="table table-light table-bordered table-striped">
@@ -116,14 +129,13 @@
       {% endif %}
     </div>
 
-    <div class="box">
+    <div class="container">
       <h1>Vulnerabilities</h1>
       <ul>
         <li>
           Listing of all the potential vulnerabilities found on your system,
           per software, when applicable.
         </li>
-        <li>Click on the <i class="bi bi-search"></i> icon for more details.</li>
         <li>
           Check out the <a href="#general-recommendations-infra">general
           recommendations</a>
@@ -132,33 +144,85 @@
       </ul>
       <br>
       {% for vulnerability in vulnerabilities %}
-        <h3>{{ vulnerability.service }}</h3>
-        {% if vulnerability.vuln_list %}
-          <div class="table-responsive">
-            <table class="table table-light table-bordered table-striped">
-              <tr>
-                <th>ID</th>
-                <th>CVSS</th>
-                <th>Type</th>
-                <th>External link</th>
-              </tr>
-              {% for vuln in vulnerability.vuln_list %}
-                <tr>
-                  <td>{{ vuln.id }}</td>
-                  <td>{{ vuln.cvss }}</td>
-                  <td>{{ vuln.type }}</td>
-                  <td>
-                      <a href="{{ vuln.link }}"
-                         target="_blank">
-                        <i class="bi bi-search"></i>
-                      </a>
-                  </td>
-                </tr>
-              {% endfor %}
-            </table>
+        {% if vulnerability.vuln_dict.cve %}
+          <div class="container">
+            <h3 class="card-title">{{ vulnerability.service }}</h3>
+            <h5>CVE</h5>
+            {% for cve in vulnerability.vuln_dict.cve %}
+              <div class="box">
+                <ul>
+                  <li class="list-group-item bg-light d-flex justify-content-between align-items-center">
+                    <div class="container">
+                      <span class="badge bg-info rounded-pill me-2">{{ cve.type }}</span> {{ cve.id }}
+                    </div>
+                    <span class="badge
+                      {% if cve.severity == "CRITICAL" %} bg-danger
+                      {% elif cve.severity == "HIGH" %} bg-danger
+                      {% elif cve.severity == "MEDIUM" %} bg-warning
+                      {% else %} bg-info
+                      {% endif %}
+                      rounded-pill me-2">{{ cve.cvss }} ({{ cve.severity }})
+                    </span>
+                  </li>
+                  <div class="container">
+                    <p>{{ cve.description }}</p>
+                    {% if cve.cvss_details %}
+                      <ul>
+                        <li>
+                          <strong>Attack Vector</strong>: {{ cve.cvss_details.attackVector }}
+                        </li>
+                        <li>
+                          <strong>Attack Complexity</strong>: {{ cve.cvss_details.attackComplexity }}
+                        </li>
+                        <li>
+                          <strong>Privileges Required</strong>: {{ cve.cvss_details.privilegesRequired }}
+                        </li>
+                        <li>
+                          <strong>User Interaction</strong>: {{ cve.cvss_details.userInteraction }}
+                        </li>
+                        <li>
+                          <strong>Scope</strong>: {{ cve.cvss_details.scope }}
+                        </li>
+                        <li>
+                          <strong>Confidentiality Impact</strong>: {{ cve.cvss_details.confidentialityImpact }}
+                        </li>
+                        <li>
+                          <strong>Integrity Impact</strong>: {{ cve.cvss_details.integrityImpact }}
+                        </li>
+                        <li>
+                          <strong>Availability Impact</strong>: {{ cve.cvss_details.availabilityImpact }}
+                        </li>
+                      </ul>
+                    {% endif %}
+                    <p><strong>Sightings over the last month:</strong> {{ cve.sightings.total }}</p>
+                    <p class="mt-2"><a href="{{ cve.link }}" target="_blank">More details</a></p>
+                  </div>
+                </ul>
+              </div>
+            {% endfor %}
           </div>
-        {% else %}
-          <p>No vulnerabilities found for this service.</p>
+        {% endif %}
+        {% if vulnerability.vuln_dict.others %}
+          <div class="box">
+            <h5 class="mt-2">Others</h5>
+            <ul>
+              {% for vuln in vulnerability.vuln_dict.others %}
+                <li class="list-group-item bg-light d-flex justify-content-between align-items-center">
+                  <div class="container">
+                    <span class="badge bg-info rounded-pill me-2">{{ vuln.type }}</span>
+                    <a href="{{ vuln.link }}" target="_blank">{{ vuln.id }}</a>
+                  </div>
+                  <span class="badge
+                    {% if vuln.severity == "CRITICAL" %} bg-danger
+                    {% elif vuln.severity == "HIGH" %} bg-danger
+                    {% elif vuln.severity == "MEDIUM" %} bg-warning
+                    {% else %} bg-info
+                    {% endif %}
+                    rounded-pill">{{ vuln.cvss }} ({{ vuln.severity }})</span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
         {% endif %}
       {% endfor %}
       <div class="container" id="general-recommendations-infra">
@@ -169,9 +233,9 @@
           software behind it is outdated.
         </p>
         <h4>Why is my software version not showed, and what should I do?</h4>
-        This information was not found, as it is not visible either in your server's
+        <p>This information was not found, as it is not visible either in your server's
         HTTP headers or any of the publicly available data from your server.
-        Possible course of actions:
+        Possible course of actions:</p>
         <ul>
           <li>
             Best practice is to find documentation for the service, and follow the

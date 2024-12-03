@@ -7,11 +7,6 @@ from drf_spectacular.views import (
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
-    AutomatedFailedApiView,
-    AutomatedScheduledApiView,
-    AutomatedSuccessApiView,
-    AutomatedTestHTTPApiView,
-    AutomatedTestPingApiView,
     CheckAuthApiView,
     DKIMPublicKeyCheckApiView,
     InfraTestingEmailApiView,
@@ -46,11 +41,6 @@ urlpatterns = [
     path("User/", UserApiView.as_view()),
     path("User/<int:id>", UserElementApiView.as_view()),
     path("TlsScanHistory/", TlsScanHistoryApiView.as_view()),
-    path("AutomatedTasks/Success/", AutomatedSuccessApiView.as_view()),
-    path("AutomatedTasks/Scheduled/", AutomatedScheduledApiView.as_view()),
-    path("AutomatedTasks/Failed/", AutomatedFailedApiView.as_view()),
-    path("AutomatedTests/HTTP/", AutomatedTestHTTPApiView.as_view()),
-    path("AutomatedTests/Ping/", AutomatedTestPingApiView.as_view()),
     path("InfraTesting/Email/", InfraTestingEmailApiView.as_view()),
     path("InfraTesting/File/", InfraTestingFileApiView.as_view()),
     path("InfraTesting/IPv6/", InfraTestingIPv6ApiView.as_view()),

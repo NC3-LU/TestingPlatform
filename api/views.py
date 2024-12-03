@@ -1,5 +1,4 @@
 from django.contrib.auth import authenticate
-from django_q import models as q_models
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
@@ -11,7 +10,6 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import AccessToken, OutstandingToken, RefreshToken
 
 from authentication.models import User
-from automation.models import HttpAutomatedTest, PingAutomatedTest
 from testing.helpers import (
     check_dkim_public_key,
     check_soa_record,
@@ -25,11 +23,6 @@ from testing.models import TlsScanHistory
 from testing_platform import tools
 
 from .serializers import (
-    AutomatedFailedSerializer,
-    AutomatedScheduledSerializer,
-    AutomatedSuccessSerializer,
-    AutomatedTestHTTPSerializer,
-    AutomatedTestPingSerializer,
     DomainNameAndServiceSerializer,
     DomainNameSerializer,
     FileSerializer,
@@ -240,47 +233,6 @@ class UserElementApiView(APIView):
 
 
 #
-# Model: AutomatedTest
-#
-class AutomatedTestHTTPApiView(APIView):
-    # add permission to check if user is authenticated
-    authentication_classes = [
-        SessionAuthentication,
-        BasicAuthentication,
-        JWTAuthentication,
-    ]
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    @extend_schema(request=None, responses=AutomatedTestHTTPSerializer)
-    def get(self, request, *args, **kwargs):
-        """
-        List all the external tokens.
-        """
-        objects = HttpAutomatedTest.objects.all()
-        serializer = AutomatedTestHTTPSerializer(objects, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class AutomatedTestPingApiView(APIView):
-    # add permission to check if user is authenticated
-    authentication_classes = [
-        SessionAuthentication,
-        BasicAuthentication,
-        JWTAuthentication,
-    ]
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    @extend_schema(request=None, responses=AutomatedTestPingSerializer)
-    def get(self, request, *args, **kwargs):
-        """
-        List all the external tokens.
-        """
-        objects = PingAutomatedTest.objects.all()
-        serializer = AutomatedTestPingSerializer(objects, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-#
 # Model: TlsScanHistory
 #
 class TlsScanHistoryApiView(APIView):
@@ -299,62 +251,6 @@ class TlsScanHistoryApiView(APIView):
         """
         objects = TlsScanHistory.objects.all()
         serializer = TlsScanHistorySerializer(objects, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-#
-# Model: q_models
-#
-class AutomatedSuccessApiView(APIView):
-    # add permission to check if user is authenticated
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    @extend_schema(request=None, responses=AutomatedSuccessSerializer)
-    def get(self, request, *args, **kwargs):
-        """
-        List the successfull Django Q tasks.
-        """
-        objects = q_models.Success.objects.all()
-        serializer = AutomatedSuccessSerializer(objects, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class AutomatedScheduledApiView(APIView):
-    # add permission to check if user is authenticated
-    authentication_classes = [
-        SessionAuthentication,
-        BasicAuthentication,
-        JWTAuthentication,
-    ]
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    @extend_schema(request=None, responses=AutomatedScheduledSerializer)
-    def get(self, request, *args, **kwargs):
-        """
-        List the scheduled Django Q tasks.
-        """
-        objects = q_models.Schedule.objects.all()
-        serializer = AutomatedScheduledSerializer(objects, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class AutomatedFailedApiView(APIView):
-    # add permission to check if user is authenticated
-    authentication_classes = [
-        SessionAuthentication,
-        BasicAuthentication,
-        JWTAuthentication,
-    ]
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    @extend_schema(request=None, responses=AutomatedFailedSerializer)
-    def get(self, request, *args, **kwargs):
-        """
-        List the failed Django Q tasks.
-        """
-        objects = q_models.Failure.objects.all()
-        serializer = AutomatedFailedSerializer(objects, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

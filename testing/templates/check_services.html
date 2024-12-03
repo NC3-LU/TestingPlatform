@@ -131,7 +131,7 @@
                         </div>
                       </li>
                       <div class="p-0 collapse" id="{{ cve.id }}">
-                        <div class=" p-3 border-bottom border-end border-start">
+                        <div class="p-3 border-bottom border-end border-start">
                           <h3>Description</h3>
                           <p>{{ cve.description }}</p>
                           {% if cve.cvss_details %}
@@ -167,12 +167,11 @@
                         <div class="p-3 border-bottom border-end border-start">
                           <p><strong>Sightings over the last month:</strong> {{ cve.sightings.total }}</p>
                           {% if cve.sightings.total > 0 %}
-                            <canvas id="sightings"></canvas>
-                            <script src="{% static 'js/chart.js' %}"></script>
+                            <canvas id="sightings-{{ cve.id }}"></canvas>
                             <script>
                               const labels = {{ cve.sightings.dates|safe }};
                               const values = {{ cve.sightings.counts|safe }};
-                              const ctx = document.getElementById('sightings').getContext('2d');
+                              const ctx = document.getElementById('sightings-{{ cve.id }}').getContext('2d');
                               new Chart(ctx, {
                                 type: 'bar', // Change to 'line' or 'pie' for other types
                                 data: {
@@ -242,18 +241,18 @@
                     software behind it is outdated.
                   </p>
                   <h4>Why is my software version not showed, and what should I do?</h4>
-                  This information was not found, as it is not visible either in your server's
-                  HTTP headers or any of the publicly available data from your server.
-                  Possible course of actions:
+                  This information was not found, as it is not visible either in your
+                  server's HTTP headers or any of the publicly available data from your
+                  server. Possible course of actions:
                   <ul>
                     <li>
-                      Best practice is to find documentation for the service, and follow the
-                      instructions to find what version is running on your system.
+                      Best practice is to find documentation for the service, and follow
+                      the instructions to find what version is running on your system.
                     </li>
                     <li>
-                      If your infrastructure is administered by third party, please contact
-                      them
-                      to inquire about possible updates to be made on your systems.
+                      If your infrastructure is administered by third party, please
+                      contact them to inquire about possible updates to be made on your
+                      systems.
                     </li>
                   </ul>
                 </div>

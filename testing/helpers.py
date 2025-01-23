@@ -1427,7 +1427,11 @@ def get_capture_result(lookyloo, capture_uuid):
     url = lookyloo.get_info(capture_uuid)['url']
     if len(url) > 60:
         url = url[:30] + ' [...] ' + url[-30:] + ' (shortened url)'
-    virustotal = any(value is not None for value in capture_results['vt'].values())
+    vt = list(capture_results['vt'].values())[0]
+    if vt:
+        virustotal = any(value['result'] not in ('clean', 'unrated') for value in vt['attributes']['last_analysis_results'].values())
+    else:
+        virustotal = False
     phishtank = any(value is not None for value in
                     capture_results['phishtank']['urls'].values())
     urlhaus = any(

@@ -149,36 +149,49 @@
         <div class="col-lg-12 fs-4">
           <div class="row my-2">
             {% for capture in recent_captures %}
-              <div class="alert {% if capture.overall %}alert-danger{% else %}alert-info{% endif %}" role="alert">
-                <p>URL: {{ capture.url }}</p>
-                <p>Phishtank:
-                  {% if capture.phishtank == False %}
-                    <i class="bi bi-check-circle-fill color-success"></i> No report
+              <div class="card border-1 bg-light mb-2">
+                <div class="d-flex align-items-center">
+                  {% if capture.phishtank or capture.virustotal or capture.urlhaus or capture.urlscan %}
+                    <span class="badge bg-warning rounded-pill me-2">Phishing</span>
                   {% else %}
-                    <i class="bi bi-x-circle-fill color-danger"></i> Reported
+                    <span class="badge bg-info rounded-pill me-2">Clear</span>
                   {% endif %}
-                </p>
-                <p>Virustotal:
-                  {% if capture.virustotal == False %}
-                    <i class="bi bi-check-circle-fill color-success"></i> No report
-                  {% else %}
-                    <i class="bi bi-x-circle-fill color-danger"></i> Reported
-                  {% endif %}
-                </p>
-                <p>urlhaus:
-                  {% if capture.urlhaus == False %}
-                    <i class="bi bi-check-circle-fill color-success"></i> No report
-                  {% else %}
-                    <i class="bi bi-x-circle-fill color-danger"></i> Reported
-                  {% endif %}
-                </p>
-                <p>urlscan:
-                  {% if capture.urlscan == False %}
-                    <i class="bi bi-check-circle-fill color-success"></i> No report
-                  {% else %}
-                    <i class="bi bi-x-circle-fill color-danger"></i> Reported
-                  {% endif %}
-                </p>
+                  {{ capture.url }}
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="align-items-center me-5">
+                    {% if not capture.phishtank %}
+                       <i class="bi bi-check-circle-fill color-success"></i>
+                    {% else %}
+                      <i class="bi bi-exclamation-circle-fill color-warning"></i>
+                    {% endif %}
+                    Phishtank
+                  </span>
+                  <span class="align-items-center me-5">
+                    {% if not capture.virustotal %}
+                      <i class="bi bi-check-circle-fill color-success"></i>
+                    {% else %}
+                      <i class="bi bi-exclamation-circle-fill color-warning"></i>
+                    {% endif %}
+                    Virustotal
+                  </span>
+                  <span class="align-items-center me-5">
+                    {% if not capture.urlhaus %}
+                      <i class="bi bi-check-circle-fill color-success"></i>
+                    {% else %}
+                      <i class="bi bi-exclamation-circle-fill color-warning"></i>
+                    {% endif %}
+                    urlhaus
+                  </span>
+                  <span class="align-items-center me-5">
+                    {% if not capture.urlscan %}
+                      <i class="bi bi-check-circle-fill color-success"></i>
+                    {% else %}
+                      <i class="bi bi-exclamation-circle-fill color-warning"></i>
+                    {% endif %}
+                    urlscan
+                  </span>
+                </div>
               </div>
             {% endfor %}
           </div>

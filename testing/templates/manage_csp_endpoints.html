@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Manage CSP Report Endpoints</h2>
+                <a href="{% url 'create_csp_endpoint' %}" class="btn btn-primary">Create New Endpoint</a>
+            </div>
+
+            {% if endpoints %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Allowed Origin</th>
+                                        <th>Endpoint URL</th>
+                                        <th>Created</th>
+                                        <th>Reports</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for endpoint in endpoints %}
+                                    <tr>
+                                        <td>{{ endpoint.allowed_origin }}</td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm"
+                                                       value="https://testing.nc3.lu/uri-report/{{ endpoint.endpoint_uuid }}/"
+                                                       id="endpoint-{{ endpoint.id }}" readonly>
+                                                <button class="btn btn-outline-secondary btn-sm" type="button"
+                                                        onclick="copyToClipboard('endpoint-{{ endpoint.id }}')">
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td>{{ endpoint.timestamp|date:"Y-m-d H:i" }}</td>
+                                        <td>{{ endpoint.cspreport_set.count }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'view_csp_reports' endpoint.endpoint_uuid %}"
+                                                   class="btn btn-info">View Reports</a>
+                                                <button type="button" class="btn btn-danger"
+                                                        onclick="confirmDelete('{{ endpoint.endpoint_uuid }}')">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No CSP report endpoints configured yet. Create one to start monitoring CSP violations.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this endpoint? All associated reports will be permanently deleted.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    element.select();
+    document.execCommand('copy');
+
+    const button = element.nextElementSibling;
+    const originalText = button.innerText;
+    button.innerText = 'Copied!';
+    setTimeout(() => button.innerText = originalText, 2000);
+}
+
+function confirmDelete(endpointUuid) {
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const form = document.getElementById('deleteForm');
+    form.action = `/csp/reports/${endpointUuid}/delete/`;
+    modal.show();
+}
+</script>
+{% endblock %}

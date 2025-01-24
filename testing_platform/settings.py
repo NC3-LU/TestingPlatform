@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_extensions",
     "django_icons",
-    "django_q",
     "widget_tweaks",
     "django_bootstrap5",
     "api",

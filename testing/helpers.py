@@ -924,13 +924,22 @@ def analyze_csp(csp, result, header_name):
     check_unsafe_directives(directives, result, header_name)
     check_missing_directives(directives, result, header_name)
     check_overly_permissive_directives(directives, result, header_name)
-    check_csp_syntax(csp, result, header_name)
+    # check_csp_syntax(csp, result, header_name)
     check_report_uri(directives, result, header_name)
 
 
 def parse_csp(csp):
-    return dict(
-        directive.split(None, 1) for directive in csp.split(';') if directive.strip())
+    directives = {}
+    for directive in csp.split(';'):
+        directive = directive.strip()
+        if not directive:
+            continue
+        parts = directive.split(None, 1)
+        if len(parts) == 2:
+            directives[parts[0]] = parts[1]
+        elif len(parts) == 1:
+            directives[parts[0]] = ""
+    return directives
 
 
 def check_unsafe_directives(directives, result, header_name):
@@ -946,9 +955,9 @@ def check_unsafe_directives(directives, result, header_name):
 
 def check_missing_directives(directives, result, header_name):
     important_directives = ['default-src', 'script-src', 'style-src', 'img-src',
-                            'connect-src', 'frame-src']
+                          'connect-src']  # Removed frame-src as it's optional when default-src is set
     for directive in important_directives:
-        if directive not in directives:
+        if directive not in directives and 'default-src' not in directives:
             result['issues'].append(
                 f"{header_name}: Missing important directive '{directive}'.")
             result['recommendations'].append(
@@ -957,24 +966,26 @@ def check_missing_directives(directives, result, header_name):
 
 def check_overly_permissive_directives(directives, result, header_name):
     for directive, value in directives.items():
-        if '*' in value:
-            result['issues'].append(
-                f"{header_name}: Overly permissive wildcard '*' found in '{directive}'.")
-            result['recommendations'].append(
-                f"Restrict the '{directive}' directive to specific sources instead of using '*'.")
+        values = value.split()
+        for val in values:
+            if val == '*':  # Only flag standalone wildcards
+                result['issues'].append(
+                    f"{header_name}: Overly permissive wildcard '*' found in '{directive}'.")
+                result['recommendations'].append(
+                    f"Restrict the '{directive}' directive to specific sources instead of using '*'.")
 
-
-def check_csp_syntax(csp, result, header_name):
-    if not re.match(r'^[a-zA-Z0-9\-]+\s+[^;]+(?:;\s*[a-zA-Z0-9\-]+\s+[^;]+)*$', csp):
-        result['issues'].append(f"{header_name}: CSP syntax appears to be invalid.")
-        result['recommendations'].append("Review and correct the CSP syntax.")
+# False positives not reliable enough
+#def check_csp_syntax(csp, result, header_name):
+#    if not re.match(r'^[a-zA-Z0-9\-]+\s+[^;]+(?:;\s*[a-zA-Z0-9\-]+\s+[^;]+)*$', csp):
+#        result['issues'].append(f"{header_name}: CSP syntax appears to be invalid.")
+#        result['recommendations'].append("Review and correct the CSP syntax.")
 
 
 def check_report_uri(directives, result, header_name):
     if 'report-uri' not in directives and 'report-to' not in directives:
         result['issues'].append(f"{header_name}: No reporting directive found.")
         result['recommendations'].append(
-            "Consider adding a 'report-uri' or 'report-to' directive for CSP violation reporting.")
+            "Consider adding a 'report-uri (deprecated)' or 'report-to' directive for CSP violation reporting.")
 
 
 def check_cookies(domain: str) -> Dict[str, Any]:

@@ -12,6 +12,13 @@ urlpatterns = [
     path("dmarc-generator/", views.dmarc_generator, name="dmarc-generator"),
     path("email-policy-generator/", views.record_generator, name="email_policy_generator"),
     path("<test>/export/<site>", views.pdf_from_template, name="pdf_from_template"),
+    path('uri-report/<uuid:endpoint_uuid>/', views.csp_report_endpoint,
+         name='csp_report_endpoint'),
+    path('csp/manage/', views.manage_csp_endpoints, name='manage_csp_endpoints'),
+    path('csp/create/', views.create_csp_endpoint, name='create_csp_endpoint'),
+    path('csp/reports/<str:endpoint_uuid>/', views.view_csp_reports,
+         name='view_csp_reports'),
+
     # path('whois-lookup/', views.ping_test, name='ping_test'),
 
     # path("web-test/", views.web_test, name="web_test"),

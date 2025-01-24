@@ -1,7 +1,8 @@
 from django.db import models
-
+from django.contrib.auth import get_user_model
 from authentication.models import User
-
+import uuid
+import hashlib
 
 class Domain(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -103,3 +104,36 @@ class TestReport(models.Model):
 
     def __str__(self):
         return f"{self.test_ran}_{self.tested_site.replace('.', '-')}"
+
+
+class CSPReport(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    allowed_origin = models.URLField(help_text="The domain allowed to send reports to this endpoint.")
+    endpoint_uuid = models.CharField(max_length=64, unique=True, editable=False)
+    report_data = models.JSONField(default=dict)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.endpoint_uuid:
+            # Create namespace using user's ID
+            namespace = uuid.uuid5(uuid.NAMESPACE_DNS, str(self.user.id))
+            # Generate UUID5 using namespace and domain
+            domain_uuid = uuid.uuid5(namespace, self.allowed_origin)
+            # Hash for additional security
+            self.endpoint_uuid = hashlib.blake2b(
+                str(domain_uuid).encode(),
+                digest_size=32
+            ).hexdigest()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.allowed_origin}"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'allowed_origin'],
+                name='unique_user_domain'
+            )
+        ]
+

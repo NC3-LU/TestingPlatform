@@ -5,7 +5,6 @@ import re
 import socket
 from time import sleep
 
-import xmltodict
 import weasyprint
 import matplotlib.pyplot as plt
 import base64
@@ -50,7 +49,13 @@ from .helpers import (
     get_capture_result,
     get_recent_captures
 )
-from .models import DMARCRecord, DMARCReport, MailDomain, TestReport
+from .models import DMARCRecord, DMARCReport, MailDomain, TestReport, CSPReport
+import json
+from datetime import datetime
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 
 
 @login_required
@@ -467,35 +472,6 @@ def dmarc_reporter(request):
 
 
 @login_required
-def dmarc_shower(request, domain, mailfrom, timestamp):
-    dmarc_report = DMARCReport.objects.get(
-        mail_from=mailfrom, timestamp=timestamp, dmarc_record__domain__domain=domain
-    )
-    if (
-        dmarc_report.dmarc_record.user == request.user
-        and request.user.maildomain_set.filter(domain=domain)
-    ):
-        report = xmltodict.parse(dmarc_report.report)
-        record = report["feedback"]["record"]
-        if not isinstance(record, list):
-            record = [record]
-        return render(
-            request,
-            "dmarc_shower.html",
-            {
-                "report": report,
-                "records": record,
-                "domain": domain,
-                "timestamp": timestamp,
-                "mailfrom": mailfrom,
-            },
-        )
-    else:
-        messages.error(request, "Unauthorized")
-        return redirect("index")
-
-
-@login_required
 def dmarc_dl(request, domain, mailfrom, timestamp):
     dmarc_report = DMARCReport.objects.get(
         mail_from=mailfrom, timestamp=timestamp, dmarc_record__domain__domain=domain
@@ -638,3 +614,94 @@ def url_test(request):
         recent_captures = get_recent_captures(lookyloo)
         return render(request, 'check_lookyloo.html', {'recent_captures': recent_captures})
     return render(request, 'check_lookyloo.html')
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def csp_report_endpoint(request, endpoint_uuid):
+    try:
+        report_record = get_object_or_404(CSPReport, endpoint_uuid=endpoint_uuid)
+
+        # Validate origin
+        request_origin = request.headers.get("Origin") or request.headers.get("Referer")
+        if not request_origin or not request_origin.startswith(
+            report_record.allowed_origin):
+            return JsonResponse({"error": "Invalid origin"}, status=403)
+
+        # Parse report - handle both report-uri and report-to formats
+        try:
+            report_data = json.loads(request.body)
+            # Handle report-to format
+            if 'type' in report_data and report_data['type'] == 'csp-violation':
+                processed_data = {
+                    'document-uri': report_data.get('url', ''),
+                    'referrer': report_data.get('referrer', ''),
+                    'violated-directive': report_data.get('body', {}).get(
+                        'violated-directive', ''),
+                    'effective-directive': report_data.get('body', {}).get(
+                        'effective-directive', ''),
+                    'original-policy': report_data.get('body', {}).get(
+                        'original-policy', ''),
+                    'blocked-uri': report_data.get('body', {}).get('blocked-uri', ''),
+                    'status-code': report_data.get('body', {}).get('status-code', 0)
+                }
+            # Handle legacy report-uri format
+            elif 'csp-report' in report_data:
+                processed_data = report_data['csp-report']
+            else:
+                processed_data = report_data
+
+            CSPReport.objects.create(
+                user=report_record.user,
+                endpoint_uuid=report_record.endpoint_uuid,
+                allowed_origin=report_record.allowed_origin,
+                report_data=processed_data,
+                timestamp=datetime.now()
+            )
+            return JsonResponse({"status": "success"}, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+
+@login_required
+def manage_csp_endpoints(request):
+    user_endpoints = CSPReport.objects.filter(user=request.user)
+    return render(request, "manage_csp_endpoints.html", {"endpoints": user_endpoints})
+
+
+@login_required
+def create_csp_endpoint(request):
+    if request.method == "POST":
+        allowed_origin = request.POST.get("allowed_origin", "").strip()
+        if not allowed_origin:
+            return render(request, "create_csp_endpoint.html",
+                          {"error": "Allowed origin is required."})
+
+        # Create or update endpoint
+        endpoint, created = CSPReport.objects.get_or_create(
+            user=request.user,
+            allowed_origin=allowed_origin,
+            defaults={"report_data": {}}
+        )
+
+        endpoint_url = f"https://testing.nc3.lu/uri-report/{endpoint.endpoint_uuid}/"
+        return render(request, "create_csp_endpoint.html",
+                      {"endpoint_url": endpoint_url})
+
+    return render(request, "create_csp_endpoint.html")
+
+
+@login_required
+def view_csp_reports(request, endpoint_uuid):
+    endpoint = get_object_or_404(CSPReport, endpoint_uuid=endpoint_uuid,
+                                 user=request.user)
+    reports = CSPReport.objects.filter(endpoint_uuid=endpoint_uuid).order_by(
+        "-timestamp")
+    return render(request, "view_csp_reports.html", {
+        "endpoint": endpoint,
+        "reports": reports
+    })

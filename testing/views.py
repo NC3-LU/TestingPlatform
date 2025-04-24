@@ -47,16 +47,17 @@ from .helpers import (
     check_x_content_type_options,
     check_security_txt,
     get_capture_result,
-    get_recent_captures
+    get_recent_captures,
+    check_dkim
 )
-from .models import DMARCRecord, DMARCReport, MailDomain, TestReport, CSPReport
+from .models import DMARCRecord, DMARCReport, MailDomain, TestReport, CSPReport, CSPEndpoint
 import json
 from datetime import datetime
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-
+BASE_URL = os.getenv("BASE_URL", "localhost:8000")
 
 @login_required
 def ping_test(request):
@@ -201,10 +202,11 @@ def email_test(request):
             #context['mx'] = {'servers': mx_servers, 'tls': check_tls(mx_servers)}
 
             context['spf'] = check_spf(target)
-
-
             context['dmarc'] = check_dmarc(target)
-            #context['dkim'], context['dkim_valid'] = check_dkim(target, dkim_selector)
+            # Check DKIM with specific selector
+            dkim_result, is_valid = check_dkim(target, selector=dkim_selector)
+            context['dkim'] = dkim_result
+            context['dkim_valid'] = is_valid
 
         try:
             test_report = TestReport.objects.get(tested_site=target, test_ran="email-test")
@@ -618,90 +620,114 @@ def url_test(request):
 
 @csrf_exempt
 @require_http_methods(["POST"])
-def csp_report_endpoint(request, endpoint_uuid):
+def receive_csp_report(request, endpoint_uuid):
+    """Handle incoming CSP violation reports"""
     try:
-        report_record = get_object_or_404(CSPReport, endpoint_uuid=endpoint_uuid)
+        # Rate limiting
+        cache_key = f'csp_rate_{endpoint_uuid}'
+        if cache.get(cache_key, 0) >= getattr(settings, 'CSP_RATE_LIMIT', 1000):
+            return JsonResponse({"error": "Rate limit exceeded"}, status=429)
+        cache.incr(cache_key, 1)
 
-        # Validate origin
-        request_origin = request.headers.get("Origin") or request.headers.get("Referer")
-        if not request_origin or not request_origin.startswith(
-            report_record.allowed_origin):
+        # Get endpoint
+        endpoint = get_object_or_404(CSPEndpoint, endpoint_uuid=endpoint_uuid,
+                                     is_active=True)
+
+        # Basic origin validation
+        origin = request.headers.get("Origin") or request.META.get("HTTP_REFERER")
+        if not origin or not origin.startswith(endpoint.allowed_origin):
             return JsonResponse({"error": "Invalid origin"}, status=403)
 
-        # Parse report - handle both report-uri and report-to formats
+        # Parse report
         try:
             report_data = json.loads(request.body)
-            # Handle report-to format
-            if 'type' in report_data and report_data['type'] == 'csp-violation':
-                processed_data = {
-                    'document-uri': report_data.get('url', ''),
-                    'referrer': report_data.get('referrer', ''),
-                    'violated-directive': report_data.get('body', {}).get(
-                        'violated-directive', ''),
-                    'effective-directive': report_data.get('body', {}).get(
-                        'effective-directive', ''),
-                    'original-policy': report_data.get('body', {}).get(
-                        'original-policy', ''),
-                    'blocked-uri': report_data.get('body', {}).get('blocked-uri', ''),
-                    'status-code': report_data.get('body', {}).get('status-code', 0)
-                }
-            # Handle legacy report-uri format
-            elif 'csp-report' in report_data:
-                processed_data = report_data['csp-report']
-            else:
-                processed_data = report_data
-
-            CSPReport.objects.create(
-                user=report_record.user,
-                endpoint_uuid=report_record.endpoint_uuid,
-                allowed_origin=report_record.allowed_origin,
-                report_data=processed_data,
-                timestamp=datetime.now()
-            )
-            return JsonResponse({"status": "success"}, status=201)
-
+            # CSP reports can come in two formats:
+            # 1. {"csp-report": {...}}
+            # 2. {...}
+            csp_data = report_data.get('csp-report', report_data)
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON"}, status=400)
 
+        # Store report
+        CSPReport.objects.create(
+            endpoint=endpoint,
+            report_data=csp_data,
+            user_agent=request.headers.get('User-Agent')
+        )
+
+        return JsonResponse({"status": "success"}, status=201)
+
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        return JsonResponse({"error": str(e)}, status=500)
 
 
 @login_required
-def manage_csp_endpoints(request):
-    user_endpoints = CSPReport.objects.filter(user=request.user)
-    return render(request, "manage_csp_endpoints.html", {"endpoints": user_endpoints})
+def manage_endpoints(request):
+    """View to manage CSP report endpoints"""
+    if request.method == "POST":
+        action = request.POST.get("action")
+        endpoint_uuid = request.POST.get("endpoint_uuid")
+
+        if endpoint_uuid:
+            endpoint = get_object_or_404(CSPEndpoint, endpoint_uuid=endpoint_uuid,
+                                         user=request.user)
+
+            if action == "delete":
+                endpoint.delete()
+            elif action == "toggle":
+                endpoint.is_active = not endpoint.is_active
+                endpoint.save()
+
+    endpoints = CSPEndpoint.objects.filter(user=request.user)
+    return render(request, "manage_csp_endpoints.html", {"endpoints": endpoints})
 
 
 @login_required
-def create_csp_endpoint(request):
+def create_endpoint(request):
+    """View to create a new CSP endpoint"""
     if request.method == "POST":
         allowed_origin = request.POST.get("allowed_origin", "").strip()
         if not allowed_origin:
             return render(request, "create_csp_endpoint.html",
                           {"error": "Allowed origin is required."})
 
-        # Create or update endpoint
-        endpoint, created = CSPReport.objects.get_or_create(
+        endpoint = CSPEndpoint.objects.create(
             user=request.user,
-            allowed_origin=allowed_origin,
-            defaults={"report_data": {}}
+            allowed_origin=allowed_origin
         )
 
-        endpoint_url = f"https://testing.nc3.lu/uri-report/{endpoint.endpoint_uuid}/"
-        return render(request, "create_csp_endpoint.html",
-                      {"endpoint_url": endpoint_url})
+        endpoint_url = request.build_absolute_uri(
+            f'/csp/report/{endpoint.endpoint_uuid}/')
+        return render(request, "create_csp_endpoint.html", {
+            "endpoint_url": endpoint_url,
+            "endpoint": endpoint
+        })
 
     return render(request, "create_csp_endpoint.html")
 
 
 @login_required
-def view_csp_reports(request, endpoint_uuid):
-    endpoint = get_object_or_404(CSPReport, endpoint_uuid=endpoint_uuid,
+def view_reports(request, endpoint_uuid):
+    """View to display CSP reports and analytics"""
+    endpoint = get_object_or_404(CSPEndpoint, endpoint_uuid=endpoint_uuid,
                                  user=request.user)
-    reports = CSPReport.objects.filter(endpoint_uuid=endpoint_uuid).order_by(
-        "-timestamp")
+    days = min(int(request.GET.get('days', 30)), 365)
+    start_date = datetime.now() - timedelta(days=days)
+
+    # Basic statistics
+    reports = CSPReport.objects.filter(
+        endpoint=endpoint,
+        occurred_at__gte=start_date
+    ).order_by('-occurred_at')
+
+    # Calculate some basic stats
+    stats = {
+        'total_reports': reports.count(),
+        'recent_reports': reports[:100],  # Show last 100 reports
+    }
+
     return render(request, "view_csp_reports.html", {
         "endpoint": endpoint,
-        "reports": reports
+        "stats": stats,
+        "reports": stats['recent_reports']
     })

@@ -8,7 +8,7 @@ from datetime import datetime, timezone, timedelta
 from dateutil.relativedelta import relativedelta
 from base64 import b64decode
 from io import BytesIO
-from typing import Any, Union, Dict
+from typing import Any, Union, Dict, List, Tuple, Optional
 from bs4 import BeautifulSoup
 import dns.resolver
 import dns.dnssec
@@ -17,7 +17,6 @@ import ssl
 import socket
 import dns.message
 import dns.rdatatype
-import dns.resolver
 import nmap3
 import pypandora
 import requests
@@ -26,11 +25,10 @@ import base64
 import smtplib as smtp
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, urlunparse
 from Crypto.PublicKey import RSA
 from django.template.loader import render_to_string
 from weasyprint import CSS, HTML
-from typing import Dict, List, Tuple
 import logging
 from testing import validators
 from testing_platform.settings import PANDORA_ROOT_URL
@@ -40,6 +38,103 @@ from pylookyloo import Lookyloo
 
 logger = logging.getLogger(__name__)
 
+# Allowlisted protocols for URL construction
+ALLOWED_PROTOCOLS = ["http", "https"]
+
+def safe_url_utils(domain: str, path: str = "", protocol: str = "https") -> Optional[str]:
+    """
+    Safely constructs a URL from domain and path components after validating inputs.
+    
+    Args:
+        domain (str): The domain to use in the URL
+        path (str): Optional path to append to the domain
+        protocol (str): Protocol to use (defaults to https)
+        
+    Returns:
+        Optional[str]: A properly constructed URL or None if validation fails
+    """
+    # Validate protocol
+    if protocol not in ALLOWED_PROTOCOLS:
+        logger.error(f"Invalid protocol: {protocol}")
+        return None
+        
+    # Validate domain using the validator
+    try:
+        validated_domain = validators.full_domain_validator(domain)
+    except Exception as e:
+        logger.error(f"Domain validation failed: {e}")
+        return None
+    
+    # Ensure path starts with / if it's not empty
+    if path and not path.startswith('/'):
+        path = f"/{path}"
+    
+    # Construct URL using urlunparse to safely handle components
+    url_components = (protocol, validated_domain, path, '', '', '')
+    return urlunparse(url_components)
+
+def check_csp(domain):
+    """
+    Perform a comprehensive check of the Content Security Policy (CSP) for a given domain.
+
+    Args:
+        domain (str): The domain to check.
+
+    Returns:
+        dict: A dictionary with detailed CSP analysis results.
+    """
+    # Construct URL safely
+    url = safe_url_utils(domain)
+    if not url:
+        return {
+            'status': False,
+            'csp_value': None,
+            'csp_report_only': None,
+            'issues': ["Invalid domain provided"],
+            'recommendations': ["Provide a valid domain name"]
+        }
+    
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+
+        csp_header = response.headers.get('Content-Security-Policy')
+        csp_report_only = response.headers.get('Content-Security-Policy-Report-Only')
+
+        result = {
+            'status': False,
+            'csp_value': csp_header,
+            'csp_report_only': csp_report_only,
+            'issues': [],
+            'recommendations': []
+        }
+
+        if not csp_header and not csp_report_only:
+            result['issues'].append("No Content-Security-Policy header found.")
+            result['recommendations'].append(
+                "Implement a Content-Security-Policy header.")
+            return result
+
+        headers_to_check = [
+            ('Content-Security-Policy', csp_header),
+            ('Content-Security-Policy-Report-Only', csp_report_only)
+        ]
+
+        for header_name, header_value in headers_to_check:
+            if header_value:
+                analyze_csp(header_value, result, header_name)
+
+        result['status'] = len(result['issues']) == 0
+        return result
+
+    except requests.RequestException as e:
+        return {
+            'status': False,
+            'csp_value': None,
+            'csp_report_only': None,
+            'issues': [f"An error occurred while fetching the page: {e}"],
+            'recommendations': ["Ensure the domain is accessible and try again."]
+        }
 
 def check_soa_record(target: str) -> Union[bool, Dict]:
     """Checks the presence of a SOA record for the Email Systems Testing."""
@@ -49,7 +144,7 @@ def check_soa_record(target: str) -> Union[bool, Dict]:
         return {"error": "You entered an invalid hostname!"}
     result = False
     try:
-        answers = dns.resolver.query(target, "SOA")
+        answers = dns.resolver.resolve(target, "SOA")
         result = 0 != len(answers)
     except Exception:
         result = False
@@ -60,27 +155,41 @@ def email_check(target: str) -> Dict[str, Any]:
     """Parses and validates MX, SPF, and DMARC records,
     Checks for DNSSEC deployment, Checks for STARTTLS and TLS support.
     Checks for the validity of the DKIM public key."""
+    # Validate the domain before proceeding with any operations
     try:
-        target = validators.full_domain_validator(target)
+        validated_domain = validators.full_domain_validator(target)
     except Exception:
         return {"error": "You entered an invalid hostname!"}
+        
     result = {}
     env = os.environ.copy()
     cmd = [
         os.path.join(sys.exec_prefix, "bin/checkdmarc"),
-        target,
+        validated_domain,
         "-f",
         "JSON",
     ]
-    (stdout, stderr) = (
-        subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
-    ).communicate()
     try:
-        result = json.loads(stdout)
-    except Exception:
-        result = {}
+        (stdout, stderr) = (
+            subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+        ).communicate()
+        
+        try:
+            result = json.loads(stdout)
+        except Exception:
+            result = {}
+    except Exception as e:
+        logger.error(f"Error running checkdmarc: {e}")
+        return {"error": f"Failed to check DMARC: {str(e)}"}
 
-    # result["dkim"] = check_dkim_public_key(target, [])
+    # Check DKIM using multiple default selectors
+    try:
+        # result["dkim"] = check_dkim_public_key(validated_domain, [])
+        pass  # Commented out for now
+    except Exception as e:
+        logger.error(f"Error checking DKIM: {e}")
+        result["dkim"] = {"error": f"Error checking DKIM: {str(e)}"}
+        
     return result
 
 
@@ -132,13 +241,29 @@ def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, An
 def ipv6_check(
     domain: str, port=None
 ) -> Dict[str, Union[Dict[Any, Any], List[Union[str, int]], List[Any]]]:
-    logger.info(f"ipv6 scan: scanning domain {domain}")
+    """
+    Checks IPv6 connectivity for a domain.
+    
+    Args:
+        domain (str): The domain to check.
+        port: Optional port number
+        
+    Returns:
+        dict: IPv6 check results or error message.
+    """
+    # Validate the domain before proceeding with any operations
+    try:
+        validated_domain = validators.full_domain_validator(domain)
+    except Exception:
+        return {"error": "You entered an invalid hostname!"}
+        
+    logger.info(f"ipv6 scan: scanning domain {validated_domain}")
     results = {}
 
     # Check Name Servers connectivity:
     default_resolver = dns.resolver.Resolver().nameservers[0]
     logger.info(f"ipv6 scan: default resolver is {default_resolver}")
-    q = dns.message.make_query(domain, dns.rdatatype.NS)
+    q = dns.message.make_query(validated_domain, dns.rdatatype.NS)
     ns_response = dns.query.udp(q, default_resolver)
     ns_names = [
         t.target.to_text()
@@ -268,24 +393,31 @@ def ipv6_check(
 
     # Check website connectivity (available ips and reachability)
     try:
-        resolved_v4 = socket.getaddrinfo(domain, port, socket.AF_INET)
+        resolved_v4 = socket.getaddrinfo(validated_domain, port, socket.AF_INET)
         records_v4 = [hit[4][0] for hit in resolved_v4]
         records_v4 = list(set(records_v4))
     except socket.gaierror:
         records_v4 = [""]
     try:
-        resolved_v6 = socket.getaddrinfo(domain, port, socket.AF_INET6)
+        resolved_v6 = socket.getaddrinfo(validated_domain, port, socket.AF_INET6)
         records_v6 = [hit[4][0] for hit in resolved_v6]
         records_v6 = list(set(records_v6))
     except socket.gaierror:
         records_v6 = [""]
 
-    records = [(domain, records_v4[i], records_v6[i]) for i in range(len(records_v4))]
+    # Make sure both lists have the same length for pairing
+    max_len = max(len(records_v4), len(records_v6))
+    records_v4.extend([""] * (max_len - len(records_v4)))
+    records_v6.extend([""] * (max_len - len(records_v6)))
+    
+    records = [(validated_domain, records_v4[i], records_v6[i]) for i in range(max_len)]
 
     response = False
     records_v4_comments = None
-    if records_v4:
+    if records_v4 and records_v4[0]:
         for ip4 in records_v4:
+            if not ip4:
+                continue
             command = ["ping", "-c", "1", ip4]
             if subprocess.call(command) == 0:
                 response = True
@@ -302,8 +434,10 @@ def ipv6_check(
 
     response = False
     records_v6_comments = None
-    if records_v6:
+    if records_v6 and records_v6[0]:
         for ip6 in records_v6:
+            if not ip6:
+                continue
             command = ["ping", "-c", "1", ip6]
             if subprocess.call(command) == 0:
                 response = True
@@ -330,15 +464,26 @@ def ipv6_check(
 
 
 def web_server_check(domain: str):
-    # Validate the domain
-    if not validators.full_domain_validator(domain):
+    """
+    Performs security scanning on a web server.
+    
+    Args:
+        domain (str): The domain to check.
+        
+    Returns:
+        dict: Security scan results or error message.
+    """
+    # Validate the domain before proceeding with any operations
+    try:
+        validated_domain = validators.full_domain_validator(domain)
+    except Exception:
         return {"error": "You entered an invalid hostname!"}
 
+    logger.info(f"server scan: testing {validated_domain}")
     nmap = nmap3.Nmap()
-    logger.info(f"server scan: testing {domain}")
 
     try:
-        service_scans = nmap.nmap_version_detection(domain, args="--script vulners --script-args mincvss+5.0")
+        service_scans = nmap.nmap_version_detection(validated_domain, args="--script vulners --script-args mincvss+5.0")
     except Exception as e:
         logger.error(f"Error during Nmap scan: {e}")
         return {"error": "Nmap scan failed"}
@@ -522,15 +667,33 @@ def web_server_check_no_raw_socket(hostname):
 def tls_version_check(domain: str, service):
     """
     Checks the version of TLS.
+    
+    Args:
+        domain (str): The domain to check.
+        service: The service type ('web' or 'mail')
+        
+    Returns:
+        dict: TLS version check results or error message.
     """
+    # Validate the domain before proceeding with any operations
     try:
-        validators.full_domain_validator(domain)
+        validated_domain = validators.full_domain_validator(domain)
     except Exception:
         return {"error": "You entered an invalid hostname!"}
+        
+    # Validate service
+    if service not in ["web", "mail"]:
+        return {"error": "Invalid service type. Must be 'web' or 'mail'."}
+        
     nmap = nmap3.Nmap()
-    logger.info(f"tls scan: Scanning host/domain {domain}")
-    tls_scans = nmap.nmap_version_detection(domain, args="--script ssl-enum-ciphers")
-    ip, tls_scans = list(tls_scans.items())[0]
+    logger.info(f"tls scan: Scanning host/domain {validated_domain}")
+    tls_scans = nmap.nmap_version_detection(validated_domain, args="--script ssl-enum-ciphers")
+    
+    try:
+        ip, tls_scans = list(tls_scans.items())[0]
+    except IndexError:
+        return {"error": "No scan results found"}
+        
     tls_scans = list(
         filter(lambda element: element["state"] == "open", tls_scans["ports"])
     )
@@ -557,6 +720,9 @@ def tls_version_check(domain: str, service):
                     if script.get("name") == "ssl-enum-ciphers":
                         results = script["data"]
 
+    if not results:
+        return {"error": "No TLS information found for the specified service"}
+
     try:
         results.pop("least strength", None)
     except AttributeError:
@@ -569,11 +735,11 @@ def tls_version_check(domain: str, service):
         for ciphersuite in results[tls_version]:
             ciphersuite.pop("strength")
             try:
-                cipher_info = json.loads(
-                    requests.get(
-                        f"https://ciphersuite.info/api/cs/{ciphersuite['name']}"
-                    ).text
-                )[ciphersuite["name"]]
+                # Construct a safe URL for the API request
+                api_url = f"https://ciphersuite.info/api/cs/{ciphersuite['name']}"
+                cipher_response = requests.get(api_url)
+                cipher_response.raise_for_status()
+                cipher_info = json.loads(cipher_response.text)[ciphersuite["name"]]
             except Exception:
                 continue
             for key in ["gnutls_name", "openssl_name", "hex_byte_1", "hex_byte_2"]:
@@ -587,15 +753,44 @@ def tls_version_check(domain: str, service):
     return {"result": results, "lowest_sec_level": lowest_sec_level}
 
 
-def check_dkim_public_key(domain: str, selectors: list):
-    """Looks for a DKIM public key in a DNS field and verifies that it can be used to
-    encrypt data."""
+def check_dkim(domain: str, selector: str = None, selectors: list = None):
+    """
+    Check DKIM record for a domain with the specified selector(s).
+    
+    Args:
+        domain (str): The domain to check
+        selector (str, optional): A single DKIM selector to use
+        selectors (list, optional): A list of DKIM selectors to try
+        
+    Returns:
+        dict or tuple: Either a dict with DKIM status or a tuple with (record_text, is_valid)
+                      depending on how the function is called
+    """
+    # Validate domain
     try:
-        validators.full_domain_validator(domain)
+        validated_domain = validators.full_domain_validator(domain)
     except Exception:
-        return {"error": "You entered an invalid hostname!"}
-    if len(selectors) == 0:
-        # TODO Check to get proper selector or have a database of selectors
+        return None, False
+    
+    # Handle case where a single selector is provided
+    if selector and not selectors:
+        # Validate selector (allow only alphanumeric, hyphen, underscore)
+        if not re.match(r'^[a-zA-Z0-9_-]+$', selector):
+            return None, False
+            
+        dkim_domain = f'{selector}._domainkey.{validated_domain}'
+        
+        try:
+            dkim_record = dns.resolver.resolve(dkim_domain, 'TXT')
+            for record in dkim_record:
+                return record.to_text(), True
+            return None, False
+        except Exception as e:
+            logger.error(f'Error checking DKIM for {dkim_domain}: {e}')
+            return None, False
+    
+    # Handle case where multiple selectors are provided or none (use defaults)
+    if selectors is None:
         selectors = [
             "selector1",
             "selector2",
@@ -606,18 +801,31 @@ def check_dkim_public_key(domain: str, selectors: list):
             "mxvault",
             "mail",
         ]
-    for selector in selectors:
+    
+    for s in selectors:
+        # Validate the selector to avoid injection
+        if not s or not re.match(r'^[a-zA-Z0-9_-]+$', s):
+            logger.warning(f"Invalid selector format: {s}")
+            continue
+            
         try:
+            dns_query = f"{s}._domainkey.{validated_domain}."
             dns_response = (
-                dns.resolver.query(f"{selector}._domainkey.{domain}.", "TXT")
+                dns.resolver.resolve(dns_query, "TXT")
                 .response.answer[1]
                 .to_text()
             )
-            p = re.search(r"p=([\w\d/+]*)", dns_response).group(1)
+            p_match = re.search(r"p=([\w\d/+]*)", dns_response)
+            if not p_match:
+                continue
+                
+            p = p_match.group(1)
             key = RSA.importKey(b64decode(p))
             return {"dkim": key.can_encrypt()}
-        except Exception:
+        except Exception as e:
+            logger.debug(f"DKIM check failed for selector {s}: {e}")
             continue
+    
     return {"dkim": False}
 
 
@@ -648,9 +856,19 @@ def check_dnssec(domain):
     Returns:
         dict: A dictionary containing DNSSEC status and details.
     """
+    # Validate the domain before proceeding with any operations
+    try:
+        validated_domain = validators.full_domain_validator(domain)
+    except Exception:
+        return {
+            "enabled": False, 
+            "keys": [], 
+            "error": "Invalid domain provided"
+        }
+        
     result = {"enabled": False, "keys": [], "error": None}
     try:
-        dnskey = dns.resolver.resolve(domain, 'DNSKEY')
+        dnskey = dns.resolver.resolve(validated_domain, 'DNSKEY')
         result["enabled"] = True
         result["keys"] = [key.to_text() for key in dnskey]
     except dns.resolver.NXDOMAIN:
@@ -662,9 +880,9 @@ def check_dnssec(domain):
     except Exception as e:
         result["error"] = f"Unexpected error: {str(e)}"
 
-    logger.info(f"DNSSEC check for {domain}: {'Enabled' if result['enabled'] else 'Disabled'}")
+    logger.info(f"DNSSEC check for {validated_domain}: {'Enabled' if result['enabled'] else 'Disabled'}")
     if result["error"]:
-        logger.warning(f"DNSSEC check error for {domain}: {result['error']}")
+        logger.warning(f"DNSSEC check error for {validated_domain}: {result['error']}")
 
     return result
 
@@ -679,9 +897,18 @@ def check_mx(domain):
     Returns:
         dict: A dictionary containing MX records and details.
     """
+    # Validate the domain before proceeding with any operations
+    try:
+        validated_domain = validators.full_domain_validator(domain)
+    except Exception:
+        return {
+            "records": [], 
+            "error": "Invalid domain provided"
+        }
+        
     result = {"records": [], "error": None}
     try:
-        mx_records = dns.resolver.resolve(domain, 'MX')
+        mx_records = dns.resolver.resolve(validated_domain, 'MX')
         result["records"] = [{"preference": mx.preference, "exchange": str(mx.exchange)} for mx in mx_records]
     except dns.resolver.NXDOMAIN:
         result["error"] = "Domain does not exist"
@@ -692,9 +919,9 @@ def check_mx(domain):
     except Exception as e:
         result["error"] = f"Unexpected error: {str(e)}"
 
-    logger.info(f"MX check for {domain}: {len(result['records'])} records found")
+    logger.info(f"MX check for {validated_domain}: {len(result['records'])} records found")
     if result["error"]:
-        logger.warning(f"MX check error for {domain}: {result['error']}")
+        logger.warning(f"MX check error for {validated_domain}: {result['error']}")
 
     return result
 
@@ -709,9 +936,19 @@ def check_spf(domain):
     Returns:
         dict: A dictionary containing SPF record details.
     """
+    # Validate the domain before proceeding with any operations
+    try:
+        validated_domain = validators.full_domain_validator(domain)
+    except Exception:
+        return {
+            "record": None, 
+            "valid": False, 
+            "error": "Invalid domain provided"
+        }
+        
     result = {"record": None, "valid": False, "error": None}
     try:
-        txt_records = dns.resolver.resolve(domain, 'TXT')
+        txt_records = dns.resolver.resolve(validated_domain, 'TXT')
         for record in txt_records:
             if 'v=spf1' in str(record):
                 result["record"] = record.to_text()
@@ -726,9 +963,9 @@ def check_spf(domain):
     except Exception as e:
         result["error"] = f"Unexpected error: {str(e)}"
 
-    logger.info(f"SPF check for {domain}: {'Valid' if result['valid'] else 'Not found or invalid'}")
+    logger.info(f"SPF check for {validated_domain}: {'Valid' if result['valid'] else 'Not found or invalid'}")
     if result["error"]:
-        logger.warning(f"SPF check error for {domain}: {result['error']}")
+        logger.warning(f"SPF check error for {validated_domain}: {result['error']}")
 
     return result
 
@@ -743,8 +980,18 @@ def check_dmarc(domain: str) -> dict[str, bool | None | str | Any]:
     Returns:
         dict: A dictionary containing DMARC record details.
     """
+    # Validate the domain before proceeding with any operations
+    try:
+        validated_domain = validators.full_domain_validator(domain)
+    except Exception:
+        return {
+            "record": None, 
+            "valid": False, 
+            "error": "Invalid domain provided"
+        }
+        
     result = {"record": None, "valid": False, "error": None}
-    dmarc_domain = f'_dmarc.{domain}'
+    dmarc_domain = f'_dmarc.{validated_domain}'
 
     try:
         dmarc_records = dns.resolver.resolve(dmarc_domain, 'TXT')
@@ -768,9 +1015,9 @@ def check_dmarc(domain: str) -> dict[str, bool | None | str | Any]:
     except Exception as e:
         result['error'] = f"Unexpected error: {str(e)}"
 
-    logger.info(f"DMARC check for {domain}: {'Valid' if result['valid'] else 'Not found or invalid'}")
+    logger.info(f"DMARC check for {validated_domain}: {'Valid' if result['valid'] else 'Not found or invalid'}")
     if result['error']:
-        logger.warning(f"DMARC check error for {domain}: {result['error']}")
+        logger.warning(f"DMARC check error for {validated_domain}: {result['error']}")
 
     return result
 
@@ -795,23 +1042,14 @@ def check_tls(mx_servers: List[str]) -> Dict[str, Dict[str, str]]:
     Dict[str, Dict[str, str]]: A nested dictionary where the outer key is the server hostname,
                                and the inner dictionary contains port numbers as keys and
                                TLS support status or error messages as values.
-
-    Example return value:
-    {
-        "mail.example.com": {
-            "mail.example.com:25": "TLS supported (STARTTLS)",
-            "mail.example.com:587": "TLS supported (STARTTLS)",
-            "mail.example.com:465": "TLS supported"
-        }
-    }
-
-    Note:
-    - The function limits concurrent threads to a maximum of 10 to prevent resource exhaustion.
-    - Exceptions during the checking process are logged for debugging purposes.
-    - SSL certificate verification errors are caught and reported separately from other errors.
     """
-
     def check_server(server: str) -> Tuple[str, Dict[str, str]]:
+        # Validate the server hostname
+        try:
+            validated_server = validators.full_domain_validator(server)
+        except Exception:
+            return server, {f"{server}:0": "Invalid server hostname"}
+            
         results = {}
         ports = [25, 587, 465]  # Common SMTP ports
         for port in ports:
@@ -820,102 +1058,50 @@ def check_tls(mx_servers: List[str]) -> Dict[str, Dict[str, str]]:
                 context.check_hostname = True
                 context.verify_mode = ssl.CERT_REQUIRED
 
-                with socket.create_connection((server, port), timeout=5) as sock:
+                with socket.create_connection((validated_server, port), timeout=5) as sock:
                     if port in (25, 587):
                         # For these ports, try STARTTLS
-                        with smtp.SMTP(host=server, port=port, timeout=5) as smtp_conn:
+                        with smtp.SMTP(host=validated_server, port=port, timeout=5) as smtp_conn:
                             smtp_conn.ehlo()
                             if smtp_conn.has_extn('STARTTLS'):
                                 smtp_conn.starttls(context=context)
                                 smtp_conn.ehlo()
-                                results[f"{server}:{port}"] = "TLS supported (STARTTLS)"
+                                results[f"{validated_server}:{port}"] = "TLS supported (STARTTLS)"
                             else:
-                                results[f"{server}:{port}"] = "TLS not supported"
+                                results[f"{validated_server}:{port}"] = "TLS not supported"
                     elif port == 465:
                         # For 465, it should be SSL/TLS from the start
-                        with context.wrap_socket(sock, server_hostname=server) as ssock:
+                        with context.wrap_socket(sock, server_hostname=validated_server) as ssock:
                             cert = ssock.getpeercert()
-                            ssl.match_hostname(cert, server)
-                            results[f"{server}:{port}"] = "TLS supported"
+                            ssl.match_hostname(cert, validated_server)
+                            results[f"{validated_server}:{port}"] = "TLS supported"
             except ssl.SSLCertVerificationError:
-                results[f"{server}:{port}"] = "TLS supported, but certificate verification failed"
+                results[f"{validated_server}:{port}"] = "TLS supported, but certificate verification failed"
             except Exception as e:
-                results[f"{server}:{port}"] = f"Error: {str(e)}"
-                logging.exception(f"Error checking {server}:{port}")
-        return server, results
+                results[f"{validated_server}:{port}"] = f"Error: {str(e)}"
+                logging.exception(f"Error checking {validated_server}:{port}")
+        return validated_server, results
+
+    # Validate the list of servers
+    if not mx_servers or not isinstance(mx_servers, list):
+        return {"error": "No valid mail servers provided"}
+        
+    # Filter out any invalid servers
+    validated_servers = []
+    for server in mx_servers:
+        if isinstance(server, str) and server.strip():
+            validated_servers.append(server.strip())
+            
+    if not validated_servers:
+        return {"error": "No valid mail servers provided"}
 
     tls_results = {}
-    with ThreadPoolExecutor(max_workers=min(len(mx_servers), 10)) as executor:
-        future_to_server = {executor.submit(check_server, server): server for server in mx_servers}
+    with ThreadPoolExecutor(max_workers=min(len(validated_servers), 10)) as executor:
+        future_to_server = {executor.submit(check_server, server): server for server in validated_servers}
         for future in as_completed(future_to_server):
             server, result = future.result()
             tls_results[server] = result
     return tls_results
-
-
-def check_dkim(domain, selector):
-    dkim_domain = f'{selector}._domainkey.{domain}'
-    try:
-        dkim_record = dns.resolver.resolve(dkim_domain, 'TXT')
-        for record in dkim_record:
-            return record.to_text(), True
-        return None, False
-    except Exception as e:
-        print(f'Error checking DKIM for {dkim_domain}: {e}')
-        return None, False
-
-
-def check_csp(domain):
-    """
-    Perform a comprehensive check of the Content Security Policy (CSP) for a given domain.
-
-    Args:
-        domain (str): The domain to check.
-
-    Returns:
-        dict: A dictionary with detailed CSP analysis results.
-    """
-    try:
-        response = requests.get(f"https://{domain}", timeout=10)
-        response.raise_for_status()
-
-        csp_header = response.headers.get('Content-Security-Policy')
-        csp_report_only = response.headers.get('Content-Security-Policy-Report-Only')
-
-        result = {
-            'status': False,
-            'csp_value': csp_header,
-            'csp_report_only': csp_report_only,
-            'issues': [],
-            'recommendations': []
-        }
-
-        if not csp_header and not csp_report_only:
-            result['issues'].append("No Content-Security-Policy header found.")
-            result['recommendations'].append(
-                "Implement a Content-Security-Policy header.")
-            return result
-
-        headers_to_check = [
-            ('Content-Security-Policy', csp_header),
-            ('Content-Security-Policy-Report-Only', csp_report_only)
-        ]
-
-        for header_name, header_value in headers_to_check:
-            if header_value:
-                analyze_csp(header_value, result, header_name)
-
-        result['status'] = len(result['issues']) == 0
-        return result
-
-    except requests.RequestException as e:
-        return {
-            'status': False,
-            'csp_value': None,
-            'csp_report_only': None,
-            'issues': [f"An error occurred while fetching the page: {e}"],
-            'recommendations': ["Ensure the domain is accessible and try again."]
-        }
 
 
 def analyze_csp(csp, result, header_name):
@@ -1004,8 +1190,17 @@ def check_cookies(domain: str) -> Dict[str, Any]:
                   - 'http_only' (bool): True if the cookie has the 'HttpOnly' attribute, False otherwise.
               - 'message' (str): Additional information or error message.
     """
+    # Construct URL safely
+    url = safe_url_utils(domain)
+    if not url:
+        return {
+            'status': False,
+            'cookies': [],
+            'message': 'Invalid domain provided'
+        }
+        
     try:
-        response = requests.get(f"https://{domain}", timeout=10)
+        response = requests.get(url, timeout=10)
         response.raise_for_status()
 
         cookies = response.cookies
@@ -1031,7 +1226,7 @@ def check_cookies(domain: str) -> Dict[str, Any]:
             'cookies': cookie_details,
             'message': message
         }
-    except RequestException as e:
+    except requests.RequestException as e:
         return {
             'status': False,
             'cookies': [],
@@ -1052,8 +1247,17 @@ def check_cors(domain):
               - 'cors_headers' (dict): A dictionary of CORS-related headers and their values.
               - 'message' (str): Additional information or error message.
     """
+    # Construct URL safely
+    url = safe_url_utils(domain)
+    if not url:
+        return {
+            'status': False,
+            'cors_headers': {},
+            'message': 'Invalid domain provided'
+        }
+        
     try:
-        response = requests.options(f"https://{domain}", timeout=10)
+        response = requests.options(url, timeout=10)
         cors_headers = {
             'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
             'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
@@ -1093,18 +1297,48 @@ def check_https_redirect(domain):
               - 'redirect_url' (str): The URL to which the domain redirects or None if not applicable.
               - 'message' (str): Additional information or error message.
     """
+    # First validate the domain
     try:
-        http_response = requests.get(f"http://{domain}", allow_redirects=False, timeout=10)
-        if http_response.is_redirect and http_response.headers.get('Location', '').startswith('https'):
-            return {
-                'status': True,
-                'redirect_url': http_response.headers.get('Location'),
-                'message': 'HTTP to HTTPS redirection is properly configured.'
-            }
+        validated_domain = validators.full_domain_validator(domain)
+    except Exception:
+        return {
+            'status': False,
+            'redirect_url': None,
+            'message': 'Invalid domain provided'
+        }
+    
+    # Safely construct HTTP URL for testing redirect
+    url = safe_url_utils(validated_domain, protocol="http")
+    if not url:
+        return {
+            'status': False,
+            'redirect_url': None,
+            'message': 'Invalid domain provided'
+        }
+        
+    try:
+        http_response = requests.get(url, allow_redirects=False, timeout=10)
+        redirect_location = http_response.headers.get('Location', '')
+        
+        # Validate the redirect location
+        if http_response.is_redirect:
+            # Check if it redirects to HTTPS
+            if redirect_location.startswith('https'):
+                return {
+                    'status': True,
+                    'redirect_url': redirect_location,
+                    'message': 'HTTP to HTTPS redirection is properly configured.'
+                }
+            else:
+                return {
+                    'status': False,
+                    'redirect_url': redirect_location,
+                    'message': 'Redirection exists but does not use HTTPS.'
+                }
         else:
             return {
                 'status': False,
-                'redirect_url': http_response.headers.get('Location'),
+                'redirect_url': redirect_location,
                 'message': 'HTTP to HTTPS redirection is not properly configured.'
             }
     except requests.RequestException as e:
@@ -1128,8 +1362,17 @@ def check_referrer_policy(domain):
               - 'header_value' (str): The value of the 'Referrer-Policy' header or None if not present.
               - 'message' (str): Additional information or error message.
     """
+    # Construct URL safely
+    url = safe_url_utils(domain)
+    if not url:
+        return {
+            'status': False,
+            'header_value': None,
+            'message': 'Invalid domain provided'
+        }
+        
     try:
-        response = requests.get(f"https://{domain}", timeout=10)
+        response = requests.get(url, timeout=10)
         response.raise_for_status()
         referrer_policy = response.headers.get('Referrer-Policy')
 
@@ -1170,8 +1413,16 @@ def check_sri(domain):
                   - 'integrity_valid' (bool): True if the integrity attribute matches the resource content, False otherwise.
               - 'message' (str): Additional information or error message.
     """
+    # Construct URL safely
+    url = safe_url_utils(domain)
+    if not url:
+        return {
+            'status': 'red',
+            'resources': [],
+            'message': 'Invalid domain provided'
+        }
+        
     try:
-        url = f"https://{domain}"
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -1184,6 +1435,12 @@ def check_sri(domain):
         for resource in scripts + stylesheets:
             resource_type = 'script' if resource.name == 'script' else 'stylesheet'
             src = urljoin(url, resource['src'] if resource_type == 'script' else resource['href'])
+            
+            # Validate the constructed URL
+            parsed_src = urlparse(src)
+            if not parsed_src.scheme or parsed_src.scheme not in ALLOWED_PROTOCOLS:
+                continue
+                
             integrity = resource.get('integrity')
             is_cross_origin = is_cross_origin_url(url, src)
             has_integrity = bool(integrity)
@@ -1254,6 +1511,16 @@ def validate_integrity(src, integrity):
     Returns:
         bool: True if the integrity is valid, False otherwise.
     """
+    # Validate URL before making request
+    parsed_url = urlparse(src)
+    if not parsed_url.scheme or not parsed_url.netloc:
+        logger.error(f"Invalid URL format: {src}")
+        return False
+        
+    if parsed_url.scheme not in ALLOWED_PROTOCOLS:
+        logger.error(f"Disallowed protocol in URL: {src}")
+        return False
+        
     try:
         response = requests.get(src, timeout=10)
         response.raise_for_status()
@@ -1300,8 +1567,17 @@ def check_x_content_type_options(domain):
               - 'header_value' (str): The value of the 'X-Content-Type-Options' header or None if not present.
               - 'message' (str): Additional information or error message.
     """
+    # Construct URL safely
+    url = safe_url_utils(domain)
+    if not url:
+        return {
+            'status': False, 
+            'header_value': None, 
+            'message': 'Invalid domain provided'
+        }
+        
     try:
-        response = requests.get(f"https://{domain}", timeout=10)
+        response = requests.get(url, timeout=10)
         header_value = response.headers.get('X-Content-Type-Options')
         if header_value == 'nosniff':
             return {'status': True, 'header_value': header_value, 'message': 'Header is correctly set to nosniff.'}
@@ -1326,7 +1602,19 @@ def check_hsts(domain: str) -> Dict[str, Union[bool, str, Dict[str, Union[str, b
               - 'strength' (str): Evaluation of the HSTS implementation strength.
               - 'recommendations' (list): List of recommendations for improving HSTS implementation.
     """
-    url = f'https://{domain}'
+    # Construct URL safely
+    url = safe_url_utils(domain)
+    if not url:
+        return {
+            'status': False,
+            'data': 'Invalid domain provided',
+            'parsed': {},
+            'http_status': None,
+            'preload_ready': False,
+            'strength': 'N/A',
+            'recommendations': ['Provide a valid domain name']
+        }
+        
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
@@ -1411,7 +1699,14 @@ def check_security_txt(domain: str) -> dict:
               - 'status' (bool): True if the security.txt file is found and readable, False otherwise.
               - 'data' (str): The content of the security.txt file or an error message.
     """
-    url = f'https://{domain}/.well-known/security.txt'
+    # Construct URL safely with a specific path
+    url = safe_url_utils(domain, path="/.well-known/security.txt")
+    if not url:
+        return {
+            'status': False,
+            'data': 'Invalid domain provided'
+        }
+        
     try:
         # First, check if the file exists using HEAD request
         head_response = requests.head(url, timeout=10)

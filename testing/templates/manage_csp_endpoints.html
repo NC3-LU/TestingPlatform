@@ -17,8 +17,8 @@
                                     <tr>
                                         <th>Allowed Origin</th>
                                         <th>Endpoint URL</th>
+                                        <th>Status</th>
                                         <th>Created</th>
-                                        <th>Reports</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -29,7 +29,7 @@
                                         <td>
                                             <div class="input-group">
                                                 <input type="text" class="form-control form-control-sm"
-                                                       value="https://testing.nc3.lu/uri-report/{{ endpoint.endpoint_uuid }}/"
+                                                       value="{{ request.scheme }}://{{ request.get_host }}/csp/report/{{ endpoint.endpoint_uuid }}/"
                                                        id="endpoint-{{ endpoint.id }}" readonly>
                                                 <button class="btn btn-outline-secondary btn-sm" type="button"
                                                         onclick="copyToClipboard('endpoint-{{ endpoint.id }}')">
@@ -37,14 +37,31 @@
                                                 </button>
                                             </div>
                                         </td>
-                                        <td>{{ endpoint.timestamp|date:"Y-m-d H:i" }}</td>
-                                        <td>{{ endpoint.cspreport_set.count }}</td>
+                                        <td>
+                                            <span class="badge {% if endpoint.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ endpoint.is_active|yesno:"Active,Inactive" }}
+                                            </span>
+                                        </td>
+                                        <td>{{ endpoint.created_at|date:"Y-m-d H:i" }}</td>
                                         <td>
                                             <div class="btn-group btn-group-sm">
                                                 <a href="{% url 'view_csp_reports' endpoint.endpoint_uuid %}"
                                                    class="btn btn-info">View Reports</a>
-                                                <button type="button" class="btn btn-danger"
-                                                        onclick="confirmDelete('{{ endpoint.endpoint_uuid }}')">Delete</button>
+                                                <form method="POST" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="endpoint_uuid" value="{{ endpoint.endpoint_uuid }}">
+                                                    <input type="hidden" name="action" value="toggle">
+                                                    <button type="submit" class="btn btn-warning">
+                                                        {{ endpoint.is_active|yesno:"Disable,Enable" }}
+                                                    </button>
+                                                </form>
+                                                <form method="POST" style="display: inline;"
+                                                      onsubmit="return confirm('Are you sure you want to delete this endpoint?');">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="endpoint_uuid" value="{{ endpoint.endpoint_uuid }}">
+                                                    <input type="hidden" name="action" value="delete">
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
                                             </div>
                                         </td>
                                     </tr>
@@ -63,29 +80,6 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Deletion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete this endpoint? All associated reports will be permanently deleted.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteForm" method="POST" style="display: inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="delete">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
 function copyToClipboard(elementId) {
     const element = document.getElementById(elementId);
@@ -96,13 +90,6 @@ function copyToClipboard(elementId) {
     const originalText = button.innerText;
     button.innerText = 'Copied!';
     setTimeout(() => button.innerText = originalText, 2000);
-}
-
-function confirmDelete(endpointUuid) {
-    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-    const form = document.getElementById('deleteForm');
-    form.action = `/csp/reports/${endpointUuid}/delete/`;
-    modal.show();
 }
 </script>
 {% endblock %}

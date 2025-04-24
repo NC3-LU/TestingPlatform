@@ -15,7 +15,7 @@
                     {% if endpoint_url %}
                         <div class="alert alert-success">
                             <h4 class="alert-heading">Endpoint Created Successfully!</h4>
-                            <p>Your CSP report endpoint URL is:</p>
+                            <p class="mb-3">Your CSP report endpoint URL is:</p>
                             <div class="input-group mb-3">
                                 <input type="text" class="form-control" value="{{ endpoint_url }}" id="endpoint-url" readonly>
                                 <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('endpoint-url')">
@@ -26,25 +26,45 @@
                             <hr>
                             <p>Add these headers to your website's configuration:</p>
                             <div class="bg-light p-3 rounded">
-                                <code class="d-block">Content-Security-Policy-Report-Only: default-src 'self'; report-uri {{ endpoint_url }};</code>
-                                <small class="text-muted">Use this header to test your CSP without enforcing it</small>
+                                <div class="mb-3">
+                                    <strong>Testing Mode (won't block anything):</strong>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control font-monospace" id="report-only"
+                                               value="Content-Security-Policy-Report-Only: default-src 'self'; report-uri {{ endpoint_url }};" readonly>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('report-only')">
+                                            Copy
+                                        </button>
+                                    </div>
+                                </div>
 
-                                <code class="d-block mt-3">Content-Security-Policy: default-src 'self'; report-uri {{ endpoint_url }};</code>
-                                <small class="text-muted">Use this header to enforce your CSP</small>
+                                <div>
+                                    <strong>Enforcement Mode:</strong>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control font-monospace" id="enforce"
+                                               value="Content-Security-Policy: default-src 'self'; report-uri {{ endpoint_url }};" readonly>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('enforce')">
+                                            Copy
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <a href="{% url 'manage_csp_endpoints' %}" class="btn btn-primary">Return to Endpoints List</a>
                             </div>
                         </div>
+                    {% else %}
+                        <form method="POST" class="mt-4">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="allowed_origin" class="form-label">Allowed Origin:</label>
+                                <input type="url" class="form-control" id="allowed_origin" name="allowed_origin"
+                                       placeholder="https://example.com" required>
+                                <div class="form-text">Enter the domain that will be sending CSP reports</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create Endpoint</button>
+                        </form>
                     {% endif %}
-
-                    <form method="POST" class="mt-4">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="allowed_origin" class="form-label">Allowed Origin:</label>
-                            <input type="url" class="form-control" id="allowed_origin" name="allowed_origin"
-                                   placeholder="https://example.com" required>
-                            <div class="form-text">Enter the domain that will be sending CSP reports</div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Create Endpoint</button>
-                    </form>
                 </div>
             </div>
         </div>
@@ -57,7 +77,6 @@ function copyToClipboard(elementId) {
     element.select();
     document.execCommand('copy');
 
-    // Optional: Show feedback
     const button = element.nextElementSibling;
     const originalText = button.innerText;
     button.innerText = 'Copied!';

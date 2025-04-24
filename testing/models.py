@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.validators import URLValidator
+from django.conf import settings
 from authentication.models import User
 import uuid
 import hashlib
@@ -106,34 +108,47 @@ class TestReport(models.Model):
         return f"{self.test_ran}_{self.tested_site.replace('.', '-')}"
 
 
-class CSPReport(models.Model):
+class CSPEndpoint(models.Model):
+    """Represents a CSP reporting endpoint configuration"""
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    allowed_origin = models.URLField(help_text="The domain allowed to send reports to this endpoint.")
-    endpoint_uuid = models.CharField(max_length=64, unique=True, editable=False)
-    report_data = models.JSONField(default=dict)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    allowed_origin = models.URLField(
+        help_text="The domain allowed to send reports to this endpoint.",
+        validators=[URLValidator(schemes=['https'])]
+    )
+    endpoint_uuid = models.CharField(max_length=64, unique=True, editable=False, db_index=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'allowed_origin']),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'allowed_origin'],
+                name='unique_user_origin'
+            )
+        ]
 
     def save(self, *args, **kwargs):
         if not self.endpoint_uuid:
-            # Create namespace using user's ID
-            namespace = uuid.uuid5(uuid.NAMESPACE_DNS, str(self.user.id))
-            # Generate UUID5 using namespace and domain
+            namespace = uuid.uuid5(uuid.NAMESPACE_DNS, f"{settings.SECRET_KEY[:16]}:{self.user.id}")
             domain_uuid = uuid.uuid5(namespace, self.allowed_origin)
-            # Hash for additional security
             self.endpoint_uuid = hashlib.blake2b(
                 str(domain_uuid).encode(),
+                salt=settings.SECRET_KEY[:16].encode(),
                 digest_size=32
             ).hexdigest()
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return f"{self.user.username} - {self.allowed_origin}"
+class CSPReport(models.Model):
+    """Stores CSP violation reports"""
+    endpoint = models.ForeignKey(CSPEndpoint, on_delete=models.CASCADE)
+    report_data = models.JSONField()  # Store the complete report
+    user_agent = models.CharField(max_length=255, null=True)  # Useful for debugging browser-specific issues
+    occurred_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'allowed_origin'],
-                name='unique_user_domain'
-            )
+        indexes = [
+            models.Index(fields=['endpoint', 'occurred_at']),
         ]
-

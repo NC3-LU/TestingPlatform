@@ -11,7 +11,7 @@ from rest_framework_simplejwt.tokens import AccessToken, OutstandingToken, Refre
 
 from authentication.models import User
 from testing.helpers import (
-    check_dkim_public_key,
+    check_dkim,
     check_soa_record,
     email_check,
     file_check,
@@ -361,10 +361,10 @@ class DKIMPublicKeyCheckApiView(APIView):
 
     def post(self, request):
         """
-        Triggers a scan (with nmap) on a web server.
+        Checks the DKIM configuration for a domain.
         """
         serializer = self.serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         domain_name = request.data.get("domain_name", None)
-        result = check_dkim_public_key(domain_name, [])
+        result = check_dkim(domain_name, selectors=[])
         return Response(result, status=status.HTTP_200_OK)

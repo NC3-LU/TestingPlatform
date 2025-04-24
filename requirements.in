@@ -24,6 +24,6 @@ defusedxml
 matplotlib
 beautifulsoup4
 python3-nmap
-pycrypto
+pycryptodome
 cryptography
 blake2signer

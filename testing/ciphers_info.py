@@ -1,4 +1,5 @@
 import re
+import logging
 from collections import OrderedDict
 from enum import Enum
 from math import log, pow
@@ -6,6 +7,41 @@ from math import log, pow
 from nassl.legacy_ssl_client import LegacySslClient
 from nassl.ssl_client import SslClient
 
+logger = logging.getLogger(__name__)
+
+
+class ModernConnection:
+    """
+    Wrapper class for modern TLS connections using SslClient.
+    This class provides a standardized interface for cipher suite testing
+    with modern TLS protocol versions (TLS 1.2, TLS 1.3).
+    Attributes:
+    ALL_CIPHERS (str): Cipher specification string for all available ciphers
+    """
+    ALL_CIPHERS = "ALL:COMPLEMENTOFALL"
+    @staticmethod
+    def get_peer_signature_digest():
+        """
+        Get the signature digest used in the TLS handshake.
+        In a real implementation, this would extract the signature algorithm
+        from the peer certificate. For this stub implementation, we return None
+        as a safe default.
+        Returns:
+            str or None: The signature digest algorithm name, or None if unavailable
+        """
+        return None
+
+class DebugConnection:
+    """
+    Wrapper class for legacy SSL/TLS connections using LegacySslClient.
+    
+    This class provides a standardized interface for cipher suite testing
+    with legacy protocol versions (SSL 3.0, TLS 1.0, TLS 1.1).
+    
+    Attributes:
+        ALL_CIPHERS (str): Cipher specification string for all available ciphers
+    """
+    ALL_CIPHERS = "ALL:COMPLEMENTOFALL"
 
 class SecLevel(Enum):
     GOOD = 3
@@ -259,8 +295,51 @@ class CipherScoreAndSecLevel:
 
 # Load OpenSSL data about cipher suites
 def load_cipher_info():
+    """
+    Load and parse cipher suite information from OpenSSL.
+    
+    This function:
+    1. Creates an instance of both legacy and modern SSL clients
+    2. Retrieves all available cipher suites from each client
+    3. Parses cipher descriptions to extract relevant properties
+    4. Calculates security levels for each cipher
+    
+    The resulting dictionary maps cipher names to CipherInfo objects containing:
+    - Connection class that supports the cipher
+    - TLS version
+    - Key exchange algorithms 
+    - Authentication algorithm
+    - Bulk encryption algorithm and security length
+    - MAC algorithm
+    - Pre-calculated security level
+    
+    Returns:
+        dict: A dictionary mapping cipher names to CipherInfo objects
+    """
     class CipherInfo:
+        """
+        Container class for cipher suite information.
+        
+        Attributes:
+            conn_class: The connection class that supports this cipher
+            name: The OpenSSL name of the cipher
+            tls_version: The TLS protocol version
+            kex_algs: Key exchange algorithms
+            auth_alg: Authentication algorithm
+            bulk_enc_alg: Bulk encryption algorithm
+            bulk_enc_alg_sec_len: Security length of the bulk encryption algorithm
+            mac_alg: Message Authentication Code algorithm
+            sec_level: Security level classification
+            supported_conns: Set of connection classes that support this cipher
+        """
         def __init__(self, conn_class, match):
+            """
+            Initialize a CipherInfo object from a regex match object.
+            
+            Args:
+                conn_class: The connection class that supports this cipher
+                match: A regex match object containing cipher information
+            """
             self.conn_class = conn_class
             self.name = match.group("name")
             self.tls_version = match.group("tls_version")
@@ -314,7 +393,7 @@ def load_cipher_info():
 
                     result[cipher_name] = ci
                 else:
-                    logger.warn(
+                    logger.warning(
                         f"Unable to parse description of cipher {cipher_name} "
                         f'output by {client_class.__name__}: "{desc}"'
                     )
@@ -327,4 +406,4 @@ def load_cipher_info():
 
 
 cipher_infos = load_cipher_info()
-logger.info(f'Loaded data on {len(cipher_infos)} ciphers."')
+logger.info(f'Loaded data on {len(cipher_infos)} ciphers.')

@@ -34,7 +34,6 @@ from testing import validators
 from testing_platform.settings import PANDORA_ROOT_URL
 from .cipher_scoring import load_cipher_info
 from pyvulnerabilitylookup import PyVulnerabilityLookup
-from pylookyloo import Lookyloo
 
 logger = logging.getLogger(__name__)
 

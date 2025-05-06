@@ -40,18 +40,62 @@ logger = logging.getLogger(__name__)
 # Allowlisted protocols for URL construction
 ALLOWED_PROTOCOLS = ["http", "https"]
 
+def extract_domain_from_url(url: str) -> str:
+    """
+    Extract domain from URL, handling cases with or without protocol prefixes.
+    
+    Args:
+        url (str): The URL or domain string
+        
+    Returns:
+        str: Just the domain part of the URL
+    """
+    original_url = url
+    
+    # If URL starts with a protocol prefix, extract the domain
+    if url.startswith(('http://', 'https://')):
+        try:
+            parsed = urlparse(url)
+            # Return just the domain without port if present
+            domain = parsed.netloc
+            if ':' in domain:
+                domain = domain.split(':')[0]
+            logger.debug(f"Extracted domain '{domain}' from URL '{original_url}'")
+            return domain
+        except Exception as e:
+            logger.error(f"Error parsing URL '{original_url}': {e}")
+            return url
+    
+    # Handle cases like "nc3.lu/" with no protocol but with a path
+    if '/' in url:
+        domain = url.split('/', 1)[0]
+        logger.debug(f"Extracted domain '{domain}' from URL-like string '{original_url}'")
+        return domain
+    
+    logger.debug(f"URL '{url}' does not have a protocol prefix or path, treating as domain")
+    return url
+
+
 def safe_url_utils(domain: str, path: str = "", protocol: str = "https") -> Optional[str]:
     """
     Safely constructs a URL from domain and path components after validating inputs.
     
     Args:
-        domain (str): The domain to use in the URL
+        domain (str): The domain to use in the URL (can include protocol that will be stripped)
         path (str): Optional path to append to the domain
         protocol (str): Protocol to use (defaults to https)
         
     Returns:
         Optional[str]: A properly constructed URL or None if validation fails
     """
+    original_domain = domain
+    
+    # Extract just the domain if a full URL was provided
+    domain = extract_domain_from_url(domain)
+    
+    # Handle edge cases where the domain might still have trailing characters
+    domain = domain.strip()
+    
     # Validate protocol
     if protocol not in ALLOWED_PROTOCOLS:
         logger.error(f"Invalid protocol: {protocol}")
@@ -60,8 +104,9 @@ def safe_url_utils(domain: str, path: str = "", protocol: str = "https") -> Opti
     # Validate domain using the validator
     try:
         validated_domain = validators.full_domain_validator(domain)
+        logger.debug(f"Domain '{domain}' validated successfully")
     except Exception as e:
-        logger.error(f"Domain validation failed: {e}")
+        logger.error(f"Domain validation failed for '{domain}' (original input: '{original_domain}'): {e}")
         return None
     
     # Ensure path starts with / if it's not empty
@@ -70,7 +115,9 @@ def safe_url_utils(domain: str, path: str = "", protocol: str = "https") -> Opti
     
     # Construct URL using urlunparse to safely handle components
     url_components = (protocol, validated_domain, path, '', '', '')
-    return urlunparse(url_components)
+    final_url = urlunparse(url_components)
+    logger.debug(f"Constructed URL: {final_url} from domain: {validated_domain}")
+    return final_url
 
 def check_csp(domain):
     """
@@ -202,39 +249,103 @@ def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, An
     pandora_cli = pypandora.PyPandora(root_url=PANDORA_ROOT_URL)
     analysis_result: Dict[str, Any] = {}
 
-    # Submit the file to Pandora for analysis.
-    # scan_start_time = time.time()
-    result = pandora_cli.submit(file_in_memory, file_to_check_name, 100)
-    if not result["success"]:
-        # unsuccessfull submission of the file
-        return {
-            "result": analysis_result,
-        }
+    try:
+        # Submit the file to Pandora for analysis with a seed that doesn't expire
+        # This allows unauthenticated access to the results
+        result = pandora_cli.submit(file_in_memory, file_to_check_name, seed_expire=0)
+        
+        # Check if result is valid
+        if not result or not isinstance(result, dict):
+            logger.warning(f"Invalid response format from Pandora: {result}")
+            return {"result": {"error": "Invalid response from Pandora API", "details": str(result)}}
+            
+        if not result.get("success"):
+            # Unsuccessful submission of the file
+            error_msg = str(result.get("error", "Unknown error"))
+            logger.warning(f"Unsuccessful file submission to Pandora: {error_msg}")
+            return {"result": {"error": "File submission failed", "details": error_msg}}
 
-    time.sleep(0.1)
-    # Get the status of a task.
-    analysis_result = pandora_cli.task_status(result["taskId"])
-    time.sleep(0.1)
-    loop = 0
-    while loop < (50 * 10):
-        analysis_result = pandora_cli.task_status(analysis_result["taskId"])
-        # Handle responde from Pandora
-        status = analysis_result["status"]
-        if status != "WAITING":
-            break
+        # Ensure taskId exists in the response
+        if "taskId" not in result:
+            logger.warning(f"Missing 'taskId' in Pandora submit response: {result}")
+            return {"result": {"error": "Invalid response from Pandora API", "details": "No task ID received"}}
 
-        # wait a little
-        pass
+        # Save task ID, seed, and link for all future API calls
+        task_id = result["taskId"]
+        seed = result.get("seed")
+        report_link = result.get("link", "")
+        
+        if not seed:
+            logger.warning("No seed received from Pandora API, status checks may fail due to authentication issues")
+            
         time.sleep(0.1)
-
-        loop += 1
-    # scan_end_time = time.time()
-
-    analysis_result.update({"link": result["link"]})
-
-    return {
-        "result": analysis_result,
-    }
+        
+        # First status check - use the seed for authentication
+        try:
+            initial_status = pandora_cli.task_status(task_id, seed=seed)
+            
+            # Check for API errors
+            if isinstance(initial_status, dict) and initial_status.get("success") is False:
+                error_msg = str(initial_status.get("error", "Unknown error"))
+                logger.warning(f"Error from Pandora API: {error_msg}")
+                return {"result": {"error": "API error", "details": error_msg, "link": report_link}}
+                
+            if isinstance(initial_status, dict):
+                analysis_result = initial_status
+        except Exception as e:
+            logger.warning(f"Error in initial task status check: {e}")
+            
+        time.sleep(0.1)
+        
+        # Poll for status changes
+        loop = 0
+        while loop < (50 * 10):  # Maximum 500 attempts
+            try:
+                status_response = pandora_cli.task_status(task_id, seed=seed)
+                
+                # Validate response
+                if not status_response or not isinstance(status_response, dict):
+                    logger.warning(f"Invalid response from Pandora task_status: {status_response}")
+                    break
+                
+                # Check for API errors
+                if status_response.get("success") is False:
+                    error_msg = str(status_response.get("error", "Unknown error"))
+                    logger.warning(f"Error from Pandora API: {error_msg}")
+                    analysis_result = {"error": "API error", "details": error_msg}
+                    break
+                
+                # Update our result with the latest data
+                analysis_result = status_response
+                
+                # Check if status field exists
+                if "status" not in analysis_result:
+                    logger.warning(f"Missing 'status' key in Pandora response: {analysis_result}")
+                    if "error" not in analysis_result:
+                        analysis_result["error"] = "Unknown error: Missing status field in response"
+                    break
+                
+                # Check if processing is complete
+                if analysis_result["status"] != "WAITING":
+                    break
+                    
+            except Exception as e:
+                logger.exception(f"Error checking task status: {e}")
+                break
+                
+            # Wait before next poll
+            time.sleep(0.1)
+            loop += 1
+            
+        # Add link to the result if we don't have an error
+        if report_link and "error" not in analysis_result:
+            analysis_result.update({"link": report_link})
+            
+    except Exception as e:
+        logger.exception(f"Unexpected error in file_check: {e}")
+        analysis_result = {"error": "File check failed", "details": str(e)}
+    
+    return {"result": analysis_result}
 
 
 def ipv6_check(

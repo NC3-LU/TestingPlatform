@@ -48,7 +48,8 @@ from .helpers import (
     check_security_txt,
     get_capture_result,
     get_recent_captures,
-    check_dkim
+    check_dkim,
+    extract_domain_from_url
 )
 from .models import DMARCRecord, DMARCReport, MailDomain, TestReport, CSPReport, CSPEndpoint
 import json
@@ -137,7 +138,15 @@ def test_landing(request):
 @csrf_exempt
 def check_website_security(request):
     if request.method == 'POST':
-        domain = request.POST.get('target')
+        domain = request.POST.get('target', '').strip()
+        
+        # Log the input for debugging
+        logger.debug(f"Web security check requested for: {domain}")
+        
+        if not domain:
+            return render(request, 'check_webapp.html', {
+                'error': 'Please enter a domain to check'
+            })
 
         csp_result = check_csp(domain)
         cookies_result = check_cookies(domain)
@@ -161,6 +170,17 @@ def check_website_security(request):
             'hsts_result': hsts_result,
             'security_txt_result': security_txt_result
         }
+
+        # Check if we had errors with any of the tests
+        has_errors = any(
+            isinstance(result, dict) and result.get('error') 
+            for result in [csp_result, cookies_result, cors_result, https_redirect_result, 
+                          referrer_policy_result, sri_result, x_content_type_options_result,
+                          hsts_result, security_txt_result]
+        )
+        
+        if has_errors:
+            context['validation_error'] = f"Some tests couldn't be completed for {domain}. Please verify the domain name."
 
         try:
             test_report = TestReport.objects.get(tested_site=domain, test_ran="web-test")
@@ -190,7 +210,14 @@ def email_test(request):
                 "You reached the maximum number of tests. Please create an account.",
             )
             return redirect("signup")
-        target = request.POST["target"]
+            
+        target = request.POST["target"].strip()
+        # Log the input for debugging
+        logger.debug(f"Email test requested for: {target}")
+        
+        # Extract domain from URL-like inputs without re-importing
+        target = extract_domain_from_url(target)
+        
         if not check_soa_record(target):
             context = {"status": False, "statusmessage": "The given domain is invalid!"}
         else:
@@ -253,8 +280,16 @@ def ipv6_test(request):
                 "You reached the maximum number of tests. Please create an account.",
             )
             return redirect("signup")
+            
+        target = request.POST["target"].strip()
+        # Log the input for debugging
+        logger.debug(f"IPv6 test requested for: {target}")
+        
+        # Extract domain from URL-like inputs without re-importing
+        target = extract_domain_from_url(target)
+        
         context = {}
-        context.update(ipv6_check(request.POST["target"], None))
+        context.update(ipv6_check(target, None))
         nb_tests += 1
         response = render(request, "check_ipv6.html", context)
         response.set_cookie("nb_tests", nb_tests)
@@ -275,7 +310,14 @@ def web_server_test(request):
                 "You reached the maximum number of tests. Please create an account.",
             )
             return redirect("signup")
-        domain = request.POST["target"]
+            
+        domain = request.POST["target"].strip()
+        # Log the input for debugging
+        logger.debug(f"Web server test requested for: {domain}")
+        
+        # Extract domain from URL-like inputs without re-importing
+        domain = extract_domain_from_url(domain)
+        
         context = {'domain': domain}
         context.update(web_server_check(domain))
 
@@ -599,18 +641,32 @@ def url_test(request):
     lookyloo = Lookyloo('https://lookyloo.circl.lu')
     if request.method == 'POST':
         url = request.POST.get('target')
+        
+        # Ensure URL has a proper protocol prefix
+        if url and not url.startswith(('http://', 'https://')):
+            url = 'https://' + url
+            logger.info(f"Added https:// prefix to URL: {url}")
+            
         if lookyloo.is_up:
             context = {'lookyloo_status': lookyloo.is_up}
-            capture_uuid = lookyloo.submit(url=url, quiet=True)
-            while lookyloo.get_status(capture_uuid)['status_code'] != 1:
-                if lookyloo.get_status(capture_uuid)['status_code'] == -1:
-                    context['error'] = 'Lookyloo has encountered an issue with the requested capture. Please try again.'
-                sleep(5)
-            capture = get_capture_result(lookyloo, capture_uuid)
-            context['capture'] = capture
-            screenshot_stream = lookyloo.get_screenshot(capture_uuid)
-            screenshot = base64.b64encode(screenshot_stream.read()).decode('utf-8')
-            context['screenshot'] = screenshot
+            try:
+                capture_uuid = lookyloo.submit(url=url, quiet=True)
+                while lookyloo.get_status(capture_uuid)['status_code'] != 1:
+                    if lookyloo.get_status(capture_uuid)['status_code'] == -1:
+                        context['error'] = 'Lookyloo has encountered an issue with the requested capture. Please try again.'
+                        break
+                    sleep(5)
+                    
+                if 'error' not in context:
+                    capture = get_capture_result(lookyloo, capture_uuid)
+                    context['capture'] = capture
+                    screenshot_stream = lookyloo.get_screenshot(capture_uuid)
+                    screenshot = base64.b64encode(screenshot_stream.read()).decode('utf-8')
+                    context['screenshot'] = screenshot
+            except Exception as e:
+                logger.error(f"Error in URL test for {url}: {str(e)}")
+                context['error'] = f"An error occurred during the capture: {str(e)}"
+                
             return render(request, 'check_lookyloo.html', context)
     else:
         recent_captures = get_recent_captures(lookyloo)

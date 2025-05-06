@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IPF Referee Chief</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/css/boostrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/custom.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/jquery.min.js"></script>
+    <style>
+        .circle-pefecto {
+            border-radius: 50% !important; /* makes the button round */
+            width: 120px; /* width of the button */
+            height: 120px; /* height of the button */
+            text-align: center;
+            padding: 2%;
+        }
+    </style>
+
+</head>
+<body class="bg-dark">
+
+<script>
+    const socket = io();
+</script>
+<div class="container-fluid pb-5">
+    <section style="height:17vh;" class="bg-dark">
+        <div class="w-100 justify-content-center" id="refereeLights">
+            <h1 class="text-center text-light fs-5 position-absolute">Referee's decision</h1>
+            <svg class="mt-3" height="100" width="100">
+                <circle id="circleLeft" cx="50" cy="40" r="30" stroke="black" stroke-width="2" fill="black"/>
+                <g transform="translate(30,80)">
+                    <rect id="rectangleLeft" width="40" height="20" stroke="white" stroke-width="2"
+                          fill="transparent"/>
+                </g>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+            <svg class="mt-3" height="100" width="100">
+                <circle id="circleChief" cx="50" cy="40" r="30" stroke="black" stroke-width="2" fill="black"/>
+                <g transform="translate(30,80)">
+                    <rect id="rectangleChief" width="40" height="20" stroke="white" stroke-width="2"
+                          fill="transparent"/>
+                </g>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+            <svg class="mt-3" height="100" width="100">
+                <circle id="circleRight" cx="50" cy="40" r="30" stroke="black" stroke-width="2" fill="black"/>
+                <g transform="translate(30,80)">
+                    <rect id="rectangleRight" width="40" height="20" stroke="white" stroke-width="2"
+                          fill="transparent"/>
+                </g>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="w-100 justify-content-center" id="juryLights">
+            <h1 class="text-center text-light fs-5 position-absolute">Jury decision</h1>
+            <svg class="mt-3" height="100" width="100">
+                <circle id="juryCircle" cx="50" cy="40" r="30" stroke="black" stroke-width="2" fill="black"/>
+                <g transform="translate(30,80)">
+                    <rect id="rectangleJury" width="40" height="20" stroke="black" stroke-width="2"
+                          fill="transparent"/>
+                </g>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+            <svg class="mt-3" id="jury2" height="100" width="100">
+                <circle id="juryCircle_2"  cx="50" cy="40" r="30" stroke="black" stroke-width="2" fill="black"/>
+                <g transform="translate(30,80)">
+                    <rect id="rectangleJury_2" width="40" height="20" stroke="black" stroke-width="2"
+                          fill="transparent"/>
+                </g>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+            <svg class="mt-3" id="jury3" height="100" width="100">
+                <circle id="juryCircle_3"  cx="50" cy="40" r="30" stroke="black" stroke-width="2" fill="black"/>
+                <g transform="translate(30,80)">
+                    <rect id="rectangleJury_3" width="40" height="20" stroke="black" stroke-width="2"
+                          fill="transparent"/>
+                </g>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+    </section>
+    <h1 class="text-center text-white">Chief Referee</h1>
+    <section id="powerliftingLights" class="w-100 justify-content-center flex-wrap">
+        <div class="mt-5 w-100 d-flex justify-content-evenly align-items-center">
+            <button onclick="white();" class="circle-pefecto btn border-0 fw-bolder white bg-white"
+                    style="box-shadow: 0 3px 12px black">
+                GOOD LIFT
+            </button>
+            <button onclick="red();" class="circle-pefecto btn border-0 text-white fw-bolder red"
+                    style="background:red;box-shadow: 0 3px 12px black">
+                RED
+            </button>
+        </div>
+        <div class="mt-5 mb-5 w-100 d-flex justify-content-evenly align-items-center">
+            <button onclick="blue();" class="circle-pefecto btn border-0 text-white fw-bolder blue"
+                    style="background:blue;box-shadow: 0 3px 12px black">
+                BLUE
+            </button>
+            <button onclick="yellow();" class="circle-pefecto btn border-0 fw-bolder yellow"
+                    style="background:yellow;box-shadow: 0 3px 12px black">
+                YELLOW
+            </button>
+        </div>
+    </section>
+</div>
+</body>
+</html>

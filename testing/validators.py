@@ -17,8 +17,35 @@ def file_size(file: BytesIO):
 
 
 def full_domain_validator(value):
+    """
+    Validates that a string is a valid domain name.
+    
+    Args:
+        value (str): The domain name to validate
+        
+    Returns:
+        str: The validated domain name
+        
+    Raises:
+        Exception: If the domain name is invalid
+    """
+    if not value:
+        raise Exception("Domain name cannot be empty.")
+        
+    if not isinstance(value, str):
+        raise Exception("Domain name must be a string.")
+    
+    # Remove any leading/trailing whitespace
+    value = value.strip()
+    
+    # Check for common invalid characters
+    invalid_chars = ['<', '>', '"', "'", '\\', ' ']
+    for char in invalid_chars:
+        if char in value:
+            raise Exception(f"Domain name contains invalid character: '{char}'")
+    
     res = pattern.match(value)
     if res:
         return value
     else:
-        raise Exception("This field must be a domain name.")
+        raise Exception("Invalid domain name format. Please enter a valid domain (e.g., example.com).")

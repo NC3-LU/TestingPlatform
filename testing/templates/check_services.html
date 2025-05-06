@@ -22,7 +22,9 @@
       <form method="post">
         {% csrf_token %}
         {% if error %}
-        <span class="text-danger">{{ error }}</span>
+        <div class="alert alert-danger" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+        </div>
         {% endif %}
         <div class="mb-3">
           <label class="mb-1">
@@ -35,7 +37,7 @@
         <input type="submit" value="Test"
                class="text-white button-text-background primary-primary-blue_background">
       </form>
-      {% if services %}
+      {% if services and not error %}
         {% if user.is_authenticated %}
           <div class="d-flex justify-content-center pb-3 pt-3">
             <a href="{% url 'pdf_from_template' test='infra-test' site=domain %}" value="Export to pdf" class="btn btn-secondary">Export this to PDF</a>
@@ -47,7 +49,7 @@
       </div>
     </div>
   </div>
-  {% if services %}
+  {% if services and not error %}
     <div class="gx-0 row d-flex justify-content-center py-5">
       <section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
         <div class="col-lg-12 fs-1 fw-bold">
@@ -83,7 +85,7 @@
       </section>
     </div>
   {% endif %}
-  {% if vulnerabilities %}
+  {% if vulnerabilities and not error %}
     <div class="gx-0 row d-flex justify-content-center py-5">
       <section class="container-extended box-shadow primary-fadded-blue_border p-5">
         <div class="row my-2">

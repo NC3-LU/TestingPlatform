@@ -50,7 +50,14 @@ def extract_domain_from_url(url: str) -> str:
     Returns:
         str: Just the domain part of the URL
     """
+    if not url or not isinstance(url, str):
+        logger.error(f"Invalid URL input: {url}")
+        return ""
+        
     original_url = url
+    
+    # Remove any leading/trailing whitespace
+    url = url.strip()
     
     # If URL starts with a protocol prefix, extract the domain
     if url.startswith(('http://', 'https://')):
@@ -64,7 +71,7 @@ def extract_domain_from_url(url: str) -> str:
             return domain
         except Exception as e:
             logger.error(f"Error parsing URL '{original_url}': {e}")
-            return url
+            return ""
     
     # Handle cases like "nc3.lu/" with no protocol but with a path
     if '/' in url:
@@ -184,17 +191,25 @@ def check_csp(domain):
 
 def check_soa_record(target: str) -> Union[bool, Dict]:
     """Checks the presence of a SOA record for the Email Systems Testing."""
+    if not target:
+        return {"error": "No domain provided"}
+        
     try:
         validators.full_domain_validator(target)
-    except Exception:
-        return {"error": "You entered an invalid hostname!"}
-    result = False
+    except Exception as e:
+        return {"error": f"Invalid domain format: {str(e)}"}
+        
     try:
         answers = dns.resolver.resolve(target, "SOA")
-        result = 0 != len(answers)
-    except Exception:
-        result = False
-    return result
+        return 0 != len(answers)
+    except dns.resolver.NXDOMAIN:
+        return {"error": "Domain does not exist"}
+    except dns.resolver.NoAnswer:
+        return {"error": "No SOA records found for this domain"}
+    except dns.exception.DNSException as e:
+        return {"error": f"DNS error: {str(e)}"}
+    except Exception as e:
+        return {"error": f"Unexpected error: {str(e)}"}
 
 
 def email_check(target: str) -> Dict[str, Any]:
@@ -967,13 +982,20 @@ def check_dnssec(domain):
         dict: A dictionary containing DNSSEC status and details.
     """
     # Validate the domain before proceeding with any operations
-    try:
-        validated_domain = validators.full_domain_validator(domain)
-    except Exception:
+    if not domain:
         return {
             "enabled": False, 
             "keys": [], 
-            "error": "Invalid domain provided"
+            "error": "No domain provided"
+        }
+        
+    try:
+        validated_domain = validators.full_domain_validator(domain)
+    except Exception as e:
+        return {
+            "enabled": False, 
+            "keys": [], 
+            "error": f"Invalid domain: {str(e)}"
         }
         
     result = {"enabled": False, "keys": [], "error": None}
@@ -1047,13 +1069,20 @@ def check_spf(domain):
         dict: A dictionary containing SPF record details.
     """
     # Validate the domain before proceeding with any operations
-    try:
-        validated_domain = validators.full_domain_validator(domain)
-    except Exception:
+    if not domain:
         return {
             "record": None, 
             "valid": False, 
-            "error": "Invalid domain provided"
+            "error": "No domain provided"
+        }
+        
+    try:
+        validated_domain = validators.full_domain_validator(domain)
+    except Exception as e:
+        return {
+            "record": None, 
+            "valid": False, 
+            "error": f"Invalid domain: {str(e)}"
         }
         
     result = {"record": None, "valid": False, "error": None}
@@ -1091,13 +1120,20 @@ def check_dmarc(domain: str) -> dict[str, bool | None | str | Any]:
         dict: A dictionary containing DMARC record details.
     """
     # Validate the domain before proceeding with any operations
-    try:
-        validated_domain = validators.full_domain_validator(domain)
-    except Exception:
+    if not domain:
         return {
             "record": None, 
             "valid": False, 
-            "error": "Invalid domain provided"
+            "error": "No domain provided"
+        }
+        
+    try:
+        validated_domain = validators.full_domain_validator(domain)
+    except Exception as e:
+        return {
+            "record": None, 
+            "valid": False, 
+            "error": f"Invalid domain: {str(e)}"
         }
         
     result = {"record": None, "valid": False, "error": None}

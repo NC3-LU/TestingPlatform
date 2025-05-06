@@ -28,8 +28,29 @@
             <form method="post">
                 {% csrf_token %}
                 {% if error %}
-                <span class="text-danger">{{ error }}</span>
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+                </div>
                 {% endif %}
+                
+                {% if validation_error %}
+                <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ validation_error }}
+                    {% if validation_details %}
+                    <button class="btn btn-sm btn-outline-secondary mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#validationDetails" aria-expanded="false" aria-controls="validationDetails">
+                        Show details
+                    </button>
+                    <div class="collapse mt-2" id="validationDetails">
+                        <ul class="list-group">
+                            {% for detail in validation_details %}
+                            <li class="list-group-item list-group-item-warning">{{ detail }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
                 <div class="mb-3">
                     <label class="mb-1">Enter your domain name:</label>
                     <input class="form-control" type="text" placeholder="domain.com" id="target" name="target"
@@ -47,8 +68,9 @@
             {% endif %}
         </div>
     </div>
-    {% if domain %}
-
+    
+    {% if domain and not error and not validation_error %}
+    <!-- Only show results if there's no error -->
     <div class="gx-0 row d-flex justify-content-center py-5">
         <section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
             <h1 class="text-center">Overview of {{ domain }}</h1>

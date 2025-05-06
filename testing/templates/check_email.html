@@ -36,7 +36,9 @@
       <form method="post">
         {% csrf_token %}
         {% if error %}
-        <span class="text-danger">{{ error }}</span>
+        <div class="alert alert-danger" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+        </div>
         {% endif %}
         <div class="mb-3">
           <label class="mb-1">
@@ -62,7 +64,7 @@
     </div>
   </div>
 
-  {% if domain %}
+  {% if domain and not error %}
   <div class="gx-0 row d-flex justify-content-center py-5">
     <section class="container-extended box-shadow primary-fadded-blue_border border-top-radius-only p-5">
       <h1 class="text-center">Overview of {{ domain }}</h1>
@@ -155,7 +157,7 @@ DKIM Record
         SPF Record
       </div>
       <div class="col-lg-12 fs-4">
-        <p>The Sender Policy Framework (SPF) is an email validation protocol that helps detect and block email spoofing. Email spoofing is a common technique used in phishing and spam emails. SPF allows the receiving mail server to verify that incoming mail from a domain comes from a host authorized by that domain’s administrators. The list of authorized sending hosts for a domain is published in the Domain Name System (DNS) records.</p>
+        <p>The Sender Policy Framework (SPF) is an email validation protocol that helps detect and block email spoofing. Email spoofing is a common technique used in phishing and spam emails. SPF allows the receiving mail server to verify that incoming mail from a domain comes from a host authorized by that domain's administrators. The list of authorized sending hosts for a domain is published in the Domain Name System (DNS) records.</p>
         <div class="row my-2">
           <button type="button" data-bs-toggle="collapse" data-bs-target="#records" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background rte collapsed">
             <i id="collapse-icon" class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
@@ -211,7 +213,7 @@ DKIM Record
         DMARC Record
       </div>
       <div class="col-lg-12 fs-4">
-        <p>DMARC (Domain-based Message Authentication, Reporting, and Conformance) is an email authentication protocol that provides additional protection against email spoofing and phishing attacks. It uses the Sender Policy Framework (SPF) and DomainKeys Identified Mail (DKIM) standards. DMARC enables a domain owner to specify how mail servers should handle messages from their domain that don’t pass SPF or DKIM checks. This adds an extra layer of security</p>
+        <p>DMARC (Domain-based Message Authentication, Reporting, and Conformance) is an email authentication protocol that provides additional protection against email spoofing and phishing attacks. It uses the Sender Policy Framework (SPF) and DomainKeys Identified Mail (DKIM) standards. DMARC enables a domain owner to specify how mail servers should handle messages from their domain that don't pass SPF or DKIM checks. This adds an extra layer of security</p>
         <div class="row my-2">
           <button type="button" data-bs-toggle="collapse" data-bs-target="#d_record" aria-expanded="false" aria-controls="collapseExample" class="accordion-button btn p-3 fs-2 fw-bold text-start text-light blue-gradient-cta_background rte collapsed">
             <i id="collapse-icon" class="p-2 circle bi bi-chevron-right bg-white me-3 icon-flipped text-black"></i>
@@ -379,7 +381,7 @@ Recommendations
         <div class="p-0 collapse" id="dnssec-recommendation">
           <div class="p-3 border-bottom border-end border-start table-responsive">
             <ul>
-              <li><strong>Enable DNSSEC on Authoritative Name Servers:</strong> Ensure that your domain’s authoritative name servers support DNSSEC by enabling it in your DNS management tool or control panel. This typically involves generating and maintaining cryptographic key pairs (ZSK and KSK) and signing DNS records.</li>
+              <li><strong>Enable DNSSEC on Authoritative Name Servers:</strong> Ensure that your domain's authoritative name servers support DNSSEC by enabling it in your DNS management tool or control panel. This typically involves generating and maintaining cryptographic key pairs (ZSK and KSK) and signing DNS records.</li>
               <li><strong>Regular Key Management:</strong> Implement a robust key management process, including regularly rotating your Zone Signing Key (ZSK) and, less frequently, your Key Signing Key (KSK). Use automated key rollovers whenever possible to reduce the risk of human error.</li>
               <li><strong>Monitor DNSSEC Status:</strong> Continuously monitor DNSSEC validation and resolution through tools like DNSViz or the BIND DNSSEC tools to ensure records are correctly signed and resolvable. This can help quickly identify and rectify any misconfigurations.</li>
               <li><strong>Use a DNSSEC-enabled Resolver:</strong> Ensure your DNS resolvers are DNSSEC-aware and validate signed records. This adds a layer of protection for users by verifying the authenticity of DNS data.</li>

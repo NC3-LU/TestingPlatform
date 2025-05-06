@@ -512,53 +512,10 @@ footer .border-top {
 
 
 /* 404 - 500 */
- .notfound .notfound-404 h1 {
-    color: black;
-    font-weight: 900;
-    font-size: 276px;
-    margin: 0;
-  }
-   .notfound h2 {
-    font-size: 46px;
-    color: #000;
-    font-weight: 900;
-    text-transform: uppercase;
-    margin: 0
-  }
-  .notfound p {
-    font-size: 16px;
-    color: #000;
-    font-weight: 400;
-    text-transform: uppercase;
-    margin-top: 15px
-  }
-  .notfound a {
-    font-size: 14px;
-    text-decoration: none;
-    text-transform: uppercase;
-    background: #189cf0;
-    display: inline-block;
-    padding: 16px 38px;
-    border: 2px solid transparent;
-    border-radius: 40px;
-    color: #fff;
-    font-weight: 400;
-    -webkit-transition: .2s all;
-    transition: .2s all
-  }
-  .notfound a:hover {
-    background-color: #fff;
-    border-color: #189cf0;
-    color: #189cf0
-  }
-
+ /* Removed custom error page styles in favor of using Bootstrap */
+  
   @media only screen and (max-width:480px) {
-    .notfound .notfound-404 h1{
-      font-size:162px !important;
-    }
-    .notfound h2{
-      font-size:26px !important;
-    }
+    /* Error page responsive styles */
   }
 
 /*
@@ -630,13 +587,15 @@ footer .border-top {
     }
 
     .border-bottom-radius-only{
-     border-radius: 0 0 20px 20px;!important;
+     border-radius: 0 0 20px 20px !important;
     }
      .border-top-radius-only{
-     border-radius: 20px 20px 0 0;!important;
+     border-radius: 20px 20px 0 0 !important;
     }
 @media(min-width: 2800px) {
 .container-extended{
   max-width:1650px;
 }
 }
+
+

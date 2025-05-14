@@ -5,6 +5,7 @@ import re
 import socket
 from time import sleep
 import logging
+import requests
 
 import weasyprint
 import matplotlib.pyplot as plt
@@ -50,7 +51,8 @@ from .helpers import (
     get_capture_result,
     get_recent_captures,
     check_dkim,
-    extract_domain_from_url
+    extract_domain_from_url,
+    safe_url_utils
 )
 from .models import DMARCRecord, DMARCReport, MailDomain, TestReport, CSPReport, CSPEndpoint
 from . import validators
@@ -145,18 +147,18 @@ def test_landing(request):
 def check_website_security(request):
     if request.method == 'POST':
         domain = request.POST.get('target', '').strip()
-        
+
         # Log the input for debugging
         logger.debug(f"Web security check requested for: {domain}")
-        
+
         if not domain:
             return render(request, 'check_webapp.html', {
                 'error': 'Please enter a domain to check'
             })
-            
+
         # Extract domain from URL-like inputs
         domain = extract_domain_from_url(domain)
-        
+
         # Check if extraction was successful
         if not domain:
             return render(request, 'check_webapp.html', {
@@ -183,6 +185,12 @@ def check_website_security(request):
             # First check basic domain validity before running any requests
             try:
                 validators.full_domain_validator(domain)
+                requests.get(safe_url_utils(domain), timeout=5)
+            except requests.ConnectionError:
+                return render(request, 'check_webapp.html', {
+                    'domain': domain,
+                    'error': f"Invalid domain: {domain} could not be resolved. Please verify the domain name and that the site is accessible."
+                })
             except Exception as e:
                 return render(request, 'check_webapp.html', {
                     'domain': domain,
@@ -307,12 +315,12 @@ def check_website_security(request):
                     logger.error(f"Failed to create test report: {e}")
             except Exception as e:
                 logger.error(f"Error saving test report: {e}")
-                
+
         except Exception as e:
             # This is a catch-all for any unexpected errors
             logger.error(f"Unexpected error during security checks for {domain}: {e}")
             context['error'] = f"An unexpected error occurred. Please try again with a valid domain."
-            
+
         return render(request, 'check_webapp.html', context)
 
     return render(request, 'check_webapp.html')
@@ -331,22 +339,22 @@ def email_test(request):
                 "You reached the maximum number of tests. Please create an account.",
             )
             return redirect("signup")
-            
+
         target = request.POST["target"].strip() if "target" in request.POST else ""
         # Log the input for debugging
         logger.debug(f"Email test requested for: {target}")
-        
+
         if not target:
             context = {"error": "Please enter a domain name"}
             return render(request, "check_email.html", context)
-            
+
         # Extract domain from URL-like inputs without re-importing
         target = extract_domain_from_url(target)
-        
+
         if not target:
             context = {"error": "Unable to extract a valid domain name from your input"}
             return render(request, "check_email.html", context)
-            
+
         # Check if the domain has a valid SOA record
         soa_check = check_soa_record(target)
         if isinstance(soa_check, dict) and "error" in soa_check:
@@ -379,7 +387,7 @@ def email_test(request):
                     context = {"error": f"The domain '{target}' does not exist"}
                     has_error = True
                     break
-        
+
         if has_error:
             return render(request, "check_email.html", context)
 
@@ -432,14 +440,14 @@ def ipv6_test(request):
                 "You reached the maximum number of tests. Please create an account.",
             )
             return redirect("signup")
-            
+
         target = request.POST["target"].strip()
         # Log the input for debugging
         logger.debug(f"IPv6 test requested for: {target}")
-        
+
         # Extract domain from URL-like inputs without re-importing
         target = extract_domain_from_url(target)
-        
+
         context = {}
         context.update(ipv6_check(target, None))
         nb_tests += 1
@@ -462,35 +470,35 @@ def web_server_test(request):
                 "You reached the maximum number of tests. Please create an account.",
             )
             return redirect("signup")
-            
+
         domain = request.POST.get("target", "").strip()
         # Log the input for debugging
         logger.debug(f"Web server test requested for: {domain}")
-        
+
         # Check for empty input
         if not domain:
             context = {"error": "Please enter a domain name"}
             return render(request, "check_services.html", context)
-        
+
         # Extract domain from URL-like inputs without re-importing
         domain = extract_domain_from_url(domain)
-        
+
         # Check if extraction was successful
         if not domain:
             context = {"error": "Unable to extract a valid domain name from your input"}
             return render(request, "check_services.html", context)
-            
+
         context = {'domain': domain}
-        
+
         # Perform the web server check and handle potential errors
         try:
             server_check_result = web_server_check(domain)
-            
+
             # Check if there was an error in the result
             if isinstance(server_check_result, dict) and "error" in server_check_result:
                 context["error"] = server_check_result["error"]
                 return render(request, "check_services.html", context)
-                
+
             context.update(server_check_result)
         except Exception as e:
             logger.error(f"Error performing web server check for {domain}: {e}")
@@ -823,12 +831,12 @@ def url_test(request):
     lookyloo = Lookyloo('https://lookyloo.circl.lu')
     if request.method == 'POST':
         url = request.POST.get('target')
-        
+
         # Ensure URL has a proper protocol prefix
         if url and not url.startswith(('http://', 'https://')):
             url = 'https://' + url
             logger.info(f"Added https:// prefix to URL: {url}")
-            
+
         if lookyloo.is_up:
             context = {'lookyloo_status': lookyloo.is_up}
             try:
@@ -838,7 +846,7 @@ def url_test(request):
                         context['error'] = 'Lookyloo has encountered an issue with the requested capture. Please try again.'
                         break
                     sleep(5)
-                    
+
                 if 'error' not in context:
                     capture = get_capture_result(lookyloo, capture_uuid)
                     context['capture'] = capture
@@ -848,7 +856,7 @@ def url_test(request):
             except Exception as e:
                 logger.error(f"Error in URL test for {url}: {str(e)}")
                 context['error'] = f"An error occurred during the capture: {str(e)}"
-                
+
             return render(request, 'check_lookyloo.html', context)
     else:
         recent_captures = get_recent_captures(lookyloo)

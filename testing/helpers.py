@@ -43,22 +43,22 @@ ALLOWED_PROTOCOLS = ["http", "https"]
 def extract_domain_from_url(url: str) -> str:
     """
     Extract domain from URL, handling cases with or without protocol prefixes.
-    
+
     Args:
         url (str): The URL or domain string
-        
+
     Returns:
         str: Just the domain part of the URL
     """
     if not url or not isinstance(url, str):
         logger.error(f"Invalid URL input: {url}")
         return ""
-        
+
     original_url = url
-    
+
     # Remove any leading/trailing whitespace
     url = url.strip()
-    
+
     # If URL starts with a protocol prefix, extract the domain
     if url.startswith(('http://', 'https://')):
         try:
@@ -72,13 +72,13 @@ def extract_domain_from_url(url: str) -> str:
         except Exception as e:
             logger.error(f"Error parsing URL '{original_url}': {e}")
             return ""
-    
+
     # Handle cases like "nc3.lu/" with no protocol but with a path
     if '/' in url:
         domain = url.split('/', 1)[0]
         logger.debug(f"Extracted domain '{domain}' from URL-like string '{original_url}'")
         return domain
-    
+
     logger.debug(f"URL '{url}' does not have a protocol prefix or path, treating as domain")
     return url
 
@@ -86,28 +86,28 @@ def extract_domain_from_url(url: str) -> str:
 def safe_url_utils(domain: str, path: str = "", protocol: str = "https") -> Optional[str]:
     """
     Safely constructs a URL from domain and path components after validating inputs.
-    
+
     Args:
         domain (str): The domain to use in the URL (can include protocol that will be stripped)
         path (str): Optional path to append to the domain
         protocol (str): Protocol to use (defaults to https)
-        
+
     Returns:
         Optional[str]: A properly constructed URL or None if validation fails
     """
     original_domain = domain
-    
+
     # Extract just the domain if a full URL was provided
     domain = extract_domain_from_url(domain)
-    
+
     # Handle edge cases where the domain might still have trailing characters
     domain = domain.strip()
-    
+
     # Validate protocol
     if protocol not in ALLOWED_PROTOCOLS:
         logger.error(f"Invalid protocol: {protocol}")
         return None
-        
+
     # Validate domain using the validator
     try:
         validated_domain = validators.full_domain_validator(domain)
@@ -115,11 +115,11 @@ def safe_url_utils(domain: str, path: str = "", protocol: str = "https") -> Opti
     except Exception as e:
         logger.error(f"Domain validation failed for '{domain}' (original input: '{original_domain}'): {e}")
         return None
-    
+
     # Ensure path starts with / if it's not empty
     if path and not path.startswith('/'):
         path = f"/{path}"
-    
+
     # Construct URL using urlunparse to safely handle components
     url_components = (protocol, validated_domain, path, '', '', '')
     final_url = urlunparse(url_components)
@@ -146,7 +146,7 @@ def check_csp(domain):
             'issues': ["Invalid domain provided"],
             'recommendations': ["Provide a valid domain name"]
         }
-    
+
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
@@ -193,12 +193,12 @@ def check_soa_record(target: str) -> Union[bool, Dict]:
     """Checks the presence of a SOA record for the Email Systems Testing."""
     if not target:
         return {"error": "No domain provided"}
-        
+
     try:
         validators.full_domain_validator(target)
     except Exception as e:
         return {"error": f"Invalid domain format: {str(e)}"}
-        
+
     try:
         answers = dns.resolver.resolve(target, "SOA")
         return 0 != len(answers)
@@ -221,7 +221,7 @@ def email_check(target: str) -> Dict[str, Any]:
         validated_domain = validators.full_domain_validator(target)
     except Exception:
         return {"error": "You entered an invalid hostname!"}
-        
+
     result = {}
     env = os.environ.copy()
     cmd = [
@@ -234,7 +234,7 @@ def email_check(target: str) -> Dict[str, Any]:
         (stdout, stderr) = (
             subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
         ).communicate()
-        
+
         try:
             result = json.loads(stdout)
         except Exception:
@@ -250,7 +250,7 @@ def email_check(target: str) -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Error checking DKIM: {e}")
         result["dkim"] = {"error": f"Error checking DKIM: {str(e)}"}
-        
+
     return result
 
 
@@ -268,12 +268,12 @@ def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, An
         # Submit the file to Pandora for analysis with a seed that doesn't expire
         # This allows unauthenticated access to the results
         result = pandora_cli.submit(file_in_memory, file_to_check_name, seed_expire=0)
-        
+
         # Check if result is valid
         if not result or not isinstance(result, dict):
             logger.warning(f"Invalid response format from Pandora: {result}")
             return {"result": {"error": "Invalid response from Pandora API", "details": str(result)}}
-            
+
         if not result.get("success"):
             # Unsuccessful submission of the file
             error_msg = str(result.get("error", "Unknown error"))
@@ -289,77 +289,77 @@ def file_check(file_in_memory: BytesIO, file_to_check_name: str) -> Dict[str, An
         task_id = result["taskId"]
         seed = result.get("seed")
         report_link = result.get("link", "")
-        
+
         if not seed:
             logger.warning("No seed received from Pandora API, status checks may fail due to authentication issues")
-            
+
         time.sleep(0.1)
-        
+
         # First status check - use the seed for authentication
         try:
             initial_status = pandora_cli.task_status(task_id, seed=seed)
-            
+
             # Check for API errors
             if isinstance(initial_status, dict) and initial_status.get("success") is False:
                 error_msg = str(initial_status.get("error", "Unknown error"))
                 logger.warning(f"Error from Pandora API: {error_msg}")
                 return {"result": {"error": "API error", "details": error_msg, "link": report_link}}
-                
+
             if isinstance(initial_status, dict):
                 analysis_result = initial_status
         except Exception as e:
             logger.warning(f"Error in initial task status check: {e}")
-            
+
         time.sleep(0.1)
-        
+
         # Poll for status changes
         loop = 0
         while loop < (50 * 10):  # Maximum 500 attempts
             try:
                 status_response = pandora_cli.task_status(task_id, seed=seed)
-                
+
                 # Validate response
                 if not status_response or not isinstance(status_response, dict):
                     logger.warning(f"Invalid response from Pandora task_status: {status_response}")
                     break
-                
+
                 # Check for API errors
                 if status_response.get("success") is False:
                     error_msg = str(status_response.get("error", "Unknown error"))
                     logger.warning(f"Error from Pandora API: {error_msg}")
                     analysis_result = {"error": "API error", "details": error_msg}
                     break
-                
+
                 # Update our result with the latest data
                 analysis_result = status_response
-                
+
                 # Check if status field exists
                 if "status" not in analysis_result:
                     logger.warning(f"Missing 'status' key in Pandora response: {analysis_result}")
                     if "error" not in analysis_result:
                         analysis_result["error"] = "Unknown error: Missing status field in response"
                     break
-                
+
                 # Check if processing is complete
                 if analysis_result["status"] != "WAITING":
                     break
-                    
+
             except Exception as e:
                 logger.exception(f"Error checking task status: {e}")
                 break
-                
+
             # Wait before next poll
             time.sleep(0.1)
             loop += 1
-            
+
         # Add link to the result if we don't have an error
         if report_link and "error" not in analysis_result:
             analysis_result.update({"link": report_link})
-            
+
     except Exception as e:
         logger.exception(f"Unexpected error in file_check: {e}")
         analysis_result = {"error": "File check failed", "details": str(e)}
-    
+
     return {"result": analysis_result}
 
 
@@ -368,11 +368,11 @@ def ipv6_check(
 ) -> Dict[str, Union[Dict[Any, Any], List[Union[str, int]], List[Any]]]:
     """
     Checks IPv6 connectivity for a domain.
-    
+
     Args:
         domain (str): The domain to check.
         port: Optional port number
-        
+
     Returns:
         dict: IPv6 check results or error message.
     """
@@ -381,7 +381,7 @@ def ipv6_check(
         validated_domain = validators.full_domain_validator(domain)
     except Exception:
         return {"error": "You entered an invalid hostname!"}
-        
+
     logger.info(f"ipv6 scan: scanning domain {validated_domain}")
     results = {}
 
@@ -534,7 +534,7 @@ def ipv6_check(
     max_len = max(len(records_v4), len(records_v6))
     records_v4.extend([""] * (max_len - len(records_v4)))
     records_v6.extend([""] * (max_len - len(records_v6)))
-    
+
     records = [(validated_domain, records_v4[i], records_v6[i]) for i in range(max_len)]
 
     response = False
@@ -591,10 +591,10 @@ def ipv6_check(
 def web_server_check(domain: str):
     """
     Performs security scanning on a web server.
-    
+
     Args:
         domain (str): The domain to check.
-        
+
     Returns:
         dict: Security scan results or error message.
     """
@@ -646,6 +646,8 @@ def web_server_check(domain: str):
                     except TypeError:
                         continue
                     except AttributeError:
+                        continue
+                    except KeyError:
                         continue
 
             services.append(service)
@@ -792,11 +794,11 @@ def web_server_check_no_raw_socket(hostname):
 def tls_version_check(domain: str, service):
     """
     Checks the version of TLS.
-    
+
     Args:
         domain (str): The domain to check.
         service: The service type ('web' or 'mail')
-        
+
     Returns:
         dict: TLS version check results or error message.
     """
@@ -805,20 +807,20 @@ def tls_version_check(domain: str, service):
         validated_domain = validators.full_domain_validator(domain)
     except Exception:
         return {"error": "You entered an invalid hostname!"}
-        
+
     # Validate service
     if service not in ["web", "mail"]:
         return {"error": "Invalid service type. Must be 'web' or 'mail'."}
-        
+
     nmap = nmap3.Nmap()
     logger.info(f"tls scan: Scanning host/domain {validated_domain}")
     tls_scans = nmap.nmap_version_detection(validated_domain, args="--script ssl-enum-ciphers")
-    
+
     try:
         ip, tls_scans = list(tls_scans.items())[0]
     except IndexError:
         return {"error": "No scan results found"}
-        
+
     tls_scans = list(
         filter(lambda element: element["state"] == "open", tls_scans["ports"])
     )
@@ -881,12 +883,12 @@ def tls_version_check(domain: str, service):
 def check_dkim(domain: str, selector: str = None, selectors: list = None):
     """
     Check DKIM record for a domain with the specified selector(s).
-    
+
     Args:
         domain (str): The domain to check
         selector (str, optional): A single DKIM selector to use
         selectors (list, optional): A list of DKIM selectors to try
-        
+
     Returns:
         dict or tuple: Either a dict with DKIM status or a tuple with (record_text, is_valid)
                       depending on how the function is called
@@ -896,15 +898,15 @@ def check_dkim(domain: str, selector: str = None, selectors: list = None):
         validated_domain = validators.full_domain_validator(domain)
     except Exception:
         return None, False
-    
+
     # Handle case where a single selector is provided
     if selector and not selectors:
         # Validate selector (allow only alphanumeric, hyphen, underscore)
         if not re.match(r'^[a-zA-Z0-9_-]+$', selector):
             return None, False
-            
+
         dkim_domain = f'{selector}._domainkey.{validated_domain}'
-        
+
         try:
             dkim_record = dns.resolver.resolve(dkim_domain, 'TXT')
             for record in dkim_record:
@@ -913,7 +915,7 @@ def check_dkim(domain: str, selector: str = None, selectors: list = None):
         except Exception as e:
             logger.error(f'Error checking DKIM for {dkim_domain}: {e}')
             return None, False
-    
+
     # Handle case where multiple selectors are provided or none (use defaults)
     if selectors is None:
         selectors = [
@@ -926,13 +928,13 @@ def check_dkim(domain: str, selector: str = None, selectors: list = None):
             "mxvault",
             "mail",
         ]
-    
+
     for s in selectors:
         # Validate the selector to avoid injection
         if not s or not re.match(r'^[a-zA-Z0-9_-]+$', s):
             logger.warning(f"Invalid selector format: {s}")
             continue
-            
+
         try:
             dns_query = f"{s}._domainkey.{validated_domain}."
             dns_response = (
@@ -943,14 +945,14 @@ def check_dkim(domain: str, selector: str = None, selectors: list = None):
             p_match = re.search(r"p=([\w\d/+]*)", dns_response)
             if not p_match:
                 continue
-                
+
             p = p_match.group(1)
             key = RSA.importKey(b64decode(p))
             return {"dkim": key.can_encrypt()}
         except Exception as e:
             logger.debug(f"DKIM check failed for selector {s}: {e}")
             continue
-    
+
     return {"dkim": False}
 
 
@@ -984,20 +986,20 @@ def check_dnssec(domain):
     # Validate the domain before proceeding with any operations
     if not domain:
         return {
-            "enabled": False, 
-            "keys": [], 
+            "enabled": False,
+            "keys": [],
             "error": "No domain provided"
         }
-        
+
     try:
         validated_domain = validators.full_domain_validator(domain)
     except Exception as e:
         return {
-            "enabled": False, 
-            "keys": [], 
+            "enabled": False,
+            "keys": [],
             "error": f"Invalid domain: {str(e)}"
         }
-        
+
     result = {"enabled": False, "keys": [], "error": None}
     try:
         dnskey = dns.resolver.resolve(validated_domain, 'DNSKEY')
@@ -1034,10 +1036,10 @@ def check_mx(domain):
         validated_domain = validators.full_domain_validator(domain)
     except Exception:
         return {
-            "records": [], 
+            "records": [],
             "error": "Invalid domain provided"
         }
-        
+
     result = {"records": [], "error": None}
     try:
         mx_records = dns.resolver.resolve(validated_domain, 'MX')
@@ -1071,20 +1073,20 @@ def check_spf(domain):
     # Validate the domain before proceeding with any operations
     if not domain:
         return {
-            "record": None, 
-            "valid": False, 
+            "record": None,
+            "valid": False,
             "error": "No domain provided"
         }
-        
+
     try:
         validated_domain = validators.full_domain_validator(domain)
     except Exception as e:
         return {
-            "record": None, 
-            "valid": False, 
+            "record": None,
+            "valid": False,
             "error": f"Invalid domain: {str(e)}"
         }
-        
+
     result = {"record": None, "valid": False, "error": None}
     try:
         txt_records = dns.resolver.resolve(validated_domain, 'TXT')
@@ -1122,20 +1124,20 @@ def check_dmarc(domain: str) -> dict[str, bool | None | str | Any]:
     # Validate the domain before proceeding with any operations
     if not domain:
         return {
-            "record": None, 
-            "valid": False, 
+            "record": None,
+            "valid": False,
             "error": "No domain provided"
         }
-        
+
     try:
         validated_domain = validators.full_domain_validator(domain)
     except Exception as e:
         return {
-            "record": None, 
-            "valid": False, 
+            "record": None,
+            "valid": False,
             "error": f"Invalid domain: {str(e)}"
         }
-        
+
     result = {"record": None, "valid": False, "error": None}
     dmarc_domain = f'_dmarc.{validated_domain}'
 
@@ -1195,7 +1197,7 @@ def check_tls(mx_servers: List[str]) -> Dict[str, Dict[str, str]]:
             validated_server = validators.full_domain_validator(server)
         except Exception:
             return server, {f"{server}:0": "Invalid server hostname"}
-            
+
         results = {}
         ports = [25, 587, 465]  # Common SMTP ports
         for port in ports:
@@ -1231,13 +1233,13 @@ def check_tls(mx_servers: List[str]) -> Dict[str, Dict[str, str]]:
     # Validate the list of servers
     if not mx_servers or not isinstance(mx_servers, list):
         return {"error": "No valid mail servers provided"}
-        
+
     # Filter out any invalid servers
     validated_servers = []
     for server in mx_servers:
         if isinstance(server, str) and server.strip():
             validated_servers.append(server.strip())
-            
+
     if not validated_servers:
         return {"error": "No valid mail servers provided"}
 
@@ -1344,7 +1346,7 @@ def check_cookies(domain: str) -> Dict[str, Any]:
             'cookies': [],
             'message': 'Invalid domain provided'
         }
-        
+
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
@@ -1401,7 +1403,7 @@ def check_cors(domain):
             'cors_headers': {},
             'message': 'Invalid domain provided'
         }
-        
+
     try:
         response = requests.options(url, timeout=10)
         cors_headers = {
@@ -1452,7 +1454,7 @@ def check_https_redirect(domain):
             'redirect_url': None,
             'message': 'Invalid domain provided'
         }
-    
+
     # Safely construct HTTP URL for testing redirect
     url = safe_url_utils(validated_domain, protocol="http")
     if not url:
@@ -1461,11 +1463,11 @@ def check_https_redirect(domain):
             'redirect_url': None,
             'message': 'Invalid domain provided'
         }
-        
+
     try:
         http_response = requests.get(url, allow_redirects=False, timeout=10)
         redirect_location = http_response.headers.get('Location', '')
-        
+
         # Validate the redirect location
         if http_response.is_redirect:
             # Check if it redirects to HTTPS
@@ -1516,7 +1518,7 @@ def check_referrer_policy(domain):
             'header_value': None,
             'message': 'Invalid domain provided'
         }
-        
+
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
@@ -1567,7 +1569,7 @@ def check_sri(domain):
             'resources': [],
             'message': 'Invalid domain provided'
         }
-        
+
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
@@ -1581,12 +1583,12 @@ def check_sri(domain):
         for resource in scripts + stylesheets:
             resource_type = 'script' if resource.name == 'script' else 'stylesheet'
             src = urljoin(url, resource['src'] if resource_type == 'script' else resource['href'])
-            
+
             # Validate the constructed URL
             parsed_src = urlparse(src)
             if not parsed_src.scheme or parsed_src.scheme not in ALLOWED_PROTOCOLS:
                 continue
-                
+
             integrity = resource.get('integrity')
             is_cross_origin = is_cross_origin_url(url, src)
             has_integrity = bool(integrity)
@@ -1662,11 +1664,11 @@ def validate_integrity(src, integrity):
     if not parsed_url.scheme or not parsed_url.netloc:
         logger.error(f"Invalid URL format: {src}")
         return False
-        
+
     if parsed_url.scheme not in ALLOWED_PROTOCOLS:
         logger.error(f"Disallowed protocol in URL: {src}")
         return False
-        
+
     try:
         response = requests.get(src, timeout=10)
         response.raise_for_status()
@@ -1717,11 +1719,11 @@ def check_x_content_type_options(domain):
     url = safe_url_utils(domain)
     if not url:
         return {
-            'status': False, 
-            'header_value': None, 
+            'status': False,
+            'header_value': None,
             'message': 'Invalid domain provided'
         }
-        
+
     try:
         response = requests.get(url, timeout=10)
         header_value = response.headers.get('X-Content-Type-Options')
@@ -1760,7 +1762,7 @@ def check_hsts(domain: str) -> Dict[str, Union[bool, str, Dict[str, Union[str, b
             'strength': 'N/A',
             'recommendations': ['Provide a valid domain name']
         }
-        
+
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
@@ -1852,7 +1854,7 @@ def check_security_txt(domain: str) -> dict:
             'status': False,
             'data': 'Invalid domain provided'
         }
-        
+
     try:
         # First, check if the file exists using HEAD request
         head_response = requests.head(url, timeout=10)

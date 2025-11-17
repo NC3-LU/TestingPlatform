@@ -1,0 +1,33 @@
+services:
+
+  testing-platform:
+    build:
+      context: ../..
+      dockerfile: compose/staging/Dockerfile
+      args:
+        - DEBUG=1
+        - PYTHON_VERSION=3.12
+      cache_from:
+        - testing-platform:app
+    image: "testing-platform:app"
+    command: gunicorn testing_platform.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ../../static:/var/www/testing_platform/static
+    expose:
+      - 8000
+
+  nginx:
+    build:
+      context: ../../nginx
+      cache_from:
+        - testing-platform:nginx
+    image: "testing-platform:nginx"
+    volumes:
+      - ../../static:/var/www/testing_platform/static
+    ports:
+      - '80:80'
+    depends_on:
+      - testing-platform
+
+volumes:
+  static:

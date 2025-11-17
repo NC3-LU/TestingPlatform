@@ -10,7 +10,6 @@ from .helpers import (
     client_generate_report,
     client_get_report_link,
     client_login,
-    client_upload_firmware,
     get_default_product_group,
 )
 from .models import AnalysisRequest, IOTUser
@@ -35,9 +34,7 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
                 if not analysis_request.firmware_uuid:
                     client = client_login(iot_user)
                     default_product_group = get_default_product_group(client)
-                    firmware = client_upload_firmware(
-                        client, analysis_request, default_product_group
-                    )
+                    firmware = {"id": "ONEKEY removed"} # TODO: Find a replacement for ONKEY firmware analisys
                     firmware_uuid = firmware["id"]
                     analysis_request.firmware_uuid = firmware_uuid
                     analysis_request.status = True

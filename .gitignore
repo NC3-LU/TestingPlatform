@@ -2,7 +2,7 @@ __pycache__/
 .fleet
 .idea
 .venv
-*.env
+.env
 */__pycache__/
 db.sqlite3
 db/db.sqlite3

@@ -7,7 +7,6 @@ import requests
 from decouple import config
 from django.core.files.storage import FileSystemStorage
 from django.core.signing import Signer
-from onekey_client import Client, FirmwareMetadata
 
 from testing_platform import settings
 
@@ -109,18 +108,6 @@ def get_default_product_group(client):
         pg for pg in res["allProductGroups"] if pg["name"] == "Default"
     )
     return default_product_group
-
-
-def client_upload_firmware(client, analysis_request, default_product_group):
-    metadata = FirmwareMetadata(
-        name=analysis_request.name,
-        vendor_name=analysis_request.vendor_name,
-        product_name=analysis_request.product_name,
-        product_group_id=default_product_group["id"],
-    )
-    firmware_path = Path(analysis_request.file.path)
-    res = client.upload_firmware(metadata, firmware_path, enable_monitoring=True)
-    return res
 
 
 def client_get_or_generate_report_config(client):

@@ -1,14 +1,14 @@
-ARG PYTHON_VERSION
-FROM python:${PYTHON_VERSION}
+FROM python:latest
 ARG DEBUG
 ENV PYTHONUNBUFFERED 1
 
 ENV APP_ROOT /var/www/testing_platform
 WORKDIR ${APP_ROOT}
 
-COPY ../../requirements.txt ${APP_ROOT}
+COPY ../.. ${APP_ROOT}
 
-RUN pip3 install -r ${APP_ROOT}/requirements.txt
+RUN pip install --upgrade pip && \
+    pip install -r ${APP_ROOT}/requirements.in
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         iputils-ping nmap && \
@@ -17,7 +17,6 @@ RUN apt-get update && \
 
 EXPOSE 8000
 
-COPY ../.. ${APP_ROOT}
 COPY compose/staging/entrypoint.sh ${APP_ROOT}
 
-ENTRYPOINT [ "/var/www/testing_platform/entrypoint.sh" ]
+ENTRYPOINT ${APP_ROOT}/entrypoint.sh

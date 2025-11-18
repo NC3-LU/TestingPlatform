@@ -755,7 +755,7 @@ def pdf_from_template(request, test, site):
     report = TestReport.objects.get(tested_site=site, test_ran=test).report
 
     css_path = os.path.join(settings.STATIC_DIR, 'css/style.css')
-    bootstrap_path = os.path.join(settings.STATIC_DIR, 'npm_components/bootstrap/dist/css/bootstrap.css')
+    bootstrap_path = os.path.join(settings.STATIC_DIR, 'css/bootstrap.css')
 
     with open(css_path, 'r') as f:
         css = f.read()

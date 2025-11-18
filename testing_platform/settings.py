@@ -262,12 +262,12 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 BOOTSTRAP5 = {
     "css_url": {
-        "url": "/static/npm_components/bootstrap/dist/css/bootstrap.min.css",
+        "url": "/static/css/bootstrap.css",
         "crossorigin": "anonymous",
     },
     # The complete URL to the Bootstrap JavaScript file
     "javascript_url": {
-        "url": "/static/npm_components/bootstrap/dist/js/bootstrap.bundle.min.js",
+        "url": "/static/js/bootstrap.min.js",
         "crossorigin": "anonymous",
     },
 }

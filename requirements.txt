@@ -785,10 +785,6 @@ numpy==2.2.2 \
     # via
     #   contourpy
     #   matplotlib
-onekey-client==2.3.0 \
-    --hash=sha256:08bfc333ae57a27f914d51939b7e3bde8e5179cef31ecec151499706efda5457 \
-    --hash=sha256:7b656b1fdffcb7c99111e74c17aa3756679481c69ae83856ac924b0f95ca0e05
-    # via -r requirements.in
 packaging==24.2 \
     --hash=sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759 \
     --hash=sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f

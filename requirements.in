@@ -10,7 +10,6 @@ djangorestframework
 djangorestframework-simplejwt
 drf-spectacular
 drf-spectacular-sidecar
-onekey-client
 python-decouple
 redis
 weasyprint

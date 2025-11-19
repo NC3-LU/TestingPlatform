@@ -4,9 +4,6 @@ services:
     build:
       context: ../..
       dockerfile: compose/staging/Dockerfile
-      args:
-        - DEBUG=1
-        - PYTHON_VERSION=3.12
       cache_from:
         - testing-platform:app
     image: "testing-platform:app"
@@ -28,6 +25,16 @@ services:
       - '80:80'
     depends_on:
       - testing-platform
+
+  # db:
+  #   image: postgres
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: change_me
+  #     POSTGRES_DB: testing-platform
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql
 
 volumes:
   static:

@@ -1,5 +1,5 @@
 FROM python:latest
-ARG DEBUG
+
 ENV PYTHONUNBUFFERED 1
 
 ENV APP_ROOT /var/www/testing_platform

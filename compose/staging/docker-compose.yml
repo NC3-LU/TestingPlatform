@@ -7,6 +7,12 @@ services:
       cache_from:
         - testing-platform:app
     image: "testing-platform:app"
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: testing_platform
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: change_me
     command: gunicorn testing_platform.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - ../../static:/var/www/testing_platform/static
@@ -19,6 +25,7 @@ services:
       cache_from:
         - testing-platform:nginx
     image: "testing-platform:nginx"
+    restart: unless-stopped
     volumes:
       - ../../static:/var/www/testing_platform/static
     ports:
@@ -26,15 +33,16 @@ services:
     depends_on:
       - testing-platform
 
-  # db:
-  #   image: postgres
-  #   restart: always
-  #   environment:
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: change_me
-  #     POSTGRES_DB: testing-platform
-  #   volumes:
-  #     - pgdata:/var/lib/postgresql
+  db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: change_me
+      POSTGRES_DB: testing_platform
+    volumes:
+      - pgdata:/var/lib/postgresql
 
 volumes:
   static:
+  pgdata:

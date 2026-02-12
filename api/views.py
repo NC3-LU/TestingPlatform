@@ -192,12 +192,22 @@ class UserApiView(APIView):
         """
         Create a new user.
         """
-        password = request.data.pop("password")
-        new_user = User.objects.create(**request.data)
+        serializer = UserInputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        validated = serializer.validated_data
+        password = validated.pop("password")
+        new_user = User.objects.create(
+            username=validated.get("username"),
+            email=validated.get("email", ""),
+            company_name=validated.get("company_name", ""),
+            address=validated.get("address", ""),
+            post_code=validated.get("post_code", ""),
+            city=validated.get("city", ""),
+            vat_number=validated.get("vat_number", ""),
+        )
         new_user.set_password(password)
         new_user.save()
-        serializer = UserSerializer(new_user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(UserSerializer(new_user).data, status=status.HTTP_201_CREATED)
 
 
 class UserElementApiView(APIView):
@@ -258,6 +268,12 @@ class TlsScanHistoryApiView(APIView):
 # InfraTesting
 #
 class InfraTestingEmailApiView(APIView):
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
+    permission_classes = [IsAuthenticated]
     serializer_class = DomainNameSerializer
     serializer = DomainNameSerializer
 
@@ -273,6 +289,12 @@ class InfraTestingEmailApiView(APIView):
 
 
 class InfraTestingFileApiView(APIView):
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
+    permission_classes = [IsAuthenticated]
     serializer_class = FileSerializer
     serializer = FileSerializer
 
@@ -294,6 +316,12 @@ class InfraTestingFileApiView(APIView):
 
 
 class InfraTestingIPv6ApiView(APIView):
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
+    permission_classes = [IsAuthenticated]
     serializer_class = DomainNameSerializer
     serializer = DomainNameSerializer
 
@@ -309,6 +337,12 @@ class InfraTestingIPv6ApiView(APIView):
 
 
 class InfraTestingSOAApiView(APIView):
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
+    permission_classes = [IsAuthenticated]
     serializer_class = DomainNameSerializer
     serializer = DomainNameSerializer
 
@@ -325,6 +359,12 @@ class InfraTestingSOAApiView(APIView):
 
 
 class WebServerCheckApiView(APIView):
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
+    permission_classes = [IsAuthenticated]
     serializer_class = DomainNameSerializer
     serializer = DomainNameSerializer
 
@@ -340,6 +380,12 @@ class WebServerCheckApiView(APIView):
 
 
 class TLSVersionCheckApiView(APIView):
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
+    permission_classes = [IsAuthenticated]
     serializer_class = DomainNameAndServiceSerializer
     serializer = DomainNameAndServiceSerializer
 
@@ -356,6 +402,12 @@ class TLSVersionCheckApiView(APIView):
 
 
 class DKIMPublicKeyCheckApiView(APIView):
+    authentication_classes = [
+        SessionAuthentication,
+        BasicAuthentication,
+        JWTAuthentication,
+    ]
+    permission_classes = [IsAuthenticated]
     serializer_class = DomainNameSerializer
     serializer = DomainNameSerializer
 

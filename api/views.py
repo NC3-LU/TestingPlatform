@@ -283,7 +283,9 @@ class InfraTestingEmailApiView(APIView):
         Checks for DNSSEC deployment, Checks for STARTTLS and TLS support.
         Checks for the validity of the DKIM public key.
         """
-        domain_name = request.data.get("domain_name", None)
+        serializer = self.serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        domain_name = serializer.validated_data["domain_name"]
         result = email_check(domain_name)
         return Response(result, status=status.HTTP_200_OK)
 
@@ -304,14 +306,8 @@ class InfraTestingFileApiView(APIView):
         """
         serializer = self.serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        file_uploaded = request.FILES.get("file")
-        try:
-            result = file_check(file_uploaded.read(), file_uploaded.name)
-        except Exception:
-            return Response(
-                {"result": "Payload too large."},
-                status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            )
+        file_uploaded = serializer.validated_data["file"]
+        result = file_check(file_uploaded.read(), file_uploaded.name)
         return Response(result, status=status.HTTP_200_OK)
 
 
@@ -331,7 +327,7 @@ class InfraTestingIPv6ApiView(APIView):
         """
         serializer = self.serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        domain_name = request.data.get("domain_name", None)
+        domain_name = serializer.validated_data["domain_name"]
         result = ipv6_check(domain_name)
         return Response(result, status=status.HTTP_200_OK)
 
@@ -352,8 +348,7 @@ class InfraTestingSOAApiView(APIView):
         """
         serializer = self.serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        domain_name = request.data.get("domain_name", None)
-        DomainNameSerializer(domain_name)
+        domain_name = serializer.validated_data["domain_name"]
         result = check_soa_record(domain_name)
         return Response(result, status=status.HTTP_200_OK)
 
@@ -374,7 +369,7 @@ class WebServerCheckApiView(APIView):
         """
         serializer = self.serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        domain_name = request.data.get("domain_name", None)
+        domain_name = serializer.validated_data["domain_name"]
         result = web_server_check(domain_name)
         return Response(result, status=status.HTTP_200_OK)
 
@@ -395,8 +390,8 @@ class TLSVersionCheckApiView(APIView):
         """
         serializer = self.serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        domain_name = request.data.get("domain_name", None)
-        service = request.data.get("service", "web")
+        domain_name = serializer.validated_data["domain_name"]
+        service = serializer.validated_data["service"]
         result = tls_version_check(domain_name, service)
         return Response(result, status=status.HTTP_200_OK)
 
@@ -417,6 +412,6 @@ class DKIMPublicKeyCheckApiView(APIView):
         """
         serializer = self.serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        domain_name = request.data.get("domain_name", None)
+        domain_name = serializer.validated_data["domain_name"]
         result = check_dkim(domain_name, selectors=[])
         return Response(result, status=status.HTTP_200_OK)

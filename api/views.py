@@ -35,6 +35,7 @@ from .serializers import (
 
 class LoginApiView(APIView):
     authentication_classes = [JWTAuthentication]
+    throttle_scope = "auth"
 
     def post(self, request):
         username = request.data.get("username")
@@ -274,6 +275,7 @@ class InfraTestingEmailApiView(APIView):
         JWTAuthentication,
     ]
     permission_classes = [IsAuthenticated]
+    throttle_scope = "infra_testing"
     serializer_class = DomainNameSerializer
     serializer = DomainNameSerializer
 
@@ -297,6 +299,7 @@ class InfraTestingFileApiView(APIView):
         JWTAuthentication,
     ]
     permission_classes = [IsAuthenticated]
+    throttle_scope = "infra_testing_expensive"
     serializer_class = FileSerializer
     serializer = FileSerializer
 
@@ -318,6 +321,7 @@ class InfraTestingIPv6ApiView(APIView):
         JWTAuthentication,
     ]
     permission_classes = [IsAuthenticated]
+    throttle_scope = "infra_testing"
     serializer_class = DomainNameSerializer
     serializer = DomainNameSerializer
 
@@ -339,6 +343,7 @@ class InfraTestingSOAApiView(APIView):
         JWTAuthentication,
     ]
     permission_classes = [IsAuthenticated]
+    throttle_scope = "infra_testing"
     serializer_class = DomainNameSerializer
     serializer = DomainNameSerializer
 
@@ -360,6 +365,7 @@ class WebServerCheckApiView(APIView):
         JWTAuthentication,
     ]
     permission_classes = [IsAuthenticated]
+    throttle_scope = "infra_testing_expensive"
     serializer_class = DomainNameSerializer
     serializer = DomainNameSerializer
 
@@ -381,6 +387,7 @@ class TLSVersionCheckApiView(APIView):
         JWTAuthentication,
     ]
     permission_classes = [IsAuthenticated]
+    throttle_scope = "infra_testing"
     serializer_class = DomainNameAndServiceSerializer
     serializer = DomainNameAndServiceSerializer
 
@@ -403,6 +410,7 @@ class DKIMPublicKeyCheckApiView(APIView):
         JWTAuthentication,
     ]
     permission_classes = [IsAuthenticated]
+    throttle_scope = "infra_testing"
     serializer_class = DomainNameSerializer
     serializer = DomainNameSerializer
 

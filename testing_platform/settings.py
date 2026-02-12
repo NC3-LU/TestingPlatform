@@ -14,6 +14,8 @@ import sys
 from datetime import timedelta
 from pathlib import Path
 
+from django.core.management.utils import get_random_secret_key
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,11 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-
-SECRET_KEY = os.environ.get("SECRET_KEY", "secret")
+SECRET_KEY = os.environ.get("SECRET_KEY", "") or get_random_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "1") == "1"
+DEBUG = os.environ.get("DEBUG", "0") == "1"
 
 allowed_hosts = os.environ.get("ALLOWED_HOSTS", "localhost")
 ALLOWED_HOSTS = list(map(str.strip, allowed_hosts.split(",")))
@@ -264,8 +265,8 @@ BOOTSTRAP5 = {
     },
 }
 
-if not DEBUG and SECRET_KEY == "secret":
-    print("FATAL: the secret key in the config has not yet been configured. Quitting.")
+if not DEBUG and "SECRET_KEY" not in os.environ:
+    print("FATAL: SECRET_KEY environment variable must be set in production. Quitting.")
     exit(-1)
 
-ZAP_API_KEY = os.environ.get("ZAP_API_KEY", "123456")
+ZAP_API_KEY = os.environ.get("ZAP_API_KEY", "")

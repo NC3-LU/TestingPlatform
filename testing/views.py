@@ -869,11 +869,16 @@ def url_test(request):
 def receive_csp_report(request, endpoint_uuid):
     """Handle incoming CSP violation reports"""
     try:
-        # Rate limiting
-        cache_key = f'csp_rate_{endpoint_uuid}'
-        if cache.get(cache_key, 0) >= getattr(settings, 'CSP_RATE_LIMIT', 1000):
+        # Rate limiting (60-second window)
+        cache_key = f"csp_rate_{endpoint_uuid}"
+        rate_limit = getattr(settings, "CSP_RATE_LIMIT", 1000)
+        current_count = cache.get(cache_key, 0)
+        if current_count >= rate_limit:
             return JsonResponse({"error": "Rate limit exceeded"}, status=429)
-        cache.incr(cache_key, 1)
+        if current_count == 0:
+            cache.set(cache_key, 1, timeout=60)
+        else:
+            cache.incr(cache_key)
 
         # Get endpoint
         endpoint = get_object_or_404(CSPEndpoint, endpoint_uuid=endpoint_uuid,
@@ -903,8 +908,9 @@ def receive_csp_report(request, endpoint_uuid):
 
         return JsonResponse({"status": "success"}, status=201)
 
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+    except Exception:
+        logger.exception("Error processing CSP report for endpoint %s", endpoint_uuid)
+        return JsonResponse({"error": "Internal server error"}, status=500)
 
 
 @login_required

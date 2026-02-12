@@ -13,3 +13,7 @@ node_modules/
 poetry.lock
 poetry.lock*
 docs/_build/
+
+# Environment files with secrets
+.env
+compose/**/.env

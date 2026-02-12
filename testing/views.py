@@ -58,6 +58,7 @@ from .models import DMARCRecord, DMARCReport, MailDomain, TestReport, CSPReport,
 from . import validators
 import json
 from datetime import datetime
+from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -143,7 +144,6 @@ def test_landing(request):
 #         return render(request, "check_zap.html")
 
 
-@csrf_exempt
 def check_website_security(request):
     if request.method == 'POST':
         domain = request.POST.get('target', '').strip()

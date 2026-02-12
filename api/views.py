@@ -52,16 +52,16 @@ class LoginApiView(APIView):
                 key="access_token",
                 value=access_token,
                 httponly=True,
-                samesite="None",
-                secure=True,  # Set to true for prod
+                samesite="Lax",
+                secure=True,
             )
 
             response.set_cookie(
                 key="refresh_token",
                 value=refresh_token,
                 httponly=True,
-                samesite="None",
-                secure=True,  # Set to true for prod
+                samesite="Lax",
+                secure=True,
             )
 
             return response

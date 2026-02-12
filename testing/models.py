@@ -20,9 +20,23 @@ class Domain(models.Model):
 class UserDomain(Domain):
     ip_address = models.GenericIPAddressField(blank=True, null=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "domain"],
+                name="unique_user_domain",
+            )
+        ]
+
 
 class MailDomain(Domain):
-    pass
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "domain"],
+                name="unique_mail_domain",
+            )
+        ]
 
 
 class TlsScanHistory(models.Model):

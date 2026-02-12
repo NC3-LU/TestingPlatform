@@ -1,7 +1,6 @@
 django
 django-bootstrap5
 django-cors-headers
-django-enumfields
 django-extensions
 django-icons
 django-picklefield
@@ -27,3 +26,5 @@ python3-nmap
 pycryptodome
 cryptography
 blake2signer
+zaproxy
+checkdmarc

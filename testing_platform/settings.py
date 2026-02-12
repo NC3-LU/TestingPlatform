@@ -68,7 +68,6 @@ INSTALLED_APPS = [
     "testing",
     "iot_inspector",
     "onekey",
-    "automation",
     "contact",
     "c3_protocols",
     "specialized_testing",
@@ -140,8 +139,6 @@ SESSION_COOKIE_SAMESITE = "None"
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CORS_ALLOW_CREDENTIALS = True
-Q_CLUSTER = {"name": "scheduler", "orm": "default", "timeout": 300, "retry": 330}
-
 ROOT_URLCONF = "testing_platform.urls"
 
 TEMPLATES = [

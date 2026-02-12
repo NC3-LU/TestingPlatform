@@ -1838,7 +1838,10 @@ def parse_hsts_header(header: str) -> Dict[str, Union[str, bool, int]]:
     for component in components:
         component = component.strip().lower()
         if component.startswith('max-age='):
-            parsed['max-age'] = int(component.split('=')[1])
+            try:
+                parsed['max-age'] = int(component.split('=')[1])
+            except (ValueError, IndexError):
+                parsed['max-age'] = 0
         elif component == 'includesubdomains':
             parsed['includeSubDomains'] = True
         elif component == 'preload':

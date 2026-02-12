@@ -464,7 +464,7 @@ def ipv6_check(
                 except OSError:
                     connect_tcp = False
 
-                if connect_udp and connect_tcp:
+                if connect_udp or connect_tcp:
                     reachable = True
                 else:
                     reachable = False

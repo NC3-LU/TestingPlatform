@@ -231,17 +231,31 @@ def email_check(target: str) -> Dict[str, Any]:
         "JSON",
     ]
     try:
-        (stdout, stderr) = (
-            subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
-        ).communicate()
+        proc = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
+        )
+        stdout, stderr = proc.communicate(timeout=60)
+
+        if proc.returncode != 0:
+            logger.warning(
+                "checkdmarc exited with code %d for %s: %s",
+                proc.returncode,
+                validated_domain,
+                stderr.decode(errors="replace"),
+            )
 
         try:
             result = json.loads(stdout)
-        except Exception:
-            result = {}
+        except (json.JSONDecodeError, ValueError) as e:
+            logger.error("Failed to parse checkdmarc output for %s: %s", validated_domain, e)
+            return {"error": "Email check produced invalid results. Please try again later."}
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        logger.error("checkdmarc timed out for %s", validated_domain)
+        return {"error": "Email check timed out. Please try again later."}
     except Exception as e:
-        logger.error(f"Error running checkdmarc: {e}")
-        return {"error": f"Failed to check DMARC: {str(e)}"}
+        logger.error("Error running checkdmarc: %s", e)
+        return {"error": "Failed to perform email check. Please try again later."}
 
     # Check DKIM using multiple default selectors
     try:

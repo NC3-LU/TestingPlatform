@@ -74,25 +74,16 @@ class LogoutView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def post(self, request):
-        # Clear the access token cookie
         response = Response()
-
         response.delete_cookie("access_token")
-        # Clear the refresh token cookie
+
         refresh_token = request.COOKIES.get("refresh_token")
         response.delete_cookie("refresh_token")
 
         # Invalidate the refresh token on the server side
         if refresh_token:
-            try:
-                # Try to remove the refresh token (OutstandingToken) for the given user
+            OutstandingToken.objects.filter(token=refresh_token).delete()
 
-                OutstandingToken.objects.filter(token=refresh_token).delete()
-            except OutstandingToken.DoesNotExist as e:
-                response.data = {"detail": f"Error: {str(e)}"}
-                response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-                return response
-                # If all operations were successfulException as e:
         response.data = {"detail": "Logged out successfully."}
         response.status_code = status.HTTP_200_OK
         return response

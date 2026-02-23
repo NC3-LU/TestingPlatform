@@ -29,8 +29,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserInputSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=200, required=True)
-    email = serializers.CharField(max_length=200, required=True)
-    password = serializers.CharField(max_length=200, required=True)
+    email = serializers.EmailField(max_length=254, required=True)
+    password = serializers.CharField(max_length=200, required=True, write_only=True)
     company_name = serializers.CharField(max_length=200, required=True)
     address = serializers.CharField(max_length=200, required=True)
     post_code = serializers.CharField(max_length=200, required=True)
@@ -49,6 +49,13 @@ class UserInputSerializer(serializers.ModelSerializer):
             "city",
             "vat_number",
         ]
+
+    def validate_email(self, value):
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError(
+                "A user with this email address already exists."
+            )
+        return value
 
 
 #

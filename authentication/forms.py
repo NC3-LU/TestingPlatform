@@ -39,14 +39,24 @@ class SignUpForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for visible in self.visible_fields():
-            visible.field.widget.attrs["class"] = "form-control multi-purpose-gray-200_border"
+            visible.field.widget.attrs["class"] = (
+                "form-control multi-purpose-gray-200_border"
+            )
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if User.objects.filter(email__iexact=email).exists():
+            raise ValidationError("An account with this email address already exists.")
+        return email
 
 
 class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for visible in self.visible_fields():
-            visible.field.widget.attrs["class"] = "form-control multi-purpose-gray-200_border"
+            visible.field.widget.attrs["class"] = (
+                "form-control multi-purpose-gray-200_border"
+            )
 
 
 class UserUpdateForm(forms.ModelForm):
@@ -66,6 +76,16 @@ class UserUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"] = "form-control"
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if (
+            User.objects.filter(email__iexact=email)
+            .exclude(pk=self.instance.pk)
+            .exists()
+        ):
+            raise ValidationError("An account with this email address already exists.")
+        return email
 
 
 class ChangePasswordForm(PasswordChangeForm):

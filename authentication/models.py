@@ -3,6 +3,7 @@ from django.db import models
 
 
 class User(AbstractUser):
+    email = models.EmailField("email address", unique=True)
     company_name = models.CharField(max_length=200)
     address = models.CharField(max_length=200)
     post_code = models.CharField(max_length=200)

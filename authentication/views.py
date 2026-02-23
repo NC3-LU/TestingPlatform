@@ -1,3 +1,4 @@
+import logging
 import socket
 
 from django.contrib import messages
@@ -17,6 +18,8 @@ from .forms import (
     UserUpdateForm,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def signup(request):
     if request.method == "POST":
@@ -28,6 +31,7 @@ def signup(request):
             raw_password = clean_form.get("password1")
             user = authenticate(username=username, password=raw_password)
             login(request, user)
+            logger.info("New user registered: '%s'", username)
             messages.success(request, "Your signed up successfully!")
             return redirect("/")
     else:
@@ -63,9 +67,10 @@ def login_user(request):
             user = authenticate(request=request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                # messages.success(request, "Logged in successfully")
+                logger.info("User logged in: '%s'", username)
                 return HttpResponseRedirect("/")
             else:
+                logger.warning("Failed login attempt for user '%s'", username)
                 return render(request, "login.html", {"form": form})
     else:
         form = LoginForm()

@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+
 import os
 import sys
 from datetime import timedelta
@@ -136,7 +137,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-_cors_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
+_cors_origins = os.environ.get(
+    "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
+)
 CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors_origins.split(",") if o.strip()]
 
 
@@ -237,12 +240,18 @@ PANDORA_ROOT_URL = os.environ.get("PANDORA_ROOT_URL", "https://pandora.circl.lu/
 
 DMARC_API_KEY = os.environ.get("DMARC_API_KEY", "")
 
+LOG_LEVEL = os.getenv("DJANGO_LOG_LEVEL", "INFO")
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
         "simple": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+        "verbose": {
+            "format": "{levelname} {asctime} {name} {module} {process:d} {thread:d} {message}",
             "style": "{",
         },
     },
@@ -251,7 +260,7 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "level": "DEBUG",
             "stream": sys.stdout,
-            "formatter": "simple",
+            "formatter": "verbose" if DEBUG else "simple",
         },
     },
     "root": {
@@ -261,7 +270,32 @@ LOGGING = {
     "loggers": {
         "testing": {
             "handlers": ["console"],
-            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "api": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "authentication": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_DB_LOG_LEVEL", "WARNING"),
             "propagate": False,
         },
     },

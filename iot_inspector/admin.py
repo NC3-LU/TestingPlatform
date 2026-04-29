@@ -10,8 +10,6 @@ from .helpers import (
     client_generate_report,
     client_get_report_link,
     client_login,
-    client_upload_firmware,
-    get_default_product_group,
 )
 from .models import AnalysisRequest, IOTUser
 
@@ -33,15 +31,10 @@ class AnalysisRequestAdmin(admin.ModelAdmin):
             iot_user = analysis_request.iot_user
             if iot_user.activated and analysis_request.status not in (True, False):
                 if not analysis_request.firmware_uuid:
-                    client = client_login(iot_user)
-                    default_product_group = get_default_product_group(client)
-                    firmware = client_upload_firmware(
-                        client, analysis_request, default_product_group
+                    messages.error(
+                        request,
+                        "Firmware upload via OneKey is no longer supported.",
                     )
-                    firmware_uuid = firmware["id"]
-                    analysis_request.firmware_uuid = firmware_uuid
-                    analysis_request.status = True
-                    analysis_request.save()
                 else:
                     messages.error(request, "This request was already made.")
             else:

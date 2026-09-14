@@ -23,6 +23,8 @@ on `127.0.0.1:18080`. The nginx service serves static assets and forwards
 application requests to Gunicorn on `127.0.0.1:18081`. Host networking
 supports IPv6 network tests.
 
+Mail settings (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`, `EMAIL_HOST_USER`,
+`EMAIL_HOST_PASSWORD`, `DEFAULT_FROM_EMAIL`) are supplied privately in Dokploy.
 
 Validate changes with:
 

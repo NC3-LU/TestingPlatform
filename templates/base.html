@@ -35,9 +35,8 @@
 
 {% include 'nav.html' %}
 
-{% bootstrap_messages %}
-
 <div id="content">
+  {% bootstrap_messages %}
   {% block content %}{% endblock %}
 </div>
 

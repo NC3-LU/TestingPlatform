@@ -1,0 +1,61 @@
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: app
+    # Use host IPv6 routing for network tests.
+    # Gunicorn binds only to loopback behind the HTTPS reverse proxy.
+    network_mode: host
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 340s
+    environment:
+      DEBUG: "0"
+      SECRET_KEY: ${SECRET_KEY:?Set the production Django signing key in Dokploy}
+      ALLOWED_HOSTS: testing.nc3.lu,localhost
+      EMAIL_HOST: localhost
+      EMAIL_PORT: "25"
+      EMAIL_USE_TLS: "0"
+    volumes:
+      - type: bind
+        source: ${TESTING_DATA_ROOT:?Set TESTING_DATA_ROOT to the prepared database and uploads directory}/db
+        target: /app/db
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${TESTING_DATA_ROOT:?Set TESTING_DATA_ROOT to the prepared database and uploads directory}/files
+        target: /app/files
+        bind:
+          create_host_path: false
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:18081/', headers={'Host':'testing.nc3.lu'}), timeout=10)"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+  proxy:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: proxy
+    network_mode: host
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "--header=Host: testing.nc3.lu", "http://127.0.0.1:18080/"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

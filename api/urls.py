@@ -32,7 +32,7 @@ from .views import (
 urlpatterns = [
     path("check-auth/", CheckAuthApiView.as_view(), name="token_obtain_pair"),
     path("logout/", LogoutView.as_view(), name="logout"),
-    path("token/", LoginApiView.as_view(), name="login"),
+    path("token/", LoginApiView.as_view(), name="token"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("schema/", SpectacularAPIView.as_view(), name="testing"),
     path(

@@ -15,6 +15,7 @@ COPY . /app/
 COPY deploy/start.sh /app/start.sh
 RUN chmod 755 /app/start.sh \
     && mkdir -p /app/db /app/files \
+    && mkdir -p /run/testingplatform && chown www-data:www-data /run/testingplatform \
     && DEBUG=1 python manage.py collectstatic --noinput \
     && test ! -e /app/db/db.sqlite3
 ENV DJANGO_SETTINGS_MODULE=deploy.settings

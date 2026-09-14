@@ -18,12 +18,19 @@ Do not use `down -v`, volume pruning, database resets, or flush commands.
 Database migrations are intentionally not run on startup. Schema changes need a
 reviewed migration and a verified backup before the corresponding code is deployed.
 
-Apache continues to terminate HTTPS and renew the existing certificate, proxying
-to `127.0.0.1:18080`. The nginx container serves static assets built from the same
-source and proxies Django to `127.0.0.1:18081`. Neither container listens on a public
-address. Host networking preserves IPv6 testing and access to local services when needed.
-The former mod_wsgi application must be disabled at cutover; retaining Apache as
-the HTTPS proxy does not keep the legacy application running.
+Traefik on the Dokploy remote terminates HTTPS and manages certificate renewal.
+In the Compose service's Dokploy Domains settings, route `testing.nc3.lu`, path
+`/`, to service `proxy`, port `80`, with HTTPS and the `letsencrypt` resolver.
+The nginx container joins `dokploy-network`, serves the built static assets and
+forwards Django requests over the private `runtime` volume's Unix socket.
+Its loopback-only `127.0.0.1:18080` mapping supports local health checks.
+
+The Django container retains host networking for IPv6 network tests and local
+SMTP access, but Gunicorn has no TCP listener. Only the web and nginx containers
+mount the socket volume. Traefik sets `X-Forwarded-Proto`, nginx preserves it,
+and the deployment settings recognize public HTTPS for generated links and CSRF.
+Apache and its former mod_wsgi application are stopped and disabled at cutover;
+neither is part of the production request path afterward.
 
 Mail settings (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`, `EMAIL_HOST_USER`,
 `EMAIL_HOST_PASSWORD`, `DEFAULT_FROM_EMAIL`) are supplied privately in Dokploy.
@@ -33,7 +40,7 @@ state; enabling a worker requires reviewing the existing scheduled tasks first.
 Validate changes with:
 
 ```sh
-python -m unittest discover -s deploy/tests -v
+DJANGO_SETTINGS_MODULE=deploy.settings python -m unittest discover -s deploy/tests -v
 docker compose -f deploy/compose.yml config --quiet
 ```
 

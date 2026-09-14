@@ -5,7 +5,7 @@ services:
       dockerfile: deploy/Dockerfile
       target: app
     # Preserve the existing host IPv6 routing used by network tests.
-    # Gunicorn binds only to loopback; Apache provides public HTTPS.
+    # Gunicorn serves a private socket; Traefik provides public HTTPS.
     network_mode: host
     restart: unless-stopped
     init: true
@@ -31,8 +31,9 @@ services:
         target: /app/files
         bind:
           create_host_path: false
+      - runtime:/run/testingplatform
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:18081/', headers={'Host':'testing.nc3.lu'}), timeout=10)"]
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(socket.AF_UNIX); s.settimeout(10); s.connect('/run/testingplatform/gunicorn.sock'); s.sendall(b'GET / HTTP/1.0\\r\\nHost: testing.nc3.lu\\r\\n\\r\\n'); assert b' 200 ' in s.recv(64)"]
       interval: 30s
       timeout: 15s
       retries: 3
@@ -47,13 +48,18 @@ services:
       context: ..
       dockerfile: deploy/Dockerfile
       target: proxy
-    network_mode: host
+    networks:
+      - dokploy-network
+    ports:
+      - "127.0.0.1:18080:80"
+    volumes:
+      - runtime:/run/testingplatform:ro
     restart: unless-stopped
     depends_on:
       web:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "--header=Host: testing.nc3.lu", "http://127.0.0.1:18080/"]
+      test: ["CMD", "wget", "-q", "--spider", "--header=Host: testing.nc3.lu", "http://127.0.0.1/"]
       interval: 30s
       timeout: 15s
       retries: 3
@@ -62,3 +68,10 @@ services:
       options:
         max-size: 10m
         max-file: "3"
+
+networks:
+  dokploy-network:
+    external: true
+
+volumes:
+  runtime:

@@ -6,5 +6,6 @@ if [ ! -s db/db.sqlite3 ]; then
     exit 78
 fi
 exec python -m gunicorn testing_platform.wsgi:application \
-    --bind 127.0.0.1:18081 --workers 1 --worker-class gthread --threads 2 \
+    --bind unix:/run/testingplatform/gunicorn.sock --umask 0111 \
+    --workers 1 --worker-class gthread --threads 2 \
     --timeout 330 --graceful-timeout 330 --access-logfile - --error-logfile -

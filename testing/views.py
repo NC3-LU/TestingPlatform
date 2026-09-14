@@ -29,7 +29,7 @@ from django.template.loader import get_template
 
 from testing_platform import settings
 
-from .forms import DMARCRecordForm, SPFRecordForm
+from .forms import DMARCRecordForm, SPFRecordForm, WebTestForm
 from .helpers import (
     check_soa_record,
     file_check,
@@ -131,7 +131,13 @@ def test_landing(request):
 @csrf_exempt
 def check_website_security(request):
     if request.method == 'POST':
-        domain = request.POST.get('target')
+        form = WebTestForm(request.POST)
+        if not form.is_valid():
+            return render(request, 'check_webapp.html', {
+                'error': form.errors['target'][0],
+                'target': request.POST.get('target', ''),
+            }, status=400)
+        domain = form.cleaned_data['target']
 
         csp_result = check_csp(domain)
         cookies_result = check_cookies(domain)

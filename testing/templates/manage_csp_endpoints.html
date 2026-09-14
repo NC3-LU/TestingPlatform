@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Manage CSP Report Endpoints</h2>
+                <a href="{% url 'create_csp_endpoint' %}" class="btn btn-primary">Create New Endpoint</a>
+            </div>
+
+            {% if endpoints %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Allowed Origin</th>
+                                        <th>Endpoint URL</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for endpoint in endpoints %}
+                                    <tr>
+                                        <td>{{ endpoint.allowed_origin }}</td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm"
+                                                       value="{{ request.scheme }}://{{ request.get_host }}/csp/report/{{ endpoint.endpoint_uuid }}/"
+                                                       id="endpoint-{{ endpoint.id }}" readonly>
+                                                <button class="btn btn-outline-secondary btn-sm" type="button"
+                                                        onclick="copyToClipboard('endpoint-{{ endpoint.id }}')">
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if endpoint.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ endpoint.is_active|yesno:"Active,Inactive" }}
+                                            </span>
+                                        </td>
+                                        <td>{{ endpoint.created_at|date:"Y-m-d H:i" }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'view_csp_reports' endpoint.endpoint_uuid %}"
+                                                   class="btn btn-info">View Reports</a>
+                                                <form method="POST" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="endpoint_uuid" value="{{ endpoint.endpoint_uuid }}">
+                                                    <input type="hidden" name="action" value="toggle">
+                                                    <button type="submit" class="btn btn-warning">
+                                                        {{ endpoint.is_active|yesno:"Disable,Enable" }}
+                                                    </button>
+                                                </form>
+                                                <form method="POST" style="display: inline;"
+                                                      onsubmit="return confirm('Are you sure you want to delete this endpoint?');">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="endpoint_uuid" value="{{ endpoint.endpoint_uuid }}">
+                                                    <input type="hidden" name="action" value="delete">
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No CSP report endpoints configured yet. Create one to start monitoring CSP violations.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    element.select();
+    document.execCommand('copy');
+
+    const button = element.nextElementSibling;
+    const originalText = button.innerText;
+    button.innerText = 'Copied!';
+    setTimeout(() => button.innerText = originalText, 2000);
+}
+</script>
+{% endblock %}

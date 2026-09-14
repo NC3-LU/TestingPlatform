@@ -12,3 +12,10 @@ node_modules/
 poetry.lock
 poetry.lock*
 docs/_build/
+.env
+.env.*
+!.env.example
+venv.*
+.venv*
+*.sqlite3
+*.sqlite3-*

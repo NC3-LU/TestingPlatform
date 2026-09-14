@@ -1,0 +1,77 @@
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: app
+    # Preserve the existing host IPv6 routing used by network tests.
+    # Gunicorn serves a private socket; Traefik provides public HTTPS.
+    network_mode: host
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 340s
+    environment:
+      DEBUG: "0"
+      SECRET_KEY: ${SECRET_KEY:?Set the production Django signing key in Dokploy}
+      ALLOWED_HOSTS: testing.nc3.lu,localhost
+      EMAIL_HOST: ${EMAIL_HOST:-localhost}
+      EMAIL_PORT: ${EMAIL_PORT:-25}
+      EMAIL_USE_TLS: ${EMAIL_USE_TLS:-0}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-webmaster@localhost}
+    volumes:
+      - type: bind
+        source: ${TESTING_DATA_ROOT:?Set TESTING_DATA_ROOT to the prepared database and uploads directory}/db
+        target: /app/db
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${TESTING_DATA_ROOT:?Set TESTING_DATA_ROOT to the prepared database and uploads directory}/files
+        target: /app/files
+        bind:
+          create_host_path: false
+      - runtime:/run/testingplatform
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(socket.AF_UNIX); s.settimeout(10); s.connect('/run/testingplatform/gunicorn.sock'); s.sendall(b'GET / HTTP/1.0\\r\\nHost: testing.nc3.lu\\r\\n\\r\\n'); assert b' 200 ' in s.recv(64)"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+  proxy:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: proxy
+    networks:
+      - dokploy-network
+    ports:
+      - "127.0.0.1:18080:80"
+    volumes:
+      - runtime:/run/testingplatform:ro
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "--header=Host: testing.nc3.lu", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+networks:
+  dokploy-network:
+    external: true
+
+volumes:
+  runtime:

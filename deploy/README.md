@@ -18,10 +18,17 @@ Do not use `down -v`, volume pruning, database resets, or flush commands.
 Database migrations are intentionally not run on startup. Schema changes need a
 reviewed migration and a verified backup before the corresponding code is deployed.
 
-Configure an HTTPS reverse proxy to forward requests to the nginx service
-on `127.0.0.1:18080`. The nginx service serves static assets and forwards
-application requests to Gunicorn on `127.0.0.1:18081`. Host networking
-supports IPv6 network tests.
+Traefik terminates HTTPS and manages certificate renewal.
+In the Compose service's Dokploy Domains settings, route `testing.nc3.lu`, path
+`/`, to service `proxy`, port `80`, with HTTPS and the `letsencrypt` resolver.
+The nginx container joins `dokploy-network`, serves the built static assets and
+forwards Django requests over the private `runtime` volume's Unix socket.
+Its loopback-only `127.0.0.1:18080` mapping supports local health checks.
+
+The Django container uses host networking for IPv6 network tests.
+Gunicorn listens on a Unix socket. Only the web and nginx containers
+mount the socket volume. Traefik sets `X-Forwarded-Proto`, nginx preserves it,
+and the deployment settings recognize public HTTPS for generated links and CSRF.
 
 Mail settings (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`, `EMAIL_HOST_USER`,
 `EMAIL_HOST_PASSWORD`, `DEFAULT_FROM_EMAIL`) are supplied privately in Dokploy.
@@ -29,7 +36,7 @@ Mail settings (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`, `EMAIL_HOST_USER`,
 Validate changes with:
 
 ```sh
-python -m unittest discover -s deploy/tests -v
+DJANGO_SETTINGS_MODULE=deploy.settings python -m unittest discover -s deploy/tests -v
 docker compose -f deploy/compose.yml config --quiet
 ```
 

@@ -42,6 +42,7 @@ class StartGuardTests(unittest.TestCase):
             )
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertIn("gunicorn", r.stdout)
+            self.assertIn("unix:/run/testingplatform/gunicorn.sock", r.stdout)
             self.assertNotIn("migrate", r.stdout)
             self.assertEqual(db.read_bytes(), before)
 

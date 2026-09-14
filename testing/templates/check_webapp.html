@@ -31,9 +31,10 @@
                 <span class="text-danger">{{ error }}</span>
                 {% endif %}
                 <div class="mb-3">
-                    <label class="mb-1">Enter your domain name:</label>
+                    <label class="mb-1" for="target">Enter your domain name or website URL:</label>
                     <input class="form-control" type="text" placeholder="domain.com" id="target" name="target"
-                           value="{{ domain }}" required>
+                           value="{% firstof target domain %}" maxlength="2048" required>
+                    <small class="form-text">For example, test-domain.lu or https://www.test-domain.lu/. The tests check the hostname's homepage.</small>
                 </div>
                 <input type="submit" value="Test"
                        class="text-white button-text-background primary-primary-blue_background">

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2>CSP Violation Reports for {{ endpoint.allowed_origin }}</h2>
+
+            {% if reports %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Violated Directive</th>
+                                        <th>Blocked URI</th>
+                                        <th>Document URI</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for report in reports %}
+                                    <tr>
+                                        <td>{{ report.timestamp|date:"Y-m-d H:i:s" }}</td>
+                                        <td>{{ report.report_data.violated-directive|default:report.report_data.effective-directive }}</td>
+                                        <td>{{ report.report_data.blocked-uri }}</td>
+                                        <td>{{ report.report_data.document-uri }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info"
+                                                    onclick="showDetails('{{ report.report_data|escapejs }}')">
+                                                View Details
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info">No CSP violation reports received yet.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Report Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <pre><code id="detailsContent"></code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showDetails(reportData) {
+    const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+    document.getElementById('detailsContent').textContent =
+        JSON.stringify(JSON.parse(reportData), null, 2);
+    modal.show();
+}
+</script>
+{% endblock %}

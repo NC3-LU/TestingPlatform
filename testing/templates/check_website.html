@@ -29,7 +29,9 @@
       <form method="post">
         {% csrf_token %}
         {% if error %}
-        <span class="text-danger">{{ error }}</span>
+        <div class="alert alert-danger" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+        </div>
         {% endif %}
         <div class="mb-3">
           <label class="mb-1">
@@ -48,8 +50,9 @@
     </div>
   </div>
 
-
-  {% include "web-test_report.html" %}
+  {% if domain and not error %}
+    {% include "web-test_report.html" %}
+  {% endif %}
 
 </main>
 <br>

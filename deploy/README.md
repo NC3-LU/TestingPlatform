@@ -21,10 +21,12 @@ reviewed migration and a verified backup before the corresponding code is deploy
 Apache continues to terminate HTTPS and renew the existing certificate, proxying
 to `127.0.0.1:18080`. The nginx container serves static assets built from the same
 source and proxies Django to `127.0.0.1:18081`. Neither container listens on a public
-address. Host networking preserves IPv6 testing and the loopback-only SMTP relay.
+address. Host networking preserves IPv6 testing and access to local services when needed.
 The former mod_wsgi application must be disabled at cutover; retaining Apache as
 the HTTPS proxy does not keep the legacy application running.
 
+Mail settings (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`, `EMAIL_HOST_USER`,
+`EMAIL_HOST_PASSWORD`, `DEFAULT_FROM_EMAIL`) are supplied privately in Dokploy.
 The original service had no active Django Q worker. This deployment preserves that
 state; enabling a worker requires reviewing the existing scheduled tasks first.
 

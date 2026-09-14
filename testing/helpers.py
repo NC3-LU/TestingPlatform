@@ -931,8 +931,12 @@ def analyze_csp(csp, result, header_name):
 
 
 def parse_csp(csp):
-    return dict(
-        directive.split(None, 1) for directive in csp.split(';') if directive.strip())
+    directives = {}
+    for directive in csp.split(';'):
+        parts = directive.split(None, 1)
+        if parts:
+            directives.setdefault(parts[0].lower(), parts[1] if len(parts) > 1 else '')
+    return directives
 
 
 def check_unsafe_directives(directives, result, header_name):
@@ -967,7 +971,9 @@ def check_overly_permissive_directives(directives, result, header_name):
 
 
 def check_csp_syntax(csp, result, header_name):
-    if not re.match(r'^[a-zA-Z0-9\-]+\s+[^;]+(?:;\s*[a-zA-Z0-9\-]+\s+[^;]+)*$', csp):
+    directives = (part.strip() for part in csp.split(';') if part.strip())
+    if any(not re.fullmatch(r'[a-zA-Z0-9-]+(?:[ \t]+[^\r\n;,]*)?', part)
+           for part in directives):
         result['issues'].append(f"{header_name}: CSP syntax appears to be invalid.")
         result['recommendations'].append("Review and correct the CSP syntax.")
 
@@ -1022,7 +1028,7 @@ def check_cookies(domain: str) -> Dict[str, Any]:
             'cookies': cookie_details,
             'message': message
         }
-    except RequestException as e:
+    except requests.RequestException as e:
         return {
             'status': False,
             'cookies': [],
@@ -1322,7 +1328,18 @@ def check_hsts(domain: str) -> Dict[str, Union[bool, str, Dict[str, Union[str, b
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         hsts_header = response.headers.get('strict-transport-security')
-        parsed_hsts = parse_hsts_header(hsts_header) if hsts_header else {}
+        try:
+            parsed_hsts = parse_hsts_header(hsts_header) if hsts_header else {}
+        except ValueError as e:
+            return {
+                'status': False,
+                'data': f'Invalid HSTS header: {e}',
+                'parsed': {},
+                'http_status': response.status_code,
+                'preload_ready': False,
+                'strength': 'Invalid',
+                'recommendations': ['Provide one non-negative integer max-age value.']
+            }
 
         preload_ready = parsed_hsts.get('preload', False)
         strength, recommendations = evaluate_hsts_strength(parsed_hsts)
@@ -1380,13 +1397,21 @@ def parse_hsts_header(header: str) -> Dict[str, Union[str, bool, int]]:
     components = header.split(';')
     parsed = {}
     for component in components:
-        component = component.strip().lower()
-        if component.startswith('max-age='):
-            parsed['max-age'] = int(component.split('=')[1])
-        elif component == 'includesubdomains':
+        name, separator, value = component.partition('=')
+        name = name.strip().lower()
+        if name == 'max-age':
+            value = value.strip()
+            if len(value) >= 2 and value.startswith('"') and value.endswith('"'):
+                value = value[1:-1]
+            if not separator or not re.fullmatch(r'[0-9]+', value) or 'max-age' in parsed:
+                raise ValueError('max-age must appear once and contain a non-negative integer.')
+            parsed['max-age'] = int(value)
+        elif name == 'includesubdomains' and not separator:
             parsed['includeSubDomains'] = True
-        elif component == 'preload':
+        elif name == 'preload' and not separator:
             parsed['preload'] = True
+    if 'max-age' not in parsed:
+        raise ValueError('The required max-age directive is missing.')
     return parsed
 
 

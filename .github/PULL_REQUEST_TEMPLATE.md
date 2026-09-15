@@ -6,6 +6,11 @@
 * Any major changes adding a functionality should be disabled by default in the configuration
 
 
+<!-- This repository is public. Describe the change, resulting behavior, and
+validation. Keep partnership or business decisions, internal discussions,
+deployment status, private infrastructure details, and credentials out of PR
+titles, descriptions, comments, and commit messages. Use generic examples. -->
+
 #### What does it do?
 
 If it fixes an existing issue, please use GitHub syntax: `#<IssueID>`
@@ -13,7 +18,10 @@ If it fixes an existing issue, please use GitHub syntax: `#<IssueID>`
 #### Questions
 
 - [ ] Does it require a DB change?
-- [ ] Are you using it in production?
+
+#### Validation
+
+Describe the checks performed and their results using non-sensitive examples.
 
 #### Release Type:
 - [ ] Major
